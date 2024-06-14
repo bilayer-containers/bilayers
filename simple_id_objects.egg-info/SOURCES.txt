@@ -1,0 +1,15 @@
+README.md
+setup.py
+Algorithms/__init__.py
+Algorithms/threshold/__init__.py
+Algorithms/threshold/threshold.py
+Build/__init__.py
+Build/Dockerfiles/__init__.py
+Build/parse/__init__.py
+Build/parse/generate.py
+Build/parse/gradio_threshold_app.py
+Build/parse/parser.py
+simple_id_objects.egg-info/PKG-INFO
+simple_id_objects.egg-info/SOURCES.txt
+simple_id_objects.egg-info/dependency_links.txt
+simple_id_objects.egg-info/top_level.txt

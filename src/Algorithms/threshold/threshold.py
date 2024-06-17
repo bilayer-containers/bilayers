@@ -22,6 +22,7 @@ def example_function(image_list, threshold_method, min_size, max_size):
         # Load the image
         print("My Input Image Path: ", image_path)
         image = skimage.io.imread(image_path.name)
+        
 
         # Threshold the image
         if threshold_method.casefold() == "otsu":
@@ -48,8 +49,10 @@ def example_function(image_list, threshold_method, min_size, max_size):
         labeled_image[area_image > max_allowed_area] = 0
 
         # Construct filename from input
-        base_filename = os.path.basename(image_path.name).split(".")[0]
-        base_dir = os.path.dirname(image_path.name)
+
+        base_filename = os.path.basename(image_path).split(".")[0]
+        base_dir = os.path.dirname(image_path)
+
         output_filename = os.path.join(base_dir, base_filename + "_output.tiff")
         
         # Save file

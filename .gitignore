@@ -29,3 +29,4 @@ flagged/
 # pixi environments
 .pixi
 *.egg-info
+test.ipynb

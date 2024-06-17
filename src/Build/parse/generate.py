@@ -149,5 +149,6 @@ def main():
         nbf.write(jupyter_app_code, f)
     print("Jupyter notebook saved at generated_notebook.ipynb")
 
+
 if __name__ == "__main__":
     main()

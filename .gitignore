@@ -18,3 +18,7 @@ frozen_version.py
 .mypy_cache/
 *.sqlite3
 _version.py
+.nox/
+app.py
+__pycache__/
+flagged/

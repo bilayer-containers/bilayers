@@ -1,6 +1,6 @@
 import yaml
 
-def parse_config(config_path="../../Algorithms/threshold/config.yaml"):
+def parse_config(config_path="../../../src/Algorithms/threshold/config.yaml"):
     with open(config_path, 'r') as file:
         config = yaml.safe_load(file)
     return config

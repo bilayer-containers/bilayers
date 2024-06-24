@@ -1,5 +1,6 @@
 import os
-from parser import parse_config 
+# Importing parse function from parse.py
+from parse import parse_config
 
 def generate_gradio_app(inputs, outputs, exec_function):
     inputs_code = []
@@ -26,7 +27,6 @@ def generate_gradio_app(inputs, outputs, exec_function):
     # Get the function name and script name
     function_name = exec_function['name']
     script_name = exec_function['script']
-    sc = exec_function['module'] + '.' + script_name
 
 
     gradio_app_code = f"""
@@ -36,7 +36,7 @@ import scipy
 import numpy
 import os
 # Import the function from the script
-from {sc} import {function_name}
+from {script_name} import {function_name}
 
 # Inputs to be shown in the GUI
 inputs = [

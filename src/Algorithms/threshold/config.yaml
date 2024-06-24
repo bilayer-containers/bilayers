@@ -28,4 +28,7 @@ output:
 exec_function: 
   name: "example_function"
   script: "threshold"
-  module: "Algorithms.threshold"
+  module: "src.Algorithms.threshold"
+
+docker-image:
+  name: "threshold-image"

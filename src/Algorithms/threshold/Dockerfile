@@ -1,19 +1,13 @@
 # Define an image to start from 
-#FROM bethcimini/docker-gradio-demo:latest
-FROM gradio-base:latest
+FROM python:3.10.0-slim
 
 # Set the working directory within the container
-WORKDIR /workspace
+WORKDIR /bilayers
 
-# Install the dependencies for the gradio app
+# Install the dependencies for the specific algorithm
 RUN python -m pip install scipy==1.9.1 scikit-image==0.20.0
 
-# Add app.py from the directory where `docker build` was run and add it into the
+# Add algorithm_name.py from the directory where `docker build` was run and add it into the
 # workspace directory within the container
-ADD /Algorithms /workspace/
-
-# Expose port 8000. You CAN do this from the command line, but it makes it possible to run entirely in the app
-EXPOSE 8000
-
-# Run the app. Will be accessible at http://localhost:8000/
-CMD [ "python3" , "/workspace/Algorithms/threshold.py" ]
+ADD config.yaml /bilayers/
+ADD threshold.py /bilayers/

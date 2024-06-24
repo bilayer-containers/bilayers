@@ -54,6 +54,7 @@ jobs:
     pull_request:
         branches:
         - main
+        - v0.1_mvp_thresh
 
 jobs:
     build:
@@ -67,7 +68,7 @@ jobs:
         - name: Set up Python 3.9
           uses: actions/setup-python@v3
           with:
-            python-version: 3.
+            python-version: 3.9
         
         - name: Install nox
           run: pip install nox

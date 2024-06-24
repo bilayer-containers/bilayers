@@ -22,9 +22,9 @@ for ALGORITHM_NAME in "${ALGORITHM_NAMES[@]}":
         nox -s run_generate
 
         # Building the Algorithm Docker image
-        nox -s build_algorithm -- ${ALGORITHM_NAME}-image
+        nox -s build_algorithm -- $ALGORITHM_NAME
 
         # Building the Interface Docker image
-        nox -s build_interface -- ${INTERFACE_NAME}-image
+        nox -s build_interface -- $INTERFACE_NAME
     done
 done

@@ -8,9 +8,9 @@ ALGORITHM_NAMES=("threshold")
 INTERFACE_NAMES=("gradio")  
 
 # Build the Docker images for each algorithm and interface
-for ALGORITHM_NAME in "${ALGORITHM_NAMES[@]}":
+for ALGORITHM_NAME in "${ALGORITHM_NAMES[@]}";
     do
-    for INTERFACE_NAME in "${INTERFACE_NAMES[@]}":
+    for INTERFACE_NAME in "${INTERFACE_NAMES[@]}";
         do
         echo "Processing Algorithm: $ALGORITHM_NAME, Interface: $INTERFACE_NAME"
 

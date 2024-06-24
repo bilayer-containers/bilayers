@@ -1,6 +1,9 @@
 import nox
 import os
+<<<<<<< HEAD
 import yaml
+=======
+>>>>>>> f18e05f ([Add] Github Actions workflow and the bash script to dynamically pull up Interfaces)
 
 @nox.session
 def run_parse(session):
@@ -12,7 +15,11 @@ def run_parse(session):
     
 @nox.session
 def run_generate(session):
+<<<<<<< HEAD
     session.install('pyyaml', 'jinja2')
+=======
+    session.install('pyyaml')
+>>>>>>> f18e05f ([Add] Github Actions workflow and the bash script to dynamically pull up Interfaces)
     session.cd('src/Build/parse')
     session.run('python', 'generate.py')
     session.cd('../../..')
@@ -22,6 +29,7 @@ def build_algorithm(session):
     """Build the Algorithm docker Image"""
     if len(session.posargs) > 0:
         algorithm = session.posargs[0] 
+<<<<<<< HEAD
         print("Algorithm Name in build_algorithm session: ", algorithm)
     else:
         algorithm = 'threshold'
@@ -90,3 +98,19 @@ def build_interface(session):
 def install_gradio(session):
     """Install Gradio"""
     session.install('gradio')
+=======
+    else:
+        algorithm = 'threshold'
+    image_name = f'{algorithm}-image'
+    dockerfile_path = f'src/Algorithms/{algorithm}/Dockerfile'
+
+    # If Dockerfile doesn't exist for the specified algorithm
+    if not os.path.exists(dockerfile_path):
+        session.error(f'Dockerfile for {algorithm} not found at {dockerfile_path}')
+    session.run('docker', 'build', '-t', image_name, '-f', dockerfile_path, f'src/Algorithms/{algorithm}')
+
+@nox.session
+def build_gradio(session):
+    """Build the Gradio docker Image"""
+    session.run('docker', 'build', '-t', 'gradio-image', '-f', 'src/build/Dockerfiles/Dockerfile', 'src/Build')
+>>>>>>> f18e05f ([Add] Github Actions workflow and the bash script to dynamically pull up Interfaces)

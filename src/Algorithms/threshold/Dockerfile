@@ -10,3 +10,7 @@ RUN python -m pip install scipy==1.9.1 scikit-image==0.20.0
 # Add algorithm_name.py from the directory where `docker build` was run and add it into the
 # workspace directory within the container
 ADD config.yaml /bilayers/
+<<<<<<< HEAD
+=======
+ADD threshold.py /bilayers/
+>>>>>>> f18e05f ([Add] Github Actions workflow and the bash script to dynamically pull up Interfaces)

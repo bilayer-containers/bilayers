@@ -21,6 +21,7 @@ _version.py
 .nox/
 app.py
 __pycache__/
+<<<<<<< HEAD
 flagged/
 .ipynb_checkpoints/
 .virtual_documents/
@@ -30,3 +31,6 @@ flagged/
 .pixi
 *.egg-info
 test.ipynb
+=======
+flagged/
+>>>>>>> f18e05f ([Add] Github Actions workflow and the bash script to dynamically pull up Interfaces)

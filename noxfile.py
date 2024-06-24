@@ -11,7 +11,7 @@ def run_parse(session):
     
 @nox.session
 def run_generate(session):
-    session.install('pyyaml')
+    session.install('pyyaml', 'jinja2')
     session.cd('src/Build/parse')
     session.run('python', 'generate.py')
     session.cd('../../..')

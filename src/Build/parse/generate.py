@@ -1,63 +1,27 @@
 import os
 # Importing parse function from parse.py
 from parse import parse_config
+from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-def generate_gradio_app(inputs, outputs, exec_function):
-    inputs_code = []
-    for input_conf in inputs:
-        print(f"Processing input: {input_conf}")  
-        if input_conf['type'] == 'Files':
-            inputs_code.append(f"gradio.Files(file_count='{input_conf['file_count']}', label='{input_conf['label']}')")
-        elif input_conf['type'] == 'Radio':
-            options = [opt['value'] for opt in input_conf['options']]
-            inputs_code.append(f"gradio.Radio({options}, type='value', value='{options[0]}', label='{input_conf['label']}')")
-        elif input_conf['type'] == 'Number':
-            inputs_code.append(f"gradio.Number(value={input_conf['value']}, interactive={input_conf['interactive']}, label='{input_conf['label']}')")
+def preprocess_config(config):
+    supported_input_types = {'Files', 'Radio', 'Number'}
+    supported_output_types = {'Files'}
 
-    outputs_code = []
-    for output_conf in outputs:
-        print(f"Processing output: {output_conf}")  
-        if output_conf['type'] == 'Files':
-            outputs_code.append(f"gradio.File(label='{output_conf['label']}')")
+    inputs = [input_conf for input_conf in config.get('inputs', []) if input_conf['type'] in supported_input_types]
+    outputs = [output_conf for output_conf in config.get('output', []) if output_conf['type'] in supported_output_types]
+    exec_function = config.get('exec_function', {})
 
-    # Convert the lists to strings
-    inputs_code_str = ",\n    ".join(inputs_code)
-    outputs_code_str = ",\n    ".join(outputs_code)
+    return inputs, outputs, exec_function
 
-    # Get the function name and script name
-    function_name = exec_function['name']
-    script_name = exec_function['script']
+def generate_gradio_app(template_path, inputs, outputs, exec_function):
+    env = Environment(
+        loader=FileSystemLoader(searchpath=os.path.dirname(template_path)),
+        autoescape=select_autoescape(['j2'])
+    )
 
+    template = env.get_template(os.path.basename(template_path))
 
-    gradio_app_code = f"""
-import gradio
-import skimage
-import scipy
-import numpy
-import os
-# Import the function from the script
-from {script_name} import {function_name}
-
-# Inputs to be shown in the GUI
-inputs = [
-    {inputs_code_str}
-]
-
-# Output to be shown in the GUI
-output = [
-    {outputs_code_str}
-]
-
-demo = gradio.Interface(
-    fn=example_function, 
-    inputs=inputs, 
-    outputs=output,
-    title="Simple ID objects"
-)
-
-if __name__ == "__main__":
-    demo.launch(server_name="0.0.0.0", server_port=8000)
-"""
+    gradio_app_code = template.render(inputs=inputs, outputs=outputs, exec_function=exec_function)
     return gradio_app_code
 
 def main():
@@ -65,16 +29,18 @@ def main():
 
     # inputs, outputs, exec_function = parse_config()
     config = parse_config()
-    inputs = config.get('inputs', [])
-    outputs = config.get('output', [])
-    exec_function = config.get('exec_function', {})
+    # inputs = config.get('inputs', [])
+    # outputs = config.get('output', [])
+    # exec_function = config.get('exec_function', {})
+    inputs, outputs, exec_function = preprocess_config(config)
 
+    template_path = "template.j2"
+    # Generating the gradio algorithm+interface app dynamically
+    gradio_app_code = generate_gradio_app(template_path, inputs, outputs, exec_function)
     # print(f"Inputs:", inputs)  
     # print(f"Outputs: {outputs}")  
     # print(f"Exec Function: {exec_function}")  
 
-    # Generating Tool+Interface Specific Code
-    gradio_app_code = generate_gradio_app(inputs, outputs, exec_function)
     with open('app.py', 'w') as f:
         f.write(gradio_app_code)
     print("app.py generated successfully!!")

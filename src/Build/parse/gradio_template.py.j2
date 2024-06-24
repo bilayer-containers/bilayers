@@ -1,0 +1,254 @@
+import os
+import gradio as gr
+import subprocess
+import tempfile
+import shutil
+
+def generate_cli_command(cli_tags, **kwargs):
+    cli_command = ["{{ exec_function.cli_command }}"]
+
+    # Radio options mapping
+    radio_options = {
+    {% for input_conf in inputs if input_conf.type == 'Radio' %}
+        "{{ input_conf.label | lower | replace(' ', '_') }}": {
+            {% for option in input_conf.options %}
+            "{{ option.label }}": "{{ option.value }}"{% if not loop.last %}, {% endif %}
+            {% endfor %}
+        }{% if not loop.last %}, {% endif %}
+    {% endfor %}
+    }
+
+    temp_dir = None
+    volume_mount_folder_name = None
+
+    # Update cli_args with user inputs or defaults
+    for key, value in kwargs.items():
+        if key in cli_tags:
+            cli_tag = cli_tags[key]["cli_tag"]
+            default = cli_tags[key].get("default", None)
+
+            if isinstance(value, bool):
+                if value:  # Only include the flag if it is True
+                    cli_command.append(cli_tag)
+            else:
+                # Handle Radio type mappings dynamically
+                if key in radio_options and value in radio_options[key]:
+                    value = radio_options[key][value]
+                    if value == "None":
+                        continue
+                # If the input is a list (mainly for input files), convert it to a string
+                elif isinstance(value, list):
+                    # If the Volume_Mount is True, then specify the path in docker-desktop
+                    # Otherwise, use the approach to copy the files to the temp folder
+                    volume_mount = cli_tags[key].get("volume_mount")
+                    print(f"volume_mount: {volume_mount}") 
+                    if volume_mount is True:
+                        print("Volume Mount is True")
+                        # Use the Volume Mount Specified directory
+                        volume_mount_folder_name = cli_tags[key].get("folder_name")
+                        print("Volume Mount Folder Name:", volume_mount_folder_name)
+                        value = volume_mount_folder_name
+                    else:
+                        print("Volume Mount is False")
+                        # Create a temporary directory and move all the input files there - By not using the Volume Mount
+                        temp_dir = tempfile.mkdtemp()
+                        for file_path in value:
+                            shutil.copy(file_path, temp_dir)
+                        value = temp_dir
+                # If the value of textbox is empty string, set it to None
+                if value == "":
+                    value = None
+                # If the value is None, append it
+                if value is not None:
+                    cli_command.append(f"{cli_tag} {value}")
+
+   # Add hidden arguments to the command
+    {% if exec_function.hidden_args %}
+    {% for arg in exec_function.hidden_args %}
+    if {{ arg.value }} == True:
+        cli_command.append("{{ arg.cli_tag }}")
+    else:
+        cli_command.append("{{ arg.cli_tag }} {{ arg.value }}")
+    {% endfor %}
+    {% endif %}
+    
+    return " ".join(cli_command), temp_dir, volume_mount_folder_name
+
+# Dynamically define on_submit with the exact input arguments
+def on_submit(
+{% for input_conf in inputs %}
+{% if input_conf.type == 'Files' %}
+{{input_conf.label | lower | replace(" ", "_")}}_description {% if not loop.last %}, {% endif %}
+{{ input_conf.label | lower | replace(" ", "_") }}{% if not loop.last %}, {% endif %}
+{% else %}
+{{ input_conf.label | lower | replace(" ", "_") }}{% if not loop.last %}, {% endif %}
+{% endif %}
+{% endfor %}
+):
+
+    kwargs = {
+    {% for input_conf in inputs %}
+        "{{ input_conf.label | lower | replace(' ', '_') }}": {{ input_conf.label | lower | replace(' ', '_') }}{% if not loop.last %}, {% endif %}
+    {% endfor %}
+    }
+
+    # Mapping of input tags to CLI tags
+    cli_tags = {
+    {% for input_conf in inputs %}
+    "{{ input_conf.label | lower | replace(' ', '_') }}": {
+        "cli_tag": "{{ input_conf.cli_tag }}",
+        "default": "{{ input_conf.default }}",
+        {% if input_conf.type == 'Files' %}
+        "volume_mount": {{ input_conf.volume_mount }},
+        "folder_name": "{{ input_conf.folder_name }}"
+        {% endif %}
+    }{% if not loop.last %}, {% endif %}
+    {% endfor %}
+}
+
+
+    print("Received inputs:", kwargs)
+
+    # Generate the CLI command
+    {#cli_command, temp_dir = generate_cli_command(cli_tags, **kwargs)#}
+    cli_command, temp_dir, volume_mount_folder_name = generate_cli_command(cli_tags, **kwargs)
+    print("Generated CLI command:", cli_command)
+
+    # If the Volume Mount is True
+    if temp_dir:
+        print("Files copied to temporary directory")
+    else:
+        # List of files before running the command
+        before_files = set(os.listdir(volume_mount_folder_name))
+
+    # Execute the CLI command
+    try:
+        result = subprocess.run(cli_command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        print("Command output:", result.stdout.decode())
+
+        
+        # Display Output files
+        output_files = []
+        if temp_dir:
+            output_files.extend([os.path.join(temp_dir, f) for f in os.listdir(temp_dir) if os.path.isfile(os.path.join(temp_dir, f))])
+        else:
+            # All the files fetched after running the command
+            after_files = set(os.listdir(volume_mount_folder_name))
+
+            # Only the output files
+            new_files = list(after_files - before_files)
+            output_files = [os.path.join(volume_mount_folder_name, f) for f in new_files if os.path.isfile(os.path.join(volume_mount_folder_name, f))]
+
+
+        return output_files
+
+    except subprocess.CalledProcessError as e:
+        error_message = "Please take a screenshot of this error and raise an issue at the Bilayers repository on GitHub."
+        error_message += f"Command failed with error: {e.stderr.decode()}\n\n"
+        raise gr.Error(error_message)
+        
+
+# Initialize lists for Beginner and Advanced sections
+beginner_inputs = []
+advanced_inputs = []
+
+{# 
+beginner_mode = gr.HTML(value="<h2><center>Beginner's Mode</center></h2>")
+advanced_mode = gr.HTML(value="<h2><center>Advanced Mode</center></h2>")
+
+beginner_inputs.append(beginner_mode)
+advanced_inputs.append(advanced_mode) #}
+
+{% for input_conf in inputs %}
+
+{% if input_conf.type == 'Radio' %}
+{{ input_conf.label | lower | replace(" ", "_") }} = gr.Radio(label="{{ input_conf.label }}", info="{{ input_conf.description }}",  choices=[{% for option in input_conf.options %}"{{ option.label }}"{% if not loop.last %}, {% endif %}{% endfor %}], value="{{ input_conf.default }}")
+{% elif input_conf.type == 'Integer' %}
+{{ input_conf.label | lower | replace(" ", "_") }} = gr.Number(label="{{ input_conf.label }}", info="{{ input_conf.description }}", value={{ input_conf.default }})
+{% elif input_conf.type == 'Float' %}
+{{ input_conf.label | lower | replace(" ", "_") }} = gr.Number(label="{{ input_conf.label }}", info="{{ input_conf.description }}", value={{ input_conf.default }})
+{% elif input_conf.type == 'Textbox' %}
+{{ input_conf.label | lower | replace(" ", "_") }} = gr.Textbox(label="{{ input_conf.label }}", info="{{ input_conf.description }}", value="{{ input_conf.default }}")
+{% elif input_conf.type == 'Checkbox' %}
+{{ input_conf.label | lower | replace(" ", "_") }} = gr.Checkbox(label="{{ input_conf.label }}", info="{{ input_conf.description }}", value={{ input_conf.value }})
+{% elif input_conf.type == 'Files' %}
+{% if input_conf.volume_mount %}
+{{ input_conf.label | lower | replace(" ", "_") }}_description = gr.Markdown(value="{{ input_conf.description }}")
+{{ input_conf.label | lower | replace(" ", "_") }} = gr.FileExplorer(label="{{ input_conf.label }}", file_count="{{ input_conf.file_count }}")
+{% else %}
+{{ input_conf.label | lower | replace(" ", "_") }}_description = gr.Markdown(value="{{ input_conf.description }}")
+{{ input_conf.label | lower | replace(" ", "_") }} = gr.Files(label="{{ input_conf.label }}", file_count="{{ input_conf.file_count }}")
+{% endif %}
+{% endif %}
+{% if input_conf.mode == "beginner" %}
+{% if input_conf.type == 'Files' %}
+{% endif %}
+{% endif %}
+
+{# {% if input_conf.mode == "beginner" %}
+{% if input_conf.type == 'Files' %}
+beginner_inputs.append({{input_conf.label | lower | replace(" ", "_")}}_description)
+beginner_inputs.append({{ input_conf.label | lower | replace(" ", "_") }})
+{% else %}
+beginner_inputs.append({{ input_conf.label | lower | replace(" ", "_") }})
+{% endif %}
+{% elif input_conf.mode == "advanced" %}
+{% if input_conf.type == 'Files' %}
+advanced_inputs.append({{input_conf.label | lower | replace(" ", "_")}}_description)
+advanced_inputs.append({{ input_conf.label | lower | replace(" ", "_") }})
+{% else %}
+advanced_inputs.append({{ input_conf.label | lower | replace(" ", "_") }})
+{% endif %}
+{% endif %}#}
+
+{% endfor %}  
+
+
+description_text = "Please cite the following while using Bilayers - Gradio Interface!\n\n"
+
+{% for citation in citations.Bilayers %}
+description_text += f"{{citation.name}}: {{citation.license}} - {{citation.description}}\n\n"
+{% endfor %}
+
+{% for citation in citations.Gradio %}
+description_text += f"{{citation.name}}: {{citation.doi}} - {{citation.description}}\n\n"
+{% endfor %}
+
+{% for citation in citations.Algorithm %}
+description_text += f"{{citation.name}}: {{citation.doi}} - {{citation.description}}\n\n"
+{% endfor %}
+
+
+{% for output_conf in outputs %}
+{% if output_conf.type == 'Files' %}
+{% endif %}
+{% endfor %}
+
+
+{# inputs = beginner_inputs + advanced_inputs #}
+
+
+inputs = [
+
+{% for input_conf in inputs %}
+{% if input_conf.type == 'Files' %}
+    {{input_conf.label | lower | replace(" ", "_")}}_description {% if not loop.last %}, {% endif %}
+    {{ input_conf.label | lower | replace(" ", "_") }}{% if not loop.last %}, {% endif %}
+{% else %}
+    {{ input_conf.label | lower | replace(" ", "_") }}{% if not loop.last %}, {% endif %}
+{% endif %}
+{% endfor %}
+]
+
+output = gr.Files(label="{{ outputs[0].label }}")
+
+app = gr.Interface(
+    fn=on_submit, 
+    inputs=inputs, 
+    outputs=output, 
+    title="Gradio App",
+    description=f"<div style='text-align: center'>{description_text}</div>"
+)
+
+if __name__ == "__main__":
+    app.launch(server_name="0.0.0.0", server_port=8000)

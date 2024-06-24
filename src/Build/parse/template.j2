@@ -1,0 +1,44 @@
+import gradio
+import skimage
+import scipy
+import numpy
+import os
+import sys
+
+# # Add this directory to the Python path
+# sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+# Import the function from the script
+from {{ exec_function.script }} import {{ exec_function.name }}
+
+# Inputs to be shown in the GUI
+inputs = [
+    {% for input in inputs %}
+    {% if input.type == 'Files' %}
+    gradio.Files(file_count='{{ input.file_count }}', label='{{ input.label }}'),
+    {% elif input.type == 'Radio' %}
+    gradio.Radio({{ input.options | tojson }}, type='value', value='{{input.options[0].value}}', label='{{ input.label }}'),
+    {% elif input.type == 'Number' %}
+    gradio.Number(value={{ input.value }}, interactive={{ input.interactive }}, label='{{ input.label }}'),
+    {% endif %}
+    {% endfor %}
+]
+
+# Outputs to be shown in the GUI
+output = [
+    {% for output in outputs %}
+    {% if output.type == 'Files' %}
+    gradio.File(label='{{ output.label }}'),
+    {% endif %}
+    {% endfor %}
+]
+
+demo = gradio.Interface(
+    fn={{ exec_function.name }},
+    inputs=inputs,
+    outputs=output,
+    title="Simple ID objects"
+)
+
+if __name__ == "__main__":
+    demo.launch(server_name="0.0.0.0", server_port=8000)

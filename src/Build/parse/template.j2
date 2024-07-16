@@ -1,12 +1,36 @@
 import os
 import gradio as gr
 import subprocess
+<<<<<<< HEAD
 import tempfile
 import shutil
 
 def generate_cli_command(cli_tags, **kwargs):
     cli_command = ["{{ exec_function.cli_command }}"]
 
+=======
+
+def generate_cli_command(**kwargs):
+    cli_command = ["{{ exec_function.cli_command }}"]
+    
+    #Mapping CLI tags to arguments
+    cli_args = {
+    {% for arg in exec_function.cli_args %}
+        "{{ arg }}": None{% if not loop.last %}, {% endif %}
+    {% endfor %}
+    }
+
+    # User inputs with their CLI tags and default values
+    cli_tags = {
+    {% for input_conf in inputs %}
+        "{{ input_conf.label | lower | replace(' ', '_') }}": {
+            "cli_tag": "{{ input_conf.cli_tag }}",
+            "default": "{{ input_conf.default }}"
+        }{% if not loop.last %}, {% endif %}
+    {% endfor %}
+    }
+
+>>>>>>> d7feedb ([Add] Cellpose's Gradio generation via CLI Usage)
     # Radio options mapping
     radio_options = {
     {% for input_conf in inputs if input_conf.type == 'Radio' %}

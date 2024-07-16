@@ -25,6 +25,7 @@ def preprocess_config(config):
     return inputs, outputs, exec_function, folder_name
 
 
+
 def generate_gradio_app(template_path, inputs, outputs, exec_function):
     env = Environment(
         loader=FileSystemLoader(searchpath=os.path.dirname(template_path)),
@@ -41,6 +42,10 @@ def generate_gradio_app(template_path, inputs, outputs, exec_function):
     env.filters['replace'] = replace
 
     template = env.get_template(os.path.basename(template_path))
+
+    print(f"Inputs: {inputs}")
+    print(f"Outputs: {outputs}")
+    print(f"Exec Function: {exec_function}")
 
     gradio_app_code = template.render(inputs=inputs, outputs=outputs, exec_function=exec_function)
 

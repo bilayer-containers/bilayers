@@ -21,10 +21,11 @@ inputs:
  
   # Input Image Arguments
   - name: dir
-    type: Textbox
+    type: Files
     label: "Input Image Directory"
     description: "Path to the directory of input images"
-    value: ""
+    file_count: "directory"
+    default: "directory"
     cli_tag: "--dir"
     section_id: "input-args"
     mode: "beginner"
@@ -37,6 +38,15 @@ inputs:
     optional: True
     section_id: "input-args"
     mode: "advanced"
+  - name: image_filter
+    type: Textbox
+    label: "Image Filter"
+    description: "filter for image files"
+    default: ""
+    cli_tag: "--img_filter"
+    optional: True
+    section_id: "input-args"
+    mode: "advanced" 
   - name: channel_axis
     type: Radio
     label: "Channel Axis"
@@ -122,7 +132,15 @@ inputs:
     optional: False
     section_id: "model-args"
     mode: "beginner"
-    # Rest Arguments of Model are for Cellpose v3
+  - type: Files
+    label: "Add Model"
+    description: "add custom model to use"
+    file_count: "single"
+    default: "single"
+    cli_tag: "--add_model"
+    optional: True
+    section_id: "model-args"
+    mode: "advanced"
 
     # Algorithm Arguments
   - name: no_resample
@@ -253,7 +271,6 @@ inputs:
     optional: True
     section_id: "output-args"
     mode: "advanced"
-  # save_dir is a directory
   - name: dir_above
     type: Checkbox
     label: "Dir Above"
@@ -333,41 +350,12 @@ exec_function:
   script: "cellpose"
   module: "Algorithms.cellpose"
   cli_command: "python -m cellpose --verbose"
-  cli_args: 
-    - "--use_gpu" 
-    - "--gpu_device"
-    - "--dir"
-    - "--look_one_level_down"
-    - "--channel_axis"
-    - "--chan" 
-    - "--chan2" 
-    - "--invert" 
-    - "--all_channels" 
-    - "--pretrained_model" 
-    - "--no_resample" 
-    - "--no_interp" 
-    - "--no_norm" 
-    - "--do_3D" 
-    - "--diameter"
-    - "--stitch_threshold"
-    - "--min_size" 
-    - "--fast_mode" 
-    - "--flow_threshold" 
-    - "--cellprob_threshold"
-    - "--exclude_on_edges"
-    - "--save_png" 
-    - "--save_tif" 
-    - "--no_npy"
-    # - "--save_dir" : []
-    - "--dir_above" 
-    - "--in_folders" 
-    - "--save_flows" 
-    - "--save_outlines" 
-    - "--save_ncolor" 
-    - "--save_txt" 
+  hidden_args:
+    # dummy example
+    # - cli_tag: "--save_png"
+    #   value: True
 
 docker-image:
   org: cellprofiler
   name: runcellpose_no_pretrained
   tag: 0.1
-  # -> cellprofiler/runcellpose_no_pretrained:0.1

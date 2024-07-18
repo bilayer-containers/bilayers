@@ -17,27 +17,6 @@ def run_generate(session):
     session.run('python', 'generate.py')
     session.cd('../../..')
 
-# Prevoiusly, we had more basic nox-session for building the Algorithm docker image
-# @nox.session
-# def build_algorithm(session):
-#     """Build the Algorithm docker Image"""
-#     if len(session.posargs) > 0:
-#         algorithm = session.posargs[0] 
-#     else:
-#         algorithm = 'threshold'
-#     print("Building Algorithm Nox-File: ", algorithm)
-#     image_name = f'{algorithm}-image'
-#     print("Image Name: ", image_name)
-#     dockerfile_path = f'src/Algorithms/{algorithm}/Dockerfile'
-#     print("Dockerfile Path: ", dockerfile_path)
-
-#     # If Dockerfile doesn't exist for the specified algorithm
-#     if not os.path.exists(dockerfile_path):
-#         print(f'Dockerfile for {algorithm} not found at {dockerfile_path}')
-#         session.error(f'Dockerfile for {algorithm} not found at {dockerfile_path}')
-#     session.run('docker', 'build', '-t', image_name, '-f', dockerfile_path, f'src/Algorithms/{algorithm}')
-
-
 @nox.session
 def build_algorithm(session):
     """Build the Algorithm docker Image"""

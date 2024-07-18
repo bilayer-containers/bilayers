@@ -1,26 +1,11 @@
 import os
 import gradio as gr
 import subprocess
+import tempfile
+import shutil
 
-def generate_cli_command(**kwargs):
+def generate_cli_command(cli_tags, **kwargs):
     cli_command = ["{{ exec_function.cli_command }}"]
-    
-    #Mapping CLI tags to arguments
-    cli_args = {
-    {% for arg in exec_function.cli_args %}
-        "{{ arg }}": None{% if not loop.last %}, {% endif %}
-    {% endfor %}
-    }
-
-    # User inputs with their CLI tags and default values
-    cli_tags = {
-    {% for input_conf in inputs %}
-        "{{ input_conf.label | lower | replace(' ', '_') }}": {
-            "cli_tag": "{{ input_conf.cli_tag }}",
-            "default": "{{ input_conf.default }}"
-        }{% if not loop.last %}, {% endif %}
-    {% endfor %}
-    }
 
     # Radio options mapping
     radio_options = {
@@ -33,32 +18,49 @@ def generate_cli_command(**kwargs):
     {% endfor %}
     }
 
+    temp_dir = None
+
     # Update cli_args with user inputs or defaults
     for key, value in kwargs.items():
         if key in cli_tags:
+            cli_tag = cli_tags[key]["cli_tag"]
+            default = cli_tags[key].get("default", None)
+
             if isinstance(value, bool):
                 if value:  # Only include the flag if it is True
-                    cli_args[cli_tags[key]["cli_tag"]] = ""
+                    cli_command.append(cli_tag)
             else:
                 # Handle Radio type mappings dynamically
                 if key in radio_options and value in radio_options[key]:
                     value = radio_options[key][value]
-                cli_args[cli_tags[key]["cli_tag"]] = value
+                # If the input is a list (mainly for input files), convert it to a string
+                elif isinstance(value, list):
+                    if default == "directory":
+                        # Create a temporary directory and move all the input files there
+                        temp_dir = tempfile.mkdtemp()
+                        for file_path in value:
+                            shutil.copy(file_path, temp_dir)
+                        value = temp_dir
+                    else:
+                        value = value[0]
+                # If the value of textbox is empty string, set it to None
+                if value == "":
+                    value = None
+                # If the value is None, append it
+                if value is not None:
+                    cli_command.append(f"{cli_tag} {value}")
 
-    # Construct the CLI command
-    for tag, value in cli_args.items():
-        if value is not None:
-            if value == "":
-                cli_command.append(f"{tag}")
-            else:
-                cli_command.append(f"{tag} {value}")
-        else:
-            # Add default value if not provided by user
-            for key, val in cli_tags.items():
-                if val["cli_tag"] == tag and val["default"]:
-                    cli_command.append(f"{tag} {val['default']}")
-
-    return " ".join(cli_command)
+   # Add hidden arguments to the command
+    {% if exec_function.hidden_args %}
+    {% for arg in exec_function.hidden_args %}
+    if {{ arg.value }} == True:
+        cli_command.append("{{ arg.cli_tag }}")
+    else:
+        cli_command.append("{{ arg.cli_tag }} {{ arg.value }}")
+    {% endfor %}
+    {% endif %}
+    
+    return " ".join(cli_command), temp_dir
 
 # Dynamically define on_submit with the exact input arguments
 def on_submit({% for input_conf in inputs %}{{ input_conf.label | lower | replace(' ', '_') }}{% if not loop.last %}, {% endif %}{% endfor %}):
@@ -67,19 +69,37 @@ def on_submit({% for input_conf in inputs %}{{ input_conf.label | lower | replac
         "{{ input_conf.label | lower | replace(' ', '_') }}": {{ input_conf.label | lower | replace(' ', '_') }}{% if not loop.last %}, {% endif %}
     {% endfor %}
     }
+
+    cli_tags = {
+    {% for input_conf in inputs %}
+        "{{ input_conf.label | lower | replace(' ', '_') }}": {
+            "cli_tag": "{{ input_conf.cli_tag }}",
+            "default": "{{ input_conf.default }}"
+        }{% if not loop.last %}, {% endif %}
+    {% endfor %}
+    }
+
     print("Received inputs:", kwargs)
 
-    cli_command = generate_cli_command(**kwargs)
+    # Generate the CLI command
+    cli_command, temp_dir = generate_cli_command(cli_tags, **kwargs)
     print("Generated CLI command:", cli_command)
 
     # Execute the CLI command
     try:
         result = subprocess.run(cli_command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         print("Command output:", result.stdout.decode())
+
+        # Display Output files
+        output_files = []
+        if temp_dir:
+            output_files.extend([os.path.join(temp_dir, f) for f in os.listdir(temp_dir) if os.path.isfile(os.path.join(temp_dir, f))])
+
+        return output_files
+
     except subprocess.CalledProcessError as e:
         print("Command failed with error:", e.stderr.decode())
-
-
+        return []
 
 
 {% for input_conf in inputs %}
@@ -91,6 +111,13 @@ def on_submit({% for input_conf in inputs %}{{ input_conf.label | lower | replac
 {{ input_conf.label | lower | replace(" ", "_") }} = gr.Textbox(label="{{ input_conf.label }}", value="{{ input_conf.default }}")
 {% elif input_conf.type == 'Checkbox' %}
 {{ input_conf.label | lower | replace(" ", "_") }} = gr.Checkbox(label="{{ input_conf.label }}", value={{ input_conf.value }})
+{% elif input_conf.type == 'Files' %}
+{{ input_conf.label | lower | replace(" ", "_") }} = gr.File(label="{{ input_conf.label }}", file_count="{{ input_conf.file_count }}")
+{% endif %}
+{% endfor %}
+
+{% for output_conf in outputs %}
+{% if output_conf.type == 'Files' %}
 {% endif %}
 {% endfor %}
 

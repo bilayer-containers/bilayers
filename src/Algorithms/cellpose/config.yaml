@@ -378,4 +378,8 @@ exec_function:
 docker-image:
   org: cellprofiler
   name: runcellpose_with_pretrained
+<<<<<<< HEAD
   tag: 0.1
+=======
+  tag: 0.1
+>>>>>>> 0763482 ([Update] Noxfile to dynamically set Base-Image to dockerfile)

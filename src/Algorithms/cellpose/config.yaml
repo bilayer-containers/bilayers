@@ -61,6 +61,15 @@ inputs:
     optional: True
     section_id: "input-args"
     mode: "advanced"
+  - name: z_axis
+    type: Number
+    label: "Z Axis"
+    description: "axis of image which corresponds to z dimension"
+    default: None
+    cli_tag: "--z_axis"
+    optional: True
+    section_id: "input-args"
+    mode: "advanced"
   - name: chan
     type: Radio
     label: "Chan To Segment"
@@ -233,6 +242,15 @@ inputs:
     optional: True
     section_id: "algorithm-args"
     mode: "advanced"
+  - name: anisotropy
+    type: Number
+    label: "Anisotropy"
+    description: "anisotropy of image"
+    default: 1.0
+    cli_tag: "--anisotropy"
+    optional: True
+    section_id: "algorithm-args"
+    mode: "advanced"
   - name: exclude_on_edges
     type: Checkbox
     label: "Exclude On Edges"
@@ -357,5 +375,5 @@ exec_function:
 
 docker-image:
   org: cellprofiler
-  name: runcellpose_no_pretrained
+  name: runcellpose_with_pretrained
   tag: 0.1

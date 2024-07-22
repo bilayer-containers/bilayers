@@ -90,6 +90,7 @@ def build_algorithm(session):
             with open('/tmp/docker_image_name.txt', 'w') as file:
                 file.write(docker_image_name)
                 
+<<<<<<< HEAD
             if docker_image_name:
                 print(f'Found Docker image name in config: {docker_image_name}')
                 # Pull the Docker image from DockerHub
@@ -157,6 +158,8 @@ def install_gradio(session):
             tag = config.get('docker-image', {}).get('tag')
             docker_image_name = f'{org}/{name}:{tag}' if org and name and tag else None
             
+=======
+>>>>>>> 0763482 ([Update] Noxfile to dynamically set Base-Image to dockerfile)
             if docker_image_name:
                 print(f'Found Docker image name in config: {docker_image_name}')
                 # Pull the Docker image from DockerHub
@@ -186,13 +189,19 @@ def build_interface(session):
     print("Dockerfile Path: ", dockerfile_path)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     session.run('docker', 'build', '-t', image_name, '-f', dockerfile_path, 'src/Build')
 >>>>>>> 2fbe84b ([mod] noxfile for building interface-image)
 =======
     # Take the input from build_docker.sh file pass it whilst building the image
     algorithm_name = session.posargs[1] 
+=======
+    # Read the Docker image name from the file
+    with open('/tmp/docker_image_name.txt', 'r') as file:
+        base_image = file.read().strip()
+>>>>>>> 0763482 ([Update] Noxfile to dynamically set Base-Image to dockerfile)
 
-    session.run('docker', 'build', '--build-arg',  f'ALGORITHM_NAME={algorithm_name}', '-t', image_name, '-f', dockerfile_path, 'src/Build')
+    session.run('docker', 'build', '--build-arg',  f'BASE_IMAGE={base_image}', '-t', image_name, '-f', dockerfile_path, 'src/Build')
 
 @nox.session
 def install_gradio(session):

@@ -1,5 +1,8 @@
+# Argument that takes Algorithm-Image-Name as input
+ARG BASE_IMAGE
+
 # From algorithm image
-FROM cellprofiler/runcellpose_no_pretrained:0.1
+FROM $BASE_IMAGE
 
 # Set the working directory within the container
 WORKDIR /bilayers

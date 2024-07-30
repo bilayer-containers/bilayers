@@ -22,3 +22,6 @@ _version.py
 app.py
 __pycache__/
 flagged/
+.ipynb_checkpoints/
+.virtual_documents/
+generated_notebook.ipynb

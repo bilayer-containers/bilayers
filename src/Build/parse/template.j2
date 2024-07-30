@@ -33,6 +33,8 @@ def generate_cli_command(cli_tags, **kwargs):
                 # Handle Radio type mappings dynamically
                 if key in radio_options and value in radio_options[key]:
                     value = radio_options[key][value]
+                    if value == "None":
+                        continue
                 # If the input is a list (mainly for input files), convert it to a string
                 elif isinstance(value, list):
                     if default == "directory":

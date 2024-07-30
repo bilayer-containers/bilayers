@@ -22,6 +22,7 @@ _version.py
 app.py
 __pycache__/
 <<<<<<< HEAD
+<<<<<<< HEAD
 flagged/
 .ipynb_checkpoints/
 .virtual_documents/
@@ -34,3 +35,9 @@ test.ipynb
 =======
 flagged/
 >>>>>>> f18e05f ([Add] Github Actions workflow and the bash script to dynamically pull up Interfaces)
+=======
+flagged/
+.ipynb_checkpoints/
+.virtual_documents/
+generated_notebooks.ipynb
+>>>>>>> a48158e (Skeleton code for jupyternb but still need changes)

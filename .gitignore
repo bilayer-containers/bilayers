@@ -26,6 +26,7 @@ __pycache__/
 flagged/
 .ipynb_checkpoints/
 .virtual_documents/
+<<<<<<< HEAD
 generated_notebook.ipynb
 flagged/
 # pixi environments
@@ -41,3 +42,6 @@ flagged/
 .virtual_documents/
 generated_notebooks.ipynb
 >>>>>>> a48158e (Skeleton code for jupyternb but still need changes)
+=======
+generated_notebook.ipynb
+>>>>>>> d9fac59 (Skeleton code for jupyternb but still need changes)

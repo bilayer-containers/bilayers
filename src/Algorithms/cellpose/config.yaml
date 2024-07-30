@@ -52,7 +52,7 @@ inputs:
     label: "Channel Axis"
     description: "axis of image which corresponds to image channels"
     options: 
-      - label: 0 
+      - label: 0
         value: 0
       - label: 2
         value: 2
@@ -93,7 +93,7 @@ inputs:
     label: "Chan2"
     description: "Nuclear Channel, if cyto then optional"
     options: 
-      - label: None 
+      - label: None  
         value: 0
       - label: RED
         value: 1
@@ -135,7 +135,9 @@ inputs:
       - label: Nuclei
         value: "nuclei"
       - label: Cyto2
-        value: "cyto2"  
+        value: "cyto2" 
+      - label: Ignore
+        value: None
     default: "cyto"
     cli_tag: "--pretrained_model"
     optional: False

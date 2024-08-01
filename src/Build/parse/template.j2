@@ -100,19 +100,20 @@ def on_submit({% for input_conf in inputs %}{{ input_conf.label | lower | replac
         return output_files
 
     except subprocess.CalledProcessError as e:
-        print("Command failed with error:", e.stderr.decode())
-        return []
+        error_message = "Please take a screenshot of this error and raise an issue at the Bilayers repository on GitHub."
+        error_message += f"Command failed with error: {e.stderr.decode()}\n\n"
+        raise gr.Error(error_message)
 
 
 {% for input_conf in inputs %}
 {% if input_conf.type == 'Radio' %}
-{{ input_conf.label | lower | replace(" ", "_") }} = gr.Radio(label="{{ input_conf.label }}", choices=[{% for option in input_conf.options %}"{{ option.label }}"{% if not loop.last %}, {% endif %}{% endfor %}], value="{{ input_conf.default }}")
+{{ input_conf.label | lower | replace(" ", "_") }} = gr.Radio(label="{{ input_conf.label }}", info="{{ input_conf.description }}",  choices=[{% for option in input_conf.options %}"{{ option.label }}"{% if not loop.last %}, {% endif %}{% endfor %}], value="{{ input_conf.default }}")
 {% elif input_conf.type == 'Number' %}
-{{ input_conf.label | lower | replace(" ", "_") }} = gr.Number(label="{{ input_conf.label }}", value={{ input_conf.default }})
+{{ input_conf.label | lower | replace(" ", "_") }} = gr.Number(label="{{ input_conf.label }}", info="{{ input_conf.description }}", value={{ input_conf.default }})
 {% elif input_conf.type == 'Textbox' %}
-{{ input_conf.label | lower | replace(" ", "_") }} = gr.Textbox(label="{{ input_conf.label }}", value="{{ input_conf.default }}")
+{{ input_conf.label | lower | replace(" ", "_") }} = gr.Textbox(label="{{ input_conf.label }}", info="{{ input_conf.description }}", value="{{ input_conf.default }}")
 {% elif input_conf.type == 'Checkbox' %}
-{{ input_conf.label | lower | replace(" ", "_") }} = gr.Checkbox(label="{{ input_conf.label }}", value={{ input_conf.value }})
+{{ input_conf.label | lower | replace(" ", "_") }} = gr.Checkbox(label="{{ input_conf.label }}", info="{{ input_conf.description }}", value={{ input_conf.value }})
 {% elif input_conf.type == 'Files' %}
 {{ input_conf.label | lower | replace(" ", "_") }} = gr.File(label="{{ input_conf.label }}", file_count="{{ input_conf.file_count }}")
 {% endif %}

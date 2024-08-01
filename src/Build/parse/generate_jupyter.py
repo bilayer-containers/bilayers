@@ -166,7 +166,7 @@ def main():
     jupyter_app_code = generate_jupyter_notebook(inputs, outputs, exec_function)
 
     # Save the notebook
-    notebook_path = "generated_notebook.ipynb"
+    notebook_path = "final_generated_notebook.ipynb"
     with open(notebook_path, "w") as f:
         nbf.write(jupyter_app_code, f)
     

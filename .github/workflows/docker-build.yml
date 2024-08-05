@@ -4,10 +4,12 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
-      - v0.1_mvp_threshold
+  # TODO: disable until caching system is implemented
+  # pull_request:
+  #   types: [opened, reopened, synchronize, ready_for_review, review_requested]
+  #   branches:
+  #     - main
+  workflow_dispatch:
 
 jobs:
   build:

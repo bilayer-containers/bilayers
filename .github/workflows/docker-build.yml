@@ -1,43 +1,46 @@
 name: Docker-Build Pipeline
 
 on:
-    push:
-        branches:
-        - main
-    pull_request:
-        branches:
-        - main
-        - v0.1_mvp_threshold
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+      - v0.1_mvp_threshold
 
 jobs:
-    build:
-        name: Docker Build
-        runs-on: ubuntu-latest
+  build:
+    name: Docker Build
+    runs-on: ubuntu-latest
 
-        steps:
-        - name: Checkout Repository
-          uses: actions/checkout@v3
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
 
-        - name: Set up Python 3.9
-          uses: actions/setup-python@v3
-          with:
-            python-version: 3.9
-        
-        - name: Install nox
-          run: pip install nox
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.9
 
-        - name: Run parse,generate and build docker images
-          run: |
-            chmod +x ./scripts/build_docker.sh
-            ./scripts/build_docker.sh
+      - name: Install nox
+        run: |
+          pip install nox
+          # TODO: remove this as a sessiond dependency
+          pip install pyyaml
 
-        - name: Run gradio Docker Container
-          run: |
-            docker run -d -p 8000:8000 --name gradio-container gradio-image
-            # Wait for the container to start
-            sleep 30
-            # Check if the container is running
-            curl --fail http://localhost:8000 || (echo "Failed to start the container" && exit 1)
+      - name: Run parse,generate and build docker images
+        run: |
+          chmod +x ./scripts/build_docker.sh
+          ./scripts/build_docker.sh
 
-        - name: Verify the Gradio App
-          run: curl http://localhost:8000
+      - name: Run gradio Docker Container
+        run: |
+          docker run -d -p 8000:8000 --name gradio-container gradio-image
+          # Wait for the container to start
+          sleep 30
+          # Check if the container is running
+          curl --fail http://localhost:8000 || (echo "Failed to start the container" && exit 1)
+
+      - name: Verify the Gradio App
+        run: curl http://localhost:8000

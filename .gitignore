@@ -25,3 +25,7 @@ flagged/
 .ipynb_checkpoints/
 .virtual_documents/
 generated_notebook.ipynb
+flagged/
+# pixi environments
+.pixi
+*.egg-info

@@ -1,44 +1,113 @@
-import gradio
-import skimage
-import scipy
-import numpy
 import os
-import sys
+import gradio as gr
+import subprocess
 
-# # Add this directory to the Python path
-# sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+def generate_cli_command(**kwargs):
+    cli_command = ["{{ exec_function.cli_command }}"]
+    
+    #Mapping CLI tags to arguments
+    cli_args = {
+    {% for arg in exec_function.cli_args %}
+        "{{ arg }}": None{% if not loop.last %}, {% endif %}
+    {% endfor %}
+    }
 
-# Import the function from the script
-from {{ exec_function.script }} import {{ exec_function.name }}
+    # User inputs with their CLI tags and default values
+    cli_tags = {
+    {% for input_conf in inputs %}
+        "{{ input_conf.label | lower | replace(' ', '_') }}": {
+            "cli_tag": "{{ input_conf.cli_tag }}",
+            "default": "{{ input_conf.default }}"
+        }{% if not loop.last %}, {% endif %}
+    {% endfor %}
+    }
 
-# Inputs to be shown in the GUI
+    # Radio options mapping
+    radio_options = {
+    {% for input_conf in inputs if input_conf.type == 'Radio' %}
+        "{{ input_conf.label | lower | replace(' ', '_') }}": {
+            {% for option in input_conf.options %}
+            "{{ option.label }}": "{{ option.value }}"{% if not loop.last %}, {% endif %}
+            {% endfor %}
+        }{% if not loop.last %}, {% endif %}
+    {% endfor %}
+    }
+
+    # Update cli_args with user inputs or defaults
+    for key, value in kwargs.items():
+        if key in cli_tags:
+            if isinstance(value, bool):
+                if value:  # Only include the flag if it is True
+                    cli_args[cli_tags[key]["cli_tag"]] = ""
+            else:
+                # Handle Radio type mappings dynamically
+                if key in radio_options and value in radio_options[key]:
+                    value = radio_options[key][value]
+                cli_args[cli_tags[key]["cli_tag"]] = value
+
+    # Construct the CLI command
+    for tag, value in cli_args.items():
+        if value is not None:
+            if value == "":
+                cli_command.append(f"{tag}")
+            else:
+                cli_command.append(f"{tag} {value}")
+        else:
+            # Add default value if not provided by user
+            for key, val in cli_tags.items():
+                if val["cli_tag"] == tag and val["default"]:
+                    cli_command.append(f"{tag} {val['default']}")
+
+    return " ".join(cli_command)
+
+# Dynamically define on_submit with the exact input arguments
+def on_submit({% for input_conf in inputs %}{{ input_conf.label | lower | replace(' ', '_') }}{% if not loop.last %}, {% endif %}{% endfor %}):
+    kwargs = {
+    {% for input_conf in inputs %}
+        "{{ input_conf.label | lower | replace(' ', '_') }}": {{ input_conf.label | lower | replace(' ', '_') }}{% if not loop.last %}, {% endif %}
+    {% endfor %}
+    }
+    print("Received inputs:", kwargs)
+
+    cli_command = generate_cli_command(**kwargs)
+    print("Generated CLI command:", cli_command)
+
+    # Execute the CLI command
+    try:
+        result = subprocess.run(cli_command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        print("Command output:", result.stdout.decode())
+    except subprocess.CalledProcessError as e:
+        print("Command failed with error:", e.stderr.decode())
+
+
+
+
+{% for input_conf in inputs %}
+{% if input_conf.type == 'Radio' %}
+{{ input_conf.label | lower | replace(" ", "_") }} = gr.Radio(label="{{ input_conf.label }}", choices=[{% for option in input_conf.options %}"{{ option.label }}"{% if not loop.last %}, {% endif %}{% endfor %}], value="{{ input_conf.default }}")
+{% elif input_conf.type == 'Number' %}
+{{ input_conf.label | lower | replace(" ", "_") }} = gr.Number(label="{{ input_conf.label }}", value={{ input_conf.default }})
+{% elif input_conf.type == 'Textbox' %}
+{{ input_conf.label | lower | replace(" ", "_") }} = gr.Textbox(label="{{ input_conf.label }}", value="{{ input_conf.default }}")
+{% elif input_conf.type == 'Checkbox' %}
+{{ input_conf.label | lower | replace(" ", "_") }} = gr.Checkbox(label="{{ input_conf.label }}", value={{ input_conf.value }})
+{% endif %}
+{% endfor %}
+
 inputs = [
-    {% for input in inputs %}
-    {% if input.type == 'Files' %}
-    gradio.Files(file_count='{{ input.file_count }}', label='{{ input.label }}'),
-    {% elif input.type == 'Radio' %}
-    gradio.Radio({{ input.options | tojson }}, type='value', value='{{input.options[0].value}}', label='{{ input.label }}'),
-    {% elif input.type == 'Number' %}
-    gradio.Number(value={{ input.value }}, interactive={{ input.interactive }}, label='{{ input.label }}'),
-    {% endif %}
-    {% endfor %}
+{% for input_conf in inputs %}
+    {{ input_conf.label | lower | replace(" ", "_") }}{% if not loop.last %}, {% endif %}
+{% endfor %}
 ]
 
-# Outputs to be shown in the GUI
-output = [
-    {% for output in outputs %}
-    {% if output.type == 'Files' %}
-    gradio.File(label='{{ output.label }}'),
-    {% endif %}
-    {% endfor %}
-]
+output = gr.Files(label="{{ outputs[0].label }}")
 
-demo = gradio.Interface(
-    fn={{ exec_function.name }},
-    inputs=inputs,
-    outputs=output,
-    title="Simple ID objects"
+app = gr.Interface(
+    fn=on_submit, 
+    inputs=inputs, 
+    outputs=output, 
+    title="Gradio App"
 )
 
 if __name__ == "__main__":
-    demo.launch(server_name="0.0.0.0", server_port=8000)
+    app.launch(server_name="0.0.0.0", server_port=8000)

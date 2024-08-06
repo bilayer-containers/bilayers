@@ -1,0 +1,140 @@
+from ipywidgets import widgets, VBox, HBox, Tab, Accordion
+from IPython.display import display
+import tempfile
+import os
+import nbformat as nbf
+import json
+
+{% autoescape false %}
+inputs = {{inputs}}
+exec_function = {{exec_function}}
+
+{% endautoescape %}
+
+
+beginner_widgets = []
+advanced_widgets = []
+
+input_vars = []
+
+# Appending args in cli_command
+cli_command = []
+cli_command.append(exec_function['cli_command'])
+
+radio_options = {
+    {% for input_conf in inputs if input_conf.type == 'Radio' -%}
+        "{{ input_conf.label | lower | replace(' ', '_') }}": {
+            {% for option in input_conf.options %}
+            "{{ option.label }}": "{{ option.value }}"{% if not loop.last -%}, {%- endif %}
+            {%- endfor %}
+        }{% if not loop.last -%}, {%- endif %}
+    {% endfor -%}
+    }
+
+{% for input_conf in inputs -%}
+{% if input_conf.type == 'Files' and input_conf.file_count == "directory" %}
+{{ input_conf.label | lower | replace(" ", "_") }} = widgets.FileUpload(multiple=True)
+{% elif input_conf.type == 'Files' and input_conf.file_count == "single" %}
+{{ input_conf.label | lower | replace(" ", "_") }} = widgets.FileUpload(multiple=False)
+{% elif input_conf.type == 'Radio' %}
+{{ input_conf.label | lower | replace(" ", "_") }} = widgets.RadioButtons(options=[{% for option in input_conf.options %}("{{ option.label }}", "{{ option.value }}"){% if not loop.last %}, {% endif %}{% endfor %}], value="{{ input_conf.default }}")
+{% elif input_conf.type == 'Number' %}
+{% set default_value = input_conf['default'] %}
+{% if default_value is none -%}
+{{ input_conf.label | lower | replace(" ", "_") }} = widgets.IntText(value=0)
+{% else %}
+{# {% set default_value = default_value|float %} #}
+{{ input_conf.label | lower | replace(" ", "_") }} = widgets.IntText(value={{ default_value }})
+{%- endif %}
+{% elif input_conf.type == 'Textbox' %}
+{{ input_conf.label | lower | replace(" ", "_") }} = widgets.Textarea(value="{{ input_conf.default if input_conf.default is not none else '' }}")
+{% elif input_conf.type == 'Checkbox' %}
+{{ input_conf.label | lower | replace(" ", "_") }} = widgets.Checkbox(value={{ input_conf.value }})
+{%- endif %}
+
+# Add a description label
+{{ "desc_" + input_conf.label | lower | replace(" ", "_") }}  = widgets.Label(value="<strong>{{ input_conf['label'] }}</strong>: {{ input_conf.get('description', '') }}")
+
+# Add widget and description to accordion
+tab = Tab(children=[HBox([widgets.Label("{{ input_conf['label'] }}"), {{ input_conf.label | lower | replace(" ", "_") }}]), {{ "desc_" + input_conf.label | lower | replace(" ", "_") }}])
+tab.set_title(0, "{{ input_conf['label'] }}")
+tab.set_title(1, "Description")
+
+# Append the corresponding cli_tag, widget to input_vars
+input_vars.append(("{{ input_conf['cli_tag'] }}", {{ input_conf.label | lower | replace(" ", "_") }}))
+
+{% if input_conf.mode == 'beginner' -%}
+beginner_widgets.append(tab)
+{% else %}
+advanced_widgets.append(tab)
+{%- endif %}
+{%- endfor %}
+
+acc = Accordion()
+# Add beginner_widgets to the first section
+acc.children = [VBox(beginner_widgets)]
+acc.set_title(0, "Beginner's Section")
+# Add advanced_widgets to the second section
+acc.children = acc.children + (VBox(advanced_widgets),)
+acc.set_title(1, "Advanced Section")
+
+def construct_cli_command():
+    cli_command = ["{{ exec_function.cli_command }}"]
+    for cli_tag, widget in input_vars:
+        if isinstance(widget, widgets.Checkbox):
+            if widget.value == True:
+                cli_command.append(cli_tag)
+            else:
+                continue
+        elif isinstance(widget, widgets.Textarea):
+            if widget.value == "":
+                continue
+            cli_command.append(f"{cli_tag} {widget.value}")
+        elif isinstance(widget, widgets.RadioButtons):
+            if widget.value != "None":
+                cli_command.append(f"{cli_tag} {widget.value}")
+            else:
+                continue
+        elif isinstance(widget, widgets.FileUpload):
+            # Create a temporary directory and move all the input files there : For multiple files
+            temp_dir = tempfile.mkdtemp()
+            for uploaded_file in widget.value:  
+                file_content = uploaded_file['content']
+                file_path = os.path.join(temp_dir, uploaded_file['name'])
+                with open(file_path, 'wb') as f:
+                    # Convert memoryview to bytes
+                    f.write(file_content.tobytes())  
+            # Update widget.value or cli_command as needed
+            cli_command.append(f" {cli_tag} {temp_dir}")
+        else:
+            cli_command.append(f" {cli_tag} {widget.value}")
+
+    # Add hidden arguments to the command
+    {% if exec_function.hidden_args %}
+    {% for arg in exec_function.hidden_args %}
+    if {{ arg.value }} == True:
+        cli_command.append("{{ arg.cli_tag }}")
+    else:
+        cli_command.append("{{ arg.cli_tag }} {{ arg.value }}")
+    {% endfor %}
+    {% endif %}
+
+    return " ".join(cli_command)
+    
+
+print("Printing the cli_command", cli_command)
+
+
+def update_command(change):
+    cli_command.value = construct_cli_command()
+
+cli_command = widgets.Textarea(value=construct_cli_command(), description="CLI Command")
+
+for _, widget in input_vars:
+    widget.observe(update_command, names='value')
+
+display(acc, cli_command)
+
+
+if __name__ == "main":
+    print("Hello World")

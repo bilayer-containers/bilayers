@@ -1,0 +1,15 @@
+[project]
+name = "bilayers"
+version = "0.1.0"
+description = "Add a short description here"
+authors = ["Rajavi Shah <shahraja@broadinstitute.org>", "Nodar Gogoberidze <gnodar01@gmail.com>", "Beth Cimini <bcimini@broadinstitute.org>"]
+channels = ["conda-forge"]
+platforms = ["win-64", "linux-64", "osx-64", "osx-arm64"]
+
+[tasks]
+
+[dependencies]
+python = ">=3.9"
+nox = ">=2024.4.15,<2025"
+pyyaml = ">=6.0.1,<7"
+jinja2 = ">=3.1.4,<4"

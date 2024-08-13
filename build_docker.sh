@@ -5,7 +5,7 @@ set -e
 
 # List of algorithms and interfaces
 ALGORITHM_NAMES=("cellpose") 
-INTERFACE_NAMES=("gradio")  
+INTERFACE_NAMES=("gradio" "jupyter")
 
 # Build the Docker images for each algorithm and interface
 for ALGORITHM_NAME in "${ALGORITHM_NAMES[@]}";

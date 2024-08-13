@@ -26,6 +26,7 @@ __pycache__/
 flagged/
 .ipynb_checkpoints/
 .virtual_documents/
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 generated_notebook.ipynb
 flagged/
@@ -45,3 +46,10 @@ generated_notebooks.ipynb
 =======
 generated_notebook.ipynb
 >>>>>>> d9fac59 (Skeleton code for jupyternb but still need changes)
+=======
+generated_notebook.ipynb
+generated_folders/
+final_generated_notebook.ipynb
+generate_jupyter.py
+test.ipynb
+>>>>>>> Stashed changes

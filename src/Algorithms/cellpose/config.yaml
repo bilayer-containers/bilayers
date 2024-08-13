@@ -9,7 +9,7 @@ inputs:
     section_id: "hardware-args"
     mode: "advanced"
   - name: gpu_device
-    type: Number
+    type: Integer
     label: "GPU Device"
     description: "which GPU device to use - Integer for torch or mps for M1"
     default: 0
@@ -24,10 +24,12 @@ inputs:
     type: Files
     label: "Input Image Directory"
     description: "Path to the directory of input images"
-    file_count: "directory"
+    file_count: "multiple"
     default: "directory"
     cli_tag: "--dir"
     section_id: "input-args"
+    volume_mount: True
+    folder_name: "/bilayers/input_images"
     mode: "beginner"
   - name: look_one_level_down
     type: Checkbox
@@ -62,7 +64,7 @@ inputs:
     section_id: "input-args"
     mode: "advanced"
   - name: z_axis
-    type: Number
+    type: Integer
     label: "Z Axis"
     description: "axis of image which corresponds to z dimension"
     default: None
@@ -137,7 +139,7 @@ inputs:
       - label: Cyto2
         value: "cyto2" 
       - label: Ignore
-        value: None
+        value: "None"
     default: "cyto"
     cli_tag: "--pretrained_model"
     optional: False
@@ -151,6 +153,8 @@ inputs:
     cli_tag: "--add_model"
     optional: True
     section_id: "model-args"
+    volume_mount: True
+    folder_name: "/bilayers/models"
     mode: "advanced"
 
     # Algorithm Arguments
@@ -191,7 +195,7 @@ inputs:
     section_id: "algorithm-args"
     mode: "advanced"
   - name: diameter
-    type: Number
+    type: Float
     label: "Diameter"
     description: "estimated diameter of cells in pixels"
     default: 30
@@ -200,7 +204,7 @@ inputs:
     section_id: "algorithm-args"
     mode: "beginner"
   - name: stitch_threshold
-    type: Number
+    type: Float
     label: "Stitch Threshold"
     description: "stitching threshold"
     default: 0.0
@@ -209,7 +213,7 @@ inputs:
     section_id: "algorithm-args"
     mode: "advanced"
   - name: min_size
-    type: Number
+    type: Integer
     label: "Min Size"
     description: "minimum size of objects in pixels"
     default: 15
@@ -227,7 +231,7 @@ inputs:
     section_id: "algorithm-args"
     mode: "advanced"
   - name: flow_threshold
-    type: Number
+    type: Float
     label: "Flow Threshold"
     description: "flow error threshold"
     default: 0.4
@@ -236,7 +240,7 @@ inputs:
     section_id: "algorithm-args"
     mode: "advanced"
   - name: cellprob_threshold
-    type: Number
+    type: Float
     label: "Cellprob Threshold"
     description: "cell probability threshold"
     default: 0.0
@@ -245,7 +249,7 @@ inputs:
     section_id: "algorithm-args"
     mode: "advanced"
   - name: anisotropy
-    type: Number
+    type: Float
     label: "Anisotropy"
     description: "anisotropy of image"
     default: 1.0
@@ -370,7 +374,7 @@ exec_function:
   script: "cellpose"
   module: "Algorithms.cellpose"
   cli_command: "python -m cellpose --verbose"
-  hidden_args:
+  hidden_args: 
     # dummy example
     # - cli_tag: "--save_png"
     #   value: True
@@ -378,8 +382,32 @@ exec_function:
 docker-image:
   org: cellprofiler
   name: runcellpose_with_pretrained
+<<<<<<< Updated upstream
 <<<<<<< HEAD
   tag: 0.1
 =======
   tag: 0.1
 >>>>>>> 0763482 ([Update] Noxfile to dynamically set Base-Image to dockerfile)
+=======
+  tag: 0.1
+
+folder_name: "cellpose"
+
+citations:
+  Bilayers:
+    - name: "Bilayers"
+      license: xxxxx
+      description: "GUI interfaces for deep learning-based cell segmentation algorithms"
+  Jupyter:
+    - name: "Jupyter"
+      doi: 10.1109/MCSE.2007.53
+      description: "Interactive, code-driven documents for data analysis and visualization"
+  Gradio:
+    - name: "Gradio"
+      doi: 10.48550/arXiv.1906.02569
+      description: "A simple web interface for deploying machine learning models"
+  Algorithm: 
+    - name: "Cellpose"
+      doi: 10.1038/s41592-020-01018-x
+      description: "Deep Learning algorithm for cell segmentation in microscopy images"
+>>>>>>> Stashed changes

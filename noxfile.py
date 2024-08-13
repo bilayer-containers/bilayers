@@ -19,11 +19,15 @@ def run_parse(session):
     
 @nox.session
 def run_generate(session):
+<<<<<<< Updated upstream
 <<<<<<< HEAD
     session.install('pyyaml', 'jinja2')
 =======
     session.install('pyyaml')
 >>>>>>> f18e05f ([Add] Github Actions workflow and the bash script to dynamically pull up Interfaces)
+=======
+    session.install('pyyaml', 'jinja2', 'nbformat', 'ipython', 'ipywidgets')
+>>>>>>> Stashed changes
     session.cd('src/Build/parse')
     session.run('python', 'generate.py')
     session.cd('../../..')
@@ -85,10 +89,14 @@ def build_algorithm(session):
             name = config.get('docker-image', {}).get('name')
             tag = config.get('docker-image', {}).get('tag')
             docker_image_name = f'{org}/{name}:{tag}' if org and name and tag else None
+            folder_name = config.get('folder_name', None)
 
             # Save the Docker image name in a file
             with open('/tmp/docker_image_name.txt', 'w') as file:
                 file.write(docker_image_name)
+
+            with open('/tmp/folder_name.txt', 'w') as file:
+                file.write(folder_name)
                 
 <<<<<<< HEAD
             if docker_image_name:
@@ -112,14 +120,20 @@ def build_interface(session):
     image_name = f'{interface}-image'
     print("Image Name: ", image_name)
 
-    dockerfile_path = f'src/Build/Dockerfiles/Dockerfile'
+    dockerfile_path = f'src/Build/Dockerfiles/{interface.capitalize()}.Dockerfile'
     print("Dockerfile Path: ", dockerfile_path)
 
     # Read the Docker image name from the file
     with open('/tmp/docker_image_name.txt', 'r') as file:
         base_image = file.read().strip()
 
-    session.run('docker', 'build', '--build-arg',  f'BASE_IMAGE={base_image}', '-t', image_name, '-f', dockerfile_path, 'src/Build')
+    with open('/tmp/folder_name.txt', 'r') as file:
+        folder_name = file.read().strip()
+        
+    if interface == 'gradio':
+        session.run('docker', 'build', '-f', 'Gradio.Dockerfile', '--build-arg',  f'BASE_IMAGE={base_image}', '--build-arg',  f'FOLDER_NAME={folder_name}', '-t', image_name, '-f', dockerfile_path, 'src/Build')
+    elif interface == 'jupyter':
+        session.run('docker', 'build', '-f', 'Jupyter.Dockerfile', '--build-arg',  f'BASE_IMAGE={base_image}', '--build-arg',  f'FOLDER_NAME={folder_name}', '-t', image_name, '-f', dockerfile_path, 'src/Build')
 
 @nox.session
 def install_gradio(session):

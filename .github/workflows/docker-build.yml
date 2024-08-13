@@ -80,7 +80,7 @@ jobs:
 
         - name: Run gradio Docker Container
           run: |
-            docker run -d -p 8000:8000 --name gradio-container gradio-image
+            docker run -d -p 8000:8000 --name gradio-container gradio-image 
             # Wait for the container to start
             sleep 30
             # Check if the container is running

@@ -3,10 +3,11 @@ import os
 from parse import main as parse_config
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 import nbformat as nbf 
-from IPython.display import display
+import ipywidgets as widgets
+from IPython.display import display, HTML
 
 def preprocess_config(config):
-    supported_input_types = {'Files', 'Radio', 'Number', 'Textbox', 'Checkbox'}
+    supported_input_types = {'Files', 'Radio', 'Number', 'Textbox', 'Checkbox', 'Float', 'Integer'}
     supported_output_types = {'Files', 'Textbox', 'Image'}
     
     # section_mapping = {section['id']: section['label'] for section in config[0]}
@@ -22,11 +23,12 @@ def preprocess_config(config):
 
     folder_name = config[4]
 
-    return inputs, outputs, exec_function, folder_name
+    citations = config[5]
+
+    return inputs, outputs, exec_function, folder_name, citations
 
 
-
-def generate_gradio_app(template_path, inputs, outputs, exec_function):
+def generate_gradio_app(template_path, inputs, outputs, exec_function, citations):
     env = Environment(
         loader=FileSystemLoader(searchpath=os.path.dirname(template_path)),
         autoescape=select_autoescape(['j2'])
@@ -43,16 +45,12 @@ def generate_gradio_app(template_path, inputs, outputs, exec_function):
 
     template = env.get_template(os.path.basename(template_path))
 
-    print(f"Inputs: {inputs}")
-    print(f"Outputs: {outputs}")
-    print(f"Exec Function: {exec_function}")
-
-    gradio_app_code = template.render(inputs=inputs, outputs=outputs, exec_function=exec_function)
+    gradio_app_code = template.render(inputs=inputs, outputs=outputs, exec_function=exec_function, citations=citations)
 
     return gradio_app_code
 
 
-def generate_jupyter_notebook(template_path, inputs, outputs, exec_function):
+def generate_jupyter_notebook(template_path, inputs, outputs, exec_function, citations):
     env = Environment(
         loader=FileSystemLoader(searchpath=os.path.dirname(template_path)),
         autoescape=select_autoescape(['j2'])
@@ -70,43 +68,70 @@ def generate_jupyter_notebook(template_path, inputs, outputs, exec_function):
     def create_markdown_cell(content):
         return nbf.v4.new_markdown_cell(content)
 
-    print(" Hello from generate_jupyter_notebook function ")
-
     template = env.get_template(os.path.basename(template_path))
     print("To check the type of inputs: ", type(inputs))
-    notebook_content = template.render(inputs=inputs, exec_function=exec_function)
+    notebook_content = template.render(inputs=inputs, outputs=outputs, exec_function=exec_function)
 
     nb = nbf.v4.new_notebook()
     
     # Create a markdown cell for instructions or say citations
     nb.cells.append(create_markdown_cell("## Set Variables and Run the cell"))
 
+    citation_cell = "### Please use the following citations while using Bilayers - JupyterNotebook Interface!\n"
+    for citation in citations['Bilayers']:
+        citation_cell += f"- {citation['name']} : {citation['license']} --> {citation['description']}\n"
+
+    for citation in citations['Jupyter']:
+        citation_cell += f"- {citation['name']} : {citation['doi']} --> {citation['description']}\n"
+
+    for citation in citations['Algorithm']:
+        citation_cell += f"- {citation['name']} : {citation['doi']} --> {citation['description']}\n"
+
+    # Add a markdown cell with the formatted citations
+    nb.cells.append(create_markdown_cell(citation_cell))
+
     # Create a hidden code cell for widget creation
     hidden_cell = create_code_cell(notebook_content)
     
     hidden_cell.metadata.jupyter = {"source_hidden": True}
-    # hidden_cell.metadata.tags = ['hide-input']
     nb.cells.append(hidden_cell)
 
     nb.cells.append(create_code_cell(f"print({{cli_command.value}})"))
 
 
     run_command_cell = f"""
-!{{cli_command.value}}
-"""
-    nb.cells.append(create_code_cell(run_command_cell))
-    print("No prob before display")
-    # nb.cells.append(create_code_cell(display(run_command_cell)))
-    print("No prob after display")
-    return nb
+import subprocess
+import nbformat as nbf
+from IPython.core.getipython import get_ipython
+try:
+    res = subprocess.run(cli_command.value, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    !{{cli_command.value}}
 
+except Exception as e:
+    error_message = str(e)
+    # print(f"Error occurred: {{error_message}}")
+    error_cell = nbf.v4.new_code_cell(f"# Error Details: {{error_message}}")
+
+    ####################
+    # Display the error cell
+    shell = get_ipython()
+    shell.payload_manager.write_payload(dict(
+    source='set_next_input',
+    text=error_cell['source'],
+    replace=False), single=False)
+"""
+    
+    # Append the try-except cell to the notebook
+    nb.cells.append(create_code_cell(run_command_cell))
+
+    return nb
 def main():
     print("Parsing config...")
 
     # inputs, outputs, exec_function = parse_config()
     config = parse_config()
     
-    inputs, outputs, exec_function, folder_name = preprocess_config(config)
+    inputs, outputs, exec_function, folder_name, citations = preprocess_config(config)
 
     ########################################
     # Logic for generating Gradio App
@@ -118,10 +143,10 @@ def main():
     os.makedirs(os.path.join(folderA, folderB), exist_ok=True)
 
     # Template path for the Gradio app
-    gradio_template_path = "template.j2"
+    gradio_template_path = "gradio_template.py.j2"
 
     # Generating the gradio algorithm+interface app dynamically
-    gradio_app_code = generate_gradio_app(gradio_template_path, inputs, outputs, exec_function)
+    gradio_app_code = generate_gradio_app(gradio_template_path, inputs, outputs, exec_function, citations)
 
     # Join folders and file name
     gradio_app_path = os.path.join(folderA, folderB, 'app.py')
@@ -142,10 +167,10 @@ def main():
     os.makedirs(os.path.join(folderA, folderB), exist_ok=True)
 
     # Template path for the Jupyter Notebook
-    jupyter_template_path = "jupyter_template.j2"
+    jupyter_template_path = "jupyter_template.py.j2"
 
     # Generating Jupyter Notebook file dynamically
-    jupyter_app_code = generate_jupyter_notebook(jupyter_template_path, inputs, outputs, exec_function)
+    jupyter_app_code = generate_jupyter_notebook(jupyter_template_path, inputs, outputs, exec_function, citations)
 
     # Join folders and file name
     jupyter_notebook_path = os.path.join(folderA, folderB, 'generated_notebook.ipynb')

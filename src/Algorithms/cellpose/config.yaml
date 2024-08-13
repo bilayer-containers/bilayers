@@ -382,13 +382,6 @@ exec_function:
 docker-image:
   org: cellprofiler
   name: runcellpose_with_pretrained
-<<<<<<< Updated upstream
-<<<<<<< HEAD
-  tag: 0.1
-=======
-  tag: 0.1
->>>>>>> 0763482 ([Update] Noxfile to dynamically set Base-Image to dockerfile)
-=======
   tag: 0.1
 
 folder_name: "cellpose"
@@ -410,4 +403,3 @@ citations:
     - name: "Cellpose"
       doi: 10.1038/s41592-020-01018-x
       description: "Deep Learning algorithm for cell segmentation in microscopy images"
->>>>>>> Stashed changes

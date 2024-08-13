@@ -103,7 +103,6 @@ def construct_cli_command():
                     f.write(file_content.tobytes())  
             # Update widget.value or cli_command as needed
             cli_command.append(f" {cli_tag} {temp_dir}") 
-            {# cli_command.append(f" {cli_tag} "/bilayers/input") #}
         else:
             cli_command.append(f" {cli_tag} {widget.value}")
 

@@ -31,8 +31,4 @@ exec_function:
   module: "src.Algorithms.threshold"
 
 docker-image:
-<<<<<<< HEAD
   name: "threshold-image"
-=======
-  name: "threshold-image"
->>>>>>> f18e05f ([Add] Github Actions workflow and the bash script to dynamically pull up Interfaces)

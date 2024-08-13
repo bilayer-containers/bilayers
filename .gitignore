@@ -21,35 +21,14 @@ _version.py
 .nox/
 app.py
 __pycache__/
-<<<<<<< HEAD
-<<<<<<< HEAD
 flagged/
 .ipynb_checkpoints/
 .virtual_documents/
-<<<<<<< Updated upstream
-<<<<<<< HEAD
-generated_notebook.ipynb
-flagged/
-# pixi environments
-.pixi
-*.egg-info
-test.ipynb
-=======
-flagged/
->>>>>>> f18e05f ([Add] Github Actions workflow and the bash script to dynamically pull up Interfaces)
-=======
-flagged/
-.ipynb_checkpoints/
-.virtual_documents/
-generated_notebooks.ipynb
->>>>>>> a48158e (Skeleton code for jupyternb but still need changes)
-=======
-generated_notebook.ipynb
->>>>>>> d9fac59 (Skeleton code for jupyternb but still need changes)
-=======
 generated_notebook.ipynb
 generated_folders/
 final_generated_notebook.ipynb
 generate_jupyter.py
 test.ipynb
->>>>>>> Stashed changes
+# pixi environments
+.pixi
+*.egg-info

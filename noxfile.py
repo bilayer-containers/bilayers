@@ -12,7 +12,7 @@ def run_parse(session):
     
 @nox.session
 def run_generate(session):
-    session.install('pyyaml', 'jinja2', 'nbformat', 'ipython', 'ipywidgets')
+    session.install('pyyaml','jinja2', 'nbformat', 'ipython', 'ipywidgets')
     session.cd('src/Build/parse')
     session.run('python', 'generate.py')
     session.cd('../../..')

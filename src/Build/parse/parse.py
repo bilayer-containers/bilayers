@@ -20,16 +20,19 @@ def main():
 
     folder_name = config.get('folder_name', None)
 
-    return sections, inputs, outputs, exec_function, folder_name
+    citations = config.get('citations', [])
+
+    return sections, inputs, outputs, exec_function, folder_name, citations
 
 if __name__ == "__main__":
     # sections, inputs, outputs, exec_function = main()
 
-    sections, inputs, outputs, exec_function, folder_name = main()
+    sections, inputs, outputs, exec_function, folder_name, citations = main()
     print(f"Sections: {sections}")
     print(f"Inputs: {inputs}")
     print(f"Outputs: {outputs}")
     print(f"Exec Function: {exec_function}")
     print(f"Folder Name: {folder_name}")
+    print(f"Citations: {citations}")
 
     

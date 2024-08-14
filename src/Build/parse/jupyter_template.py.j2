@@ -58,7 +58,12 @@ tab.set_title(0, "{{ input_conf['label'] }}")
 tab.set_title(1, "Description")
 
 # Append the corresponding cli_tag, widget to input_vars
+# Append the corresponding cli_tag, widget to input_vars
+{% if input_conf.type == 'Files' %}
+input_vars.append(("{{ input_conf['cli_tag'] }}", {{ input_conf.label | lower | replace(" ", "_") }}, {{ input_conf.get('volume_mount', 'False') }}, "{{ input_conf.get('folder_name', '') }}"))
+{% else %}
 input_vars.append(("{{ input_conf['cli_tag'] }}", {{ input_conf.label | lower | replace(" ", "_") }}))
+{% endif %}
 
 {% if input_conf.mode == 'beginner' -%}
 beginner_widgets.append(tab)
@@ -77,34 +82,46 @@ acc.set_title(1, "Advanced Section")
 
 def construct_cli_command():
     cli_command = ["{{ exec_function.cli_command }}"]
-    for cli_tag, widget in input_vars:
-        if isinstance(widget, widgets.Checkbox):
-            if widget.value == True:
-                cli_command.append(cli_tag)
-            else:
-                continue
-        elif isinstance(widget, widgets.Textarea):
-            if widget.value == "":
-                continue
-            cli_command.append(f"{cli_tag} {widget.value}")
-        elif isinstance(widget, widgets.RadioButtons):
-            if widget.value != "None":
-                cli_command.append(f"{cli_tag} {widget.value}")
-            else:
-                continue
-        elif isinstance(widget, widgets.FileUpload):
-            # Create a temporary directory and move all the input files there : For multiple files
-            temp_dir = tempfile.mkdtemp()
-            for uploaded_file in widget.value:  
-                file_content = uploaded_file['content']
-                file_path = os.path.join(temp_dir, uploaded_file['name'])
-                with open(file_path, 'wb') as f:
-                    # Convert memoryview to bytes
-                    f.write(file_content.tobytes())  
-            # Update widget.value or cli_command as needed
-            cli_command.append(f" {cli_tag} {temp_dir}") 
-        else:
-            cli_command.append(f" {cli_tag} {widget.value}")
+    for input_var in input_vars:
+            cli_tag = input_var[0]
+            widget = input_var[1]
+            
+            if len(input_var) == 4:  # This is a 'Files' type
+                volume_mount = input_var[2]
+                folder_name = input_var[3]
+            
+                if isinstance(widget, widgets.FileUpload):
+                    if volume_mount:
+                        # If volume_mount is True, add the user provided folder_name to the cli_command
+                        cli_command.append(f"{cli_tag} {folder_name}")
+                    else:
+                        # Create a temporary directory and move all the input files there
+                        temp_dir = tempfile.mkdtemp()
+                        for uploaded_file in widget.value:  
+                            file_content = uploaded_file['content']
+                            file_path = os.path.join(temp_dir, uploaded_file['name'])
+                            with open(file_path, 'wb') as f:
+                                # Convert memoryview to bytes
+                                f.write(file_content.tobytes())  
+                        cli_command.append(f"{cli_tag} {temp_dir}")
+            
+            else:  # Handling other types then Files
+                if isinstance(widget, widgets.Checkbox):
+                    if widget.value == True:
+                        cli_command.append(cli_tag)
+                    else:
+                        continue
+                elif isinstance(widget, widgets.Textarea):
+                    if widget.value == "":
+                        continue
+                    cli_command.append(f"{cli_tag} {widget.value}")
+                elif isinstance(widget, widgets.RadioButtons):
+                    if widget.value != "None":
+                        cli_command.append(f"{cli_tag} {widget.value}")
+                    else:
+                        continue
+                else:
+                    cli_command.append(f"{cli_tag} {widget.value}")
 
     # Add hidden arguments to the command
     {% if exec_function.hidden_args %}
@@ -123,7 +140,8 @@ def update_command(change):
 
 cli_command = widgets.Textarea(value=construct_cli_command(), description="CLI Command")
 
-for _, widget in input_vars:
+for input_var in input_vars:
+    widget = input_var[1]
     widget.observe(update_command, names='value')
 
 display(acc, cli_command)

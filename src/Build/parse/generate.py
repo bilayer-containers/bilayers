@@ -1,10 +1,12 @@
 import os
+import sys
 # Importing parse function from parse.py
 from parse import main as parse_config
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 import nbformat as nbf 
 import ipywidgets as widgets
 from IPython.display import display, HTML
+
 
 def preprocess_config(config):
     supported_input_types = {'Files', 'Radio', 'Number', 'Textbox', 'Checkbox', 'Float', 'Integer'}
@@ -128,10 +130,15 @@ except Exception as e:
 def main():
     print("Parsing config...")
 
-    # inputs, outputs, exec_function = parse_config()
-    config = parse_config()
-    
-    inputs, outputs, exec_function, folder_name, citations = preprocess_config(config)
+    if len(sys.argv) > 1:
+        config_path = sys.argv[1]
+    else:
+        config_path = None
+
+    sections, inputs, outputs, exec_function, folder_name, citations = parse_config(config_path)
+
+    # config = parse_config()
+    # inputs, outputs, exec_function, folder_name, citations = preprocess_config(config)
 
     ########################################
     # Logic for generating Gradio App
@@ -163,7 +170,8 @@ def main():
 
     folderA = "generated_folders"
     folderB = folder_name
-    # CreAate Directory if they don't exist
+    print("Folder Name: ", folderB)
+    # Create Directory if they don't exist
     os.makedirs(os.path.join(folderA, folderB), exist_ok=True)
 
     # Template path for the Jupyter Notebook

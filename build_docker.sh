@@ -4,7 +4,7 @@
 set -e
 
 # List of algorithms and interfaces
-ALGORITHM_NAMES=("cellpose") 
+ALGORITHM_NAMES=("cellpose_inference") 
 INTERFACE_NAMES=("gradio" "jupyter")
 
 # Build the Docker images for each algorithm and interface
@@ -15,11 +15,12 @@ for ALGORITHM_NAME in "${ALGORITHM_NAMES[@]}";
         echo "Processing Algorithm: $ALGORITHM_NAME, Interface: $INTERFACE_NAME"
 
         # Running the parse script by giving actual config_path
-        CONFIG_PATH="./src/Algorithm/${ALGORITHM_NAME}/config.yaml"
+        CONFIG_PATH="../../../src/Algorithms/${ALGORITHM_NAME}/config.yaml"
         nox -s run_parse -- $CONFIG_PATH
 
         # Running the generate file 
-        nox -s run_generate
+        CONFIG_PATH="../../../src/Algorithms/${ALGORITHM_NAME}/config.yaml"
+        nox -s run_generate -- $CONFIG_PATH
 
         # Building the Algorithm Docker image
         nox -s build_algorithm -- $ALGORITHM_NAME

@@ -371,8 +371,8 @@ outputs:
 
 exec_function: 
   name: "generate_cli_command"
-  script: "cellpose"
-  module: "Algorithms.cellpose"
+  script: "cellpose_inference"
+  module: "Algorithms.cellpose_inference"
   cli_command: "python -m cellpose --verbose"
   hidden_args: 
     # dummy example
@@ -381,10 +381,10 @@ exec_function:
 
 docker-image:
   org: cellprofiler
-  name: runcellpose_with_pretrained
+  name: runcellpose_no_pretrained
   tag: 0.1
 
-folder_name: "cellpose"
+folder_name: "cellpose_inference"
 
 citations:
   Bilayers:

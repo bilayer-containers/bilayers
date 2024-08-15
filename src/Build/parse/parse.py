@@ -25,7 +25,6 @@ def main():
     return sections, inputs, outputs, exec_function, folder_name, citations
 
 if __name__ == "__main__":
-    # sections, inputs, outputs, exec_function = main()
 
     sections, inputs, outputs, exec_function, folder_name, citations = main()
     print(f"Sections: {sections}")

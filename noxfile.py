@@ -14,7 +14,8 @@ def run_parse(session):
 def run_generate(session):
     session.install('pyyaml','jinja2', 'nbformat', 'ipython', 'ipywidgets')
     session.cd('src/Build/parse')
-    session.run('python', 'generate.py')
+    config_path = session.posargs[0]
+    session.run('python', 'generate.py', config_path)
     session.cd('../../..')
 
 @nox.session

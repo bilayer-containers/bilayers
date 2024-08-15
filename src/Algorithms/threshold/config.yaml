@@ -20,7 +20,7 @@ inputs:
     max: 30
     interactive: true
 
-output:
+outputs:
   - type: Files
     file_count: multiple
     label: "Download Output"
@@ -32,3 +32,23 @@ exec_function:
 
 docker-image:
   name: "threshold-image"
+
+folder_name: "threshold"
+
+citations:
+  Bilayers:
+    - name: "Bilayers"
+      license: xxxxx
+      description: "GUI interfaces for deep learning-based cell segmentation algorithms"
+  Jupyter:
+    - name: "Jupyter"
+      doi: 10.1109/MCSE.2007.53
+      description: "Interactive, code-driven documents for data analysis and visualization"
+  Gradio:
+    - name: "Gradio"
+      doi: 10.48550/arXiv.1906.02569
+      description: "A simple web interface for deploying machine learning models"
+  Algorithm: 
+    - name: "Threshold"
+      doi: xxxx
+      description: "This is threshold algorithm"

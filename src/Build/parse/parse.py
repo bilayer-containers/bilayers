@@ -1,13 +1,18 @@
 import yaml
+import sys
 
-def parse_config(config_path="../../../src/Algorithms/cellpose/config.yaml"):
+def parse_config(config_path=None):
+    if config_path is None:
+        config_path = '../../../src/Algorithms/threshold/config.yaml'
     with open(config_path, 'r') as file:
         config = yaml.safe_load(file)
     return config
 
-def main():
+def main(config_path=None):
 
-    config = parse_config()
+    config_path = sys.argv[1] if len(sys.argv) > 1 else None
+
+    config = parse_config(config_path)
 
     sections = config.get('sections', [])
 

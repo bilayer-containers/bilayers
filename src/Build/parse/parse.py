@@ -14,7 +14,6 @@ def main(config_path=None):
 
     config = parse_config(config_path)
 
-    sections = config.get('sections', [])
 
     inputs = config.get('inputs', [])
     
@@ -27,12 +26,11 @@ def main(config_path=None):
 
     citations = config.get('citations', [])
 
-    return sections, inputs, outputs, exec_function, folder_name, citations
+    return inputs, outputs, exec_function, folder_name, citations
 
 if __name__ == "__main__":
 
-    sections, inputs, outputs, exec_function, folder_name, citations = main()
-    print(f"Sections: {sections}")
+    inputs, outputs, exec_function, folder_name, citations = main()
     print(f"Inputs: {inputs}")
     print(f"Outputs: {outputs}")
     print(f"Exec Function: {exec_function}")

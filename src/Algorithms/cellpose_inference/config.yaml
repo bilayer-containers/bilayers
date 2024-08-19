@@ -350,18 +350,6 @@ inputs:
     section_id: "output-args"
     mode: "advanced"
 
-sections:
-  - id: hardware-args
-    label: "Hardware Arguments"
-  - id: input-args
-    label: "Input Arguments"
-  - id: model-args
-    label: "Model Arguments"
-  - id: algorithm-args
-    label: "Algorithm Arguments"
-  - id: output-args
-    label: "Output Arguments"
-
 outputs:
   - name: output_dir
     type: Files

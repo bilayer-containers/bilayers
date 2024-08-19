@@ -5,27 +5,26 @@ from parse import main as parse_config
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 import nbformat as nbf 
 import ipywidgets as widgets
-from IPython.display import display, HTML
+from IPython.display import display, HTML, FileLink
+from zipfile import ZipFile, ZIP_DEFLATED
+from pathlib import Path
 
 
 def preprocess_config(config):
     supported_input_types = {'Files', 'Radio', 'Number', 'Textbox', 'Checkbox', 'Float', 'Integer'}
     supported_output_types = {'Files', 'Textbox', 'Image'}
     
-    # section_mapping = {section['id']: section['label'] for section in config[0]}
-    # # debugging what's there in section_mapping?
-    # print(f"Section Mapping in generate.py: {section_mapping}")
 
-    inputs = [input_conf for input_conf in config[1] if input_conf['type'] in supported_input_types]
+    inputs = [input_conf for input_conf in config[0] if input_conf['type'] in supported_input_types]
     # print(f"Inputs in generate.py: {inputs}")
 
-    outputs = [output_conf for output_conf in config[2] if output_conf['type'] in supported_output_types]
+    outputs = [output_conf for output_conf in config[1] if output_conf['type'] in supported_output_types]
 
-    exec_function = config[3]
+    exec_function = config[2]
 
-    folder_name = config[4]
+    folder_name = config[3]
 
-    citations = config[5]
+    citations = config[4]
 
     return inputs, outputs, exec_function, folder_name, citations
 
@@ -100,14 +99,29 @@ def generate_jupyter_notebook(template_path, inputs, outputs, exec_function, cit
 
     nb.cells.append(create_code_cell(f"print({{cli_command.value}})"))
 
+    def create_zip_and_display_link(zipname='xyz_folder.zip', folder_path='input_images'):
+        folder_to_zip = Path(folder_path)
+        with ZipFile(zipname, 'w') as zipf:
+            for file in folder_to_zip.rglob('*'):
+                if file.is_file():
+                    zipf.write(file, file.relative_to(folder_to_zip.parent))
+        
+        display(FileLink(zipname, result_html_prefix="Click here to download: "))
 
     run_command_cell = f"""
 import subprocess
 import nbformat as nbf
 from IPython.core.getipython import get_ipython
+from IPython.display import display, FileLink
+from zipfile import ZipFile, ZIP_DEFLATED
+from pathlib import Path
+
 try:
     res = subprocess.run(cli_command.value, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     !{{cli_command.value}}
+    
+    # Download output zip-folder 
+    create_zip_and_display_link()    
 
 except Exception as e:
     error_message = str(e)
@@ -135,7 +149,7 @@ def main():
     else:
         config_path = None
 
-    sections, inputs, outputs, exec_function, folder_name, citations = parse_config(config_path)
+    inputs, outputs, exec_function, folder_name, citations = parse_config(config_path)
 
     # config = parse_config()
     # inputs, outputs, exec_function, folder_name, citations = preprocess_config(config)

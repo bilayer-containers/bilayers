@@ -21,6 +21,8 @@ def generate_cli_command(cli_tags, **kwargs):
     {# Below folders are only used when volume-mount option is explicitly provided, otherwise no-use #}
     temp_dir = None
     volume_mount_folder_name = None
+    folder_name = None
+    output_folder_name = None
 
     # Update cli_args with user inputs or defaults
     for key, value in kwargs.items():
@@ -68,7 +70,17 @@ def generate_cli_command(cli_tags, **kwargs):
                     value = None
                 # If the value is None, append it
                 if value is not None:
-                    cli_command.append(f"{cli_tag} {value}")
+                    {# if it is output thing nu textbox then set output_folder_name #}
+                    if cli_tags[key].get("output_dir_set") == True:
+                        output_folder_name = value
+                        cli_command.append(f"{cli_tag} {output_folder_name}")
+                        os.makedirs(output_folder_name, exist_ok=True)
+                    elif cli_tags[key].get("output_dir_set") == False:
+                        output_folder_name = default
+                        cli_command.append(f"{cli_tag} {default}")
+                        os.makedirs(value, exist_ok=True) 
+                    else:
+                        cli_command.append(f"{cli_tag} {value}")
 
    # Add hidden arguments to the command
     {% if exec_function.hidden_args %}
@@ -80,23 +92,35 @@ def generate_cli_command(cli_tags, **kwargs):
     {% endfor %}
     {% endif %}
     
-    return " ".join(cli_command), folder_name, volume_mount_folder_name
+    return " ".join(cli_command), folder_name, volume_mount_folder_name, output_folder_name
 
 # Dynamically define on_submit with the exact input arguments
 def on_submit(
 {% for input_conf in inputs %}
 {% if input_conf.type == 'Files' %}
-{{input_conf.label | lower | replace(" ", "_")}}_description {% if not loop.last %}, {% endif %}
-{{ input_conf.label | lower | replace(" ", "_") }}{% if not loop.last %}, {% endif %}
+{{input_conf.label | lower | replace(" ", "_")}}_description,
+{{ input_conf.label | lower | replace(" ", "_") }},
 {% else %}
-{{ input_conf.label | lower | replace(" ", "_") }}{% if not loop.last %}, {% endif %}
+{{ input_conf.label | lower | replace(" ", "_") }},
+{% endif %}
+{% endfor %}
+{% for output_conf in outputs %}
+{% if output_conf.type == 'Textbox' %}
+{{ output_conf.label | lower | replace(" ", "_") }},
 {% endif %}
 {% endfor %}
 ):
 
     kwargs = {
     {% for input_conf in inputs %}
-        "{{ input_conf.label | lower | replace(' ', '_') }}": {{ input_conf.label | lower | replace(' ', '_') }}{% if not loop.last %}, {% endif %}
+        "{{ input_conf.label | lower | replace(' ', '_') }}": {{ input_conf.label | lower | replace(' ', '_') }},
+    {% endfor %}
+    {% for output_conf in outputs %}
+    {% if output_conf.type == 'Textbox' %}
+    {% if output_conf.cli_tag != "None" %}
+        "{{ output_conf.label | lower | replace(' ', '_') }}": {{ output_conf.label | lower | replace(' ', '_') }},
+    {% endif %}
+    {% endif %}
     {% endfor %}
     }
 
@@ -110,7 +134,18 @@ def on_submit(
         # If volume_mount option is used, try fetching what user has provided : "volume_mount": {{ input_conf.volume_mount }},
         "folder_name": "{{ input_conf.folder_name }}"
         {% endif %}
+    },
+    {% endfor %}
+    {% for output_conf in outputs %}
+    {% if output_conf.type == 'Textbox' %}
+    {% if output_conf.cli_tag != "None" %}
+    "{{ output_conf.label | lower | replace(' ', '_') }}": {
+        "cli_tag": "{{ output_conf.cli_tag }}",
+        "output_dir_set": {{ output_conf.output_dir_set }},
+        "default": "{{ output_conf.default }}"    
     }{% if not loop.last %}, {% endif %}
+    {% endif %}
+    {% endif %}
     {% endfor %}
 }
 
@@ -118,16 +153,16 @@ def on_submit(
     print("Received inputs:", kwargs)
 
     # Generate the CLI command - volume_mount_folder_name has no use in this case
-    cli_command, folder_name, volume_mount_folder_name = generate_cli_command(cli_tags, **kwargs)
+    cli_command, folder_name, volume_mount_folder_name, output_folder_name = generate_cli_command(cli_tags, **kwargs)
     print("Generated CLI command:", cli_command)
 
-    # Here, it'll be always True, as we are not using the Volume Mount option
+    {# # Here, it'll be always True, as we are not using the Volume Mount option
     if folder_name:
         print("Files copied to temporary directory")
         before_files = set(os.listdir(folder_name))
     else: # If the Volume Mount option is used and True
         # List of files before running the command
-        before_files = set(os.listdir(volume_mount_folder_name))
+        before_files = set(os.listdir(volume_mount_folder_name)) #}
 
     # Execute the CLI command
     try:
@@ -137,10 +172,13 @@ def on_submit(
         
         # Display Output files
         output_files = []
-        if folder_name:
-            {# Previously used when we were creating temp_dir using tempfile lib #}
-            {# output_files.extend([os.path.join(temp_dir, f) for f in os.listdir(temp_dir) if os.path.isfile(os.path.join(temp_dir, f))]) #}
-            {# Currently every file would be fetched from the folder_name which is given by user #}
+        if output_folder_name:
+            print("Output Folder Name:", output_folder_name)
+            output_files = [os.path.join(output_folder_name, f) for f in os.listdir(output_folder_name) if os.path.isfile(os.path.join(output_folder_name, f))]
+        {# if folder_name:
+            # Previously used when we were creating temp_dir using tempfile lib 
+            # output_files.extend([os.path.join(temp_dir, f) for f in os.listdir(temp_dir) if os.path.isfile(os.path.join(temp_dir, f))]) 
+            # Currently every file would be fetched from the folder_name which is given by user
             after_files = set(os.listdir(folder_name))
 
             # Only the output files
@@ -152,7 +190,7 @@ def on_submit(
 
             # Only the output files
             new_files = list(after_files - before_files)
-            output_files = [os.path.join(volume_mount_folder_name, f) for f in new_files if os.path.isfile(os.path.join(volume_mount_folder_name, f))]
+            output_files = [os.path.join(volume_mount_folder_name, f) for f in new_files if os.path.isfile(os.path.join(volume_mount_folder_name, f))] #}
 
 
         return output_files
@@ -195,6 +233,15 @@ def on_submit(
 {% endfor %}  
 
 
+
+{% for output_conf in outputs %}
+{% if output_conf.type == 'Textbox' and output_conf.output_dir_set == False %}
+{{ output_conf.label | lower | replace(" ", "_") }} = gr.Textbox(label="{{ output_conf.label }}", info="{{ output_conf.description }}", value="{{ output_conf.default }}", interactive=False)
+{% elif output_conf.type == 'Textbox' and output_conf.output_dir_set == True %}
+{{ output_conf.label | lower | replace(" ", "_") }} = gr.Textbox(label="{{ output_conf.label }}", info="{{ output_conf.description }}", value="{{ output_conf.default }}")
+{% endif %}
+{% endfor %}
+
 description_text = "Please cite the following while using Bilayers - Gradio Interface!\n\n"
 
 {% for citation in citations.Bilayers %}
@@ -216,7 +263,8 @@ description_text += f"{{citation.name}}: {{citation.doi}} - {{citation.descripti
 {% endfor %}
 
 
-inputs = [
+
+{# inputs = [
 
 {% for input_conf in inputs %}
 {% if input_conf.type == 'Files' %}
@@ -226,13 +274,34 @@ inputs = [
     {{ input_conf.label | lower | replace(" ", "_") }}{% if not loop.last %}, {% endif %}
 {% endif %}
 {% endfor %}
+] #}
+inputs = [
+{% for input_conf in inputs %}
+{% if input_conf.type == 'Files' %}
+    {{input_conf.label | lower | replace(" ", "_")}}_description,
+    {{ input_conf.label | lower | replace(" ", "_") }},
+{% else %}
+    {{ input_conf.label | lower | replace(" ", "_") }},
+{% endif %}
+{% endfor %}
+{% for output_conf in outputs %}
+{% if output_conf.type == 'Textbox' %}
+    {{ output_conf.label | lower | replace(" ", "_") }},
+{% endif %}
+{% endfor %}
 ]
 
-output = gr.Files(label="{{ outputs[0].label }}")
+output = [
+{% for output_conf in outputs %}
+{% if output_conf.type == 'Files' %}
+gr.Files(label="{{ output_conf.label }}", file_count="{{ output_conf.file_count }}")
+{% endif %}
+{% endfor %}
+]
 
 app = gr.Interface(
     fn=on_submit, 
-    inputs=inputs, 
+    inputs=inputs,
     outputs=output, 
     title="Gradio App",
     description=f"<div style='text-align: center'>{description_text}</div>"

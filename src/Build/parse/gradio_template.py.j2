@@ -18,9 +18,7 @@ def generate_cli_command(cli_tags, **kwargs):
     {% endfor %}
     }
 
-    {# Below folders are only used when volume-mount option is explicitly provided, otherwise no-use #}
-    temp_dir = None
-    volume_mount_folder_name = None
+
     folder_name = None
     output_folder_name = None
 
@@ -41,26 +39,9 @@ def generate_cli_command(cli_tags, **kwargs):
                         continue
                 # If the input is a list (mainly for input files), convert it to a string
                 elif isinstance(value, list):
-                    # If the Volume_Mount is True, then specify the path in docker-desktop
-                    # Otherwise, use the approach to copy the files to the temp folder
-                    {# volume_mount = cli_tags[key].get("volume_mount")
-                    print(f"volume_mount: {volume_mount}") 
-                    # Logic specifically, if we want to provide 2 options : Volume_mount and creating temp_dir 
-                    if volume_mount is True:
-                        print("Volume Mount is True")
-                        # Use the Volume Mount Specified directory
-                        volume_mount_folder_name = cli_tags[key].get("folder_name")
-                        print("Volume Mount Folder Name:", volume_mount_folder_name)
-                        value = volume_mount_folder_name 
-                    else:
-                        # Move the below stuff in else portion of logic, to provide the non-volume mount option  
-                        print("Volume Mount is False") #}
-                        # Create a temporary directory and move all the input files there - By not using the Volume Mount
                     folder_name = cli_tags[key].get("folder_name")
                     print("Folder Name:", folder_name)
                     os.makedirs(folder_name, exist_ok=True)
-                    {# temp_dir = tempfile.mkdtemp() #}
-                    print("Temp Directory:", temp_dir)
                     print("Value of dir", value)
                     for file_path in value:
                         shutil.copy(file_path, folder_name)
@@ -70,7 +51,7 @@ def generate_cli_command(cli_tags, **kwargs):
                     value = None
                 # If the value is None, append it
                 if value is not None:
-                    {# if it is output thing nu textbox then set output_folder_name #}
+                    # If it's Textbox which comes from output directory, check for output_dir_set
                     if cli_tags[key].get("output_dir_set") == True:
                         output_folder_name = value
                         cli_command.append(f"{cli_tag} {output_folder_name}")
@@ -92,7 +73,7 @@ def generate_cli_command(cli_tags, **kwargs):
     {% endfor %}
     {% endif %}
     
-    return " ".join(cli_command), folder_name, volume_mount_folder_name, output_folder_name
+    return " ".join(cli_command), folder_name, output_folder_name
 
 # Dynamically define on_submit with the exact input arguments
 def on_submit(
@@ -131,7 +112,6 @@ def on_submit(
         "cli_tag": "{{ input_conf.cli_tag }}",
         "default": "{{ input_conf.default }}",
         {% if input_conf.type == 'Files' %}
-        # If volume_mount option is used, try fetching what user has provided : "volume_mount": {{ input_conf.volume_mount }},
         "folder_name": "{{ input_conf.folder_name }}"
         {% endif %}
     },
@@ -152,17 +132,11 @@ def on_submit(
 
     print("Received inputs:", kwargs)
 
-    # Generate the CLI command - volume_mount_folder_name has no use in this case
-    cli_command, folder_name, volume_mount_folder_name, output_folder_name = generate_cli_command(cli_tags, **kwargs)
+    # Generate the CLI command
+    cli_command, folder_name, output_folder_name = generate_cli_command(cli_tags, **kwargs)
     print("Generated CLI command:", cli_command)
 
-    {# # Here, it'll be always True, as we are not using the Volume Mount option
-    if folder_name:
-        print("Files copied to temporary directory")
-        before_files = set(os.listdir(folder_name))
-    else: # If the Volume Mount option is used and True
-        # List of files before running the command
-        before_files = set(os.listdir(volume_mount_folder_name)) #}
+  
 
     # Execute the CLI command
     try:
@@ -175,23 +149,7 @@ def on_submit(
         if output_folder_name:
             print("Output Folder Name:", output_folder_name)
             output_files = [os.path.join(output_folder_name, f) for f in os.listdir(output_folder_name) if os.path.isfile(os.path.join(output_folder_name, f))]
-        {# if folder_name:
-            # Previously used when we were creating temp_dir using tempfile lib 
-            # output_files.extend([os.path.join(temp_dir, f) for f in os.listdir(temp_dir) if os.path.isfile(os.path.join(temp_dir, f))]) 
-            # Currently every file would be fetched from the folder_name which is given by user
-            after_files = set(os.listdir(folder_name))
-
-            # Only the output files
-            new_files = list(after_files - before_files)
-            output_files = [os.path.join(folder_name, f) for f in new_files if os.path.isfile(os.path.join(folder_name, f))]
-        else:
-            # All the files fetched after running the command
-            after_files = set(os.listdir(volume_mount_folder_name))
-
-            # Only the output files
-            new_files = list(after_files - before_files)
-            output_files = [os.path.join(volume_mount_folder_name, f) for f in new_files if os.path.isfile(os.path.join(volume_mount_folder_name, f))] #}
-
+        
 
         return output_files
 
@@ -215,14 +173,8 @@ def on_submit(
 {% elif input_conf.type == 'Checkbox' %}
 {{ input_conf.label | lower | replace(" ", "_") }} = gr.Checkbox(label="{{ input_conf.label }}", info="{{ input_conf.description }}", value={{ input_conf.value }})
 {% elif input_conf.type == 'Files' %}
-{# # If the Volume Mount option is used, then use the FileExplorer widget
-{% if input_conf.volume_mount %}
-{{ input_conf.label | lower | replace(" ", "_") }}_description = gr.Markdown(value="{{ input_conf.description }}")
-{{ input_conf.label | lower | replace(" ", "_") }} = gr.FileExplorer(label="{{ input_conf.label }}", file_count="{{ input_conf.file_count }}")
-{% else %} #}
 {{ input_conf.label | lower | replace(" ", "_") }}_description = gr.Markdown(value="{{ input_conf.description }}")
 {{ input_conf.label | lower | replace(" ", "_") }} = gr.Files(label="{{ input_conf.label }}", file_count="{{ input_conf.file_count }}")
-{# {% endif %} #}
 {% endif %}
 {% if input_conf.mode == "beginner" %}
 {% if input_conf.type == 'Files' %}
@@ -264,17 +216,7 @@ description_text += f"{{citation.name}}: {{citation.doi}} - {{citation.descripti
 
 
 
-{# inputs = [
 
-{% for input_conf in inputs %}
-{% if input_conf.type == 'Files' %}
-    {{input_conf.label | lower | replace(" ", "_")}}_description {% if not loop.last %}, {% endif %}
-    {{ input_conf.label | lower | replace(" ", "_") }}{% if not loop.last %}, {% endif %}
-{% else %}
-    {{ input_conf.label | lower | replace(" ", "_") }}{% if not loop.last %}, {% endif %}
-{% endif %}
-{% endfor %}
-] #}
 inputs = [
 {% for input_conf in inputs %}
 {% if input_conf.type == 'Files' %}

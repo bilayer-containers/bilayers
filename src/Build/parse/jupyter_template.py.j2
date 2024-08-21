@@ -92,7 +92,7 @@ def construct_cli_command():
             
                 if isinstance(widget, widgets.FileUpload):
                 {# Regardless, Volume-Mount is true or False, we are just allowing Volume Mount at the Jupyter Level #}
-                cli_command.append(f"{cli_tag} {folder_name}")
+                    cli_command.append(f"{cli_tag} {folder_name}")
                     {# if volume_mount: 
                         # If volume_mount is True, add the user provided folder_name to the cli_command 
                         cli_command.append(f"{cli_tag} {folder_name}")

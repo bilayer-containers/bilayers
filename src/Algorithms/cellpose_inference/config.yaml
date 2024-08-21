@@ -351,10 +351,24 @@ inputs:
     mode: "advanced"
 
 outputs:
+  - name: save_output_dir
+    type: Textbox
+    label: "Save Output Directory"
+    description: "Directory to save the output files"
+    output_dir_set: True
+    volume_mount: True
+    default: "/bilayers/input_images"
+    cli_tag: "--savedir"
+    optional: False
+    section_id: "output-section"
+    mode: "beginner"
   - name: output_dir
     type: Files
     label: "Download Outputs"
     description: "Directory containing the output files"
+    cli_tag : "None"
+    optional: True
+    section_id: "output-section"
     mode: "beginner"
 
 exec_function: 

@@ -6,7 +6,7 @@ import nbformat as nbf
 import json
 
 {% autoescape false %}
-inputs = {{inputs}}
+parameters = {{parameters}}
 exec_function = {{exec_function}}
 outputs = {{outputs}}
 
@@ -16,55 +16,55 @@ outputs = {{outputs}}
 beginner_widgets = []
 advanced_widgets = []
 
-input_vars = []
+param_vars = []
 
 # Appending args in cli_command
 cli_command = []
 cli_command.append(exec_function['cli_command'])
 
 radio_options = {
-    {% for input_conf in inputs if input_conf.type == 'Radio' -%}
-        "{{ input_conf.label | lower | replace(' ', '_') }}": {
-            {% for option in input_conf.options %}
+    {% for param_conf in parameters if param_conf.type == 'Radio' -%}
+        "{{ param_conf.label | lower | replace(' ', '_') }}": {
+            {% for option in param_conf.options %}
             "{{ option.label }}": "{{ option.value }}"{% if not loop.last -%}, {%- endif %}
             {%- endfor %}
         }{% if not loop.last -%}, {%- endif %}
     {% endfor -%}
     }
 
-{% for input_conf in inputs -%}
-{% if input_conf.type == 'Files' and input_conf.file_count == "multiple" %}
-{{ input_conf.label | lower | replace(" ", "_") }} = widgets.FileUpload(multiple=True)
-{% elif input_conf.type == 'Files' and input_conf.file_count == "single" %}
-{{ input_conf.label | lower | replace(" ", "_") }} = widgets.FileUpload(multiple=False)
-{% elif input_conf.type == 'Radio' %}
-{{ input_conf.label | lower | replace(" ", "_") }} = widgets.RadioButtons(options=[{% for option in input_conf.options %}("{{ option.label }}", "{{ option.value }}"){% if not loop.last %}, {% endif %}{% endfor %}], value="{{ input_conf.default }}")
-{% elif input_conf.type == 'Integer' %}
-{{ input_conf.label | lower | replace(" ", "_") }} = widgets.IntText(value={{ input_conf.default }})
-{% elif input_conf.type == 'Float' %}
-{{ input_conf.label | lower | replace(" ", "_") }} = widgets.FloatText(value={{ input_conf.default }})
-{% elif input_conf.type == 'Textbox' %}
-{{ input_conf.label | lower | replace(" ", "_") }} = widgets.Textarea(value="{{ input_conf.default if input_conf.default is not none else '' }}")
-{% elif input_conf.type == 'Checkbox' %}
-{{ input_conf.label | lower | replace(" ", "_") }} = widgets.Checkbox(value={{ input_conf.value }})
+{% for param_conf in parameters -%}
+{% if param_conf.type == 'Files' and param_conf.file_count == "multiple" %}
+{{ param_conf.label | lower | replace(" ", "_") }} = widgets.FileUpload(multiple=True)
+{% elif param_conf.type == 'Files' and param_conf.file_count == "single" %}
+{{ param_conf.label | lower | replace(" ", "_") }} = widgets.FileUpload(multiple=False)
+{% elif param_conf.type == 'Radio' %}
+{{ param_conf.label | lower | replace(" ", "_") }} = widgets.RadioButtons(options=[{% for option in param_conf.options %}("{{ option.label }}", "{{ option.value }}"){% if not loop.last %}, {% endif %}{% endfor %}], value="{{ param_conf.default }}")
+{% elif param_conf.type == 'Integer' %}
+{{ param_conf.label | lower | replace(" ", "_") }} = widgets.IntText(value={{ param_conf.default }})
+{% elif param_conf.type == 'Float' %}
+{{ param_conf.label | lower | replace(" ", "_") }} = widgets.FloatText(value={{ param_conf.default }})
+{% elif param_conf.type == 'Textbox' %}
+{{ param_conf.label | lower | replace(" ", "_") }} = widgets.Textarea(value="{{ param_conf.default if param_conf.default is not none else '' }}")
+{% elif param_conf.type == 'Checkbox' %}
+{{ param_conf.label | lower | replace(" ", "_") }} = widgets.Checkbox(value={{ param_conf.value }})
 {%- endif %}
 
 # Add a description label
-{{ "desc_" + input_conf.label | lower | replace(" ", "_") }}  = widgets.HTML(value = "<b>{{ input_conf['label'] }} </b> :  {{ input_conf.get('description', '') }}")
+{{ "desc_" + param_conf.label | lower | replace(" ", "_") }}  = widgets.HTML(value = "<b>{{ param_conf['label'] }} </b> :  {{ param_conf.get('description', '') }}")
 
 # Add widget and description to accordion
-tab = Tab(children=[HBox([widgets.Label("{{ input_conf['label'] }}"), {{ input_conf.label | lower | replace(" ", "_") }}]), {{ "desc_" + input_conf.label | lower | replace(" ", "_") }}])
-tab.set_title(0, "{{ input_conf['label'] }}")
+tab = Tab(children=[HBox([widgets.Label("{{ param_conf['label'] }}"), {{ param_conf.label | lower | replace(" ", "_") }}]), {{ "desc_" + param_conf.label | lower | replace(" ", "_") }}])
+tab.set_title(0, "{{ param_conf['label'] }}")
 tab.set_title(1, "Description")
 
-# Append the corresponding cli_tag, widget to input_vars
-{% if input_conf.type == 'Files' %}
-input_vars.append(("{{ input_conf['cli_tag'] }}", {{ input_conf.label | lower | replace(" ", "_") }}, "{{ input_conf.get('folder_name', '') }}"))
+# Append the corresponding cli_tag, widget to param_vars
+{% if param_conf.type == 'Files' %}
+param_vars.append(("{{ param_conf['cli_tag'] }}", {{ param_conf.label | lower | replace(" ", "_") }}, "{{ param_conf.get('folder_name', '') }}"))
 {% else %}
-input_vars.append(("{{ input_conf['cli_tag'] }}", {{ input_conf.label | lower | replace(" ", "_") }}))
+param_vars.append(("{{ param_conf['cli_tag'] }}", {{ param_conf.label | lower | replace(" ", "_") }}))
 {% endif %}
 
-{% if input_conf.mode == 'beginner' -%}
+{% if param_conf.mode == 'beginner' -%}
 beginner_widgets.append(tab)
 {% else %}
 advanced_widgets.append(tab)
@@ -88,8 +88,8 @@ tab = Tab(children=[HBox([widgets.Label("{{ output_conf['label'] }}"), {{ output
 tab.set_title(0, "{{ output_conf['label'] }}")
 tab.set_title(1, "Description")
 
-# Append the corresponding cli_tag, widget to input_vars
-input_vars.append(("{{ output_conf['cli_tag'] }}", {{ output_conf.label | lower | replace(" ", "_") }}))
+# Append the corresponding cli_tag, widget to param_vars
+param_vars.append(("{{ output_conf['cli_tag'] }}", {{ output_conf.label | lower | replace(" ", "_") }}))
 
 {% if output_conf.mode == 'beginner' -%}
 beginner_widgets.append(tab)
@@ -111,12 +111,12 @@ acc.set_title(1, "Advanced Section")
 
 def construct_cli_command():
     cli_command = ["{{ exec_function.cli_command }}"]
-    for input_var in input_vars:
-            cli_tag = input_var[0]
-            widget = input_var[1]
+    for param_var in param_vars:
+            cli_tag = param_var[0]
+            widget = param_var[1]
             
-            if len(input_var) == 3:  # This is a 'Files' type
-                folder_name = input_var[2]
+            if len(param_var) == 3:  # This is a 'Files' type
+                folder_name = param_var[2]
             
                 if isinstance(widget, widgets.FileUpload):
                     cli_command.append(f"{cli_tag} {folder_name}")
@@ -156,8 +156,8 @@ def update_command(change):
 
 cli_command = widgets.Textarea(value=construct_cli_command(), description="CLI Command")
 
-for input_var in input_vars:
-    widget = input_var[1]
+for param_var in param_vars:
+    widget = param_var[1]
     widget.observe(update_command, names='value')
 
 display(acc, cli_command)

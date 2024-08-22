@@ -1,4 +1,4 @@
-inputs:
+parameters:
   # Hardware Arguments
   - name: use_gpu
     type: Checkbox

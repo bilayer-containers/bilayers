@@ -11,12 +11,12 @@ from pathlib import Path
 
 
 def preprocess_config(config):
-    supported_input_types = {'Files', 'Radio', 'Number', 'Textbox', 'Checkbox', 'Float', 'Integer'}
+    supported_parameter_types = {'Files', 'Radio', 'Number', 'Textbox', 'Checkbox', 'Float', 'Integer'}
     supported_output_types = {'Files', 'Textbox', 'Image'}
     
 
-    inputs = [input_conf for input_conf in config[0] if input_conf['type'] in supported_input_types]
-    # print(f"Inputs in generate.py: {inputs}")
+    parameters = [param_conf for param_conf in config[0] if param_conf['type'] in supported_parameter_types]
+    # print(f"Parameters in generate.py: {parameters}")
 
     outputs = [output_conf for output_conf in config[1] if output_conf['type'] in supported_output_types]
 
@@ -26,10 +26,10 @@ def preprocess_config(config):
 
     citations = config[4]
 
-    return inputs, outputs, exec_function, folder_name, citations
+    return parameters, outputs, exec_function, folder_name, citations
 
 
-def generate_gradio_app(template_path, inputs, outputs, exec_function, citations):
+def generate_gradio_app(template_path, parameters, outputs, exec_function, citations):
     env = Environment(
         loader=FileSystemLoader(searchpath=os.path.dirname(template_path)),
         autoescape=select_autoescape(['j2'])
@@ -46,12 +46,12 @@ def generate_gradio_app(template_path, inputs, outputs, exec_function, citations
 
     template = env.get_template(os.path.basename(template_path))
 
-    gradio_app_code = template.render(inputs=inputs, outputs=outputs, exec_function=exec_function, citations=citations)
+    gradio_app_code = template.render(parameters=parameters, outputs=outputs, exec_function=exec_function, citations=citations)
 
     return gradio_app_code
 
 
-def generate_jupyter_notebook(template_path, inputs, outputs, exec_function, citations):
+def generate_jupyter_notebook(template_path, parameters, outputs, exec_function, citations):
     env = Environment(
         loader=FileSystemLoader(searchpath=os.path.dirname(template_path)),
         autoescape=select_autoescape(['j2'])
@@ -70,8 +70,8 @@ def generate_jupyter_notebook(template_path, inputs, outputs, exec_function, cit
         return nbf.v4.new_markdown_cell(content)
 
     template = env.get_template(os.path.basename(template_path))
-    print("To check the type of inputs: ", type(inputs))
-    notebook_content = template.render(inputs=inputs, outputs=outputs, exec_function=exec_function)
+    print("To check the type of parameters: ", type(parameters))
+    notebook_content = template.render(parameters=parameters, outputs=outputs, exec_function=exec_function)
 
     nb = nbf.v4.new_notebook()
     
@@ -98,53 +98,11 @@ def generate_jupyter_notebook(template_path, inputs, outputs, exec_function, cit
     nb.cells.append(hidden_cell)
 
     nb.cells.append(create_code_cell(f"print({{cli_command.value}})"))
-
-    def create_zip_and_display_link(zipname='xyz_folder.zip', folder_path='input_images'):
-        folder_to_zip = Path(folder_path)
-        with ZipFile(zipname, 'w') as zipf:
-            for file in folder_to_zip.rglob('*'):
-                if file.is_file():
-                    zipf.write(file, file.relative_to(folder_to_zip.parent))
-        
-        display(FileLink(zipname, result_html_prefix="Click here to download: "))
-
-    run_command_cell = f"""
-import subprocess
-import nbformat as nbf
-from IPython.core.getipython import get_ipython
-from IPython.display import display, FileLink
-from zipfile import ZipFile, ZIP_DEFLATED
-from pathlib import Path
-
-def create_zip_and_display_link(zipname='xyz_folder.zip', folder_path='input_images'):
-    folder_to_zip = Path(folder_path)
-    with ZipFile(zipname, 'w') as zipf:
-        for file in folder_to_zip.rglob('*'):
-            if file.is_file():
-                zipf.write(file, file.relative_to(folder_to_zip.parent))
-        
-    display(FileLink(zipname, result_html_prefix="Click here to download: "))
-
-try:
-    res = subprocess.run(cli_command.value, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    !{{cli_command.value}}
     
-    # Download output zip-folder 
-    create_zip_and_display_link()    
-
-except Exception as e:
-    error_message = str(e)
-    # print(f"Error occurred: {{error_message}}")
-    error_cell = nbf.v4.new_code_cell(f"# Error Details: {{error_message}}")
-
-    ####################
-    # Display the error cell
-    shell = get_ipython()
-    shell.payload_manager.write_payload(dict(
-    source='set_next_input',
-    text=error_cell['source'],
-    replace=False), single=False)
-"""
+    # jupyter_shell_command_template_path
+    jupyter_shell_command_template_path = "jupyter_shell_command_template.py.j2"
+    shell_command_template = env.get_template(os.path.basename(jupyter_shell_command_template_path))
+    run_command_cell = shell_command_template.render(cli_command=exec_function['cli_command'])
     
     # Append the try-except cell to the notebook
     nb.cells.append(create_code_cell(run_command_cell))
@@ -158,10 +116,10 @@ def main():
     else:
         config_path = None
 
-    inputs, outputs, exec_function, folder_name, citations = parse_config(config_path)
+    parameters, outputs, exec_function, folder_name, citations = parse_config(config_path)
 
     # config = parse_config()
-    # inputs, outputs, exec_function, folder_name, citations = preprocess_config(config)
+    # parameters, outputs, exec_function, folder_name, citations = preprocess_config(config)
 
     ########################################
     # Logic for generating Gradio App
@@ -176,7 +134,7 @@ def main():
     gradio_template_path = "gradio_template.py.j2"
 
     # Generating the gradio algorithm+interface app dynamically
-    gradio_app_code = generate_gradio_app(gradio_template_path, inputs, outputs, exec_function, citations)
+    gradio_app_code = generate_gradio_app(gradio_template_path, parameters, outputs, exec_function, citations)
 
     # Join folders and file name
     gradio_app_path = os.path.join(folderA, folderB, 'app.py')
@@ -201,7 +159,7 @@ def main():
     jupyter_template_path = "jupyter_template.py.j2"
 
     # Generating Jupyter Notebook file dynamically
-    jupyter_app_code = generate_jupyter_notebook(jupyter_template_path, inputs, outputs, exec_function, citations)
+    jupyter_app_code = generate_jupyter_notebook(jupyter_template_path, parameters, outputs, exec_function, citations)
 
     # Join folders and file name
     jupyter_notebook_path = os.path.join(folderA, folderB, 'generated_notebook.ipynb')

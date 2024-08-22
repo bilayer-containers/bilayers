@@ -9,9 +9,9 @@ def generate_cli_command(cli_tags, **kwargs):
 
     # Radio options mapping
     radio_options = {
-    {% for input_conf in inputs if input_conf.type == 'Radio' %}
-        "{{ input_conf.label | lower | replace(' ', '_') }}": {
-            {% for option in input_conf.options %}
+    {% for param_conf in parameters if param_conf.type == 'Radio' %}
+        "{{ param_conf.label | lower | replace(' ', '_') }}": {
+            {% for option in param_conf.options %}
             "{{ option.label }}": "{{ option.value }}"{% if not loop.last %}, {% endif %}
             {% endfor %}
         }{% if not loop.last %}, {% endif %}
@@ -22,7 +22,7 @@ def generate_cli_command(cli_tags, **kwargs):
     folder_name = None
     output_folder_name = None
 
-    # Update cli_args with user inputs or defaults
+    # Update cli_args with user parameters or defaults
     for key, value in kwargs.items():
         if key in cli_tags:
             cli_tag = cli_tags[key]["cli_tag"]
@@ -37,7 +37,7 @@ def generate_cli_command(cli_tags, **kwargs):
                     value = radio_options[key][value]
                     if value == "None":
                         continue
-                # If the input is a list (mainly for input files), convert it to a string
+                # If the parameter is a list (mainly for parameter files), convert it to a string
                 elif isinstance(value, list):
                     folder_name = cli_tags[key].get("folder_name")
                     print("Folder Name:", folder_name)
@@ -46,7 +46,7 @@ def generate_cli_command(cli_tags, **kwargs):
                     for file_path in value:
                         shutil.copy(file_path, folder_name)
                     value = folder_name
-                # If the input is a TextBox, check if it has a directory-name i.e. it's coming from ouputs
+                # If the parameter is a TextBox, check if it has a directory-name i.e. it's coming from ouputs
                 elif isinstance(value, str) and value!="":
                     output_dir_set = cli_tags[key].get("output_dir_set")
                     if output_dir_set == True:
@@ -79,14 +79,14 @@ def generate_cli_command(cli_tags, **kwargs):
     
     return " ".join(cli_command), folder_name, output_folder_name
 
-# Dynamically define on_submit with the exact input arguments
+# Dynamically define on_submit with the exact parameter arguments
 def on_submit(
-{% for input_conf in inputs %}
-{% if input_conf.type == 'Files' %}
-{{input_conf.label | lower | replace(" ", "_")}}_description,
-{{ input_conf.label | lower | replace(" ", "_") }},
+{% for param_conf in parameters %}
+{% if param_conf.type == 'Files' %}
+{{param_conf.label | lower | replace(" ", "_")}}_description,
+{{ param_conf.label | lower | replace(" ", "_") }},
 {% else %}
-{{ input_conf.label | lower | replace(" ", "_") }},
+{{ param_conf.label | lower | replace(" ", "_") }},
 {% endif %}
 {% endfor %}
 {% for output_conf in outputs %}
@@ -97,8 +97,8 @@ def on_submit(
 ):
 
     kwargs = {
-    {% for input_conf in inputs %}
-        "{{ input_conf.label | lower | replace(' ', '_') }}": {{ input_conf.label | lower | replace(' ', '_') }},
+    {% for param_conf in parameters %}
+        "{{ param_conf.label | lower | replace(' ', '_') }}": {{ param_conf.label | lower | replace(' ', '_') }},
     {% endfor %}
     {% for output_conf in outputs %}
     {% if output_conf.type == 'Textbox' %}
@@ -107,14 +107,14 @@ def on_submit(
     {% endfor %}
     }
 
-    # Mapping of input tags to CLI tags
+    # Mapping of parameter tags to CLI tags
     cli_tags = {
-    {% for input_conf in inputs %}
-    "{{ input_conf.label | lower | replace(' ', '_') }}": {
-        "cli_tag": "{{ input_conf.cli_tag }}",
-        "default": "{{ input_conf.default }}",
-        {% if input_conf.type == 'Files' %}
-        "folder_name": "{{ input_conf.folder_name }}"
+    {% for param_conf in parameters %}
+    "{{ param_conf.label | lower | replace(' ', '_') }}": {
+        "cli_tag": "{{ param_conf.cli_tag }}",
+        "default": "{{ param_conf.default }}",
+        {% if param_conf.type == 'Files' %}
+        "folder_name": "{{ param_conf.folder_name }}"
         {% endif %}
     },
     {% endfor %}
@@ -130,7 +130,7 @@ def on_submit(
 }
 
 
-    print("Received inputs:", kwargs)
+    print("Received parameters:", kwargs)
 
     # Generate the CLI command
     cli_command, folder_name, output_folder_name = generate_cli_command(cli_tags, **kwargs)
@@ -160,24 +160,24 @@ def on_submit(
         
 
 
-{% for input_conf in inputs %}
+{% for param_conf in parameters %}
 
-{% if input_conf.type == 'Radio' %}
-{{ input_conf.label | lower | replace(" ", "_") }} = gr.Radio(label="{{ input_conf.label }}", info="{{ input_conf.description }}",  choices=[{% for option in input_conf.options %}"{{ option.label }}"{% if not loop.last %}, {% endif %}{% endfor %}], value="{{ input_conf.default }}")
-{% elif input_conf.type == 'Integer' %}
-{{ input_conf.label | lower | replace(" ", "_") }} = gr.Number(label="{{ input_conf.label }}", info="{{ input_conf.description }}", value={{ input_conf.default }})
-{% elif input_conf.type == 'Float' %}
-{{ input_conf.label | lower | replace(" ", "_") }} = gr.Number(label="{{ input_conf.label }}", info="{{ input_conf.description }}", value={{ input_conf.default }})
-{% elif input_conf.type == 'Textbox' %}
-{{ input_conf.label | lower | replace(" ", "_") }} = gr.Textbox(label="{{ input_conf.label }}", info="{{ input_conf.description }}", value="{{ input_conf.default }}")
-{% elif input_conf.type == 'Checkbox' %}
-{{ input_conf.label | lower | replace(" ", "_") }} = gr.Checkbox(label="{{ input_conf.label }}", info="{{ input_conf.description }}", value={{ input_conf.value }})
-{% elif input_conf.type == 'Files' %}
-{{ input_conf.label | lower | replace(" ", "_") }}_description = gr.Markdown(value="{{ input_conf.description }}")
-{{ input_conf.label | lower | replace(" ", "_") }} = gr.Files(label="{{ input_conf.label }}", file_count="{{ input_conf.file_count }}")
+{% if param_conf.type == 'Radio' %}
+{{ param_conf.label | lower | replace(" ", "_") }} = gr.Radio(label="{{ param_conf.label }}", info="{{ param_conf.description }}",  choices=[{% for option in param_conf.options %}"{{ option.label }}"{% if not loop.last %}, {% endif %}{% endfor %}], value="{{ param_conf.default }}")
+{% elif param_conf.type == 'Integer' %}
+{{ param_conf.label | lower | replace(" ", "_") }} = gr.Number(label="{{ param_conf.label }}", info="{{ param_conf.description }}", value={{ param_conf.default }})
+{% elif param_conf.type == 'Float' %}
+{{ param_conf.label | lower | replace(" ", "_") }} = gr.Number(label="{{ param_conf.label }}", info="{{ param_conf.description }}", value={{ param_conf.default }})
+{% elif param_conf.type == 'Textbox' %}
+{{ param_conf.label | lower | replace(" ", "_") }} = gr.Textbox(label="{{ param_conf.label }}", info="{{ param_conf.description }}", value="{{ param_conf.default }}")
+{% elif param_conf.type == 'Checkbox' %}
+{{ param_conf.label | lower | replace(" ", "_") }} = gr.Checkbox(label="{{ param_conf.label }}", info="{{ param_conf.description }}", value={{ param_conf.value }})
+{% elif param_conf.type == 'Files' %}
+{{ param_conf.label | lower | replace(" ", "_") }}_description = gr.Markdown(value="{{ param_conf.description }}")
+{{ param_conf.label | lower | replace(" ", "_") }} = gr.Files(label="{{ param_conf.label }}", file_count="{{ param_conf.file_count }}")
 {% endif %}
-{% if input_conf.mode == "beginner" %}
-{% if input_conf.type == 'Files' %}
+{% if param_conf.mode == "beginner" %}
+{% if param_conf.type == 'Files' %}
 {% endif %}
 {% endif %}
 
@@ -217,13 +217,13 @@ description_text += f"{{citation.name}}: {{citation.doi}} - {{citation.descripti
 
 
 
-inputs = [
-{% for input_conf in inputs %}
-{% if input_conf.type == 'Files' %}
-    {{input_conf.label | lower | replace(" ", "_")}}_description,
-    {{ input_conf.label | lower | replace(" ", "_") }},
+parameters = [
+{% for param_conf in parameters %}
+{% if param_conf.type == 'Files' %}
+    {{param_conf.label | lower | replace(" ", "_")}}_description,
+    {{ param_conf.label | lower | replace(" ", "_") }},
 {% else %}
-    {{ input_conf.label | lower | replace(" ", "_") }},
+    {{ param_conf.label | lower | replace(" ", "_") }},
 {% endif %}
 {% endfor %}
 {% for output_conf in outputs %}
@@ -243,7 +243,7 @@ gr.Files(label="{{ output_conf.label }}", file_count="{{ output_conf.file_count 
 
 app = gr.Interface(
     fn=on_submit, 
-    inputs=inputs,
+    inputs=parameters,
     outputs=output, 
     title="Gradio App",
     description=f"<div style='text-align: center'>{description_text}</div>"

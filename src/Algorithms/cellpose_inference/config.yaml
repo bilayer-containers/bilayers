@@ -28,7 +28,6 @@ inputs:
     default: "directory"
     cli_tag: "--dir"
     section_id: "input-args"
-    volume_mount: True
     folder_name: "/bilayers/input_images"
     mode: "beginner"
   - name: look_one_level_down
@@ -153,7 +152,6 @@ inputs:
     cli_tag: "--add_model"
     optional: True
     section_id: "model-args"
-    volume_mount: True
     folder_name: "/bilayers/models"
     mode: "advanced"
 
@@ -356,7 +354,6 @@ outputs:
     label: "Save Output Directory"
     description: "Directory to save the output files"
     output_dir_set: True
-    volume_mount: True
     default: "/bilayers/input_images"
     cli_tag: "--savedir"
     optional: False

@@ -46,22 +46,26 @@ def generate_cli_command(cli_tags, **kwargs):
                     for file_path in value:
                         shutil.copy(file_path, folder_name)
                     value = folder_name
-                # If the value of textbox is empty string, set it to None
+                # If the input is a TextBox, check if it has a directory-name i.e. it's coming from ouputs
+                elif isinstance(value, str) and value!="":
+                    output_dir_set = cli_tags[key].get("output_dir_set")
+                    if output_dir_set == True:
+                        output_folder_name = value
+                        os.makedirs(output_folder_name, exist_ok=True)
+                        if cli_tag != "None":
+                            value = output_folder_name
+                    elif output_dir_set == False:
+                        output_folder_name = default
+                        os.makedirs(default, exist_ok=True)
+                        if cli_tag != "None":
+                            value = default
+            
+                # If the value of (textbox) is empty string, set it to None
                 if value == "":
                     value = None
                 # If the value is None, append it
-                if value is not None:
-                    # If it's Textbox which comes from output directory, check for output_dir_set
-                    if cli_tags[key].get("output_dir_set") == True:
-                        output_folder_name = value
-                        cli_command.append(f"{cli_tag} {output_folder_name}")
-                        os.makedirs(output_folder_name, exist_ok=True)
-                    elif cli_tags[key].get("output_dir_set") == False:
-                        output_folder_name = default
-                        cli_command.append(f"{cli_tag} {default}")
-                        os.makedirs(value, exist_ok=True) 
-                    else:
-                        cli_command.append(f"{cli_tag} {value}")
+                elif value is not None and cli_tag != "None":
+                    cli_command.append(f"{cli_tag} {value}")
 
    # Add hidden arguments to the command
     {% if exec_function.hidden_args %}
@@ -98,9 +102,7 @@ def on_submit(
     {% endfor %}
     {% for output_conf in outputs %}
     {% if output_conf.type == 'Textbox' %}
-    {% if output_conf.cli_tag != "None" %}
         "{{ output_conf.label | lower | replace(' ', '_') }}": {{ output_conf.label | lower | replace(' ', '_') }},
-    {% endif %}
     {% endif %}
     {% endfor %}
     }
@@ -118,13 +120,11 @@ def on_submit(
     {% endfor %}
     {% for output_conf in outputs %}
     {% if output_conf.type == 'Textbox' %}
-    {% if output_conf.cli_tag != "None" %}
     "{{ output_conf.label | lower | replace(' ', '_') }}": {
         "cli_tag": "{{ output_conf.cli_tag }}",
         "output_dir_set": {{ output_conf.output_dir_set }},
         "default": "{{ output_conf.default }}"    
     }{% if not loop.last %}, {% endif %}
-    {% endif %}
     {% endif %}
     {% endfor %}
 }

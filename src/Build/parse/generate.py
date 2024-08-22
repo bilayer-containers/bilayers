@@ -116,6 +116,15 @@ from IPython.display import display, FileLink
 from zipfile import ZipFile, ZIP_DEFLATED
 from pathlib import Path
 
+def create_zip_and_display_link(zipname='xyz_folder.zip', folder_path='input_images'):
+    folder_to_zip = Path(folder_path)
+    with ZipFile(zipname, 'w') as zipf:
+        for file in folder_to_zip.rglob('*'):
+            if file.is_file():
+                zipf.write(file, file.relative_to(folder_to_zip.parent))
+        
+    display(FileLink(zipname, result_html_prefix="Click here to download: "))
+
 try:
     res = subprocess.run(cli_command.value, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     !{{cli_command.value}}

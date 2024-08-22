@@ -58,9 +58,8 @@ tab.set_title(0, "{{ input_conf['label'] }}")
 tab.set_title(1, "Description")
 
 # Append the corresponding cli_tag, widget to input_vars
-# Append the corresponding cli_tag, widget to input_vars
 {% if input_conf.type == 'Files' %}
-input_vars.append(("{{ input_conf['cli_tag'] }}", {{ input_conf.label | lower | replace(" ", "_") }}, {{ input_conf.get('volume_mount', 'False') }}, "{{ input_conf.get('folder_name', '') }}"))
+input_vars.append(("{{ input_conf['cli_tag'] }}", {{ input_conf.label | lower | replace(" ", "_") }}, "{{ input_conf.get('folder_name', '') }}"))
 {% else %}
 input_vars.append(("{{ input_conf['cli_tag'] }}", {{ input_conf.label | lower | replace(" ", "_") }}))
 {% endif %}
@@ -71,6 +70,36 @@ beginner_widgets.append(tab)
 advanced_widgets.append(tab)
 {%- endif %}
 {%- endfor %}
+
+{# Parsing outputs to get the `savedir` foldername - Not much effect in JupyterNB except the case `cli_tag != None` #}
+{% for output_conf in outputs -%}
+{% if output_conf.type == 'Textbox' -%}
+{% if output_conf.output_dir_set == False -%}
+{{ output_conf.label | lower | replace(" ", "_") }} = widgets.Textarea(value="{{ output_conf.default }}", disabled=True)
+{% else -%}
+{{ output_conf.label | lower | replace(" ", "_") }} = widgets.Textarea(value="{{ output_conf.default }}")
+{% endif -%}
+
+# Add a description label
+{{ "desc_" + output_conf.label | lower | replace(" ", "_") }}  = widgets.HTML(value = "<b>{{ output_conf['label'] }} </b> :  {{ output_conf.get('description', '') }}")
+
+# Add widget and description to accordion
+tab = Tab(children=[HBox([widgets.Label("{{ output_conf['label'] }}"), {{ output_conf.label | lower | replace(" ", "_") }}]), {{ "desc_" + output_conf.label | lower | replace(" ", "_") }}])
+tab.set_title(0, "{{ output_conf['label'] }}")
+tab.set_title(1, "Description")
+
+# Append the corresponding cli_tag, widget to input_vars
+input_vars.append(("{{ output_conf['cli_tag'] }}", {{ output_conf.label | lower | replace(" ", "_") }}))
+
+{% if output_conf.mode == 'beginner' -%}
+beginner_widgets.append(tab)
+{% else %}
+advanced_widgets.append(tab)
+{%- endif %}
+
+{%- endif %}
+{%- endfor %}
+
 
 acc = Accordion()
 # Add beginner_widgets to the first section
@@ -86,26 +115,11 @@ def construct_cli_command():
             cli_tag = input_var[0]
             widget = input_var[1]
             
-            if len(input_var) == 4:  # This is a 'Files' type
-                volume_mount = input_var[2]
-                folder_name = input_var[3]
+            if len(input_var) == 3:  # This is a 'Files' type
+                folder_name = input_var[2]
             
                 if isinstance(widget, widgets.FileUpload):
-                {# Regardless, Volume-Mount is true or False, we are just allowing Volume Mount at the Jupyter Level #}
                     cli_command.append(f"{cli_tag} {folder_name}")
-                    {# if volume_mount: 
-                        # If volume_mount is True, add the user provided folder_name to the cli_command 
-                        cli_command.append(f"{cli_tag} {folder_name}")
-                    else:
-                        # Create a temporary directory and move all the input files there
-                        temp_dir = tempfile.mkdtemp()
-                        for uploaded_file in widget.value:  
-                            file_content = uploaded_file['content']
-                            file_path = os.path.join(temp_dir, uploaded_file['name'])
-                            with open(file_path, 'wb') as f:
-                                # Convert memoryview to bytes
-                                f.write(file_content.tobytes())  
-                        cli_command.append(f"{cli_tag} {temp_dir}") #}
             
             else:  # Handling other types then Files
                 if isinstance(widget, widgets.Checkbox):
@@ -114,7 +128,7 @@ def construct_cli_command():
                     else:
                         continue
                 elif isinstance(widget, widgets.Textarea):
-                    if widget.value == "":
+                    if widget.value == "" or cli_tag == "None":
                         continue
                     cli_command.append(f"{cli_tag} {widget.value}")
                 elif isinstance(widget, widgets.RadioButtons):

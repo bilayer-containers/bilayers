@@ -293,6 +293,16 @@ parameters:
     optional: True
     section_id: "output-args"
     mode: "advanced"
+  - name: save_dir
+    type: Textbox
+    label: "Save Directory"
+    description: "directory to save output files"
+    output_dir_set: True
+    default: "/bilayers/input_images"
+    cli_tag: "--savedir"
+    optional: True
+    section_id: "output-args"
+    mode: "advanced"
   - name: dir_above
     type: Checkbox
     label: "Dir Above"
@@ -347,18 +357,21 @@ parameters:
     optional: True
     section_id: "output-args"
     mode: "advanced"
+    
 
-outputs:
-  - name: save_output_dir
-    type: Textbox
-    label: "Save Output Directory"
-    description: "Directory to save the output files"
-    output_dir_set: True
-    default: "/bilayers/input_images"
-    cli_tag: "--savedir"
-    optional: False
-    section_id: "output-section"
-    mode: "beginner"
+# Display_only Section
+display_only:
+  # dummy example
+  # - name: save_output_dir
+  #   type: Textbox
+  #   label: "Save Output Directory"
+  #   description: "Directory to save the output files"
+  #   default: "/bilayers/input_images"
+  #   optional: False
+  #   section_id: "output-section"
+  #   mode: "beginner"
+  
+results:
   - name: output_dir
     type: Files
     label: "Download Outputs"

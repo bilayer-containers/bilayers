@@ -16,8 +16,10 @@ def main(config_path=None):
 
 
     parameters = config.get('parameters', [])
-    
-    outputs = config.get('outputs', [])
+
+    display_only = config.get('display_only', [])
+
+    results = config.get('results', [])
     
     # Exec function whole logic from threshold.py instead of just the function name
     exec_function = config.get('exec_function', {})
@@ -26,13 +28,14 @@ def main(config_path=None):
 
     citations = config.get('citations', [])
 
-    return parameters, outputs, exec_function, folder_name, citations
+    return parameters, display_only, results, exec_function, folder_name, citations
 
 if __name__ == "__main__":
 
-    parameters, outputs, exec_function, folder_name, citations = main()
+    parameters, display_only, results, exec_function, folder_name, citations = main()
     print(f"Parameters: {parameters}")
-    print(f"Outputs: {outputs}")
+    print(f"Display Only: {display_only}")
+    print(f"Results: {results}")
     print(f"Exec Function: {exec_function}")
     print(f"Folder Name: {folder_name}")
     print(f"Citations: {citations}")

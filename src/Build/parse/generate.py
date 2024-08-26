@@ -10,26 +10,7 @@ from zipfile import ZipFile, ZIP_DEFLATED
 from pathlib import Path
 
 
-def preprocess_config(config):
-    supported_parameter_types = {'Files', 'Radio', 'Number', 'Textbox', 'Checkbox', 'Float', 'Integer'}
-    supported_output_types = {'Files', 'Textbox', 'Image'}
-    
-
-    parameters = [param_conf for param_conf in config[0] if param_conf['type'] in supported_parameter_types]
-    # print(f"Parameters in generate.py: {parameters}")
-
-    outputs = [output_conf for output_conf in config[1] if output_conf['type'] in supported_output_types]
-
-    exec_function = config[2]
-
-    folder_name = config[3]
-
-    citations = config[4]
-
-    return parameters, outputs, exec_function, folder_name, citations
-
-
-def generate_gradio_app(template_path, parameters, outputs, exec_function, citations):
+def generate_gradio_app(template_path, parameters, display_only, results, exec_function, citations):
     env = Environment(
         loader=FileSystemLoader(searchpath=os.path.dirname(template_path)),
         autoescape=select_autoescape(['j2'])
@@ -46,12 +27,12 @@ def generate_gradio_app(template_path, parameters, outputs, exec_function, citat
 
     template = env.get_template(os.path.basename(template_path))
 
-    gradio_app_code = template.render(parameters=parameters, outputs=outputs, exec_function=exec_function, citations=citations)
+    gradio_app_code = template.render(parameters=parameters, display_only=display_only, results=results, exec_function=exec_function, citations=citations)
 
     return gradio_app_code
 
 
-def generate_jupyter_notebook(template_path, parameters, outputs, exec_function, citations):
+def generate_jupyter_notebook(template_path, parameters, display_only, results, exec_function, citations):
     env = Environment(
         loader=FileSystemLoader(searchpath=os.path.dirname(template_path)),
         autoescape=select_autoescape(['j2'])
@@ -71,7 +52,7 @@ def generate_jupyter_notebook(template_path, parameters, outputs, exec_function,
 
     template = env.get_template(os.path.basename(template_path))
     print("To check the type of parameters: ", type(parameters))
-    notebook_content = template.render(parameters=parameters, outputs=outputs, exec_function=exec_function)
+    notebook_content = template.render(parameters=parameters, display_only=display_only, results=results, exec_function=exec_function)
 
     nb = nbf.v4.new_notebook()
     
@@ -116,10 +97,8 @@ def main():
     else:
         config_path = None
 
-    parameters, outputs, exec_function, folder_name, citations = parse_config(config_path)
+    parameters, display_only, results, exec_function, folder_name, citations = parse_config(config_path)
 
-    # config = parse_config()
-    # parameters, outputs, exec_function, folder_name, citations = preprocess_config(config)
 
     ########################################
     # Logic for generating Gradio App
@@ -134,7 +113,7 @@ def main():
     gradio_template_path = "gradio_template.py.j2"
 
     # Generating the gradio algorithm+interface app dynamically
-    gradio_app_code = generate_gradio_app(gradio_template_path, parameters, outputs, exec_function, citations)
+    gradio_app_code = generate_gradio_app(gradio_template_path, parameters, display_only, results, exec_function, citations)
 
     # Join folders and file name
     gradio_app_path = os.path.join(folderA, folderB, 'app.py')
@@ -159,7 +138,7 @@ def main():
     jupyter_template_path = "jupyter_template.py.j2"
 
     # Generating Jupyter Notebook file dynamically
-    jupyter_app_code = generate_jupyter_notebook(jupyter_template_path, parameters, outputs, exec_function, citations)
+    jupyter_app_code = generate_jupyter_notebook(jupyter_template_path, parameters, display_only, results, exec_function, citations)
 
     # Join folders and file name
     jupyter_notebook_path = os.path.join(folderA, folderB, 'generated_notebook.ipynb')

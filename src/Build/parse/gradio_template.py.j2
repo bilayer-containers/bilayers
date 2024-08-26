@@ -9,13 +9,20 @@ def generate_cli_command(cli_tags, **kwargs):
 
     # Radio options mapping
     radio_options = {
-    {% for param_conf in parameters if param_conf.type == 'Radio' %}
+    {% for param_conf in parameters if param_conf.type == 'Radio' -%}
         "{{ param_conf.label | lower | replace(' ', '_') }}": {
-            {% for option in param_conf.options %}
+            {% for option in param_conf.options -%}
             "{{ option.label }}": "{{ option.value }}"{% if not loop.last %}, {% endif %}
-            {% endfor %}
-        }{% if not loop.last %}, {% endif %}
-    {% endfor %}
+            {%- endfor %}
+        },
+    {%- endfor %}
+    {% for display_only_conf in display_only if display_only_conf.type == 'Radio' -%}
+        "{{ display_only_conf.label | lower | replace(' ', '_') }}": {
+            {% for option in display_only_conf.options -%}
+            "{{ option.label }}": "{{ option.value }}"{% if not loop.last %}, {% endif %}
+            {%- endfor %}
+        },
+    {%- endfor %}
     }
 
 
@@ -25,7 +32,7 @@ def generate_cli_command(cli_tags, **kwargs):
     # Update cli_args with user parameters or defaults
     for key, value in kwargs.items():
         if key in cli_tags:
-            cli_tag = cli_tags[key]["cli_tag"]
+            cli_tag = cli_tags[key].get("cli_tag", None)
             default = cli_tags[key].get("default", None)
 
             if isinstance(value, bool):
@@ -63,9 +70,13 @@ def generate_cli_command(cli_tags, **kwargs):
                 # If the value of (textbox) is empty string, set it to None
                 if value == "":
                     value = None
-                # If the value is None, append it
-                elif value is not None and cli_tag != "None":
-                    cli_command.append(f"{cli_tag} {value}")
+                # If the cli_tag is None, don't include it in the command but if cli_tag is "" then just include the value
+                elif value is not None:
+                    if cli_tag == "":  # Only append the value if cli_tag is empty string
+                        cli_command.append(f"{value}")
+                    elif cli_tag != "None":  # Append both cli_tag and value if cli_tag is neither None nor empty
+                        cli_command.append(f"{cli_tag} {value}")
+
 
    # Add hidden arguments to the command
     {% if exec_function.hidden_args %}
@@ -81,29 +92,30 @@ def generate_cli_command(cli_tags, **kwargs):
 
 # Dynamically define on_submit with the exact parameter arguments
 def on_submit(
-{% for param_conf in parameters %}
+{% for param_conf in parameters -%}
 {% if param_conf.type == 'Files' %}
 {{param_conf.label | lower | replace(" ", "_")}}_description,
 {{ param_conf.label | lower | replace(" ", "_") }},
 {% else %}
 {{ param_conf.label | lower | replace(" ", "_") }},
 {% endif %}
-{% endfor %}
-{% for output_conf in outputs %}
-{% if output_conf.type == 'Textbox' %}
-{{ output_conf.label | lower | replace(" ", "_") }},
+{% endfor -%}
+{% for display_only_conf in display_only -%}
+{% if display_only_conf.type == 'Files' %}
+{{display_only_conf.label | lower | replace(" ", "_")}}_description,
+{{ display_only_conf.label | lower | replace(" ", "_") }},
+{% else %}
+{{ display_only_conf.label | lower | replace(" ", "_") }},
 {% endif %}
-{% endfor %}
+{% endfor -%}
 ):
 
     kwargs = {
     {% for param_conf in parameters %}
         "{{ param_conf.label | lower | replace(' ', '_') }}": {{ param_conf.label | lower | replace(' ', '_') }},
     {% endfor %}
-    {% for output_conf in outputs %}
-    {% if output_conf.type == 'Textbox' %}
-        "{{ output_conf.label | lower | replace(' ', '_') }}": {{ output_conf.label | lower | replace(' ', '_') }},
-    {% endif %}
+    {% for display_only_conf in display_only %}
+        "{{ display_only_conf.label | lower | replace(' ', '_') }}": {{ display_only_conf.label | lower | replace(' ', '_') }},
     {% endfor %}
     }
 
@@ -116,16 +128,7 @@ def on_submit(
         {% if param_conf.type == 'Files' %}
         "folder_name": "{{ param_conf.folder_name }}"
         {% endif %}
-    },
-    {% endfor %}
-    {% for output_conf in outputs %}
-    {% if output_conf.type == 'Textbox' %}
-    "{{ output_conf.label | lower | replace(' ', '_') }}": {
-        "cli_tag": "{{ output_conf.cli_tag }}",
-        "output_dir_set": {{ output_conf.output_dir_set }},
-        "default": "{{ output_conf.default }}"    
-    }{% if not loop.last %}, {% endif %}
-    {% endif %}
+    }{% if not loop.last %},{% endif %}
     {% endfor %}
 }
 
@@ -168,6 +171,8 @@ def on_submit(
 {{ param_conf.label | lower | replace(" ", "_") }} = gr.Number(label="{{ param_conf.label }}", info="{{ param_conf.description }}", value={{ param_conf.default }})
 {% elif param_conf.type == 'Float' %}
 {{ param_conf.label | lower | replace(" ", "_") }} = gr.Number(label="{{ param_conf.label }}", info="{{ param_conf.description }}", value={{ param_conf.default }})
+{% elif param_conf.type == 'Textbox' and param_conf.output_dir_set == False %}
+{{ param_conf.label | lower | replace(" ", "_") }} = gr.Textbox(label="{{ param_conf.label }}", info="{{ param_conf.description }}", value="{{ param_conf.default }}", interactive=False)
 {% elif param_conf.type == 'Textbox' %}
 {{ param_conf.label | lower | replace(" ", "_") }} = gr.Textbox(label="{{ param_conf.label }}", info="{{ param_conf.description }}", value="{{ param_conf.default }}")
 {% elif param_conf.type == 'Checkbox' %}
@@ -186,11 +191,25 @@ def on_submit(
 
 
 
-{% for output_conf in outputs %}
-{% if output_conf.type == 'Textbox' and output_conf.output_dir_set == False %}
-{{ output_conf.label | lower | replace(" ", "_") }} = gr.Textbox(label="{{ output_conf.label }}", info="{{ output_conf.description }}", value="{{ output_conf.default }}", interactive=False)
-{% elif output_conf.type == 'Textbox' and output_conf.output_dir_set == True %}
-{{ output_conf.label | lower | replace(" ", "_") }} = gr.Textbox(label="{{ output_conf.label }}", info="{{ output_conf.description }}", value="{{ output_conf.default }}")
+{% for display_only_conf in display_only %}
+{% if display_only_conf.type == 'Radio' %}
+{{ display_only_conf.label | lower | replace(" ", "_") }} = gr.Radio(label="{{ display_only_conf.label }}", info="{{ display_only_conf.description }}",  choices=[{% for option in display_only_conf.options %}"{{ option.label }}"{% if not loop.last %}, {% endif %}{% endfor %}], value="{{ display_only_conf.default }}", interactive=False)
+{% elif display_only_conf.type == 'Integer' %}
+{{ display_only_conf.label | lower | replace(" ", "_") }} = gr.Number(label="{{ display_only_conf.label }}", info="{{ display_only_conf.description }}", value={{ display_only_conf.default }}, interactive=False)
+{% elif display_only_conf.type == 'Float' %}
+{{ display_only_conf.label | lower | replace(" ", "_") }} = gr.Number(label="{{ display_only_conf.label }}", info="{{ display_only_conf.description }}", value={{ display_only_conf.default }}, interactive=False)
+{% elif display_only_conf.type == 'Textbox' %}
+{{ display_only_conf.label | lower | replace(" ", "_") }} = gr.Textbox(label="{{ display_only_conf.label }}", info="{{ display_only_conf.description }}", value="{{ display_only_conf.default }}", interactive=False)
+{% elif display_only_conf.type == 'Checkbox' %}
+{{ display_only_conf.label | lower | replace(" ", "_") }} = gr.Checkbox(label="{{ display_only_conf.label }}", info="{{ display_only_conf.description }}", value={{ display_only_conf.value }}, interactive=False)
+{% elif display_only_conf.type == 'Files' %}
+{{ display_only_conf.label | lower | replace(" ", "_") }}_description = gr.Markdown(value="{{ display_only_conf.description }}")
+{{ display_only_conf.label | lower | replace(" ", "_") }} = gr.Files(label="{{ display_only_conf.label }}", file_count="{{ display_only_conf.file_count }}", interactive=False)
+{% endif %}
+{% endfor %}
+
+{% for result_conf in results %}
+{% if result_conf.type == 'Files' %}
 {% endif %}
 {% endfor %}
 
@@ -209,15 +228,15 @@ description_text += f"{{citation.name}}: {{citation.doi}} - {{citation.descripti
 {% endfor %}
 
 
-{% for output_conf in outputs %}
-{% if output_conf.type == 'Files' %}
+{% for result_conf in results %}
+{% if result_conf.type == 'Files' %}
 {% endif %}
 {% endfor %}
 
 
 
 
-parameters = [
+all_parameters = [
 {% for param_conf in parameters %}
 {% if param_conf.type == 'Files' %}
     {{param_conf.label | lower | replace(" ", "_")}}_description,
@@ -226,25 +245,28 @@ parameters = [
     {{ param_conf.label | lower | replace(" ", "_") }},
 {% endif %}
 {% endfor %}
-{% for output_conf in outputs %}
-{% if output_conf.type == 'Textbox' %}
-    {{ output_conf.label | lower | replace(" ", "_") }},
+{% for display_only_conf in display_only %}
+{% if display_only_conf.type == 'Files' %}
+    {{ display_only_conf.label | lower | replace(" ", "_")}}_description,
+    {{ display_only_conf.label | lower | replace(" ", "_") }},
+{% else %}
+    {{ display_only_conf.label | lower | replace(" ", "_") }},
 {% endif %}
 {% endfor %}
 ]
 
-output = [
-{% for output_conf in outputs %}
-{% if output_conf.type == 'Files' %}
-gr.Files(label="{{ output_conf.label }}", file_count="{{ output_conf.file_count }}")
+results = [
+{% for result_conf in results %}
+{% if result_conf.type == 'Files' %}
+gr.Files(label="{{ result_conf.label }}", file_count="{{ result_conf.file_count }}")
 {% endif %}
 {% endfor %}
 ]
 
 app = gr.Interface(
     fn=on_submit, 
-    inputs=parameters,
-    outputs=output, 
+    inputs=all_parameters,
+    outputs=results, 
     title="Gradio App",
     description=f"<div style='text-align: center'>{description_text}</div>"
 )

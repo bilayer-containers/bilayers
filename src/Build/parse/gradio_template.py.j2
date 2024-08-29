@@ -17,9 +17,23 @@ def generate_cli_command(cli_tags, **kwargs):
             {%- endfor %}
         },
     {%- endfor %}
+    {% for param_conf in parameters if param_conf.type == 'Dropdown' -%}
+        "{{ param_conf.label | lower | replace(' ', '_') }}": {
+            {% for option in param_conf.options -%}
+            "{{ option.label }}": "{{ option.value }}"{% if not loop.last %}, {% endif %}
+            {%- endfor %}
+        },
+    {%- endfor %}
     {% endif %}
     {% if display_only is not none %}
     {% for display_only_conf in display_only if display_only_conf.type == 'Radio' -%}
+        "{{ display_only_conf.label | lower | replace(' ', '_') }}": {
+            {% for option in display_only_conf.options -%}
+            "{{ option.label }}": "{{ option.value }}"{% if not loop.last %}, {% endif %}
+            {%- endfor %}
+        },
+    {%- endfor %}
+    {% for display_only_conf in display_only if display_only_conf.type == 'Dropdown' -%}
         "{{ display_only_conf.label | lower | replace(' ', '_') }}": {
             {% for option in display_only_conf.options -%}
             "{{ option.label }}": "{{ option.value }}"{% if not loop.last %}, {% endif %}
@@ -199,6 +213,8 @@ def on_submit(
 
 {% if param_conf.type == 'Radio' %}
 {{ param_conf.label | lower | replace(" ", "_") }} = gr.Radio(label="{{ param_conf.label }}", info="{{ param_conf.description }}",  choices=[{% for option in param_conf.options %}"{{ option.label }}"{% if not loop.last %}, {% endif %}{% endfor %}], value="{{ param_conf.default }}")
+{% elif param_conf.type == 'Dropdown' %}
+{{ param_conf.label | lower | replace(" ", "_") }} = gr.Dropdown(label="{{ param_conf.label }}", info="{{ param_conf.description }}",  choices=[{% for option in param_conf.options %}"{{ option.label }}"{% if not loop.last %}, {% endif %}{% endfor %}], value="{{ param_conf.default }}", multiselect = {{ param_conf.multiselect }})
 {% elif param_conf.type == 'Integer' %}
 {{ param_conf.label | lower | replace(" ", "_") }} = gr.Number(label="{{ param_conf.label }}", info="{{ param_conf.description }}", value={{ param_conf.default }})
 {% elif param_conf.type == 'Float' %}
@@ -208,7 +224,7 @@ def on_submit(
 {% elif param_conf.type == 'Textbox' %}
 {{ param_conf.label | lower | replace(" ", "_") }} = gr.Textbox(label="{{ param_conf.label }}", info="{{ param_conf.description }}", value="{{ param_conf.default }}")
 {% elif param_conf.type == 'Checkbox' %}
-{{ param_conf.label | lower | replace(" ", "_") }} = gr.Checkbox(label="{{ param_conf.label }}", info="{{ param_conf.description }}", value={{ param_conf.value }})
+{{ param_conf.label | lower | replace(" ", "_") }} = gr.Checkbox(label="{{ param_conf.label }}", info="{{ param_conf.description }}", value={{ param_conf.default }})
 {% elif param_conf.type == 'Files' %}
 {{ param_conf.label | lower | replace(" ", "_") }}_description = gr.Markdown(value="{{ param_conf.description }}")
 {{ param_conf.label | lower | replace(" ", "_") }} = gr.Files(label="{{ param_conf.label }}", file_count="{{ param_conf.file_count }}")
@@ -226,6 +242,8 @@ def on_submit(
 {% for display_only_conf in display_only %}
 {% if display_only_conf.type == 'Radio' %}
 {{ display_only_conf.label | lower | replace(" ", "_") }} = gr.Radio(label="{{ display_only_conf.label }}", info="{{ display_only_conf.description }}",  choices=[{% for option in display_only_conf.options %}"{{ option.label }}"{% if not loop.last %}, {% endif %}{% endfor %}], value="{{ display_only_conf.default }}", interactive=False)
+{% elif display_only_conf.type == 'Dropdown' %}
+{{ display_only_conf.label | lower | replace(" ", "_") }} = gr.Dropdown(label="{{ display_only_conf.label }}", info="{{ display_only_conf.description }}",  choices=[{% for option in display_only_conf.options %}"{{ option.label }}"{% if not loop.last %}, {% endif %}{% endfor %}], value="{{ display_only_conf.default }}", interactive=False, multiselect = {{ display_only_conf.multiselect }})
 {% elif display_only_conf.type == 'Integer' %}
 {{ display_only_conf.label | lower | replace(" ", "_") }} = gr.Number(label="{{ display_only_conf.label }}", info="{{ display_only_conf.description }}", value={{ display_only_conf.default }}, interactive=False)
 {% elif display_only_conf.type == 'Float' %}
@@ -233,7 +251,7 @@ def on_submit(
 {% elif display_only_conf.type == 'Textbox' %}
 {{ display_only_conf.label | lower | replace(" ", "_") }} = gr.Textbox(label="{{ display_only_conf.label }}", info="{{ display_only_conf.description }}", value="{{ display_only_conf.default }}", interactive=False)
 {% elif display_only_conf.type == 'Checkbox' %}
-{{ display_only_conf.label | lower | replace(" ", "_") }} = gr.Checkbox(label="{{ display_only_conf.label }}", info="{{ display_only_conf.description }}", value={{ display_only_conf.value }}, interactive=False)
+{{ display_only_conf.label | lower | replace(" ", "_") }} = gr.Checkbox(label="{{ display_only_conf.label }}", info="{{ display_only_conf.description }}", value={{ display_only_conf.default }}, interactive=False)
 {% elif display_only_conf.type == 'Files' %}
 {{ display_only_conf.label | lower | replace(" ", "_") }}_description = gr.Markdown(value="{{ display_only_conf.description }}")
 {{ display_only_conf.label | lower | replace(" ", "_") }} = gr.Files(label="{{ display_only_conf.label }}", file_count="{{ display_only_conf.file_count }}", interactive=False)

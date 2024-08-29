@@ -60,7 +60,7 @@ radio_options = {
 {% elif param_conf.type == 'Textbox' %}
 {{ param_conf.label | lower | replace(" ", "_") }} = widgets.Textarea(value="{{ param_conf.default if param_conf.default is not none else '' }}")
 {% elif param_conf.type == 'Checkbox' %}
-{{ param_conf.label | lower | replace(" ", "_") }} = widgets.Checkbox(value={{ param_conf.value }})
+{{ param_conf.label | lower | replace(" ", "_") }} = widgets.Checkbox(value={{ param_conf.default }})
 {%- endif %}
 
 # Add a description label
@@ -104,7 +104,7 @@ advanced_widgets.append(tab)
 {% elif display_only_conf.type == 'Textbox' %}
 {{ display_only_conf.label | lower | replace(" ", "_") }} = widgets.Textarea(value="{{ display_only_conf.default if display_only_conf.default is not none else '' }}", disabled=True)
 {% elif display_only_conf.type == 'Checkbox' %}
-{{ display_only_conf.label | lower | replace(" ", "_") }} = widgets.Checkbox(value={{ display_only_conf.value }}, disabled=True)
+{{ display_only_conf.label | lower | replace(" ", "_") }} = widgets.Checkbox(value={{ display_only_conf.default }}, disabled=True)
 {%- endif %}
 
 

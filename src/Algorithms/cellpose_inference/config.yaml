@@ -4,7 +4,7 @@ parameters:
     type: Checkbox
     label: "Use GPU"
     description: "use GPU for processing"
-    value: False
+    default: False
     cli_tag: "--use_gpu"
     section_id: "hardware-args"
     mode: "advanced"
@@ -34,7 +34,7 @@ parameters:
     type: Checkbox
     label: "Look One Level Down"
     description: "look one level down in folder structure for images"
-    value: False
+    default: False
     cli_tag: "--look_one_level_down"
     optional: True
     section_id: "input-args"
@@ -111,7 +111,7 @@ parameters:
     type: Checkbox
     label: "Invert"
     description: "invert grayscale channel"
-    value: False
+    default: False
     cli_tag: "--invert"
     optional: True
     section_id: "input-args"
@@ -120,7 +120,7 @@ parameters:
     type: Checkbox
     label: "All Channels"
     description: "use all channels in image"
-    value: False
+    default: False
     cli_tag: "--all_channels"
     optional: True
     section_id: "input-args"
@@ -160,7 +160,7 @@ parameters:
     type: Checkbox
     label: "No Resample"
     description: "do not resample image"
-    value: False
+    default: False
     cli_tag: "--no_resample"
     optional: True
     section_id: "algorithm-args"
@@ -169,7 +169,7 @@ parameters:
     type: Checkbox
     label: "No Interp"
     description: "do not interpolate image"
-    value: False
+    default: False
     cli_tag: "--no_interp"
     optional: True
     section_id: "algorithm-args"
@@ -178,7 +178,7 @@ parameters:
     type: Checkbox
     label: "No Norm"
     description: "do not normalize image"
-    value: False
+    default: False
     cli_tag: "--no_norm"
     optional: True
     section_id: "algorithm-args"
@@ -187,7 +187,7 @@ parameters:
     type: Checkbox
     label: "Do 3D"
     description: "process 3D image"
-    value: False
+    default: False
     cli_tag: "--do_3D"
     optional: True
     section_id: "algorithm-args"
@@ -223,7 +223,7 @@ parameters:
     type: Checkbox
     label: "Fast Mode"
     description: "fast mode"
-    value: False
+    default: False
     cli_tag: "--fast_mode"
     optional: True
     section_id: "algorithm-args"
@@ -259,7 +259,7 @@ parameters:
     type: Checkbox
     label: "Exclude On Edges"
     description: "exclude cells on edges"
-    value: False
+    default: False
     cli_tag: "--exclude_on_edges"
     optional: True
     section_id: "algorithm-args"
@@ -270,8 +270,8 @@ parameters:
     type: Checkbox
     label: "Save PNG"
     description: "save segmentation as PNG"
-    append_value: False
-    value: False
+    append_value: False 
+    default: False
     cli_tag: "--save_png"
     optional: True
     section_id: "output-args"
@@ -281,7 +281,7 @@ parameters:
     label: "Save TIF"
     description: "save segmentation as TIF"
     append_value: False
-    value: False
+    default: False
     cli_tag: "--save_tif"
     optional: True
     section_id: "output-args"
@@ -290,7 +290,7 @@ parameters:
     type: Checkbox
     label: "No NPY"
     description: "do not save npy"
-    value: False
+    default: False
     cli_tag: "--no_npy"
     optional: True
     section_id: "output-args"
@@ -309,7 +309,7 @@ parameters:
     type: Checkbox
     label: "Dir Above"
     description: "save output in directory above"
-    value: False
+    default: False
     cli_tag: "--dir_above"
     optional: True
     section_id: "output-args" 
@@ -318,7 +318,7 @@ parameters:
     type: Checkbox
     label: "In Folders"
     description: "save output in folders"
-    value: False
+    default: False
     cli_tag: "--in_folders"
     optional: True
     section_id: "output-args"
@@ -327,7 +327,7 @@ parameters:
     type: Checkbox
     label: "Save Flows"
     description: "save flows"
-    value: False
+    default: False
     cli_tag: "--save_flows"
     optional: True
     section_id: "output-args"
@@ -336,7 +336,7 @@ parameters:
     type: Checkbox
     label: "Save Outlines"
     description: "save outlines"
-    value: False
+    default: False
     cli_tag: "--save_outlines"
     optional: True
     section_id: "output-args"
@@ -345,7 +345,7 @@ parameters:
     type: Checkbox
     label: "Save NColor"
     description: "save ncolor"
-    value: False
+    default: False
     cli_tag: "--save_ncolor"
     optional: True
     section_id: "output-args"
@@ -354,11 +354,29 @@ parameters:
     type: Checkbox
     label: "Save TXT"
     description: "save txt"
-    value: False
+    default: False
     cli_tag: "--save_txt"
     optional: True
     section_id: "output-args"
     mode: "advanced"
+  # Dummy Example for Dropdown : (Delete later)
+  # - name: save_txt
+  #   type: Dropdown
+  #   label: "Save TXT"
+  #   description: "save txt"
+  #   options: 
+  #     - label: "Yes"
+  #       value: "True"
+  #     - label: "No"
+  #       value: "False"
+  #     - label: "Maybe"
+  #       value: "Maybe"
+  #   default: True
+  #   multiselect: False
+  #   cli_tag: "--save_txt"
+  #   optional: True
+  #   section_id: "output-args"
+  #   mode: "advanced"
     
 
 # Display_only Section
@@ -372,6 +390,20 @@ display_only:
   #   optional: False
   #   section_id: "output-section"
   #   mode: "beginner"
+  # - name: save_dummy_txt
+  #   type: Dropdown
+  #   label: "Save Dummy TXT"
+  #   description: "save txt"
+  #   options: 
+  #     - label: "Yeahhhhh"
+  #       value: "True"
+  #     - label: "Please Noo"
+  #       value: "False"
+  #   default: True
+  #   multiselect: False
+  #   optional: True
+  #   section_id: "output-args"
+  #   mode: "advanced"
   
 results:
   - name: output_dir

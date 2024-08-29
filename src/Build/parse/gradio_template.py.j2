@@ -9,6 +9,7 @@ def generate_cli_command(cli_tags, **kwargs):
 
     # Radio options mapping
     radio_options = {
+    {% if parameters is not none %}
     {% for param_conf in parameters if param_conf.type == 'Radio' -%}
         "{{ param_conf.label | lower | replace(' ', '_') }}": {
             {% for option in param_conf.options -%}
@@ -16,6 +17,8 @@ def generate_cli_command(cli_tags, **kwargs):
             {%- endfor %}
         },
     {%- endfor %}
+    {% endif %}
+    {% if display_only is not none %}
     {% for display_only_conf in display_only if display_only_conf.type == 'Radio' -%}
         "{{ display_only_conf.label | lower | replace(' ', '_') }}": {
             {% for option in display_only_conf.options -%}
@@ -23,11 +26,13 @@ def generate_cli_command(cli_tags, **kwargs):
             {%- endfor %}
         },
     {%- endfor %}
+    {% endif %}
     }
 
 
     folder_name = None
     output_folder_name = None
+    append_value = None
 
     # Update cli_args with user parameters or defaults
     for key, value in kwargs.items():
@@ -36,8 +41,15 @@ def generate_cli_command(cli_tags, **kwargs):
             default = cli_tags[key].get("default", None)
 
             if isinstance(value, bool):
-                if value:  # Only include the flag if it is True
-                    cli_command.append(cli_tag)
+                append_value = cli_tags[key].get("append_value", False)
+                if value:  
+                    if append_value:
+                        cli_command.append(f"{cli_tag} True")
+                    else:
+                        cli_command.append(f"{cli_tag}")
+                else:
+                    if append_value:
+                        cli_command.append(f"{cli_tag} False")
             else:
                 # Handle Radio type mappings dynamically
                 if key in radio_options and value in radio_options[key]:
@@ -60,7 +72,7 @@ def generate_cli_command(cli_tags, **kwargs):
                         output_folder_name = value
                         os.makedirs(output_folder_name, exist_ok=True)
                         if cli_tag != "None":
-                            value = output_folder_name
+                            value = output_folder_name 
                     elif output_dir_set == False:
                         output_folder_name = default
                         os.makedirs(default, exist_ok=True)
@@ -92,6 +104,7 @@ def generate_cli_command(cli_tags, **kwargs):
 
 # Dynamically define on_submit with the exact parameter arguments
 def on_submit(
+{% if parameters is not none %}
 {% for param_conf in parameters -%}
 {% if param_conf.type == 'Files' %}
 {{param_conf.label | lower | replace(" ", "_")}}_description,
@@ -100,6 +113,8 @@ def on_submit(
 {{ param_conf.label | lower | replace(" ", "_") }},
 {% endif %}
 {% endfor -%}
+{% endif %}
+{% if display_only is not none %}
 {% for display_only_conf in display_only -%}
 {% if display_only_conf.type == 'Files' %}
 {{display_only_conf.label | lower | replace(" ", "_")}}_description,
@@ -108,15 +123,20 @@ def on_submit(
 {{ display_only_conf.label | lower | replace(" ", "_") }},
 {% endif %}
 {% endfor -%}
+{% endif %}
 ):
 
     kwargs = {
+    {% if parameters is not none %}
     {% for param_conf in parameters %}
         "{{ param_conf.label | lower | replace(' ', '_') }}": {{ param_conf.label | lower | replace(' ', '_') }},
     {% endfor %}
+    {% endif %}
+    {% if display_only is not none %}
     {% for display_only_conf in display_only %}
         "{{ display_only_conf.label | lower | replace(' ', '_') }}": {{ display_only_conf.label | lower | replace(' ', '_') }},
     {% endfor %}
+    {% endif %}
     }
 
     # Mapping of parameter tags to CLI tags
@@ -125,8 +145,18 @@ def on_submit(
     "{{ param_conf.label | lower | replace(' ', '_') }}": {
         "cli_tag": "{{ param_conf.cli_tag }}",
         "default": "{{ param_conf.default }}",
+        {% if param_conf.type == 'Checkbox' %}
+            {% if param_conf.append_value is defined %}
+        "append_value": {{ param_conf.append_value }},
+            {% endif %}
+        {% endif %}
         {% if param_conf.type == 'Files' %}
         "folder_name": "{{ param_conf.folder_name }}"
+        {% endif %}
+        {% if param_conf.type == 'Textbox' %}
+            {% if param_conf.output_dir_set is defined %}
+        "output_dir_set": {{ param_conf.output_dir_set }}
+            {% endif %}
         {% endif %}
     }{% if not loop.last %},{% endif %}
     {% endfor %}
@@ -145,13 +175,15 @@ def on_submit(
     try:
         result = subprocess.run(cli_command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         print("Command output:", result.stdout.decode())
-
         
-        # Display Output files
-        output_files = []
-        if output_folder_name:
-            print("Output Folder Name:", output_folder_name)
+        # Check if output_folder_name is not None and is a directory
+        if output_folder_name and os.path.exists(output_folder_name) and os.path.isdir(output_folder_name):
+            print("Folder exists")
+            # Display Output files
             output_files = [os.path.join(output_folder_name, f) for f in os.listdir(output_folder_name) if os.path.isfile(os.path.join(output_folder_name, f))]
+        else:
+            print("Folder does not exist or output_folder_name is None")
+            output_files = []
         
 
         return output_files
@@ -162,7 +194,7 @@ def on_submit(
         raise gr.Error(error_message)
         
 
-
+{% if parameters is not none %}
 {% for param_conf in parameters %}
 
 {% if param_conf.type == 'Radio' %}
@@ -188,9 +220,9 @@ def on_submit(
 
 
 {% endfor %}  
+{% endif %}
 
-
-
+{% if display_only is not none %}
 {% for display_only_conf in display_only %}
 {% if display_only_conf.type == 'Radio' %}
 {{ display_only_conf.label | lower | replace(" ", "_") }} = gr.Radio(label="{{ display_only_conf.label }}", info="{{ display_only_conf.description }}",  choices=[{% for option in display_only_conf.options %}"{{ option.label }}"{% if not loop.last %}, {% endif %}{% endfor %}], value="{{ display_only_conf.default }}", interactive=False)
@@ -207,6 +239,7 @@ def on_submit(
 {{ display_only_conf.label | lower | replace(" ", "_") }} = gr.Files(label="{{ display_only_conf.label }}", file_count="{{ display_only_conf.file_count }}", interactive=False)
 {% endif %}
 {% endfor %}
+{% endif %}
 
 {% for result_conf in results %}
 {% if result_conf.type == 'Files' %}
@@ -237,6 +270,7 @@ description_text += f"{{citation.name}}: {{citation.doi}} - {{citation.descripti
 
 
 all_parameters = [
+{% if parameters is not none %}
 {% for param_conf in parameters %}
 {% if param_conf.type == 'Files' %}
     {{param_conf.label | lower | replace(" ", "_")}}_description,
@@ -245,6 +279,8 @@ all_parameters = [
     {{ param_conf.label | lower | replace(" ", "_") }},
 {% endif %}
 {% endfor %}
+{% endif %}
+{% if display_only is not none %}
 {% for display_only_conf in display_only %}
 {% if display_only_conf.type == 'Files' %}
     {{ display_only_conf.label | lower | replace(" ", "_")}}_description,
@@ -253,6 +289,7 @@ all_parameters = [
     {{ display_only_conf.label | lower | replace(" ", "_") }},
 {% endif %}
 {% endfor %}
+{% endif %}
 ]
 
 results = [

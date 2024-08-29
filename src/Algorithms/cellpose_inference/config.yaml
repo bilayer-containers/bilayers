@@ -270,6 +270,7 @@ parameters:
     type: Checkbox
     label: "Save PNG"
     description: "save segmentation as PNG"
+    append_value: False
     value: False
     cli_tag: "--save_png"
     optional: True
@@ -279,6 +280,7 @@ parameters:
     type: Checkbox
     label: "Save TIF"
     description: "save segmentation as TIF"
+    append_value: False
     value: False
     cli_tag: "--save_tif"
     optional: True
@@ -361,7 +363,7 @@ parameters:
 
 # Display_only Section
 display_only:
-  # dummy example
+  # dummy example : DONOT PUT CLI_TAG FLAG AT ALL. THESE ARE JUST FOR DISPLAY
   # - name: save_output_dir
   #   type: Textbox
   #   label: "Save Output Directory"

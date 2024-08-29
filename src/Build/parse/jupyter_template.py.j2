@@ -7,8 +7,9 @@ import json
 
 {% autoescape false %}
 parameters = {{parameters}}
+display_only = {{display_only}}
 exec_function = {{exec_function}}
-outputs = {{outputs}}
+results = {{results}}
 
 {% endautoescape %}
 
@@ -23,6 +24,8 @@ cli_command = []
 cli_command.append(exec_function['cli_command'])
 
 radio_options = {
+
+    {% if parameters is not none -%}
     {% for param_conf in parameters if param_conf.type == 'Radio' -%}
         "{{ param_conf.label | lower | replace(' ', '_') }}": {
             {% for option in param_conf.options %}
@@ -30,8 +33,19 @@ radio_options = {
             {%- endfor %}
         }{% if not loop.last -%}, {%- endif %}
     {% endfor -%}
+    {% endif -%}
+    {% if display_only is not none -%}
+    {% for display_only_conf in display_only if display_only_conf.type == 'Radio' -%}
+        "{{ display_only_conf.label | lower | replace(' ', '_') }}": {
+            {% for option in display_only_conf.options %}
+            "{{ option.label }}": "{{ option.value }}"{% if not loop.last -%}, {%- endif %}
+            {%- endfor %}
+        }{% if not loop.last -%}, {%- endif %}
+    {% endfor -%}
+    {% endif -%}
     }
 
+{% if parameters is not none -%}
 {% for param_conf in parameters -%}
 {% if param_conf.type == 'Files' and param_conf.file_count == "multiple" %}
 {{ param_conf.label | lower | replace(" ", "_") }} = widgets.FileUpload(multiple=True)
@@ -60,6 +74,8 @@ tab.set_title(1, "Description")
 # Append the corresponding cli_tag, widget to param_vars
 {% if param_conf.type == 'Files' %}
 param_vars.append(("{{ param_conf['cli_tag'] }}", {{ param_conf.label | lower | replace(" ", "_") }}, "{{ param_conf.get('folder_name', '') }}"))
+{% elif param_conf.type == 'Checkbox' %}
+param_vars.append(("{{ param_conf['cli_tag'] }}", {{ param_conf.label | lower | replace(" ", "_") }}, {{ param_conf.get('append_value', False) }} ))
 {% else %}
 param_vars.append(("{{ param_conf['cli_tag'] }}", {{ param_conf.label | lower | replace(" ", "_") }}))
 {% endif %}
@@ -70,36 +86,47 @@ beginner_widgets.append(tab)
 advanced_widgets.append(tab)
 {%- endif %}
 {%- endfor %}
+{%- endif %}
 
-{# Parsing outputs to get the `savedir` foldername - Not much effect in JupyterNB except the case `cli_tag != None` #}
-{% for output_conf in outputs -%}
-{% if output_conf.type == 'Textbox' -%}
-{% if output_conf.output_dir_set == False -%}
-{{ output_conf.label | lower | replace(" ", "_") }} = widgets.Textarea(value="{{ output_conf.default }}", disabled=True)
-{% else -%}
-{{ output_conf.label | lower | replace(" ", "_") }} = widgets.Textarea(value="{{ output_conf.default }}")
-{% endif -%}
+{# Parsing display_only section #}
+{% if display_only is not none -%}
+{% for display_only_conf in display_only -%}
+{% if display_only_conf.type == 'Files' and display_only_conf.file_count == "multiple" %}
+{{ display_only_conf.label | lower | replace(" ", "_") }} = widgets.FileUpload(multiple=True)
+{% elif display_only_conf.type == 'Files' and display_only_conf.file_count == "single" %}
+{{ display_only_conf.label | lower | replace(" ", "_") }} = widgets.FileUpload(multiple=False)
+{% elif display_only_conf.type == 'Radio' %}
+{{ display_only_conf.label | lower | replace(" ", "_") }} = widgets.RadioButtons(options=[{% for option in display_only_conf.options %}("{{ option.label }}", "{{ option.value }}"){% if not loop.last %}, {% endif %}{% endfor %}], value="{{ display_only_conf.default }}", disabled=True)
+{% elif display_only_conf.type == 'Integer' %}
+{{ display_only_conf.label | lower | replace(" ", "_") }} = widgets.IntText(value={{ display_only_conf.default }}, disabled=True)
+{% elif display_only_conf.type == 'Float' %}
+{{ display_only_conf.label | lower | replace(" ", "_") }} = widgets.FloatText(value={{ display_only_conf.default }}, disabled=True)
+{% elif display_only_conf.type == 'Textbox' %}
+{{ display_only_conf.label | lower | replace(" ", "_") }} = widgets.Textarea(value="{{ display_only_conf.default if display_only_conf.default is not none else '' }}", disabled=True)
+{% elif display_only_conf.type == 'Checkbox' %}
+{{ display_only_conf.label | lower | replace(" ", "_") }} = widgets.Checkbox(value={{ display_only_conf.value }}, disabled=True)
+{%- endif %}
+
 
 # Add a description label
-{{ "desc_" + output_conf.label | lower | replace(" ", "_") }}  = widgets.HTML(value = "<b>{{ output_conf['label'] }} </b> :  {{ output_conf.get('description', '') }}")
+{{ "desc_" + display_only_conf.label | lower | replace(" ", "_") }}  = widgets.HTML(value = "<b>{{ display_only_conf['label'] }} </b> :  {{ display_only_conf.get('description', '') }}")
 
 # Add widget and description to accordion
-tab = Tab(children=[HBox([widgets.Label("{{ output_conf['label'] }}"), {{ output_conf.label | lower | replace(" ", "_") }}]), {{ "desc_" + output_conf.label | lower | replace(" ", "_") }}])
-tab.set_title(0, "{{ output_conf['label'] }}")
+tab = Tab(children=[HBox([widgets.Label("{{ display_only_conf['label'] }}"), {{ display_only_conf.label | lower | replace(" ", "_") }}]), {{ "desc_" + display_only_conf.label | lower | replace(" ", "_") }}])
+tab.set_title(0, "{{ display_only_conf['label'] }}")
 tab.set_title(1, "Description")
 
 # Append the corresponding cli_tag, widget to param_vars
-param_vars.append(("{{ output_conf['cli_tag'] }}", {{ output_conf.label | lower | replace(" ", "_") }}))
+param_vars.append(("{{ display_only_conf['cli_tag'] }}", {{ display_only_conf.label | lower | replace(" ", "_") }}))
 
-{% if output_conf.mode == 'beginner' -%}
+{% if display_only_conf.mode == 'beginner' -%}
 beginner_widgets.append(tab)
 {% else %}
 advanced_widgets.append(tab)
 {%- endif %}
 
-{%- endif %}
 {%- endfor %}
-
+{%- endif %}
 
 acc = Accordion()
 # Add beginner_widgets to the first section
@@ -109,35 +136,67 @@ acc.set_title(0, "Beginner's Section")
 acc.children = acc.children + (VBox(advanced_widgets),)
 acc.set_title(1, "Advanced Section")
 
+def option_to_append(cli_tag, value):
+    if cli_tag is None:
+        return None  # Do nothing for display_only
+    elif cli_tag == "":
+        return str(value)  # Append only the value
+    else:
+        return f"{cli_tag} {value}"  # Append cli_tag and value
+
+
 def construct_cli_command():
     cli_command = ["{{ exec_function.cli_command }}"]
     for param_var in param_vars:
             cli_tag = param_var[0]
             widget = param_var[1]
             
-            if len(param_var) == 3:  # This is a 'Files' type
-                folder_name = param_var[2]
+            if len(param_var) == 3:  
             
-                if isinstance(widget, widgets.FileUpload):
-                    cli_command.append(f"{cli_tag} {folder_name}")
-            
-            else:  # Handling other types then Files
-                if isinstance(widget, widgets.Checkbox):
-                    if widget.value == True:
-                        cli_command.append(cli_tag)
+                if isinstance(widget, widgets.FileUpload): # This is a 'Files' type
+                    folder_name = param_var[2]
+                    if cli_tag == "":
+                        cli_command.append(folder_name)
+                    elif cli_tag is None:
+                        continue  # Do nothing for display_only
                     else:
-                        continue
-                elif isinstance(widget, widgets.Textarea):
-                    if widget.value == "" or cli_tag == "None":
-                        continue
-                    cli_command.append(f"{cli_tag} {widget.value}")
+                        cli_command.append(f"{cli_tag} {folder_name}")
+            
+                elif isinstance(widget, widgets.Checkbox):  # This is a 'Checkbox' type
+                    append_value = param_var[2]
+                    value = widget.value
+                    if value:  
+                        if append_value:
+                            cli_command.append(f"{cli_tag} True")
+                        else:
+                            cli_command.append(f"{cli_tag}")
+                    else:
+                        if append_value:
+                            cli_command.append(f"{cli_tag} False")
+        
+            
+            else:  # Handling other types then Files and Checkbox
+                
+                if isinstance(widget, widgets.Textarea):
+                    value = widget.value
+                    if value:  # Non-empty TextArea value
+                        result = option_to_append(cli_tag, value)
+                        if result:
+                            cli_command.append(result)
+
                 elif isinstance(widget, widgets.RadioButtons):
-                    if widget.value != "None":
-                        cli_command.append(f"{cli_tag} {widget.value}")
-                    else:
-                        continue
+                    value = widget.value
+                    if value != "None":  # Ensure the value is not "None"
+                        result = option_to_append(cli_tag, value)
+                        if result:
+                            cli_command.append(result)
+            
                 else:
-                    cli_command.append(f"{cli_tag} {widget.value}")
+                    value = widget.value
+                    # For other widget types
+                    result = option_to_append(cli_tag, value)
+                    if result:
+                        cli_command.append(result)
 
     # Add hidden arguments to the command
     {% if exec_function.hidden_args %}

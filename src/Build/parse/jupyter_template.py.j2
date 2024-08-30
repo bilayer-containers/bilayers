@@ -31,7 +31,14 @@ radio_options = {
             {% for option in param_conf.options %}
             "{{ option.label }}": "{{ option.value }}"{% if not loop.last -%}, {%- endif %}
             {%- endfor %}
-        }{% if not loop.last -%}, {%- endif %}
+        },
+    {% endfor -%}
+    {% for param_conf in parameters if param_conf.type == 'Dropdown' -%}
+        "{{ param_conf.label | lower | replace(' ', '_') }}": {
+            {% for option in param_conf.options %}
+            "{{ option.label }}": "{{ option.value }}"{% if not loop.last -%}, {%- endif %}
+            {%- endfor %}
+        },
     {% endfor -%}
     {% endif -%}
     {% if display_only is not none -%}
@@ -40,7 +47,14 @@ radio_options = {
             {% for option in display_only_conf.options %}
             "{{ option.label }}": "{{ option.value }}"{% if not loop.last -%}, {%- endif %}
             {%- endfor %}
-        }{% if not loop.last -%}, {%- endif %}
+        },
+    {% endfor -%}
+    {% for display_only_conf in display_only if display_only_conf.type == 'Dropdown' -%}
+        "{{ display_only_conf.label | lower | replace(' ', '_') }}": {
+            {% for option in display_only_conf.options %}
+            "{{ option.label }}": "{{ option.value }}"{% if not loop.last -%}, {%- endif %}
+            {%- endfor %}
+        },
     {% endfor -%}
     {% endif -%}
     }
@@ -53,6 +67,8 @@ radio_options = {
 {{ param_conf.label | lower | replace(" ", "_") }} = widgets.FileUpload(multiple=False)
 {% elif param_conf.type == 'Radio' %}
 {{ param_conf.label | lower | replace(" ", "_") }} = widgets.RadioButtons(options=[{% for option in param_conf.options %}("{{ option.label }}", "{{ option.value }}"){% if not loop.last %}, {% endif %}{% endfor %}], value="{{ param_conf.default }}")
+{% elif param_conf.type == 'Dropdown' %}
+{{ param_conf.label | lower | replace(" ", "_") }} = widgets.Dropdown(options=[{% for option in param_conf.options %}("{{ option.label }}", "{{ option.value }}"){% if not loop.last %}, {% endif %}{% endfor %}], value="{{ param_conf.default }}", multiselect = {{ param_conf.multiselect }})
 {% elif param_conf.type == 'Integer' %}
 {{ param_conf.label | lower | replace(" ", "_") }} = widgets.IntText(value={{ param_conf.default }})
 {% elif param_conf.type == 'Float' %}
@@ -97,6 +113,8 @@ advanced_widgets.append(tab)
 {{ display_only_conf.label | lower | replace(" ", "_") }} = widgets.FileUpload(multiple=False)
 {% elif display_only_conf.type == 'Radio' %}
 {{ display_only_conf.label | lower | replace(" ", "_") }} = widgets.RadioButtons(options=[{% for option in display_only_conf.options %}("{{ option.label }}", "{{ option.value }}"){% if not loop.last %}, {% endif %}{% endfor %}], value="{{ display_only_conf.default }}", disabled=True)
+{% elif display_only_conf.type == 'Dropdown' %}
+{{ display_only_conf.label | lower | replace(" ", "_") }} = widgets.Dropdown(options=[{% for option in display_only_conf.options %}("{{ option.label }}", "{{ option.value }}"){% if not loop.last %}, {% endif %}{% endfor %}], value="{{ display_only_conf.default }}", multiselect="{{ display_only_conf.multiselect }}" disabled=True)
 {% elif display_only_conf.type == 'Integer' %}
 {{ display_only_conf.label | lower | replace(" ", "_") }} = widgets.IntText(value={{ display_only_conf.default }}, disabled=True)
 {% elif display_only_conf.type == 'Float' %}

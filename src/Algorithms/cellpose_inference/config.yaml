@@ -27,6 +27,7 @@ parameters:
     file_count: "multiple"
     default: "directory"
     cli_tag: "--dir"
+    # cli_order: 1
     section_id: "input-args"
     folder_name: "/bilayers/input_images"
     mode: "beginner"
@@ -86,6 +87,7 @@ parameters:
         value: 3
     default: 0
     cli_tag: "--chan"
+    # cli_order: -2
     optional: False
     section_id: "input-args"
     mode: "beginner"
@@ -104,6 +106,7 @@ parameters:
         value: 3
     default: 0
     cli_tag: "--chan2"
+    # cli_order: -1
     optional: True
     section_id: "input-args"
     mode: "advanced"
@@ -198,6 +201,7 @@ parameters:
     description: "estimated diameter of cells in pixels"
     default: 30
     cli_tag: "--diameter"
+    # cli_order: 4
     optional: True
     section_id: "algorithm-args"
     mode: "beginner"
@@ -329,6 +333,7 @@ parameters:
     description: "save flows"
     default: False
     cli_tag: "--save_flows"
+    # cli_order: 1
     optional: True
     section_id: "output-args"
     mode: "advanced"
@@ -338,6 +343,7 @@ parameters:
     description: "save outlines"
     default: False
     cli_tag: "--save_outlines"
+    # cli_order: 2
     optional: True
     section_id: "output-args"
     mode: "advanced"
@@ -423,6 +429,7 @@ exec_function:
   hidden_args: 
     # dummy example
     # - cli_tag: "--save_png"
+    #   cli_order: 3
     #   value: True
 
 docker-image:

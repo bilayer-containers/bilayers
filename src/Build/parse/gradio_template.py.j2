@@ -48,22 +48,55 @@ def generate_cli_command(cli_tags, **kwargs):
     output_folder_name = None
     append_value = None
 
+    # Jagged Array Define
+    jagged_positive_array = []
+    jagged_negative_array = []
+
     # Update cli_args with user parameters or defaults
     for key, value in kwargs.items():
         if key in cli_tags:
             cli_tag = cli_tags[key].get("cli_tag", None)
             default = cli_tags[key].get("default", None)
+            cli_order = cli_tags[key].get("cli_order", 0)
+
+            # First, check the condition if cli_order is negative then dynamically append the size of jagged_negative_array
+            if cli_order < 0:
+                while len(jagged_negative_array) <= abs(cli_order):
+                    jagged_negative_array.append(None)  # Append None to fill gaps
+
+            while len(jagged_positive_array) <= cli_order:
+                jagged_positive_array.append(None)  # Append None to fill gaps
 
             if isinstance(value, bool):
                 append_value = cli_tags[key].get("append_value", False)
                 if value:  
                     if append_value:
-                        cli_command.append(f"{cli_tag} True")
+                        # First, check if the cli_order is negative
+                        if cli_order < 0:
+                            jagged_negative_array[abs(cli_order)] = jagged_negative_array[abs(cli_order)] or []
+                            jagged_negative_array[abs(cli_order)].append(f"{cli_tag} True")
+                        else:
+                            jagged_positive_array[cli_order] = jagged_positive_array[cli_order] or []
+                            jagged_positive_array[cli_order].append(f"{cli_tag}")
+                        {# cli_command.append(f"{cli_tag} True") #}
                     else:
-                        cli_command.append(f"{cli_tag}")
+                        if cli_order < 0:
+                            jagged_negative_array[abs(cli_order)] = jagged_negative_array[abs(cli_order)] or []
+                            jagged_negative_array[abs(cli_order)].append(f"{cli_tag}")
+                        else:
+                            jagged_positive_array[cli_order] = jagged_positive_array[cli_order] or []
+                            jagged_positive_array[cli_order].append(f"{cli_tag}")
+                        {# cli_command.append(f"{cli_tag}") #}
                 else:
                     if append_value:
-                        cli_command.append(f"{cli_tag} False")
+                        # First, check if the cli_order is negative
+                        if cli_order < 0:
+                            jagged_negative_array[abs(cli_order)] = jagged_negative_array[abs(cli_order)] or []
+                            jagged_negative_array[abs(cli_order)].append(f"{cli_tag} False")
+                        else:
+                            jagged_positive_array[cli_order] = jagged_positive_array[cli_order] or []
+                            jagged_positive_array[cli_order].append(f"{cli_tag} False")
+                        {# cli_command.append(f"{cli_tag} False") #}
             else:
                 # Handle Radio type mappings dynamically
                 if key in radio_options and value in radio_options[key]:
@@ -99,9 +132,21 @@ def generate_cli_command(cli_tags, **kwargs):
                 # If the cli_tag is None, don't include it in the command but if cli_tag is "" then just include the value
                 elif value is not None:
                     if cli_tag == "":  # Only append the value if cli_tag is empty string
-                        cli_command.append(f"{value}")
+                        if cli_order < 0:
+                            jagged_negative_array[abs(cli_order)] = jagged_negative_array[abs(cli_order)] or []
+                            jagged_negative_array[abs(cli_order)].append(f"{value}")
+                        else:
+                            jagged_positive_array[cli_order] = jagged_positive_array[cli_order] or []
+                            jagged_positive_array[cli_order].append(f"{value}")
+                        {# cli_command.append(f"{value}") #}
                     elif cli_tag != "None":  # Append both cli_tag and value if cli_tag is neither None nor empty
-                        cli_command.append(f"{cli_tag} {value}")
+                        if cli_order < 0:
+                            jagged_negative_array[abs(cli_order)] = jagged_negative_array[abs(cli_order)] or []
+                            jagged_negative_array[abs(cli_order)].append(f"{cli_tag} {value}")
+                        else:
+                            jagged_positive_array[cli_order] = jagged_positive_array[cli_order] or []
+                            jagged_positive_array[cli_order].append(f"{cli_tag} {value}")
+                        {# cli_command.append(f"{cli_tag} {value}") #}
 
 
    # Add hidden arguments to the command
@@ -113,7 +158,25 @@ def generate_cli_command(cli_tags, **kwargs):
         cli_command.append("{{ arg.cli_tag }} {{ arg.value }}")
     {% endfor %}
     {% endif %}
+
+    # Debug if Jagged Array is storing the correct values
+    print("Jagged Positive Array:", jagged_positive_array)
+    print("Jagged Negative Array:", jagged_negative_array)
     
+    # Append Positive ordered elements
+    for index in range(1, len(jagged_positive_array)):
+        if jagged_positive_array[index]:
+            cli_command.extend(jagged_positive_array[index])
+
+    # Append elements with cli_order == 0
+    if jagged_positive_array and jagged_positive_array[0]:
+        cli_command.extend(jagged_positive_array[0])
+    
+    # Append Negative ordered elements
+    for index in range(len(jagged_negative_array) - 1, 0, -1):
+        if jagged_negative_array[index]:
+            cli_command.extend(jagged_negative_array[index])
+
     return " ".join(cli_command), folder_name, output_folder_name
 
 # Dynamically define on_submit with the exact parameter arguments
@@ -159,6 +222,7 @@ def on_submit(
     "{{ param_conf.label | lower | replace(' ', '_') }}": {
         "cli_tag": "{{ param_conf.cli_tag }}",
         "default": "{{ param_conf.default }}",
+        "cli_order": {{ param_conf.cli_order | default(0) }},
         {% if param_conf.type == 'Checkbox' %}
             {% if param_conf.append_value is defined %}
         "append_value": {{ param_conf.append_value }},

@@ -4,6 +4,24 @@ import subprocess
 import tempfile
 import shutil
 
+def option_to_append(cli_tag, value):
+    if cli_tag == "":
+        return str(value)  # Append only the value
+    else:
+        return f"{cli_tag} {value}"  # Append cli_tag and value
+
+def insert_into_jagged_array(jagged_array, cli_order, cli_tag, value):
+    # Check the length of Jagged Array and dynamically append with None if required
+    while len(jagged_array) <= abs(cli_order):
+        jagged_array.append(None)
+
+    # Initialize the sublist if it's not already
+    jagged_array[abs(cli_order)] = jagged_array[abs(cli_order)] or []
+    
+    # Append the cli_tag and value to the appropriate sublist
+    result = option_to_append(cli_tag, value)
+    jagged_array[abs(cli_order)].append(result)
+
 def generate_cli_command(cli_tags, **kwargs):
     cli_command = ["{{ exec_function.cli_command }}"]
 
@@ -131,22 +149,11 @@ def generate_cli_command(cli_tags, **kwargs):
                     value = None
                 # If the cli_tag is None, don't include it in the command but if cli_tag is "" then just include the value
                 elif value is not None:
-                    if cli_tag == "":  # Only append the value if cli_tag is empty string
-                        if cli_order < 0:
-                            jagged_negative_array[abs(cli_order)] = jagged_negative_array[abs(cli_order)] or []
-                            jagged_negative_array[abs(cli_order)].append(f"{value}")
+                    if cli_tag != "None":
+                        if cli_order < 0: 
+                            insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)
                         else:
-                            jagged_positive_array[cli_order] = jagged_positive_array[cli_order] or []
-                            jagged_positive_array[cli_order].append(f"{value}")
-                        {# cli_command.append(f"{value}") #}
-                    elif cli_tag != "None":  # Append both cli_tag and value if cli_tag is neither None nor empty
-                        if cli_order < 0:
-                            jagged_negative_array[abs(cli_order)] = jagged_negative_array[abs(cli_order)] or []
-                            jagged_negative_array[abs(cli_order)].append(f"{cli_tag} {value}")
-                        else:
-                            jagged_positive_array[cli_order] = jagged_positive_array[cli_order] or []
-                            jagged_positive_array[cli_order].append(f"{cli_tag} {value}")
-                        {# cli_command.append(f"{cli_tag} {value}") #}
+                            insert_into_jagged_array(jagged_positive_array, cli_order, cli_tag, value)
 
 
    # Add hidden arguments to the command
@@ -209,11 +216,13 @@ def on_submit(
         "{{ param_conf.label | lower | replace(' ', '_') }}": {{ param_conf.label | lower | replace(' ', '_') }},
     {% endfor %}
     {% endif %}
-    {% if display_only is not none %}
-    {% for display_only_conf in display_only %}
-        "{{ display_only_conf.label | lower | replace(' ', '_') }}": {{ display_only_conf.label | lower | replace(' ', '_') }},
-    {% endfor %}
-    {% endif %}
+    
+    # {% if display_only is not none %} 
+    # {% for display_only_conf in display_only %}
+        # "{{ display_only_conf.label | lower | replace(' ', '_') }}": {{ display_only_conf.label | lower | replace(' ', '_') }}, 
+    # {% endfor %} 
+    # {% endif %}
+    
     }
 
     # Mapping of parameter tags to CLI tags

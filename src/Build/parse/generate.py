@@ -63,8 +63,8 @@ def generate_jupyter_notebook(template_path, parameters, display_only, results, 
     for citation in citations['Bilayers']:
         citation_cell += f"- {citation['name']} : {citation['license']} --> {citation['description']}\n"
 
-    for citation in citations['Jupyter']:
-        citation_cell += f"- {citation['name']} : {citation['doi']} --> {citation['description']}\n"
+    # Appending Jupyter Notebook Citation directly
+    citation_cell += f"- Jupyter : 10.1109/MCSE.2007.53 --> Interactive, code-driven documents for data analysis and visualization\n"
 
     for citation in citations['Algorithm']:
         citation_cell += f"- {citation['name']} : {citation['doi']} --> {citation['description']}\n"

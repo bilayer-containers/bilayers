@@ -89,11 +89,11 @@ tab.set_title(1, "Description")
 
 # Append the corresponding cli_tag, widget to param_vars
 {% if param_conf.type == 'Files' %}
-param_vars.append(("{{ param_conf['cli_tag'] }}", {{ param_conf.label | lower | replace(" ", "_") }}, "{{ param_conf.get('folder_name', '') }}"))
+param_vars.append(("{{ param_conf['cli_tag'] }}", {{ param_conf.label | lower | replace(" ", "_") }}, {{ param_conf.get('cli_order', 0) }}, "{{ param_conf.get('folder_name', '') }}"))
 {% elif param_conf.type == 'Checkbox' %}
-param_vars.append(("{{ param_conf['cli_tag'] }}", {{ param_conf.label | lower | replace(" ", "_") }}, {{ param_conf.get('append_value', False) }} ))
+param_vars.append(("{{ param_conf['cli_tag'] }}", {{ param_conf.label | lower | replace(" ", "_") }}, {{ param_conf.get('cli_order', 0) }}, {{ param_conf.get('append_value', False) }} ))
 {% else %}
-param_vars.append(("{{ param_conf['cli_tag'] }}", {{ param_conf.label | lower | replace(" ", "_") }}))
+param_vars.append(("{{ param_conf['cli_tag'] }}", {{ param_conf.label | lower | replace(" ", "_") }}, {{ param_conf.get('cli_order', 0) }} ))
 {% endif %}
 
 {% if param_conf.mode == 'beginner' -%}
@@ -114,7 +114,7 @@ advanced_widgets.append(tab)
 {% elif display_only_conf.type == 'Radio' %}
 {{ display_only_conf.label | lower | replace(" ", "_") }} = widgets.RadioButtons(options=[{% for option in display_only_conf.options %}("{{ option.label }}", "{{ option.value }}"){% if not loop.last %}, {% endif %}{% endfor %}], value="{{ display_only_conf.default }}", disabled=True)
 {% elif display_only_conf.type == 'Dropdown' %}
-{{ display_only_conf.label | lower | replace(" ", "_") }} = widgets.Dropdown(options=[{% for option in display_only_conf.options %}("{{ option.label }}", "{{ option.value }}"){% if not loop.last %}, {% endif %}{% endfor %}], value="{{ display_only_conf.default }}", multiselect="{{ display_only_conf.multiselect }}" disabled=True)
+{{ display_only_conf.label | lower | replace(" ", "_") }} = widgets.Dropdown(options=[{% for option in display_only_conf.options %}("{{ option.label }}", "{{ option.value }}"){% if not loop.last %}, {% endif %}{% endfor %}], value="{{ display_only_conf.default }}", multiselect="{{ display_only_conf.multiselect }}", disabled=True)
 {% elif display_only_conf.type == 'Integer' %}
 {{ display_only_conf.label | lower | replace(" ", "_") }} = widgets.IntText(value={{ display_only_conf.default }}, disabled=True)
 {% elif display_only_conf.type == 'Float' %}
@@ -134,9 +134,6 @@ tab = Tab(children=[HBox([widgets.Label("{{ display_only_conf['label'] }}"), {{ 
 tab.set_title(0, "{{ display_only_conf['label'] }}")
 tab.set_title(1, "Description")
 
-# Append the corresponding cli_tag, widget to param_vars
-param_vars.append(("{{ display_only_conf['cli_tag'] }}", {{ display_only_conf.label | lower | replace(" ", "_") }}))
-
 {% if display_only_conf.mode == 'beginner' -%}
 beginner_widgets.append(tab)
 {% else %}
@@ -155,76 +152,113 @@ acc.children = acc.children + (VBox(advanced_widgets),)
 acc.set_title(1, "Advanced Section")
 
 def option_to_append(cli_tag, value):
-    if cli_tag is None:
-        return None  # Do nothing for display_only
-    elif cli_tag == "":
+    if cli_tag == "":
         return str(value)  # Append only the value
     else:
         return f"{cli_tag} {value}"  # Append cli_tag and value
 
+def insert_into_jagged_array(jagged_array, cli_order, cli_tag, value):
+    # Check the length of Jagged Array and dynamically append with None if required
+    while len(jagged_array) <= abs(cli_order):
+        jagged_array.append(None)
+
+    # Initialize the sublist if it's not already
+    jagged_array[abs(cli_order)] = jagged_array[abs(cli_order)] or []
+    
+    # Append the cli_tag and value to the appropriate sublist
+    result = option_to_append(cli_tag, value)
+    jagged_array[abs(cli_order)].append(result)
+
 
 def construct_cli_command():
     cli_command = ["{{ exec_function.cli_command }}"]
+
+    # Initialize jagged arrays
+    jagged_positive_array = []
+    jagged_negative_array = []
+
+    if {{ exec_function.hidden_args }}:
+        for hidden_arg in {{ exec_function.hidden_args }}:
+            cli_tag = hidden_arg.get('cli_tag', '')
+            cli_order = hidden_arg.get('cli_order', 0)
+            value = hidden_arg.get('value', '')
+
+            # Insert hidden arguments into jagged arrays
+            if cli_order < 0:
+                insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)
+            else:
+                insert_into_jagged_array(jagged_positive_array, cli_order, cli_tag, value)
+
     for param_var in param_vars:
-            cli_tag = param_var[0]
-            widget = param_var[1]
+        cli_tag = param_var[0]
+        widget = param_var[1]
+        cli_order = param_var[2]
             
-            if len(param_var) == 3:  
-            
-                if isinstance(widget, widgets.FileUpload): # This is a 'Files' type
-                    folder_name = param_var[2]
-                    if cli_tag == "":
-                        cli_command.append(folder_name)
-                    elif cli_tag is None:
-                        continue  # Do nothing for display_only
-                    else:
-                        cli_command.append(f"{cli_tag} {folder_name}")
-            
-                elif isinstance(widget, widgets.Checkbox):  # This is a 'Checkbox' type
-                    append_value = param_var[2]
-                    value = widget.value
-                    if value:  
-                        if append_value:
-                            cli_command.append(f"{cli_tag} True")
-                        else:
-                            cli_command.append(f"{cli_tag}")
-                    else:
-                        if append_value:
-                            cli_command.append(f"{cli_tag} False")
-        
-            
-            else:  # Handling other types then Files and Checkbox
-                
-                if isinstance(widget, widgets.Textarea):
-                    value = widget.value
-                    if value:  # Non-empty TextArea value
-                        result = option_to_append(cli_tag, value)
-                        if result:
-                            cli_command.append(result)
-
-                elif isinstance(widget, widgets.RadioButtons):
-                    value = widget.value
-                    if value != "None":  # Ensure the value is not "None"
-                        result = option_to_append(cli_tag, value)
-                        if result:
-                            cli_command.append(result)
-            
+        if len(param_var) == 4:  
+            if isinstance(widget, widgets.FileUpload): # This is a 'Files' type
+                folder_name = param_var[3]
+                value = folder_name
+                if cli_order < 0:
+                    insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)
                 else:
-                    value = widget.value
-                    # For other widget types
-                    result = option_to_append(cli_tag, value)
-                    if result:
-                        cli_command.append(result)
+                    insert_into_jagged_array(jagged_positive_array, cli_order, cli_tag, value)
+            elif isinstance(widget, widgets.Checkbox):  # This is a 'Checkbox' type
+                append_value = param_var[3]
+                value = widget.value
+                if append_value: # If value needs to appended along with cli_tag - Special case for Checkbox
+                    if cli_order < 0:
+                        insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)
+                    else:
+                        insert_into_jagged_array(jagged_positive_array, cli_order, cli_tag, value)
+                else: # Otherwise, just append the cli_tag - iff value is True
+                    if value:
+                        if cli_order < 0:
+                            while len(jagged_negative_array) <= abs(cli_order):
+                                jagged_negative_array.append(None)
+                            jagged_negative_array[abs(cli_order)] = jagged_negative_array[abs(cli_order)] or []
+                            jagged_negative_array[abs(cli_order)].append(cli_tag)
+                        else:
+                            while len(jagged_positive_array) <= abs(cli_order):
+                                jagged_positive_array.append(None)
+                            jagged_positive_array[abs(cli_order)] = jagged_positive_array[abs(cli_order)] or []
+                            jagged_positive_array[abs(cli_order)].append(cli_tag)
+            
+        else:  # Handling other types then Files and Checkbox
+            if isinstance(widget, widgets.RadioButtons):
+                value = widget.value
+                if value != "None":  # Ensure the value is not "None" (None helps in ignoring the whole cli_tag & value pair)
+                    if cli_order < 0:
+                        insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)
+                    else:
+                        insert_into_jagged_array(jagged_positive_array, cli_order, cli_tag, value)
+            elif isinstance(widget, widgets.Textarea): 
+                value = widget.value
+                if value: # None value should be ignored
+                    if cli_order < 0:
+                        insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)
+                    else:
+                        insert_into_jagged_array(jagged_positive_array, cli_order, cli_tag, value)
+            else:
+                value = widget.value
+                if cli_order < 0:
+                    insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)
+                else:
+                    insert_into_jagged_array(jagged_positive_array, cli_order, cli_tag, value)
+                
 
-    # Add hidden arguments to the command
-    {% if exec_function.hidden_args %}
-    {% for arg in exec_function.hidden_args %}
-    if {{ arg.value }} == True:
-        cli_command.append("{{ arg.cli_tag }}")
-    else:
-        cli_command.append("{{ arg.cli_tag }} {{ arg.value }}")
-    {% endfor %}
-    {% endif %}
+    # Append Positive ordered elements
+    for index in range(1, len(jagged_positive_array)):
+        if jagged_positive_array[index]:
+            cli_command.extend(jagged_positive_array[index])
+
+    # Append elements with cli_order == 0
+    if jagged_positive_array and jagged_positive_array[0]:
+        cli_command.extend(jagged_positive_array[0])
+
+    # Append Negative ordered elements in reverse order
+    for index in range(len(jagged_negative_array) - 1, 0, -1):
+        if jagged_negative_array[index]:
+            cli_command.extend(jagged_negative_array[index])
 
     return " ".join(cli_command)
 

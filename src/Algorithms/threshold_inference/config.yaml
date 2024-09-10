@@ -1,0 +1,75 @@
+parameters:
+  - name: input_ images
+    type: Files
+    label: "Drag and drop all images to be analyzed"
+    description: "Upload all images to be analyzed"
+    file_count: multiple
+    default: "directory"
+    cli_tag: ""
+    optional: False
+    section_id: "input-args"
+    folder_name: "input_images"
+    mode: "beginner"
+  - name: threshold_method
+    type: Radio
+    label: "Select a Threshold Method"
+    description: "Select a threshold method to segment the image"
+    options:
+      - label: "Otsu"
+        value: "Otsu"
+      - label: "Li"
+        value: "Li"
+    default: "Otsu"
+    cli_tag: ""
+    optional: False
+    section_id: "input-args"
+  - name: min_diameter
+    type: Float
+    label: "Object Minimum Diameter Size"
+    description: "Minimum diameter of objects in pixels"
+    default: 5
+    cli_tag: ""
+    optional: False
+    section_id: "input-args"
+    mode: "beginner"
+  - name: max_diameter
+    type: Float
+    label: "Object Maximum Diameter Size"
+    description: "Maximum diameter of objects in pixels"
+    default: 20
+    cli_tag: ""
+    optional: False
+    section_id: "input-args"
+    mode: "beginner"
+
+display_only:
+
+results:
+  - name: output_dir
+    type: Files
+    label: "Download Output"
+    description: "Download the output files"
+    file_count: multiple
+    cli_tag: "None"
+    optional: True
+    section_id: "output-args"
+    
+exec_function: 
+  name: "generate_cli_command"
+  script: "threshold_inference"
+  module: "Algorithms.threshold_inference"
+  cli_command: "python -m threshold"
+  hidden_args:
+
+docker-image:
+  org: threshold
+  name: 
+  tag:
+
+folder_name: "threshold_inference"
+
+citations:
+  Algorithm: 
+    - name: "Threshold"
+      doi: xxxx
+      description: "This is threshold algorithm"

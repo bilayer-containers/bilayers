@@ -155,6 +155,8 @@ def option_to_append(cli_tag, value):
     if cli_tag == "":
         return str(value)  # Append only the value
     else:
+        if "=" in cli_tag:
+            return f"{cli_tag}{value}"  # Append cli_tag and value with "="
         return f"{cli_tag} {value}"  # Append cli_tag and value
 
 def insert_into_jagged_array(jagged_array, cli_order, cli_tag, value):
@@ -177,17 +179,46 @@ def construct_cli_command():
     jagged_positive_array = []
     jagged_negative_array = []
 
-    if {{ exec_function.hidden_args }}:
-        for hidden_arg in {{ exec_function.hidden_args }}:
+    {% autoescape false %}
+    hidden_args = {{ exec_function.get("hidden_args", []) }}
+    print("Hidden Args:", hidden_args)
+    {% endautoescape %}
+
+    if hidden_args:
+        for hidden_arg in hidden_args:
             cli_tag = hidden_arg.get('cli_tag', '')
             cli_order = hidden_arg.get('cli_order', 0)
             value = hidden_arg.get('value', '')
+            append_value = hidden_arg.get('append_value', False)
 
-            # Insert hidden arguments into jagged arrays
             if cli_order < 0:
-                insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)
+                while len(jagged_negative_array) <= abs(cli_order):
+                    jagged_negative_array.append(None)  # Append None to fill gaps
+
+            while len(jagged_positive_array) <= cli_order:
+                jagged_positive_array.append(None)  # Append None to fill gaps
+
+            if isinstance(value, bool):
+                if append_value:
+                    if cli_order < 0:
+                        insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)
+                    else:
+                        insert_into_jagged_array(jagged_positive_array, cli_order, cli_tag, value)
+                else:
+                    if value:
+                        if cli_order < 0:
+                            jagged_negative_array[abs(cli_order)] = jagged_negative_array[abs(cli_order)] or []
+                            jagged_negative_array[abs(cli_order)].append(cli_tag)
+                        else:
+                            jagged_positive_array[abs(cli_order)] = jagged_positive_array[abs(cli_order)] or []
+                            jagged_positive_array[abs(cli_order)].append(cli_tag)
+
             else:
-                insert_into_jagged_array(jagged_positive_array, cli_order, cli_tag, value)
+                if cli_order < 0:
+                    insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)
+                else:
+                    insert_into_jagged_array(jagged_positive_array, cli_order, cli_tag, value)
+
 
     for param_var in param_vars:
         cli_tag = param_var[0]

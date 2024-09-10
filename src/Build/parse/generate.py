@@ -54,17 +54,33 @@ def generate_jupyter_notebook(template_path, parameters, display_only, results, 
     print("To check the type of parameters: ", type(parameters))
     notebook_content = template.render(parameters=parameters, display_only=display_only, results=results, exec_function=exec_function)
 
+    DEFAULT_CITATIONS = {
+        "Bilayers": [
+            {
+                "name" : "Bilayers",
+                "license" : "xxxx",
+                "description" : "GUI interfaces for deep learning-based cell segmentation algorithms"
+            },
+        ],
+        "Jupyter": [
+            {
+                "name" : "Jupyter",
+                "doi" : "10.1109/MCSE.2007.53",
+                "description" : "Interactive, code-driven documents for data analysis and visualization"
+            },
+        ],
+    }
+
     nb = nbf.v4.new_notebook()
     
     # Create a markdown cell for instructions or say citations
     nb.cells.append(create_markdown_cell("## Set Variables and Run the cell"))
 
-    citation_cell = "### Please use the following citations while using Bilayers - JupyterNotebook Interface!\n"
-    for citation in citations['Bilayers']:
-        citation_cell += f"- {citation['name']} : {citation['license']} --> {citation['description']}\n"
+    for citation in DEFAULT_CITATIONS['Bilayers']:
+        citation_cell = f"- {citation['name']} : {citation['license']} --> {citation['description']}\n"
 
-    # Appending Jupyter Notebook Citation directly
-    citation_cell += f"- Jupyter : 10.1109/MCSE.2007.53 --> Interactive, code-driven documents for data analysis and visualization\n"
+    for citation in DEFAULT_CITATIONS['Jupyter']:
+        citation_cell += f"- {citation['name']} : {citation['doi']} --> {citation['description']}\n"
 
     for citation in citations['Algorithm']:
         citation_cell += f"- {citation['name']} : {citation['doi']} --> {citation['description']}\n"

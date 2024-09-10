@@ -8,6 +8,8 @@ def option_to_append(cli_tag, value):
     if cli_tag == "":
         return str(value)  # Append only the value
     else:
+        if "=" in cli_tag:
+            return f"{cli_tag}{value}"
         return f"{cli_tag} {value}"  # Append cli_tag and value
 
 def insert_into_jagged_array(jagged_array, cli_order, cli_tag, value):
@@ -87,34 +89,19 @@ def generate_cli_command(cli_tags, **kwargs):
 
             if isinstance(value, bool):
                 append_value = cli_tags[key].get("append_value", False)
-                if value:  
-                    if append_value:
-                        # First, check if the cli_order is negative
-                        if cli_order < 0:
-                            jagged_negative_array[abs(cli_order)] = jagged_negative_array[abs(cli_order)] or []
-                            jagged_negative_array[abs(cli_order)].append(f"{cli_tag} True")
-                        else:
-                            jagged_positive_array[cli_order] = jagged_positive_array[cli_order] or []
-                            jagged_positive_array[cli_order].append(f"{cli_tag}")
-                        {# cli_command.append(f"{cli_tag} True") #}
+                if append_value:
+                    if cli_order < 0:
+                        insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)  
                     else:
-                        if cli_order < 0:
-                            jagged_negative_array[abs(cli_order)] = jagged_negative_array[abs(cli_order)] or []
-                            jagged_negative_array[abs(cli_order)].append(f"{cli_tag}")
-                        else:
-                            jagged_positive_array[cli_order] = jagged_positive_array[cli_order] or []
-                            jagged_positive_array[cli_order].append(f"{cli_tag}")
-                        {# cli_command.append(f"{cli_tag}") #}
+                        insert_into_jagged_array(jagged_positive_array, cli_order, cli_tag, value)
                 else:
-                    if append_value:
-                        # First, check if the cli_order is negative
+                    if value: 
                         if cli_order < 0:
                             jagged_negative_array[abs(cli_order)] = jagged_negative_array[abs(cli_order)] or []
-                            jagged_negative_array[abs(cli_order)].append(f"{cli_tag} False")
+                            jagged_negative_array[abs(cli_order)].append(cli_tag)
                         else:
                             jagged_positive_array[cli_order] = jagged_positive_array[cli_order] or []
-                            jagged_positive_array[cli_order].append(f"{cli_tag} False")
-                        {# cli_command.append(f"{cli_tag} False") #}
+                            jagged_positive_array[cli_order].append(cli_tag)
             else:
                 # Handle Radio type mappings dynamically
                 if key in radio_options and value in radio_options[key]:
@@ -156,15 +143,47 @@ def generate_cli_command(cli_tags, **kwargs):
                             insert_into_jagged_array(jagged_positive_array, cli_order, cli_tag, value)
 
 
-   # Add hidden arguments to the command
-    {% if exec_function.hidden_args %}
-    {% for arg in exec_function.hidden_args %}
-    if {{ arg.value }} == True:
-        cli_command.append("{{ arg.cli_tag }}")
-    else:
-        cli_command.append("{{ arg.cli_tag }} {{ arg.value }}")
-    {% endfor %}
-    {% endif %}
+    # Add hidden arguments to the command
+    {% autoescape false %}
+    hidden_args = {{ exec_function.get("hidden_args", []) }}
+    print("Hidden Args:", hidden_args)
+    {% endautoescape %}
+
+    # If hidden_args exists
+    if hidden_args:
+        for arg in hidden_args:
+            cli_tag = arg.get("cli_tag", '')
+            value = arg.get("value", '')
+            append_value = arg.get("append_value", False)
+            cli_order = arg.get("cli_order", 0)
+
+            if cli_order < 0:
+                while len(jagged_negative_array) <= abs(cli_order):
+                    jagged_negative_array.append(None)  # Append None to fill gaps
+
+            while len(jagged_positive_array) <= cli_order:
+                jagged_positive_array.append(None)  # Append None to fill gaps
+
+            if isinstance(value, bool):
+                if append_value:
+                    if cli_order < 0:
+                        insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)  
+                    else:
+                        insert_into_jagged_array(jagged_positive_array, cli_order, cli_tag, value)
+                else:
+                    if value: 
+                        if cli_order < 0:
+                            jagged_negative_array[abs(cli_order)] = jagged_negative_array[abs(cli_order)] or []
+                            jagged_negative_array[abs(cli_order)].append(cli_tag)
+                        else:
+                            jagged_positive_array[cli_order] = jagged_positive_array[cli_order] or []
+                            jagged_positive_array[cli_order].append(cli_tag)
+            
+            else:
+                if cli_order < 0:
+                    insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)
+                else:
+                    insert_into_jagged_array(jagged_positive_array, cli_order, cli_tag, value)
 
     # Debug if Jagged Array is storing the correct values
     print("Jagged Positive Array:", jagged_positive_array)
@@ -216,13 +235,6 @@ def on_submit(
         "{{ param_conf.label | lower | replace(' ', '_') }}": {{ param_conf.label | lower | replace(' ', '_') }},
     {% endfor %}
     {% endif %}
-    
-    # {% if display_only is not none %} 
-    # {% for display_only_conf in display_only %}
-        # "{{ display_only_conf.label | lower | replace(' ', '_') }}": {{ display_only_conf.label | lower | replace(' ', '_') }}, 
-    # {% endfor %} 
-    # {% endif %}
-    
     }
 
     # Mapping of parameter tags to CLI tags
@@ -287,7 +299,7 @@ def on_submit(
 {% if param_conf.type == 'Radio' %}
 {{ param_conf.label | lower | replace(" ", "_") }} = gr.Radio(label="{{ param_conf.label }}", info="{{ param_conf.description }}",  choices=[{% for option in param_conf.options %}"{{ option.label }}"{% if not loop.last %}, {% endif %}{% endfor %}], value="{{ param_conf.default }}")
 {% elif param_conf.type == 'Dropdown' %}
-{{ param_conf.label | lower | replace(" ", "_") }} = gr.Dropdown(label="{{ param_conf.label }}", info="{{ param_conf.description }}",  choices=[{% for option in param_conf.options %}"{{ option.label }}"{% if not loop.last %}, {% endif %}{% endfor %}], value="{{ param_conf.default }}", multiselect = {{ param_conf.multiselect }})
+{{ param_conf.label | lower | replace(" ", "_") }} = gr.Dropdown(label="{{ param_conf.label }}", info="{{ param_conf.description }}",  choices=[{% for option in param_conf.options %}("{{ option.label }}", "{{ option.value }}"){% if not loop.last %}, {% endif %}{% endfor %}], value="{{ param_conf.default }}", multiselect = {{ param_conf.multiselect }})
 {% elif param_conf.type == 'Integer' %}
 {{ param_conf.label | lower | replace(" ", "_") }} = gr.Number(label="{{ param_conf.label }}", info="{{ param_conf.description }}", value={{ param_conf.default }})
 {% elif param_conf.type == 'Float' %}
@@ -316,7 +328,7 @@ def on_submit(
 {% if display_only_conf.type == 'Radio' %}
 {{ display_only_conf.label | lower | replace(" ", "_") }} = gr.Radio(label="{{ display_only_conf.label }}", info="{{ display_only_conf.description }}",  choices=[{% for option in display_only_conf.options %}"{{ option.label }}"{% if not loop.last %}, {% endif %}{% endfor %}], value="{{ display_only_conf.default }}", interactive=False)
 {% elif display_only_conf.type == 'Dropdown' %}
-{{ display_only_conf.label | lower | replace(" ", "_") }} = gr.Dropdown(label="{{ display_only_conf.label }}", info="{{ display_only_conf.description }}",  choices=[{% for option in display_only_conf.options %}"{{ option.label }}"{% if not loop.last %}, {% endif %}{% endfor %}], value="{{ display_only_conf.default }}", interactive=False, multiselect = {{ display_only_conf.multiselect }})
+{{ display_only_conf.label | lower | replace(" ", "_") }} = gr.Dropdown(label="{{ display_only_conf.label }}", info="{{ display_only_conf.description }}",  choices=[{% for option in display_only_conf.options %}("{{ option.label }}", "{{option.value}}"){% if not loop.last %}, {% endif %}{% endfor %}], value="{{ display_only_conf.default }}", interactive=False, multiselect = {{ display_only_conf.multiselect }})
 {% elif display_only_conf.type == 'Integer' %}
 {{ display_only_conf.label | lower | replace(" ", "_") }} = gr.Number(label="{{ display_only_conf.label }}", info="{{ display_only_conf.description }}", value={{ display_only_conf.default }}, interactive=False)
 {% elif display_only_conf.type == 'Float' %}
@@ -337,14 +349,34 @@ def on_submit(
 {% endif %}
 {% endfor %}
 
+
+{% set DEFAULT_CITATIONS = {
+    "Bilayers": [
+        {
+            "name" : "Bilayers",
+            "license" : "xxxx",
+            "description" : "GUI interfaces for deep learning-based cell segmentation algorithms"
+        },
+    ],
+    "Gradio": [
+        {
+            "name" : "Gradio",
+            "doi" : "10.48550/arXiv.190602569",
+            "description" : "A simple web interface for deploying machine learning models"
+        },
+    ],
+} %}
+
 description_text = "Please cite the following while using Bilayers - Gradio Interface!\n\n"
 
-{% for citation in citations.Bilayers %}
-description_text += f"{{citation.name}}: {{citation.license}} - {{citation.description}}\n\n"
+{% for citation_type, citation_list in DEFAULT_CITATIONS.items() %}
+{% for citation in citation_list %}
+{% if citation_type == "Bilayers" %}
+description_text += f"{{ citation.name }}: {{ citation.license }} - {{ citation.description }}\n\n"
+{% elif citation_type == "Gradio" %}
+description_text += f"{{ citation.name }}: {{ citation.doi }} - {{ citation.description }}\n\n"
+{% endif %}
 {% endfor %}
-
-{% for citation in citations.Gradio %}
-description_text += f"{{citation.name}}: {{citation.doi}} - {{citation.description}}\n\n"
 {% endfor %}
 
 {% for citation in citations.Algorithm %}

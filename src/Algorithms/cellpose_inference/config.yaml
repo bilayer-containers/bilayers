@@ -6,6 +6,7 @@ parameters:
     description: "use GPU for processing"
     default: False
     cli_tag: "--use_gpu"
+    optional: True
     section_id: "hardware-args"
     mode: "advanced"
   - name: gpu_device
@@ -27,7 +28,7 @@ parameters:
     file_count: "multiple"
     default: "directory"
     cli_tag: "--dir"
-    # cli_order: 1
+    optional: False
     section_id: "input-args"
     folder_name: "/bilayers/input_images"
     mode: "beginner"
@@ -87,7 +88,6 @@ parameters:
         value: 3
     default: 0
     cli_tag: "--chan"
-    # cli_order: -2
     optional: False
     section_id: "input-args"
     mode: "beginner"
@@ -106,7 +106,6 @@ parameters:
         value: 3
     default: 0
     cli_tag: "--chan2"
-    # cli_order: -1
     optional: True
     section_id: "input-args"
     mode: "advanced"
@@ -124,6 +123,7 @@ parameters:
     label: "All Channels"
     description: "use all channels in image"
     default: False
+    append_value: False
     cli_tag: "--all_channels"
     optional: True
     section_id: "input-args"
@@ -190,6 +190,7 @@ parameters:
     type: Checkbox
     label: "Do 3D"
     description: "process 3D image"
+    append_value: False
     default: False
     cli_tag: "--do_3D"
     optional: True
@@ -201,7 +202,6 @@ parameters:
     description: "estimated diameter of cells in pixels"
     default: 30
     cli_tag: "--diameter"
-    # cli_order: 4
     optional: True
     section_id: "algorithm-args"
     mode: "beginner"
@@ -333,7 +333,6 @@ parameters:
     description: "save flows"
     default: False
     cli_tag: "--save_flows"
-    # cli_order: 1
     optional: True
     section_id: "output-args"
     mode: "advanced"
@@ -343,7 +342,6 @@ parameters:
     description: "save outlines"
     default: False
     cli_tag: "--save_outlines"
-    # cli_order: 2
     optional: True
     section_id: "output-args"
     mode: "advanced"
@@ -365,51 +363,11 @@ parameters:
     optional: True
     section_id: "output-args"
     mode: "advanced"
-  # Dummy Example for Dropdown : (Delete later)
-  # - name: save_txt
-  #   type: Dropdown
-  #   label: "Save TXT"
-  #   description: "save txt"
-  #   options: 
-  #     - label: "Yes"
-  #       value: "True"
-  #     - label: "No"
-  #       value: "False"
-  #     - label: "Maybe"
-  #       value: "Maybe"
-  #   default: True
-  #   multiselect: False
-  #   cli_tag: "--save_txt"
-  #   optional: True
-  #   section_id: "output-args"
-  #   mode: "advanced"
     
 
 # Display_only Section
 display_only:
   # dummy example : DONOT PUT CLI_TAG FLAG AT ALL. THESE ARE JUST FOR DISPLAY
-  # - name: save_output_dir
-  #   type: Textbox
-  #   label: "Save Output Directory"
-  #   description: "Directory to save the output files"
-  #   default: "/bilayers/input_images"
-  #   optional: False
-  #   section_id: "output-section"
-  #   mode: "beginner"
-  # - name: save_dummy_txt
-  #   type: Dropdown
-  #   label: "Save Dummy TXT"
-  #   description: "save txt"
-  #   options: 
-  #     - label: "Yeahhhhh"
-  #       value: "True"
-  #     - label: "Please Noo"
-  #       value: "False"
-  #   default: True
-  #   multiselect: False
-  #   optional: True
-  #   section_id: "output-args"
-  #   mode: "advanced"
   
 results:
   - name: output_dir
@@ -429,8 +387,9 @@ exec_function:
   hidden_args: 
     # dummy example
     # - cli_tag: "--save_png"
+    #   value: "True"
+    #   append_value: False
     #   cli_order: 3
-    #   value: True
 
 docker-image:
   org: cellprofiler
@@ -440,18 +399,6 @@ docker-image:
 folder_name: "cellpose_inference"
 
 citations:
-  Bilayers:
-    - name: "Bilayers"
-      license: xxxxx
-      description: "GUI interfaces for deep learning-based cell segmentation algorithms"
-  Jupyter:
-    - name: "Jupyter"
-      doi: 10.1109/MCSE.2007.53
-      description: "Interactive, code-driven documents for data analysis and visualization"
-  Gradio:
-    - name: "Gradio"
-      doi: 10.48550/arXiv.1906.02569
-      description: "A simple web interface for deploying machine learning models"
   Algorithm: 
     - name: "Cellpose"
       doi: 10.1038/s41592-020-01018-x

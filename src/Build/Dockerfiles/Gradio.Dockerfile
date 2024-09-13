@@ -22,7 +22,7 @@ ADD parse/generated_folders/$FOLDER_NAME/app.py /bilayers/
 ADD __init__.py /bilayers/
 
 # Export the port
-EXPOSE 8888
+EXPOSE 7878
 
 # Define the command to run the app
 CMD ["python", "-u", "app.py"]

@@ -33,12 +33,12 @@ jobs:
 
       - name: Run parse,generate and build docker images
         run: |
-          chmod +x ./scripts/build_docker.sh
-          ./scripts/build_docker.sh
+          chmod +x build_docker.sh
+          ./build_docker.sh
 
       - name: Run gradio Docker Container
         run: |
-          docker run -d -p 8000:8000 --name gradio-container gradio-image
+          docker run -d -p 8000:7878 --name gradio-container gradio-image
           # Wait for the container to start
           sleep 30
           # Check if the container is running
@@ -46,3 +46,14 @@ jobs:
 
       - name: Verify the Gradio App
         run: curl http://localhost:8000
+
+      - name: Run Jupyter notebook
+        run: |
+          docker run -d -p 8888:7878 --name jupyter-container jupyter-image
+          # Wait for the container to start
+          sleep 30
+          # Check if the container is running
+          curl --fail http://localhost:8888 || (echo "Failed to start the container" && exit 1)
+      
+      - name: Verify the Jupyter Notebook
+        run: curl http://localhost:8888

@@ -284,8 +284,8 @@ def on_submit(
 
     # Execute the CLI command
     try:
-        result = subprocess.run(cli_command, shell=True, check=True, stdout=None, stderr=None)
-        print("Command output:", result.stdout.decode())
+        result = subprocess.run(cli_command, shell=True, check=True, stdout=None, stderr=subprocess.PIPE)
+        print("Command executed successfully")
         
         # Check if output_folder_name is not None and is a directory
         if output_folder_name and os.path.exists(output_folder_name) and os.path.isdir(output_folder_name):
@@ -440,4 +440,4 @@ app = gr.Interface(
 )
 
 if __name__ == "__main__":
-    app.launch(server_name="0.0.0.0", server_port=8888)
+    app.launch(server_name="0.0.0.0", server_port=7878)

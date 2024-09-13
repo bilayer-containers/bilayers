@@ -22,7 +22,7 @@ ADD parse/generated_folders/$FOLDER_NAME/generated_notebook.ipynb /bilayers/
 ADD __init__.py /bilayers/
 
 # Export the port
-EXPOSE 8888
+EXPOSE 7878
 
 # Define the command to run the app
-CMD ["jupyter", "notebook", "--ip=0.0.0.0", "--allow-root"]
+CMD ["jupyter", "notebook", "--ip=0.0.0.0", "--allow-root", "--port=7878"]

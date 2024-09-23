@@ -82,7 +82,7 @@ def generate_jupyter_notebook(template_path, parameters, display_only, results, 
     for citation in DEFAULT_CITATIONS['Jupyter']:
         citation_cell += f"- {citation['name']} : {citation['doi']} --> {citation['description']}\n"
 
-    for citation in citations['Algorithm']:
+    for citation in citations['algorithm']:
         citation_cell += f"- {citation['name']} : {citation['doi']} --> {citation['description']}\n"
 
     # Add a markdown cell with the formatted citations
@@ -113,7 +113,7 @@ def main():
     else:
         config_path = None
 
-    parameters, display_only, results, exec_function, folder_name, citations = parse_config(config_path)
+    parameters, display_only, results, exec_function, algorithm_folder_name, citations = parse_config(config_path)
 
 
     ########################################
@@ -121,7 +121,7 @@ def main():
     ########################################
 
     folderA = "generated_folders"
-    folderB = folder_name
+    folderB = algorithm_folder_name
     # CreAate Directory if they don't exist
     os.makedirs(os.path.join(folderA, folderB), exist_ok=True)
 
@@ -145,7 +145,7 @@ def main():
     ################################################
 
     folderA = "generated_folders"
-    folderB = folder_name
+    folderB = algorithm_folder_name
     print("Folder Name: ", folderB)
     # Create Directory if they don't exist
     os.makedirs(os.path.join(folderA, folderB), exist_ok=True)

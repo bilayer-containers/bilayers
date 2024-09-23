@@ -130,7 +130,8 @@ parameters:
     mode: "advanced"  
 
   # Model Arguments
-  - type: Radio
+  - name: pretrained_model
+    type: Radio
     label: "PreTrained Model"
     description: "type of model to use"
     options: 
@@ -147,7 +148,8 @@ parameters:
     optional: False
     section_id: "model-args"
     mode: "beginner"
-  - type: Files
+  - name: add_models
+    type: Files
     label: "Add Model"
     description: "add custom model to use"
     file_count: "single"
@@ -391,15 +393,15 @@ exec_function:
     #   append_value: False
     #   cli_order: 3
 
-docker-image:
+docker_image:
   org: cellprofiler
   name: runcellpose_no_pretrained
-  tag: 0.1
+  tag: "0.1"
 
-folder_name: "cellpose_inference"
+algorithm_folder_name: "cellpose_inference"
 
 citations:
-  Algorithm: 
+  algorithm: 
     - name: "Cellpose"
       doi: 10.1038/s41592-020-01018-x
       description: "Deep Learning algorithm for cell segmentation in microscopy images"

@@ -48,18 +48,18 @@ def build_algorithm(session):
                 config = yaml.safe_load(file)
             
             # Extract the Docker image name from the config
-            org = config.get('docker-image', {}).get('org')
-            name = config.get('docker-image', {}).get('name')
-            tag = config.get('docker-image', {}).get('tag')
+            org = config.get('docker_image', {}).get('org')
+            name = config.get('docker_image', {}).get('name')
+            tag = config.get('docker_image', {}).get('tag')
             docker_image_name = f'{org}/{name}:{tag}' if org and name and tag else None
-            folder_name = config.get('folder_name', None)
+            algorithm_folder_name = config.get('algorithm_folder_name', None)
 
             # Save the Docker image name in a file
             with open('/tmp/docker_image_name.txt', 'w') as file:
                 file.write(docker_image_name)
 
-            with open('/tmp/folder_name.txt', 'w') as file:
-                file.write(folder_name)
+            with open('/tmp/algorithm_folder_name.txt', 'w') as file:
+                file.write(algorithm_folder_name)
                 
             if docker_image_name:
                 print(f'Found Docker image name in config: {docker_image_name}')
@@ -89,13 +89,13 @@ def build_interface(session):
     with open('/tmp/docker_image_name.txt', 'r') as file:
         base_image = file.read().strip()
 
-    with open('/tmp/folder_name.txt', 'r') as file:
-        folder_name = file.read().strip()
+    with open('/tmp/algorithm_folder_name.txt', 'r') as file:
+        algorithm_folder_name = file.read().strip()
         
     if interface == 'gradio':
-        session.run('docker', 'build', '-f', 'Gradio.Dockerfile', '--build-arg',  f'BASE_IMAGE={base_image}', '--build-arg',  f'FOLDER_NAME={folder_name}', '-t', image_name, '-f', dockerfile_path, 'src/Build')
+        session.run('docker', 'build', '-f', 'Gradio.Dockerfile', '--build-arg',  f'BASE_IMAGE={base_image}', '--build-arg',  f'FOLDER_NAME={algorithm_folder_name}', '-t', image_name, '-f', dockerfile_path, 'src/Build')
     elif interface == 'jupyter':
-        session.run('docker', 'build', '-f', 'Jupyter.Dockerfile', '--build-arg',  f'BASE_IMAGE={base_image}', '--build-arg',  f'FOLDER_NAME={folder_name}', '-t', image_name, '-f', dockerfile_path, 'src/Build')
+        session.run('docker', 'build', '-f', 'Jupyter.Dockerfile', '--build-arg',  f'BASE_IMAGE={base_image}', '--build-arg',  f'FOLDER_NAME={algorithm_folder_name}', '-t', image_name, '-f', dockerfile_path, 'src/Build')
 
 @nox.session
 def install_gradio(session):

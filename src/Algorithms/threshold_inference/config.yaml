@@ -1,6 +1,6 @@
 parameters:
   - name: input_ images
-    type: Files
+    type: files
     label: "Drag and drop all images to be analyzed"
     description: "Upload all images to be analyzed"
     file_count: multiple
@@ -24,7 +24,7 @@ parameters:
     optional: False
     section_id: "input-args"
   - name: min_diameter
-    type: Float
+    type: float
     label: "Object Minimum Diameter Size"
     description: "Minimum diameter of objects in pixels"
     default: 5
@@ -33,7 +33,7 @@ parameters:
     section_id: "input-args"
     mode: "beginner"
   - name: max_diameter
-    type: Float
+    type: float
     label: "Object Maximum Diameter Size"
     description: "Maximum diameter of objects in pixels"
     default: 20
@@ -46,7 +46,7 @@ display_only:
 
 results:
   - name: output_dir
-    type: Files
+    type: files
     label: "Download Output"
     description: "Download the output files"
     file_count: multiple

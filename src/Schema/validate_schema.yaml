@@ -245,14 +245,14 @@ enums:
   TypeEnum:
     description: "Type of the parameters, display_only, results"
     permissible_values:
-      Integer:
-      Float:
-      Boolean:
-      Checkbox:
-      Files:
-      Dropdown:
-      Radio:
-      Textbox:
+      integer:
+      float:
+      boolean:
+      checkbox:
+      files:
+      dropdown:
+      radio:
+      textbox:
   ModeEnum:
     description: "Mode of the parameters, display_only, results"
     permissible_values:

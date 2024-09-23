@@ -1,7 +1,7 @@
 parameters:
   # Hardware Arguments
   - name: use_gpu
-    type: Checkbox
+    type: checkbox
     label: "Use GPU"
     description: "use GPU for processing"
     default: False
@@ -10,7 +10,7 @@ parameters:
     section_id: "hardware-args"
     mode: "advanced"
   - name: gpu_device
-    type: Integer
+    type: integer
     label: "GPU Device"
     description: "which GPU device to use - Integer for torch or mps for M1"
     default: 0
@@ -22,7 +22,7 @@ parameters:
  
   # Input Image Arguments
   - name: dir
-    type: Files
+    type: files
     label: "Input Image Directory"
     description: "Path to the directory of input images"
     file_count: "multiple"
@@ -33,7 +33,7 @@ parameters:
     folder_name: "/bilayers/input_images"
     mode: "beginner"
   - name: look_one_level_down
-    type: Checkbox
+    type: checkbox
     label: "Look One Level Down"
     description: "look one level down in folder structure for images"
     default: False
@@ -42,7 +42,7 @@ parameters:
     section_id: "input-args"
     mode: "advanced"
   - name: image_filter
-    type: Textbox
+    type: textbox
     label: "Image Filter"
     description: "filter for image files"
     default: ""
@@ -51,7 +51,7 @@ parameters:
     section_id: "input-args"
     mode: "advanced" 
   - name: channel_axis
-    type: Radio
+    type: radio
     label: "Channel Axis"
     description: "axis of image which corresponds to image channels"
     options: 
@@ -65,7 +65,7 @@ parameters:
     section_id: "input-args"
     mode: "advanced"
   - name: z_axis
-    type: Integer
+    type: integer
     label: "Z Axis"
     description: "axis of image which corresponds to z dimension"
     default: None
@@ -74,7 +74,7 @@ parameters:
     section_id: "input-args"
     mode: "advanced"
   - name: chan
-    type: Radio
+    type: radio
     label: "Chan To Segment"
     description: "channel to segment"
     options: 
@@ -92,7 +92,7 @@ parameters:
     section_id: "input-args"
     mode: "beginner"
   - name: chan2
-    type: Radio
+    type: radio
     label: "Chan2"
     description: "Nuclear Channel, if cyto then optional"
     options: 
@@ -110,7 +110,7 @@ parameters:
     section_id: "input-args"
     mode: "advanced"
   - name: invert
-    type: Checkbox
+    type: checkbox
     label: "Invert"
     description: "invert grayscale channel"
     default: False
@@ -119,7 +119,7 @@ parameters:
     section_id: "input-args"
     mode: "advanced"
   - name: all_channels
-    type: Checkbox
+    type: checkbox
     label: "All Channels"
     description: "use all channels in image"
     default: False
@@ -131,7 +131,7 @@ parameters:
 
   # Model Arguments
   - name: pretrained_model
-    type: Radio
+    type: radio
     label: "PreTrained Model"
     description: "type of model to use"
     options: 
@@ -149,7 +149,7 @@ parameters:
     section_id: "model-args"
     mode: "beginner"
   - name: add_models
-    type: Files
+    type: files
     label: "Add Model"
     description: "add custom model to use"
     file_count: "single"
@@ -162,7 +162,7 @@ parameters:
 
     # Algorithm Arguments
   - name: no_resample
-    type: Checkbox
+    type: checkbox
     label: "No Resample"
     description: "do not resample image"
     default: False
@@ -171,7 +171,7 @@ parameters:
     section_id: "algorithm-args"
     mode: "advanced"
   - name: no_interp
-    type: Checkbox
+    type: checkbox
     label: "No Interp"
     description: "do not interpolate image"
     default: False
@@ -180,7 +180,7 @@ parameters:
     section_id: "algorithm-args"
     mode: "advanced"
   - name: no_norm
-    type: Checkbox
+    type: checkbox
     label: "No Norm"
     description: "do not normalize image"
     default: False
@@ -189,7 +189,7 @@ parameters:
     section_id: "algorithm-args"
     mode: "advanced"
   - name: do_3D
-    type: Checkbox
+    type: checkbox
     label: "Do 3D"
     description: "process 3D image"
     append_value: False
@@ -199,7 +199,7 @@ parameters:
     section_id: "algorithm-args"
     mode: "advanced"
   - name: diameter
-    type: Float
+    type: float
     label: "Diameter"
     description: "estimated diameter of cells in pixels"
     default: 30
@@ -208,7 +208,7 @@ parameters:
     section_id: "algorithm-args"
     mode: "beginner"
   - name: stitch_threshold
-    type: Float
+    type: float
     label: "Stitch Threshold"
     description: "stitching threshold"
     default: 0.0
@@ -217,7 +217,7 @@ parameters:
     section_id: "algorithm-args"
     mode: "advanced"
   - name: min_size
-    type: Integer
+    type: integer
     label: "Min Size"
     description: "minimum size of objects in pixels"
     default: 15
@@ -226,7 +226,7 @@ parameters:
     section_id: "algorithm-args"
     mode: "advanced"
   - name: fast_mode
-    type: Checkbox
+    type: checkbox
     label: "Fast Mode"
     description: "fast mode"
     default: False
@@ -235,7 +235,7 @@ parameters:
     section_id: "algorithm-args"
     mode: "advanced"
   - name: flow_threshold
-    type: Float
+    type: float
     label: "Flow Threshold"
     description: "flow error threshold"
     default: 0.4
@@ -244,7 +244,7 @@ parameters:
     section_id: "algorithm-args"
     mode: "advanced"
   - name: cellprob_threshold
-    type: Float
+    type: float
     label: "Cellprob Threshold"
     description: "cell probability threshold"
     default: 0.0
@@ -253,7 +253,7 @@ parameters:
     section_id: "algorithm-args"
     mode: "advanced"
   - name: anisotropy
-    type: Float
+    type: float
     label: "Anisotropy"
     description: "anisotropy of image"
     default: 1.0
@@ -262,7 +262,7 @@ parameters:
     section_id: "algorithm-args"
     mode: "advanced"
   - name: exclude_on_edges
-    type: Checkbox
+    type: checkbox
     label: "Exclude On Edges"
     description: "exclude cells on edges"
     default: False
@@ -273,7 +273,7 @@ parameters:
 
 # Output Arguments
   - name: save_png
-    type: Checkbox
+    type: checkbox
     label: "Save PNG"
     description: "save segmentation as PNG"
     append_value: False 
@@ -283,7 +283,7 @@ parameters:
     section_id: "output-args"
     mode: "beginner"
   - name: save_tif
-    type: Checkbox
+    type: checkbox
     label: "Save TIF"
     description: "save segmentation as TIF"
     append_value: False
@@ -293,7 +293,7 @@ parameters:
     section_id: "output-args"
     mode: "beginner"
   - name: no_npy
-    type: Checkbox
+    type: checkbox
     label: "No NPY"
     description: "do not save npy"
     default: False
@@ -302,7 +302,7 @@ parameters:
     section_id: "output-args"
     mode: "advanced"
   - name: save_dir
-    type: Textbox
+    type: textbox
     label: "Save Directory"
     description: "directory to save output files"
     output_dir_set: True
@@ -312,7 +312,7 @@ parameters:
     section_id: "output-args"
     mode: "advanced"
   - name: dir_above
-    type: Checkbox
+    type: checkbox
     label: "Dir Above"
     description: "save output in directory above"
     default: False
@@ -321,7 +321,7 @@ parameters:
     section_id: "output-args" 
     mode: "advanced"
   - name: in_folders
-    type: Checkbox
+    type: checkbox
     label: "In Folders"
     description: "save output in folders"
     default: False
@@ -330,7 +330,7 @@ parameters:
     section_id: "output-args"
     mode: "advanced"
   - name: save_flows  
-    type: Checkbox
+    type: checkbox
     label: "Save Flows"
     description: "save flows"
     default: False
@@ -339,7 +339,7 @@ parameters:
     section_id: "output-args"
     mode: "advanced"
   - name: save_outlines
-    type: Checkbox
+    type: checkbox
     label: "Save Outlines"
     description: "save outlines"
     default: False
@@ -348,7 +348,7 @@ parameters:
     section_id: "output-args"
     mode: "advanced"
   - name: save_ncolor
-    type: Checkbox
+    type: checkbox
     label: "Save NColor"
     description: "save ncolor"
     default: False
@@ -357,7 +357,7 @@ parameters:
     section_id: "output-args"
     mode: "advanced"
   - name: save_txt
-    type: Checkbox
+    type: checkbox
     label: "Save TXT"
     description: "save txt"
     default: False
@@ -373,7 +373,7 @@ display_only:
   
 results:
   - name: output_dir
-    type: Files
+    type: files
     label: "Download Outputs"
     description: "Directory containing the output files"
     cli_tag : "None"

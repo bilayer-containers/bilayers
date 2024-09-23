@@ -26,14 +26,14 @@ cli_command.append(exec_function['cli_command'])
 radio_options = {
 
     {% if parameters is not none -%}
-    {% for param_conf in parameters if param_conf.type == 'Radio' -%}
+    {% for param_conf in parameters if param_conf.type == 'radio' -%}
         "{{ param_conf.label | lower | replace(' ', '_') }}": {
             {% for option in param_conf.options %}
             "{{ option.label }}": "{{ option.value }}"{% if not loop.last -%}, {%- endif %}
             {%- endfor %}
         },
     {% endfor -%}
-    {% for param_conf in parameters if param_conf.type == 'Dropdown' -%}
+    {% for param_conf in parameters if param_conf.type == 'dropdown' -%}
         "{{ param_conf.label | lower | replace(' ', '_') }}": {
             {% for option in param_conf.options %}
             "{{ option.label }}": "{{ option.value }}"{% if not loop.last -%}, {%- endif %}
@@ -42,14 +42,14 @@ radio_options = {
     {% endfor -%}
     {% endif -%}
     {% if display_only is not none -%}
-    {% for display_only_conf in display_only if display_only_conf.type == 'Radio' -%}
+    {% for display_only_conf in display_only if display_only_conf.type == 'radio' -%}
         "{{ display_only_conf.label | lower | replace(' ', '_') }}": {
             {% for option in display_only_conf.options %}
             "{{ option.label }}": "{{ option.value }}"{% if not loop.last -%}, {%- endif %}
             {%- endfor %}
         },
     {% endfor -%}
-    {% for display_only_conf in display_only if display_only_conf.type == 'Dropdown' -%}
+    {% for display_only_conf in display_only if display_only_conf.type == 'dropdown' -%}
         "{{ display_only_conf.label | lower | replace(' ', '_') }}": {
             {% for option in display_only_conf.options %}
             "{{ option.label }}": "{{ option.value }}"{% if not loop.last -%}, {%- endif %}
@@ -61,21 +61,21 @@ radio_options = {
 
 {% if parameters is not none -%}
 {% for param_conf in parameters -%}
-{% if param_conf.type == 'Files' and param_conf.file_count == "multiple" %}
+{% if param_conf.type == 'files' and param_conf.file_count == "multiple" %}
 {{ param_conf.label | lower | replace(" ", "_") }} = widgets.FileUpload(multiple=True)
-{% elif param_conf.type == 'Files' and param_conf.file_count == "single" %}
+{% elif param_conf.type == 'files' and param_conf.file_count == "single" %}
 {{ param_conf.label | lower | replace(" ", "_") }} = widgets.FileUpload(multiple=False)
-{% elif param_conf.type == 'Radio' %}
+{% elif param_conf.type == 'radio' %}
 {{ param_conf.label | lower | replace(" ", "_") }} = widgets.RadioButtons(options=[{% for option in param_conf.options %}("{{ option.label }}", "{{ option.value }}"){% if not loop.last %}, {% endif %}{% endfor %}], value="{{ param_conf.default }}")
-{% elif param_conf.type == 'Dropdown' %}
+{% elif param_conf.type == 'dropdown' %}
 {{ param_conf.label | lower | replace(" ", "_") }} = widgets.Dropdown(options=[{% for option in param_conf.options %}("{{ option.label }}", "{{ option.value }}"){% if not loop.last %}, {% endif %}{% endfor %}], value="{{ param_conf.default }}", multiselect = {{ param_conf.multiselect }})
-{% elif param_conf.type == 'Integer' %}
+{% elif param_conf.type == 'integer' %}
 {{ param_conf.label | lower | replace(" ", "_") }} = widgets.IntText(value={{ param_conf.default }})
-{% elif param_conf.type == 'Float' %}
+{% elif param_conf.type == 'float' %}
 {{ param_conf.label | lower | replace(" ", "_") }} = widgets.FloatText(value={{ param_conf.default }})
-{% elif param_conf.type == 'Textbox' %}
+{% elif param_conf.type == 'textbox' %}
 {{ param_conf.label | lower | replace(" ", "_") }} = widgets.Textarea(value="{{ param_conf.default if param_conf.default is not none else '' }}")
-{% elif param_conf.type == 'Checkbox' %}
+{% elif param_conf.type == 'checkbox' %}
 {{ param_conf.label | lower | replace(" ", "_") }} = widgets.Checkbox(value={{ param_conf.default }})
 {%- endif %}
 
@@ -88,9 +88,9 @@ tab.set_title(0, "{{ param_conf['label'] }}")
 tab.set_title(1, "Description")
 
 # Append the corresponding cli_tag, widget to param_vars
-{% if param_conf.type == 'Files' %}
+{% if param_conf.type == 'files' %}
 param_vars.append(("{{ param_conf['cli_tag'] }}", {{ param_conf.label | lower | replace(" ", "_") }}, {{ param_conf.get('cli_order', 0) }}, "{{ param_conf.get('folder_name', '') }}"))
-{% elif param_conf.type == 'Checkbox' %}
+{% elif param_conf.type == 'checkbox' %}
 param_vars.append(("{{ param_conf['cli_tag'] }}", {{ param_conf.label | lower | replace(" ", "_") }}, {{ param_conf.get('cli_order', 0) }}, {{ param_conf.get('append_value', False) }} ))
 {% else %}
 param_vars.append(("{{ param_conf['cli_tag'] }}", {{ param_conf.label | lower | replace(" ", "_") }}, {{ param_conf.get('cli_order', 0) }} ))
@@ -107,21 +107,21 @@ advanced_widgets.append(tab)
 {# Parsing display_only section #}
 {% if display_only is not none -%}
 {% for display_only_conf in display_only -%}
-{% if display_only_conf.type == 'Files' and display_only_conf.file_count == "multiple" %}
+{% if display_only_conf.type == 'files' and display_only_conf.file_count == "multiple" %}
 {{ display_only_conf.label | lower | replace(" ", "_") }} = widgets.FileUpload(multiple=True)
-{% elif display_only_conf.type == 'Files' and display_only_conf.file_count == "single" %}
+{% elif display_only_conf.type == 'files' and display_only_conf.file_count == "single" %}
 {{ display_only_conf.label | lower | replace(" ", "_") }} = widgets.FileUpload(multiple=False)
-{% elif display_only_conf.type == 'Radio' %}
+{% elif display_only_conf.type == 'radio' %}
 {{ display_only_conf.label | lower | replace(" ", "_") }} = widgets.RadioButtons(options=[{% for option in display_only_conf.options %}("{{ option.label }}", "{{ option.value }}"){% if not loop.last %}, {% endif %}{% endfor %}], value="{{ display_only_conf.default }}", disabled=True)
-{% elif display_only_conf.type == 'Dropdown' %}
+{% elif display_only_conf.type == 'dropdown' %}
 {{ display_only_conf.label | lower | replace(" ", "_") }} = widgets.Dropdown(options=[{% for option in display_only_conf.options %}("{{ option.label }}", "{{ option.value }}"){% if not loop.last %}, {% endif %}{% endfor %}], value="{{ display_only_conf.default }}", multiselect="{{ display_only_conf.multiselect }}", disabled=True)
-{% elif display_only_conf.type == 'Integer' %}
+{% elif display_only_conf.type == 'integer' %}
 {{ display_only_conf.label | lower | replace(" ", "_") }} = widgets.IntText(value={{ display_only_conf.default }}, disabled=True)
-{% elif display_only_conf.type == 'Float' %}
+{% elif display_only_conf.type == 'float' %}
 {{ display_only_conf.label | lower | replace(" ", "_") }} = widgets.FloatText(value={{ display_only_conf.default }}, disabled=True)
-{% elif display_only_conf.type == 'Textbox' %}
+{% elif display_only_conf.type == 'textbox' %}
 {{ display_only_conf.label | lower | replace(" ", "_") }} = widgets.Textarea(value="{{ display_only_conf.default if display_only_conf.default is not none else '' }}", disabled=True)
-{% elif display_only_conf.type == 'Checkbox' %}
+{% elif display_only_conf.type == 'checkbox' %}
 {{ display_only_conf.label | lower | replace(" ", "_") }} = widgets.Checkbox(value={{ display_only_conf.default }}, disabled=True)
 {%- endif %}
 

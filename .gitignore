@@ -32,3 +32,5 @@ test.ipynb
 # pixi environments
 .pixi
 *.egg-info
+# Documentation
+docs/

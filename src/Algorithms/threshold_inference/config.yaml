@@ -11,7 +11,7 @@ parameters:
     folder_name: "input_images"
     mode: "beginner"
   - name: threshold_method
-    type: Radio
+    type: radio
     label: "Select a Threshold Method"
     description: "Select a threshold method to segment the image"
     options:
@@ -23,6 +23,7 @@ parameters:
     cli_tag: ""
     optional: False
     section_id: "input-args"
+    mode: "beginner"
   - name: min_diameter
     type: float
     label: "Object Minimum Diameter Size"
@@ -53,6 +54,7 @@ results:
     cli_tag: "None"
     optional: True
     section_id: "output-args"
+    mode: "beginner"
     
 exec_function: 
   name: "generate_cli_command"
@@ -63,8 +65,8 @@ exec_function:
 
 docker_image:
   org: threshold
-  name: 
-  tag:
+  name: ""
+  tag: ""
 
 algorithm_folder_name: "threshold_inference"
 

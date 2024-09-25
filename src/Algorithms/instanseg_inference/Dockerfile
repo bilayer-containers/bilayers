@@ -1,17 +1,29 @@
-FROM mambaorg/micromamba:1-focal-cuda-12.1.1
+FROM ghcr.io/prefix-dev/pixi:0.18.0 AS build
 
-USER root
+RUN apt-get update && apt-get upgrade -y && apt-get install -y git
 
-#SETUP
-RUN apt-get update && apt-get upgrade -y
-RUN apt-get install -y git
-
-USER $MAMBA_USER
-
-#INSTANSEG
+# copy source code, pixi.toml and pixi.lock to the container
 RUN git clone https://github.com/instanseg/instanseg.git
-WORKDIR instanseg
+WORKDIR /instanseg
+# run some compilation / build task (if needed)
+RUN pixi init --import env.yml
+# Create the shell-hook bash script to activate the environment
+RUN pixi shell-hook > /shell-hook.sh
 
-RUN micromamba create --file env.yml && micromamba clean --all --yes
+# extend the shell-hook script to run the command passed to the container
+RUN echo 'exec "$@"' >> /shell-hook.sh
 
-ENV ENV_NAME=instanseg
+FROM ubuntu:22.04 AS production
+
+# only copy the production environment into prod container
+# please note that the "prefix" (path) needs to stay the same as in the build container
+COPY --from=build /instanseg/ /instanseg/
+COPY --from=build /instanseg/.pixi/envs/default /instanseg/.pixi/envs/default
+COPY --from=build /shell-hook.sh /shell-hook.sh
+WORKDIR /instanseg
+
+# set the entrypoint to the shell-hook script (activate the environment and run the command)
+# no more pixi needed in the prod container
+ENTRYPOINT ["/bin/bash", "/shell-hook.sh"]
+
+CMD ["python"]

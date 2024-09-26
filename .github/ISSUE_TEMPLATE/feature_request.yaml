@@ -15,52 +15,25 @@ body:
       options:
         - label: I have searched the existing issues and did not find a duplicate
           required: true
-  - type: input
-    id: new_ui_type
+  - type: dropdown
+    id: feature_type
     attributes:
-      label: Specification Type
-      description: Specify the type of UI
-      placeholder: Enter the specification type (eg. dropdown, radio, etc.)
+      label: What type of feature are you requesting?
+      description: Select the type of feature you're requesting
+      options:
+        - "Spec enhancement"
+        - "New DL Algorithm"
+        - "New Interface"
+        - "CLI flag Pattern"
+        - "Something else"
     validations:
-      required: false
-  - type: input
-    id: algorithm_name
-    attributes:
-      label: New Deep Learning Algorithm (Preferably already contanerized)
-      description: Name of the new deep learning algorithm
-      placeholder: Enter the algorithm name (eg. Stardist, Cellpose, etc.)
-    validations:
-      required: false
-  - type: input
-    id: interface_request
-    attributes:
-      label: Interface Request
-      description: Describe the new interface you are requesting
-      placeholder: Enter the interface request (eg. Streamlit, Quorto, etc.)
-    validations:
-      required: false
-  - type: input
-    id: more_cli_pattern
-    attributes:
-      label: Support more cli patterns
-      description: Describe the new cli pattern you are requesting
-      placeholder: CLI pattern request
-      value: |
-        ```
-        # Write your own pattern here - remove the default value
-        
-        --type=value_with_double_dash
-        -t value_with_single_dash
-        -t=value_with_single_dash_and_equals_sign
-        ```
-    validations:
-      required: false
+      required: true
   - type: textarea
     id: description
     attributes:
       label: Feature Details
       description: A detailed description of the feature you are requesting
-      placeholder: Describe the feature you would like to see
+      placeholder: Describe the feature you would like to request. For example, Adding support for type=dropdown, integrating a new DL algorithm like Stardist, introducing a new interface like Streamlit, or requesting a CLI flag pattern like -t=value_with_single_dash
     validations:
       required: true
   - type: textarea

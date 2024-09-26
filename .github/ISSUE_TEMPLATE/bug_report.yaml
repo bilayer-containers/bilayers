@@ -1,0 +1,64 @@
+name: "🐞 Bug report 🐞"
+description: Report a bug on Bilayers
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping us improve! Before submitting, please [check the issue tracker](https://github.com/bilayer-containers/bilayers/issues) to ensure the bug hasn't already been reported.
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: Describe the bug
+      description: Please provide the detailed description of bug
+      placeholder: Bug description
+    validations:
+      required: true
+  - type: checkboxes
+    attributes:
+      label: Have you searched existing issues?
+      description: Please search to see if an issue already exists for the issue you encountered.
+      options:
+        - label: I have searched and found no existing issues
+          required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Provide steps to reproduce the bug, or share a `config.yaml` snippet if wrapping up your custom algorithm.
+      placeholder: Steps to reproduce the bug
+      value: |
+        ```
+        Your config.yaml content here : For custom algorithm
+        ```
+    validations:
+      required: true
+  - type: textarea
+    id: screenshot
+    attributes:
+      label: Screenshot
+      description: If relevant, please include screenshot(s) of the error!
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs/StackTrace
+      description: Include the full stacktrace of the errors from running Jupyter Notebook or Gradio. You can find the logs in Docker Desktop under the logs section.
+  - type: dropdown
+    id: version
+    attributes:
+      label: Bilayers Version
+      description: Select the bilayers version
+      options:
+        - "0.1"
+    validations:
+      required: true
+  - type: textarea
+    id: system_info
+    attributes: 
+        label: System Info
+        description: Fill out the system's specification
+        placeholder: OS version 
+        value: |
+            OS version: MacOS Sonoma 14.1
+    validations: 
+        required: true

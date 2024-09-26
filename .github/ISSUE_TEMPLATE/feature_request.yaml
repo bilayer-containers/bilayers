@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to open a feature request! Please provide us with as much detail as possible to help us understand your idea
+        Thank you for taking the time to submit a feature request! Please provide as much detail as possible to help us fully understand your idea.
   - type: checkboxes
     id: duplicate_check
     attributes:
@@ -15,10 +15,50 @@ body:
       options:
         - label: I have searched the existing issues and did not find a duplicate
           required: true
+  - type: input
+    id: new_ui_type
+    attributes:
+      label: Specification Type
+      description: Specify the type of UI
+      placeholder: Enter the specification type (eg. dropdown, radio, etc.)
+    validations:
+      required: false
+  - type: input
+    id: algorithm_name
+    attributes:
+      label: New Deep Learning Algorithm (Preferably already contanerized)
+      description: Name of the new deep learning algorithm
+      placeholder: Enter the algorithm name (eg. Stardist, Cellpose, etc.)
+    validations:
+      required: false
+  - type: input
+    id: interface_request
+    attributes:
+      label: Interface Request
+      description: Describe the new interface you are requesting
+      placeholder: Enter the interface request (eg. Streamlit, Quorto, etc.)
+    validations:
+      required: false
+  - type: input
+    id: more_cli_pattern
+    attributes:
+      label: Support more cli patterns
+      description: Describe the new cli pattern you are requesting
+      placeholder: CLI pattern request
+      value: |
+        ```
+        # Write your own pattern here - remove the default value
+        
+        --type=value_with_double_dash
+        -t value_with_single_dash
+        -t=value_with_single_dash_and_equals_sign
+        ```
+    validations:
+      required: false
   - type: textarea
     id: description
     attributes:
-      label: Description
+      label: Feature Details
       description: A detailed description of the feature you are requesting
       placeholder: Describe the feature you would like to see
     validations:

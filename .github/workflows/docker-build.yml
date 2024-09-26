@@ -41,7 +41,8 @@ jobs:
 
       - name: Auto generate docs with LinkML
         run: |
-            make -f Makefile
+          chmod +x scripts/generate_docs.sh
+          ./scripts/generate_docs.sh
 
   build:
     name: Docker Build

@@ -29,7 +29,7 @@ body:
       placeholder: Steps to reproduce the bug
       value: |
         ```
-        Your config.yaml content here : For custom algorithm
+          # Your config.yaml content here : For custom algorithm
         ```
     validations:
       required: true
@@ -57,8 +57,8 @@ body:
     attributes: 
         label: System Info
         description: Fill out the system's specification
-        placeholder: OS version 
+        placeholder: OS version = MacOS Sonoma 14.1 
         value: |
-            OS version: MacOS Sonoma 14.1
+            OS version: 
     validations: 
         required: true

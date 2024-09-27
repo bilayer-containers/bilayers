@@ -1,9 +1,9 @@
 import subprocess
 import nbformat as nbf
 from IPython.core.getipython import get_ipython
-from IPython.display import display, FileLink
-from zipfile import ZipFile, ZIP_DEFLATED
-from pathlib import Path
+from IPython.display import display, FileLink, HTML
+import traceback
+import urllib.parse
 
 try:
     res = subprocess.run(cli_command.value, shell=True, check=True, stdout=None, stderr=subprocess.PIPE)
@@ -13,14 +13,35 @@ try:
      
 
 except Exception as e:
-    error_message = str(e)
-    # print(f"Error occurred: {{error_message}}")
-    error_cell = nbf.v4.new_code_cell(f"# Error Details: {{error_message}}")
+    # Capture the full stack trace
+    error_message = traceback.format_exc()
 
-    ####################
-    # Display the error cell
-    shell = get_ipython()
-    shell.payload_manager.write_payload(dict(
-    source='set_next_input',
-    text=error_cell['source'],
-    replace=False), single=False)
+    # Helps turning the error message into a URL-friendly format
+    encoded_error_message = urllib.parse.quote_plus(f"## Logs\n```\n{error_message}\n```")
+
+    # Construct the GitHub issue URL, pre-filling the "logs" section with the stack trace
+    issue_url = f"https://github.com/bilayer-containers/bilayers/issues/new?assignees=&labels=bug&projects=&template=bug_report.yaml&logs={encoded_error_message}"
+
+    # Display the link as a styled button, centered
+    button_html = f'''
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="{issue_url}" target="_blank" style="
+                display: inline-block;
+                padding: 10px 20px;
+                font-size: 16px;
+                color: white;
+                background-color: #ff0000;
+                border-radius: 5px;
+                text-align: center;
+                text-decoration: none;
+                font-family: Arial, sans-serif;
+            ">
+                Report Issue
+            </a>
+        </div>
+    '''
+
+    display(HTML(button_html))
+
+    # Also, print the error message 
+    print(f"Full Stack Trace:\n{error_message}")

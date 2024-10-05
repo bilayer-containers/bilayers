@@ -14,7 +14,7 @@ RUN pixi project channel add --priority 2 nvidia
 # no way to do this from pixi cli
 # this adds "channel-priority = disabled" to the pixi.toml's [project] table
 RUN sed -i '/\[project\]/a channel-priority = \"disabled\"' pixi.toml
-RUN pixi add "pytorch==2.1.1" "torchvision==0.16.1" "monai=1.3.0" "pytorch-cuda=12.1"
+RUN pixi add "pytorch==2.1.1" "torchvision==0.16.1" "monai==1.3.0" "pytorch-cuda==12.1"
 RUN pixi add --pypi "cupy-cuda12x==13.3.0"
 # add InstanSeg as editable install
 RUN pixi add --pypi --editable "InstanSeg @ ."

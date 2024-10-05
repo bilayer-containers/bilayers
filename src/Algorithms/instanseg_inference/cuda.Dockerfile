@@ -9,7 +9,6 @@ WORKDIR /instanseg
 RUN pixi init --import env.yml
 # reinstall packages to use GPU acceleration and CUDA
 RUN pixi remove pytorch torchvision monai
-ENTRYPOINT [ "/bin/bash" ]
 RUN pixi project channel add --priority 3 nvidia/label/cuda-12.3.1
 RUN pixi project channel add --priority 2 nvidia
 # no way to do this from pixi cli

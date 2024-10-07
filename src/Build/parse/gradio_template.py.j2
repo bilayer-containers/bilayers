@@ -284,7 +284,7 @@ def on_submit(
 
     # Execute the CLI command
     try:
-        result = subprocess.run(cli_command, shell=True, check=True, stdout=None, stderr=subprocess.PIPE)
+        result = subprocess.run(cli_command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         print("Command executed successfully")
         
         # Check if output_folder_name is not None and is a directory

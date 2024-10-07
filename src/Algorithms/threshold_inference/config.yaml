@@ -1,3 +1,21 @@
+inputs:
+  - name: grayscale_image
+    type: image
+    subtype: grayscale_image
+    channels_possible: [1]
+    bitdepths_possible: [8,16]
+    optional: False
+    description: "The input image to be turned into objects"
+
+outputs:
+  - name: output_mask
+    type: image
+    subtype: grayscale_image
+    channels_possible: [1]
+    bitdepths_possible: [16]
+    optional: False
+    description: "The output object masks"
+
 parameters:
   - name: input_ images
     type: files

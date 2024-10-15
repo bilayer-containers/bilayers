@@ -112,7 +112,7 @@ def generate_cli_command(cli_tags, **kwargs):
                     if value == "None":
                         if optional is False:
                             error_message = f"{label} needs to have some value. It's Mandatory!"
-                            raise gr.Error(error_message)
+                            raise gr.Error(error_message, duration = None)
                         else:
                             continue
                 # If the parameter is a list (mainly for parameter files), convert it to a string
@@ -143,7 +143,7 @@ def generate_cli_command(cli_tags, **kwargs):
                     value = None
                     if optional is False:
                         error_message = f"{label} needs to have some value. It's Mandatory!"
-                        raise gr.Error(error_message)
+                        raise gr.Error(error_message, duration = None)
                 # If the cli_tag is None, don't include it in the command but if cli_tag is "" then just include the value
                 elif value is not None:
                     if cli_tag != "None":
@@ -302,7 +302,7 @@ def on_submit(
     except subprocess.CalledProcessError as e:
         error_message = "Please take a screenshot of this error and raise an issue at the Bilayers repository on GitHub."
         error_message += f"Command failed with error: {e.stderr.decode()}\n\n"
-        raise gr.Error(error_message)
+        raise gr.Error(error_message, duration = None)
         
 
 {% if parameters is not none -%}
@@ -325,7 +325,7 @@ def on_submit(
 {% elif param_conf.type == 'files' %}
 {{ param_conf.label | lower | replace(" ", "_") }}_description = gr.Markdown(value="{{ param_conf.description }}")
 {{ param_conf.label | lower | replace(" ", "_") }} = gr.Files(label="{{ param_conf.label }}", file_count="{{ param_conf.file_count }}")
-{%- endif %}
+{% endif %}
 
 
 {%- endfor %}  

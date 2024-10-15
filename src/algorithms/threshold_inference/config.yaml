@@ -59,7 +59,7 @@ results:
 exec_function: 
   name: "generate_cli_command"
   script: "threshold_inference"
-  module: "Algorithms.threshold_inference"
+  module: "algorithms.threshold_inference"
   cli_command: "python -m threshold"
   hidden_args:
 

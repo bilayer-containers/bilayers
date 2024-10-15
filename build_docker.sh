@@ -15,11 +15,11 @@ for ALGORITHM_NAME in "${ALGORITHM_NAMES[@]}";
         echo "Processing Algorithm: $ALGORITHM_NAME, Interface: $INTERFACE_NAME"
 
         # Running the parse script by giving actual config_path
-        CONFIG_PATH="../../../src/Algorithms/${ALGORITHM_NAME}/config.yaml"
+        CONFIG_PATH="../../../src/algorithms/${ALGORITHM_NAME}/config.yaml"
         nox -s run_parse -- $CONFIG_PATH
 
         # Running the generate file 
-        CONFIG_PATH="../../../src/Algorithms/${ALGORITHM_NAME}/config.yaml"
+        CONFIG_PATH="../../../src/algorithms/${ALGORITHM_NAME}/config.yaml"
         nox -s run_generate -- $CONFIG_PATH
 
         # Building the Algorithm Docker image

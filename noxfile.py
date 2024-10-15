@@ -5,7 +5,7 @@ import yaml
 @nox.session
 def run_parse(session):
     session.install('pyyaml')
-    session.cd('src/Build/parse')
+    session.cd('src/build/parse')
     config_path = session.posargs[0]
     session.run("python", "parse.py", config_path)
     session.cd('../../..')
@@ -13,7 +13,7 @@ def run_parse(session):
 @nox.session
 def run_generate(session):
     session.install('pyyaml','jinja2', 'nbformat', 'ipython', 'ipywidgets')
-    session.cd('src/Build/parse')
+    session.cd('src/build/parse')
     config_path = session.posargs[0]
     session.run('python', 'generate.py', config_path)
     session.cd('../../..')
@@ -82,7 +82,7 @@ def build_interface(session):
     image_name = f'{interface}-image'
     print("Image Name: ", image_name)
 
-    dockerfile_path = f'src/Build/Dockerfiles/{interface.capitalize()}.Dockerfile'
+    dockerfile_path = f'src/build/Dockerfiles/{interface.capitalize()}.Dockerfile'
     print("Dockerfile Path: ", dockerfile_path)
 
     # Read the Docker image name from the file
@@ -93,9 +93,9 @@ def build_interface(session):
         algorithm_folder_name = file.read().strip()
         
     if interface == 'gradio':
-        session.run('docker', 'build', '-f', 'Gradio.Dockerfile', '--build-arg',  f'BASE_IMAGE={base_image}', '--build-arg',  f'FOLDER_NAME={algorithm_folder_name}', '-t', image_name, '-f', dockerfile_path, 'src/Build')
+        session.run('docker', 'build', '-f', 'Gradio.Dockerfile', '--build-arg',  f'BASE_IMAGE={base_image}', '--build-arg',  f'FOLDER_NAME={algorithm_folder_name}', '-t', image_name, '-f', dockerfile_path, 'src/build')
     elif interface == 'jupyter':
-        session.run('docker', 'build', '-f', 'Jupyter.Dockerfile', '--build-arg',  f'BASE_IMAGE={base_image}', '--build-arg',  f'FOLDER_NAME={algorithm_folder_name}', '-t', image_name, '-f', dockerfile_path, 'src/Build')
+        session.run('docker', 'build', '-f', 'Jupyter.Dockerfile', '--build-arg',  f'BASE_IMAGE={base_image}', '--build-arg',  f'FOLDER_NAME={algorithm_folder_name}', '-t', image_name, '-f', dockerfile_path, 'src/build')
 
 @nox.session
 def install_gradio(session):

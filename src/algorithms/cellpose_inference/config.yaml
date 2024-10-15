@@ -384,7 +384,7 @@ results:
 exec_function: 
   name: "generate_cli_command"
   script: "cellpose_inference"
-  module: "Algorithms.cellpose_inference"
+  module: "algorithms.cellpose_inference"
   cli_command: "python -m cellpose --verbose"
   hidden_args: 
     # dummy example

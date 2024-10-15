@@ -3,7 +3,7 @@ import sys
 
 def parse_config(config_path=None):
     if config_path is None:
-        config_path = '../../../src/Algorithms/threshold/config.yaml'
+        config_path = '../../../src/algorithms/threshold/config.yaml'
     with open(config_path, 'r') as file:
         config = yaml.safe_load(file)
     return config

@@ -9,7 +9,7 @@ ALGORITHM_NAMES=("cellpose_inference" "threshold_inference")
 echo "Validating all config files against the schema $SCHEMA_FILE"
 
 for ALGORITHM in "${ALGORITHM_NAMES[@]}"; do
-    CONFIG_DIR="../src/Algorithms/${ALGORITHM}"
+    CONFIG_DIR="../src/algorithms/${ALGORITHM}"
     echo "Validating all config files in $CONFIG_DIR"
     for config in "$CONFIG_DIR"/*.yaml; do
         echo "Validating $config..."

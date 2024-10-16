@@ -1,3 +1,35 @@
+inputs:
+  - name: source_image
+    type: image
+    subtype: multichannel_image
+    channels_possible: [1,2,3,4,5,6,7,8,9,10]
+    bitdepths_possible: [8,16]
+    optional: False
+    description: "The input image to be turned into objects"
+
+outputs:
+  - name: output_flows
+    type: array
+    subtype: npy_array
+    optional: False
+    description: "The 'flows' array, which contains thisthing, thisotherthing, and thisotherotherthing. See the Cellpose documentation for more detail."
+  - name: output_mask_png
+    type: image
+    subtype: grayscale_image
+    channels_possible: [1]
+    bitdepths_possible: [16]
+    optional: True
+    description: "The output object masks in png form. Only created if --save_png is used."
+  - name: output_mask_tif
+    type: image
+    subtype: grayscale_image
+    channels_possible: [1]
+    bitdepths_possible: [16]
+    optional: True
+    description: "The output object masks in png form. Only created if --save_tif is used."
+
+  #TODO - optional outputs for the other `--save_stuff` flagss
+
 parameters:
   # Hardware Arguments
   - name: use_gpu

@@ -34,3 +34,6 @@ test.ipynb
 *.egg-info
 # Documentation
 docs/
+
+# MyST build outputs
+_build

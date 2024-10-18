@@ -377,6 +377,7 @@ results:
     label: "Download Outputs"
     description: "Directory containing the output files"
     cli_tag : "None"
+    file_count: multiple
     optional: True
     section_id: "output-section"
     mode: "beginner"

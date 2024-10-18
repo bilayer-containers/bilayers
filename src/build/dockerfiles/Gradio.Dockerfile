@@ -10,7 +10,7 @@ ARG FOLDER_NAME
 WORKDIR /bilayers
 
 # Install the dependencies for the gradio app
-RUN python -m pip install pyyaml gradio==4.43.0 gradio_client==1.3.0 huggingface-hub==0.23.4 pydantic==2.7.4
+RUN python -m pip install pyyaml gradio==4.44.1 gradio_client==1.3.0 huggingface-hub==0.23.4 pydantic==2.7.4
 
 # Install numpy and opencv-python
 RUN python -m pip install numpy==1.23.0 opencv-python-headless==4.5.3.56 matplotlib==3.5.1

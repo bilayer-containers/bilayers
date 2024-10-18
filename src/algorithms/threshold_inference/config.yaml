@@ -5,22 +5,22 @@ parameters:
     description: "Upload all images to be analyzed"
     file_count: multiple
     default: "directory"
-    cli_tag: ""
+    cli_tag: "--folder"
     optional: False
     section_id: "input-args"
-    folder_name: "input_images"
+    folder_name: "/bilayers/input_images"
     mode: "beginner"
   - name: threshold_method
     type: radio
     label: "Select a Threshold Method"
     description: "Select a threshold method to segment the image"
     options:
-      - label: "Otsu"
-        value: "Otsu"
-      - label: "Li"
-        value: "Li"
-    default: "Otsu"
-    cli_tag: ""
+      - label: "otsu"
+        value: "otsu"
+      - label: "li"
+        value: "li"
+    default: "otsu"
+    cli_tag: "--threshold_method"
     optional: False
     section_id: "input-args"
     mode: "beginner"
@@ -29,7 +29,7 @@ parameters:
     label: "Object Minimum Diameter Size"
     description: "Minimum diameter of objects in pixels"
     default: 5
-    cli_tag: ""
+    cli_tag: "--min_size"
     optional: False
     section_id: "input-args"
     mode: "beginner"
@@ -38,10 +38,20 @@ parameters:
     label: "Object Maximum Diameter Size"
     description: "Maximum diameter of objects in pixels"
     default: 20
-    cli_tag: ""
+    cli_tag: "--max_size"
     optional: False
     section_id: "input-args"
     mode: "beginner"
+  - name: save_dir
+    type: textbox
+    label: "Save Directory"
+    description: "directory to save output files"
+    output_dir_set: True
+    default: "/bilayers/input_images"
+    cli_tag: "--save_dir"
+    optional: True
+    section_id: "output-args"
+    mode: "advanced"
 
 display_only:
 

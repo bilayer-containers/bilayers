@@ -108,11 +108,11 @@ def get_image_files_from_folder(folder_path):
     # List of supported image file extensions
     image_extensions = ['.png', '.jpg', '.jpeg', '.tiff', '.bmp', '.tif']
 
-    # Get all files in the folder and filter by image extensions
+    # Get all files in the folder and filter by image extensions and also dont include the files with _output in the name
     image_files = [
         os.path.join(folder_path, file)
         for file in os.listdir(folder_path)
-        if os.path.splitext(file)[1].lower() in image_extensions
+        if os.path.splitext(file)[1].lower() in image_extensions and "_output" not in file
     ]
 
     return image_files

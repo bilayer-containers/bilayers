@@ -1,0 +1,141 @@
+parameters:
+  - name: image_path
+    type: files
+    label: "Drag and drop all images to be analyzed"
+    description: "Upload all images to be analyzed"
+    file_count: multiple
+    default: "directory"
+    cli_tag: "--image_path"
+    optional: False
+    section_id: "input-args"
+    folder_name: "input_images"
+    mode: "beginner"
+  - name: model_folder
+    type: files
+    label: "Model Folder"
+    description: "Upload the model folder"
+    file_count: single
+    default: "single"
+    cli_tag: "--model_folder"
+    optional: False
+    section_id: "input-args"
+    folder_name: "model_folder"
+    mode: "beginner"
+  - name: device
+    type: radio
+    label: "Device"
+    description: "Select the device to run the model"
+    options:
+      - label: "CPU"
+        value: "cpu"
+      - label: "GPU"
+        value: "cuda"
+    default: "cpu"
+    cli_tag: "--device"
+    optional: False
+    section_id: "input-args"
+    mode: "beginner"
+  - name: pixel_size
+    type: float
+    label: "Pixel Size"
+    description: "Pixel size of the input image in microns"
+    default: None
+    cli_tag: "--pixel_size"
+    optional: False
+    section_id: "input-args"
+    mode: "beginner"
+  - name: recursive
+    type: checkbox
+    label: "Recursive"
+    description: "Look for images recursively at the image path"
+    default: False
+    cli_tag: "--recursive"
+    append_value: False
+    optional: True
+    section_id: "input-args"
+    mode: "beginner"
+  - name: ignore_segmented
+    type: checkbox
+    label: "Ignore Segmentated"
+    description: "Whether to ignore previously segmented images in the image path"
+    default: False
+    cli_tag: "--ignore_segmented"
+    append_value: False
+    optional: True
+    section_id: "input-args"
+    mode: "beginner"
+
+  # Advanced Usage
+  - name: tile_size
+    type: integer
+    label: "Tile Size"
+    description: "tile size in pixels given to the model, only used for large images"
+    default: 512
+    cli_tag: "--tile_size"
+    optional: True
+    section_id: "advanced-args"
+    mode: "advanced"
+  - name: batch_size
+    type: integer
+    label: "Batch Size"
+    description: "batch size, only useful for large images"
+    default: 1
+    cli_tag: "--batch_size"
+    optional: True
+    section_id: "advanced-args"
+    mode: "advanced"
+  - name: save_geojson
+    type: checkbox
+    label: "Save GeoJSON"
+    description: "Output geojson files of the segmentation"
+    default: False
+    cli_tag: "--save_geojson"
+    append_value: False
+    optional: True
+    section_id: "advanced-args"
+    mode: "advanced"
+
+display_only:
+  - name: exclude_str
+    type: textbox
+    label: "Exclude String"
+    description: "Exclude images with this string in their path"
+    default: "mask prediction geojson zip"
+    cli_tag: "--exclude_str"
+    optional: True
+    section_id: "display_only-args"
+    mode: "beginner"
+
+results:
+  - name: output_dir
+    type: files
+    label: "Download Output"
+    description: "Download the output files"
+    file_count: multiple
+    cli_tag: "None"
+    optional: True
+    section_id: "output-args"
+    mode: "beginner"
+    
+exec_function: 
+  name: "generate_cli_command"
+  script: "instanseg_inference"
+  module: "algorithms.instanseg_inference"
+  cli_command: "python ../instanseg/InstanSeg/scripts/inference.py"
+  hidden_args:
+
+docker_image:
+  org: bilayer
+  name: instanseg
+  tag: "1.0.0"
+
+algorithm_folder_name: "instanseg_inference"
+
+citations:
+  algorithm: 
+    - name: "InstanSeg for Nucleus Segmentation in Brightfield Images"
+      doi: 10.48550/arXiv.2408.15954
+      description: "This is instanseg algorithm"
+    - name: "InstanSeg for Nucleus/Cell Segmentation in Fluorescence Images"
+      doi: 10.1101/2024.09.04.611150
+      description: "This is instanseg algorithm"

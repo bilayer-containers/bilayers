@@ -306,7 +306,7 @@ def on_submit(
         
 
 {% if parameters is not none -%}
-{% for param_conf in parameters -%}
+{% for param_conf in parameters %}
 
 {% if param_conf.type == 'radio' -%}
 {{ param_conf.label | lower | replace(" ", "_") }} = gr.Radio(label="{{ param_conf.label }}", info="{{ param_conf.description }}",  choices=[{% for option in param_conf.options %}"{{ option.label }}"{% if not loop.last %}, {% endif %}{% endfor %}], value="{{ param_conf.default }}")
@@ -328,7 +328,7 @@ def on_submit(
 {%- endif %}
 
 
-{%- endfor %}  
+{% endfor %}  
 {%- endif %}
 
 {% if display_only is not none -%}
@@ -387,9 +387,9 @@ description_text += f"{{ citation.name }}: {{ citation.doi }} - {{ citation.desc
 {%- endfor %}
 {%- endfor %}
 
-{% for citation in citations.algorithm -%}
+{% for citation in citations.algorithm %}
 description_text += f"{{citation.name}}: {{citation.doi}} - {{citation.description}}\n\n"
-{%- endfor %}
+{% endfor %}
 
 
 {% for result_conf in results -%}

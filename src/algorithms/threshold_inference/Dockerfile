@@ -9,4 +9,7 @@ COPY threshold.py /bilayers
 # Install the dependencies for the specific algorithm
 RUN python -m pip install scipy==1.9.1 scikit-image==0.20.0
 
+# Precompile Python module
+RUN python -m compileall /bilayers/threshold.py
+
 CMD ["python"]

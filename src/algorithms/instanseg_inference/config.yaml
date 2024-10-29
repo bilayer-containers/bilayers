@@ -121,7 +121,7 @@ exec_function:
   name: "generate_cli_command"
   script: "instanseg_inference"
   module: "algorithms.instanseg_inference"
-  cli_command: "python ../instanseg/InstanSeg/scripts/inference.py"
+  cli_command: "python /instanseg/InstanSeg/scripts/inference.py"
   hidden_args:
 
 docker_image:

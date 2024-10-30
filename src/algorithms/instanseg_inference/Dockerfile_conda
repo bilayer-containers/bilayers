@@ -14,10 +14,8 @@ WORKDIR instanseg
 
 RUN git checkout b9c9d6b
 
-RUN micromamba create --file env.yml
+RUN micromamba create --file env.yml -n instanseg
 
 RUN micromamba shell -n instanseg
 
 RUN pip install -e .
-
-ENTRYPOINT ["micromamba", "shell", "-n", "instanseg"]

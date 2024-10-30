@@ -1,0 +1,23 @@
+FROM pytorch/pytorch:2.1.1-cuda12.1-cudnn8-runtime
+
+RUN apt-get -y update && apt-get -y upgrade && apt-get install -y python3-pip git curl
+
+WORKDIR /
+
+RUN curl -Ls https://micro.mamba.pm/api/micromamba/linux-64/latest | tar -xvj bin/micromamba
+
+RUN eval "$(./bin/micromamba shell hook -s posix)"
+
+RUN git clone https://github.com/instanseg/instanseg.git
+
+WORKDIR instanseg
+
+RUN git checkout b9c9d6b
+
+RUN micromamba create --file env.yml
+
+RUN micromamba shell -n instanseg
+
+RUN pip install -e .
+
+ENTRYPOINT ["micromamba", "shell", "-n", "instanseg"]

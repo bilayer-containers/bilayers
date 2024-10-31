@@ -62,7 +62,8 @@ def build_algorithm(session):
             # Proceed to build from Dockerfile if pull fails
             if os.path.exists(dockerfile_path):
                 print("Pull failed; attempting to build locally from Dockerfile.")
-                session.run('docker', 'build', '-t', image_name, '-f', dockerfile_path, f'src/algorithms/{algorithm}')
+                # session.run('docker', 'build', '-t', image_name, '-f', dockerfile_path, f'src/algorithms/{algorithm}')
+                session.run('docker', 'buildx', "build", "--platform", "linux/amd64", '-t', image_name, '-f', dockerfile_path, f'src/algorithms/{algorithm}')
                 # Save the locally built Docker image name in a file
                 with open('/tmp/docker_image_name.txt', 'w') as file:
                     file.write(image_name)

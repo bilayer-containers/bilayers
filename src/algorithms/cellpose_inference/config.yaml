@@ -374,6 +374,7 @@ display_only:
 results:
   - name: output_dir
     type: files
+    file_count: "multiple"
     label: "Download Outputs"
     description: "Directory containing the output files"
     cli_tag : "None"

@@ -4,18 +4,16 @@ RUN apt-get -y update && apt-get -y upgrade && apt-get install -y python3-pip gi
 
 WORKDIR /
 
-RUN curl -Ls https://micro.mamba.pm/api/micromamba/linux-64/latest | tar -xvj bin/micromamba
-
-RUN eval "$(./bin/micromamba shell hook -s posix)"
-
 RUN git clone https://github.com/instanseg/instanseg.git
 
 WORKDIR instanseg
 
 RUN git checkout b9c9d6b
 
-RUN micromamba create --file env.yml -n instanseg
+RUN conda env create --file env.yml
 
-RUN micromamba shell -n instanseg
+RUN conda run -n instanseg pip install -e .
 
-RUN pip install -e .
+SHELL ["conda", "run", "-n", "instanseg", "/bin/bash", "-c"]
+
+ENTRYPOINT ["conda", "run", "-n", "instanseg"]

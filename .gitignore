@@ -34,3 +34,4 @@ test.ipynb
 *.egg-info
 # Documentation
 docs/
+_build/

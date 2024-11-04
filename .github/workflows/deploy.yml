@@ -1,0 +1,38 @@
+name: Build and Deploy Docs
+
+on:
+  push:
+    branches:
+      - docs  # Trigger the workflow on pushes to the docs branch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout docs branch
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Ensure full git history is available
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install myst-parser sphinx
+
+      - name: Build documentation
+        run: |
+          cd docs  # Navigate to the docs directory if necessary
+          sphinx-build -b html . ../_build/html  # Build HTML in the _build/html directory
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./_build/html
+          publish_branch: gh-pages

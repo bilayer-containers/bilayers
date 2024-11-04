@@ -31,7 +31,7 @@ project:
     #   title: Developer
         
   exports:
-    - format: html
+    - format: md
     
 site:
   template: book-theme

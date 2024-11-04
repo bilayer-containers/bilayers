@@ -33,7 +33,7 @@ test.ipynb
 .pixi
 *.egg-info
 # Documentation
-docs/
+
 
 # MyST build outputs
 _build

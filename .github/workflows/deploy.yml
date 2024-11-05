@@ -31,7 +31,7 @@ jobs:
 
       - name: Initalize MyST
         # run: myst build --html  # Build the HTML files with MyST
-        run: myst init 
+        run: myst build 
 
       - name: Configure Git
         run: |

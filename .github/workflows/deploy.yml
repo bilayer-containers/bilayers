@@ -29,8 +29,9 @@ jobs:
       - name: Install MyST Markdown
         run: npm install -g mystmd  # Install MyST Markdown globally
 
-      - name: Build HTML Assets
-        run: myst build --html  # Build the HTML files with MyST
+      - name: Initalize MyST
+        # run: myst build --html  # Build the HTML files with MyST
+        run: myst init 
 
       - name: Configure Git
         run: |
@@ -46,7 +47,7 @@ jobs:
           git rm -rf .  # Clear existing files in the branch
 
           # Copy the generated files to the root of the gh-pages branch
-          cp -r _build/html/* .
+          cp -r _build/templates/* .
 
           # Add and commit the files to gh-pages
           git add .
@@ -54,3 +55,5 @@ jobs:
 
           # Push to the gh-pages branch
           git push -f "https://${GH_PAT}@github.com/${{ github.repository }}.git" gh-pages
+
+          git rm -rf . # Clear existing files in the branch

@@ -6,7 +6,7 @@ authors:
       - Broad Institute of MIT and Harvard
 ---
 
-Bilayers allows you to easily create a web interface (using Gradio) or a Jupyter Notebook interface for any deep-learning cell segmentation algorithm by filling out a simple configuration file in YAML format. It’s as simple as filling out a Google Form!
+Bilayers typoooooo allows you to easily create a web interface (using Gradio) or a Jupyter Notebook interface for any deep-learning cell segmentation algorithm by filling out a simple configuration file in YAML format. It’s as simple as filling out a Google Form!
 Before you begin, let’s break down the key elements you need to know - 
 
 1. [Interface](/supported-interfaces)

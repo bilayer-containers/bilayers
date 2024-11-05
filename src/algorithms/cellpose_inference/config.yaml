@@ -375,6 +375,7 @@ results:
   - name: output_dir
     type: files
     label: "Download Outputs"
+    file_count: "multiple"
     description: "Directory containing the output files"
     cli_tag : "None"
     file_count: multiple
@@ -397,7 +398,7 @@ exec_function:
 docker_image:
   org: cellprofiler
   name: runcellpose_no_pretrained
-  tag: "0.1"
+  tag: "2.3.2"
 
 algorithm_folder_name: "cellpose_inference"
 

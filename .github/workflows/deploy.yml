@@ -1,59 +1,46 @@
-name: MyST GitHub Pages Deploy
+# This file was created automatically with `myst init --gh-pages` 🪄 💚
 
+name: MyST GitHub Pages Deploy
 on:
   push:
-    branches: [docs]  # Trigger the workflow on pushes to the "docs" branch
-
+    # Runs on pushes targeting the default branch
+    branches: [docs]
 env:
-  BASE_URL: /${{ github.event.repository.name }}  # Set the base URL for GitHub Pages
+  # `BASE_URL` determines the website is served from, including CSS & JS assets
+  # You may need to change this to `BASE_URL: ''`
+  BASE_URL: /${{ github.event.repository.name }}
 
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
-  contents: write  # Grant write permissions to push to the gh-pages branch
-
+  contents: read
+  pages: write
+  id-token: write
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
   group: 'pages'
   cancel-in-progress: false
-
 jobs:
   deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout the repository
-        uses: actions/checkout@v4  # Checkout the code
-
+      - uses: actions/checkout@v4
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
       - uses: actions/setup-node@v4
         with:
           node-version: 18.x
-
       - name: Install MyST Markdown
-        run: npm install -g mystmd  # Install MyST Markdown globally
-
-      - name: Initalize MyST
-        # run: myst build --html  # Build the HTML files with MyST
-        run: myst build 
-
-      - name: Configure Git
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
-      - name: Commit and Push to gh-pages Branch
-        env:
-          GH_PAT: ${{ secrets.GH_PAT }}  # Use the personal access token as a secret
-        run: |
-          # Initialize and switch to the gh-pages branch
-          git checkout gh-pages || git checkout --orphan gh-pages
-          git rm -rf .  # Clear existing files in the branch
-
-          # Copy the generated files to the root of the gh-pages branch
-          cp -r _build/templates/* .
-
-          # Add and commit the files to gh-pages
-          git add .
-          git commit -m "Deploy MyST site to GitHub Pages"
-
-          # Push to the gh-pages branch
-          git push -f "https://${GH_PAT}@github.com/${{ github.repository }}.git" gh-pages
-
-          git rm -rf . # Clear existing files in the branch
+        run: npm install -g mystmd
+      - name: Build HTML Assets
+        run: myst build --html
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './_build/html'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

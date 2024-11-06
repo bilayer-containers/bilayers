@@ -36,13 +36,13 @@ jobs:
 
       - name: Validate schema with LinkML
         run: |
-          chmod +x scripts/validate_schema.sh
-          ./scripts/validate_schema.sh
+          chmod +x scripts/validate.sh
+          ./scripts/validate.sh
 
       - name: Auto generate docs with LinkML
         run: |
-          chmod +x scripts/generate_docs.sh
-          ./scripts/generate_docs.sh
+          chmod +x scripts/gendoc.sh
+          ./scripts/gendoc.sh
 
   build:
     name: Docker Build

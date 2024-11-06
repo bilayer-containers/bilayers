@@ -4,7 +4,7 @@
 set -e
 
 # List of algorithms and interfaces
-ALGORITHM_NAMES=("cellpose_inference") 
+ALGORITHM_NAMES=("instanseg_inference") 
 INTERFACE_NAMES=("gradio" "jupyter") 
 
 # Build the Docker images for each algorithm and interface

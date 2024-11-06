@@ -14,8 +14,6 @@ parameters:
     type: textbox
     label: "Model Folder"
     description: "Upload the model folder"
-    # file_count: single
-    # default: "single"
     cli_tag: "--model_folder"
     optional: False
     section_id: "input-args"
@@ -75,15 +73,15 @@ parameters:
     optional: True
     section_id: "advanced-args"
     mode: "advanced"
-  # - name: batch_size
-  #   type: integer
-  #   label: "Batch Size"
-  #   description: "batch size, only useful for large images"
-  #   default: 1
-  #   cli_tag: "--batch_size"
-  #   optional: True
-  #   section_id: "advanced-args"
-  #   mode: "advanced"
+  - name: batch_size
+    type: integer
+    label: "Batch Size"
+    description: "batch size, only useful for large images"
+    default: 1
+    cli_tag: "--batch_size"
+    optional: True
+    section_id: "advanced-args"
+    mode: "advanced"
   - name: save_geojson
     type: checkbox
     label: "Save GeoJSON"
@@ -121,21 +119,21 @@ exec_function:
   name: "generate_cli_command"
   script: "instanseg_inference"
   module: "algorithms.instanseg_inference"
-  cli_command: "python /instanseg/InstanSeg/scripts/inference.py"
+  cli_command: "python /tmp/instanseg/InstanSeg/scripts/inference.py"
   hidden_args:
 
 docker_image:
-  org: bethcimini
+  org: rajavishah
   name: instanseg_mamba
-  tag: "latest"
+  tag: "1.0.0"
 
 algorithm_folder_name: "instanseg_inference"
 
 citations:
   algorithm: 
-    - name: "InstanSeg for Nucleus Segmentation in Brightfield Images"
+    - name: "InstanSeg in Brightfield Images"
       doi: 10.48550/arXiv.2408.15954
-      description: "This is instanseg algorithm"
-    - name: "InstanSeg for Nucleus/Cell Segmentation in Fluorescence Images"
+      description: "InstanSeg for Nucleus Segmentation in Brightfield Images"
+    - name: "InstanSeg in Fluorescence Images"
       doi: 10.1101/2024.09.04.611150
-      description: "This is instanseg algorithm"
+      description: "InstanSeg for Nucleus/Cell Segmentation in Fluorescence Images"

@@ -1,0 +1,22 @@
+FROM mambaorg/micromamba:1-focal-cuda-12.1.1
+
+#SETUP
+USER root
+RUN apt-get update && apt-get upgrade -y
+RUN apt-get install -y git
+USER $MAMBA_USER
+
+#INSTANSEG
+RUN git clone https://github.com/instanseg/instanseg.git
+WORKDIR instanseg
+# RUN git checkout b9c9d6b
+RUN micromamba create --file env.yml 
+# RUN micromamba create -y --no-lock --file env.yml
+
+RUN micromamba run -n instanseg pip install -e .
+
+#FOR THINGS THAT WILL CALL DIRECTLY
+ENV ENV_NAME=instanseg
+
+#IN CASE BEING RUN WITH `FROM`
+SHELL ["micromamba", "run", "-n", "instanseg", "/bin/bash", "-c"]

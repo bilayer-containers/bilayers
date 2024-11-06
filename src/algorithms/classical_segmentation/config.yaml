@@ -74,9 +74,9 @@ exec_function:
   hidden_args:
 
 docker_image:
-  org: threshold
-  name: ""
-  tag: ""
+  org: rajavishah
+  name: classical_segmentation
+  tag: "1.0.0"
 
 algorithm_folder_name: "classical_segmentation"
 

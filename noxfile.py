@@ -98,7 +98,6 @@ def build_interface(session):
         
     if interface == 'gradio':
         session.run('docker', 'build', '-f', 'Gradio.Dockerfile', '--build-arg',  f'BASE_IMAGE={base_image}', '--build-arg',  f'FOLDER_NAME={algorithm_folder_name}', '-t', image_name, '-f', dockerfile_path, 'src/build')
-        session.run('docker', 'build', '-f', 'Gradio.Dockerfile', '--build-arg',  f'BASE_IMAGE={base_image}', '--build-arg',  f'FOLDER_NAME={algorithm_folder_name}', '-t', image_name, '-f', dockerfile_path, 'src/Build')
     elif interface == 'jupyter':
         session.run('docker', 'build', '-f', 'Jupyter.Dockerfile', '--build-arg',  f'BASE_IMAGE={base_image}', '--build-arg',  f'FOLDER_NAME={algorithm_folder_name}', '-t', image_name, '-f', dockerfile_path, 'src/build')
 

@@ -68,9 +68,9 @@ results:
     
 exec_function: 
   name: "generate_cli_command"
-  script: "threshold_inference"
-  module: "algorithms.threshold_inference"
-  cli_command: "python -m threshold"
+  script: "classical_segmentation"
+  module: "algorithms.classical_segmentation"
+  cli_command: "python -m classical_segmentation"
   hidden_args:
 
 docker_image:
@@ -78,10 +78,10 @@ docker_image:
   name: ""
   tag: ""
 
-algorithm_folder_name: "threshold_inference"
+algorithm_folder_name: "classical_segmentation"
 
 citations:
   algorithm: 
-    - name: "Threshold"
+    - name: "Classical Segmentation"
       doi: xxxx
-      description: "This is threshold algorithm"
+      description: "Segments images using classical thresholding methods : Otsu and Li"

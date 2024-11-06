@@ -74,7 +74,7 @@ exec_function:
   hidden_args:
 
 docker_image:
-  org: rajavishah
+  org: bilayer
   name: classical_segmentation
   tag: "1.0.0"
 

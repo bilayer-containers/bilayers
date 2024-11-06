@@ -3,7 +3,7 @@
 cd "$(dirname "$0")"
 SCHEMA_FILE=${1:-"../schema/validate_schema.yaml"}
 # List of algorithms and interfaces
-ALGORITHM_NAMES=("cellpose_inference" "threshold_inference") 
+ALGORITHM_NAMES=("cellpose_inference" "classical_segmentation") 
 # INTERFACE_NAMES=("gradio" "jupyter") 
 
 echo "Validating all config files against the schema $SCHEMA_FILE"

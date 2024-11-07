@@ -63,8 +63,8 @@ Replace ```/path/to/your/data``` with your ```local directory``` for input image
 :::
 
 **Using Docker Desktop (GUI):**
-In the Containers tab, create a new container:
-- Gradio: Start the container as-is, assign it a name, and select an available port (e.g., 8000 for Gradio)
+
+- Gradio: Start the Image as-is, assign it a name, and select an available port (e.g., 8000 for Gradio)
 
 ![cellposeXgradio](../images/tool_user/cellposeXgradio.mp4)
 

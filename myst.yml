@@ -20,13 +20,17 @@ project:
           title: Get Started
         - file: docs/tool_user/steps_to_run.md
           title: Steps to Run Bilayers Docker Image
-    - file: docs/custom_algorithm/custom_algorithm.md
-      title: Custom Algorithm
+    - file: 
+      title: Wrap Algorithm to Bilayers
       children:
+        - file: docs/custom_algorithm/custom_algorithm.md
+          title: Creating Interfaces for Custom Algorithms
         - file: docs/custom_algorithm/supported_interfaces.md
           title: Supported Interface
         - file: docs/custom_algorithm/understanding_config.md
           title: Understanding Config File
+        - file: docs/custom_algorithm/right_base_docker_image.md
+          title: Choosing the Right Base Docker Image
         - file: docs/custom_algorithm/steps_to_create.md
           title: Steps to create a custom algorithm's interface
     # - file: docs/developer/developer.md

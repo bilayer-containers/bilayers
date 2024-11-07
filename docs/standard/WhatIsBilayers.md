@@ -25,10 +25,10 @@ Docker is a containerization platform that allows you to package code and depend
 
 ## Quick Links
 ##### Getting Started with Pre-Built Docker Images
-Learn how to quickly start using Bilayers with our pre-built Docker images. [Start Here](../tool_user/main)
+Learn how to quickly start using Bilayers with our pre-built Docker images. [Start Here](../tool-user)
 
 ##### Creating Interfaces for Your Custom Algorithm
-Follow our guide to create a web or Jupyter Notebook interface for your deep-learning algorithm. [Learn More](../custom_algorithm/main)
+Follow our guide to create a web or Jupyter Notebook interface for your deep-learning algorithm. [Learn More](../custom-algorithm)
 
 ##### Contribution & Developer Guidelines
 Want to contribute to Bilayers? Check out our developer guidelines and learn how to submit your custom interfaces. Read the Guidelines

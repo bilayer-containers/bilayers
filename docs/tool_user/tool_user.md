@@ -1,5 +1,5 @@
 ---
-title: Getting Started with Pre-Built Docker Images
+title: Get Started
 authors:
   - name: Cimini Lab
     affiliations:

@@ -6,7 +6,7 @@ authors:
       - Broad Institute of MIT and Harvard
 ---
 
-## What is Gradio?
+## Gradio
 
 Gradio provides a quick and easy way to demo your machine learning model through a user-friendly web interface, making it accessible to anyone, anywhere. [Learn More](https://www.gradio.app/)
 
@@ -14,7 +14,7 @@ Gradio provides a quick and easy way to demo your machine learning model through
 
 ---
 
-## What is a Jupyter Notebook?
+## Jupyter Notebook
 
 Jupyter Notebooks offer a flexible, interactive environment where users can run and modify code. [Learn More](https://jupyter-notebook.readthedocs.io/en/latest/)
 

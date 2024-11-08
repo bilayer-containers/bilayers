@@ -53,7 +53,7 @@ parameters:
     description: "Look for images recursively at the image path"
     default: False
     cli_tag: "--recursive"
-    append_value: False
+    append_value: True
     optional: True
     section_id: "input-args"
     mode: "beginner"
@@ -63,7 +63,17 @@ parameters:
     description: "Whether to ignore previously segmented images in the image path"
     default: False
     cli_tag: "--ignore_segmented"
-    append_value: False
+    append_value: True
+    optional: True
+    section_id: "input-args"
+    mode: "beginner"
+  - name: output_dir
+    type: textbox
+    label: "Output Directory"
+    description: "Output directory to save the segmented images"
+    output_dir_set: False
+    default: "/bilayers/input_images"
+    cli_tag: "None"
     optional: True
     section_id: "input-args"
     mode: "beginner"
@@ -92,8 +102,8 @@ parameters:
     label: "Save GeoJSON"
     description: "Output geojson files of the segmentation"
     default: False
-    cli_tag: "--output_geojson"
-    append_value: False
+    cli_tag: "--save_geojson"
+    append_value: True
     optional: True
     section_id: "advanced-args"
     mode: "advanced"

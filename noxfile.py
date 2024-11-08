@@ -52,7 +52,7 @@ def build_algorithm(session):
         # Attempt to pull the image from DockerHub
         try:
             print(f'Trying to pull the Docker image: {docker_image_name}')
-            session.run('docker', 'pull', docker_image_name)
+            session.run('docker', 'pull', "--platform", "linux/amd64", "bilayer/instanseg:1.0.2")
             print(f'Successfully pulled Docker image from DockerHub: {docker_image_name}')
             # Save the Docker image name in a file
             with open('/tmp/docker_image_name.txt', 'w') as file:
@@ -98,9 +98,9 @@ def build_interface(session):
         algorithm_folder_name = file.read().strip()
         
     if interface == 'gradio':
-        session.run('docker', 'build', '-f', 'Gradio.Dockerfile', '--build-arg',  f'BASE_IMAGE={base_image}', '--build-arg',  f'FOLDER_NAME={algorithm_folder_name}', '-t', image_name, '-f', dockerfile_path, 'src/build')
+        session.run('docker', 'build', '--platform', 'linux/amd64', '-f', 'Gradio.Dockerfile', '--build-arg',  f'BASE_IMAGE={base_image}', '--build-arg',  f'FOLDER_NAME={algorithm_folder_name}', '-t', image_name, '-f', dockerfile_path, 'src/build')
     elif interface == 'jupyter':
-        session.run('docker', 'build', '-f', 'Jupyter.Dockerfile', '--build-arg',  f'BASE_IMAGE={base_image}', '--build-arg',  f'FOLDER_NAME={algorithm_folder_name}', '-t', image_name, '-f', dockerfile_path, 'src/build')
+        session.run('docker', 'build', '--platform', 'linux/amd64', '-f', 'Jupyter.Dockerfile', '--build-arg',  f'BASE_IMAGE={base_image}', '--build-arg',  f'FOLDER_NAME={algorithm_folder_name}', '-t', image_name, '-f', dockerfile_path, 'src/build')
 
 @nox.session
 def install_gradio(session):

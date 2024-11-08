@@ -6,11 +6,11 @@ FROM $BASE_IMAGE
 
 ARG FOLDER_NAME
 
-# Set the working directory within the container
-WORKDIR /bilayers
-
 # Install the dependencies for the gradio app
 RUN python -m pip install pyyaml gradio gradio_client huggingface-hub pydantic
+
+# Set the working directory within the container
+WORKDIR /bilayers
 
 # Add app.py file to the container
 ADD parse/generated_folders/$FOLDER_NAME/app.py /bilayers/
@@ -23,3 +23,4 @@ EXPOSE 7878
 
 # Define the command to run the app
 CMD ["python", "-u", "app.py"]
+

@@ -6,11 +6,11 @@ FROM $BASE_IMAGE
 
 ARG FOLDER_NAME
 
-# Set the working directory within the container
-WORKDIR /bilayers
-
 # Install the dependencies for the gradio app
 RUN python -m pip install pyyaml jupyter huggingface-hub==0.23.4 pydantic==2.7.4
+
+# Set the working directory within the container
+WORKDIR /bilayers
 
 # # Install numpy and opencv-python
 # RUN python -m pip install numpy==1.23.0 opencv-python-headless==4.5.3.56 matplotlib==3.5.1

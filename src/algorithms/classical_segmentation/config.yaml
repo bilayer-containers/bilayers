@@ -74,9 +74,10 @@ exec_function:
   hidden_args:
 
 docker_image:
-  org: bilayerss
+  org: rajavishahzzz
   name: classical_segmentation
-  tag: "1.0.0"
+  tag: "1.0.0_amd64"
+  architecture: "linux/amd64"
 
 algorithm_folder_name: "classical_segmentation"
 

@@ -1,0 +1,20 @@
+name: Temporary Pipeline
+
+on:
+  push:
+    branches:
+      - pipeline_fix
+
+jobs:
+    try-which-machine:
+        name: Try which machine
+        runs-on: ubuntu-latest
+
+        steps: 
+            - name: Checkout code
+              run: actions/checkout@v2
+            
+            - name: Run architecture check
+              run: |
+                echo "Runner architecture: $(uname -m)"
+                docker run --rm ubuntu:latest uname -m

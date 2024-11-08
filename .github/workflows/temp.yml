@@ -11,10 +11,7 @@ jobs:
         runs-on: ubuntu-latest
 
         steps: 
-            - name: Checkout code
-              run: actions/checkout@v2
-            
             - name: Run architecture check
               run: |
-                echo "Runner architecture: $(uname -m)"
-                docker run --rm ubuntu:latest uname -m
+                echo "Runner architecture: $(uname -a)"
+                docker run --rm ubuntu:latest uname -a

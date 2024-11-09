@@ -7,13 +7,23 @@ RUN git clone https://github.com/instanseg/instanseg.git
 
 WORKDIR /instanseg
 
-# last known working state
-RUN git checkout b9c9d6b
+# last known working state as of Nov 8, 2024
+RUN git checkout 740d9da0
 
-# run some compilation / build task (if needed)
-RUN pixi init --import env.yml
-# add InstanSeg as editable install
-RUN pixi add --pypi --editable "InstanSeg @ ."
+# env.yml is outdated and not kept in sync with deps in pyproject.toml
+RUN rm env.yml
+# pyproject.toml only installs from pypi and has some conflicts
+RUN rm pyproject.toml
+# replace with dep-free pyproject.toml for editible install of instanseg-torch
+COPY ./pyproject.toml ./pyproject.toml
+# install deps from pixi.toml
+COPY ./pixi.toml ./pixi.toml
+
+RUN pixi install -e cpuenv
+
+# convert all .py files to .pyc files for faster initial startup and run times
+RUN pixi run --environment cpuenv python -m compileall /instanseg/.pixi/envs/cpuenv/lib/python3.9/site-packages
+RUN pixi run --environment cpuenv python -m compileall /instanseg/instanseg
 
 FROM ubuntu:jammy AS production
 
@@ -22,18 +32,19 @@ COPY --from=build /usr/local/bin/pixi /usr/local/bin/pixi
 # copy the production environment into prod container
 # please note that the "prefix" (path) needs to stay the same as in the build container
 COPY --from=build /instanseg/ /instanseg/
-COPY --from=build /instanseg/.pixi/envs/default /instanseg/.pixi/envs/default
+COPY --from=build /instanseg/.pixi/envs/cpuenv /instanseg/.pixi/envs/cpuenv
 
 WORKDIR /instanseg
 
-# install pip for downstream containers to pip install things
-RUN pixi add pip
+ENV BILAYERS_TOOL_NAME=instanseg
+ENV BILAYERS_VENV_MANAGER=pixi
+ENV BILAYERS_VENV_NAME=cpuenv
 
 # set shell to run commands in default pixi environment
-SHELL ["pixi", "run", "/bin/bash", "-c"]
+SHELL ["pixi", "run", "--manifest-path", "/instanseg/pixi.toml", "--environment", "cpuenv", "/bin/bash", "-c"]
 
-# set entrypoint to run pixi commands in default pixi environment
-ENTRYPOINT ["pixi", "run", "--no-progress", "--no-lockfile-update"]
+# set entrypoint to run pixi commands in pixi environment
+ENTRYPOINT ["pixi", "run", "--manifest-path", "/instanseg/pixi.toml", "--no-progress", "--no-lockfile-update", "--environment", "cpuenv"]
 
 # default command runs bash
 CMD ["/bin/bash"]

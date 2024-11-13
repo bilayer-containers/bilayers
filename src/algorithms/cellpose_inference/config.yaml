@@ -510,7 +510,11 @@ results:
     label: "Download Outputs"
     file_count: "multiple"
     description: "Directory containing the output files"
+<<<<<<< HEAD
     cli_tag: "None"
+=======
+    cli_tag : "None"
+>>>>>>> 3373396 ([removed] extra file_count)
     optional: True
     section_id: "output-section"
     mode: "beginner"

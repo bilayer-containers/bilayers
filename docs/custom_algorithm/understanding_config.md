@@ -520,6 +520,8 @@ A potential use case for hidden_args is ensuring output files are saved to a spe
 ## Defining docker_image
 Each interface’s Docker image is built on top of the base Docker image specific to the algorithm. Therefore, it's highly recommended to choose an algorithm with a pre-built Docker image available on DockerHub.
 
+For guidance on selecting a compatible base image, refer [Choosing the Right Base Docker Image](right_base_docker_image)
+
 To specify the image, select one from DockerHub. Here's how it works with an example:  
 For instance, `cellprofiler/runcellpose_no_pretrained:0.1` can be broken down into three parts:
 
@@ -527,7 +529,7 @@ For instance, `cellprofiler/runcellpose_no_pretrained:0.1` can be broken down in
 - **name**: The part between `/` and `:` is the image name (e.g., `runcellpose_no_pretrained`).
 - **tag**: The part after `:` is the tag, which can be a version number or a term like `latest` (e.g., `0.1`).
 
-To learn more about docker image naming, refer to What are Docker tags?
+To learn more about docker image naming, refer to [What are Docker tags?](https://medium.com/free-code-camp/an-introduction-to-docker-tags-9b5395636c2a)
 
 Also, here’s the template to directly paste in your config.yaml file
 ```{code} yaml

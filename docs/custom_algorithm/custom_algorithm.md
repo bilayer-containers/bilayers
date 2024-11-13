@@ -21,6 +21,8 @@ Before you begin, let’s break down the key elements you need to know -
     - [algorithm_folder_name](/understanding-config#defining-algorithm-folder-name)
     - [citations](/understanding-config#defining-citations)
 3. [Choosing the right base docker image](/right-base-docker-image)
+    - [Requirements for the Algorithm (Base) Docker Image](/right-base-docker-image#requirements-for-the-algorithm-base-docker-image)
+    - [Adapting Non-Compliant Base Images](/right-base-docker-image#adapting-non-compliant-base-images)
 4. [Steps to create your custom Algorithm’s Interfaces](/steps-to-create)
     - Step 0: Clone the repo
     - Step 1: Create your own Algorithm spec-file

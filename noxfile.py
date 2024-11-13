@@ -42,6 +42,7 @@ def build_algorithm(session):
         org = config.get('docker_image', {}).get('org')
         name = config.get('docker_image', {}).get('name')
         tag = config.get('docker_image', {}).get('tag')
+        platform = config.get('docker_image', {}).get('platform')
         docker_image_name = f'{org}/{name}:{tag}' if org and name and tag else None
         algorithm_folder_name = config.get('algorithm_folder_name', None)
 
@@ -49,10 +50,14 @@ def build_algorithm(session):
         with open('/tmp/algorithm_folder_name.txt', 'w') as file:
             file.write(algorithm_folder_name)
 
+        # Save the platform details in a file
+        with open('/tmp/docker_platform.txt', 'w') as file:
+            file.write(platform)
+
         # Attempt to pull the image from DockerHub
         try:
             print(f'Trying to pull the Docker image: {docker_image_name}')
-            session.run('docker', 'pull', docker_image_name)
+            session.run('docker', 'pull', '--platform', platform, docker_image_name)
             print(f'Successfully pulled Docker image from DockerHub: {docker_image_name}')
             # Save the Docker image name in a file
             with open('/tmp/docker_image_name.txt', 'w') as file:
@@ -62,7 +67,7 @@ def build_algorithm(session):
             # Proceed to build from Dockerfile if pull fails
             if os.path.exists(dockerfile_path):
                 print("Pull failed; attempting to build locally from Dockerfile.")
-                session.run('docker', 'build', '-t', image_name, '-f', dockerfile_path, f'src/algorithms/{algorithm}')
+                session.run('docker', 'buildx', 'build', '--platform', platform, '-t', image_name, '-f', dockerfile_path, f'src/algorithms/{algorithm}')
                 # Save the locally built Docker image name in a file
                 with open('/tmp/docker_image_name.txt', 'w') as file:
                     file.write(image_name)
@@ -96,10 +101,13 @@ def build_interface(session):
     with open('/tmp/algorithm_folder_name.txt', 'r') as file:
         algorithm_folder_name = file.read().strip()
         
+    with open('/tmp/docker_platform.txt', 'r') as file:
+        platform = file.read().strip()
+        
     if interface == 'gradio':
-        session.run('docker', 'build', '-f', 'Gradio.Dockerfile', '--build-arg',  f'BASE_IMAGE={base_image}', '--build-arg',  f'FOLDER_NAME={algorithm_folder_name}', '-t', image_name, '-f', dockerfile_path, 'src/build')
+        session.run('docker', 'buildx', 'build', '--platform', platform, '-f', 'Gradio.Dockerfile', '--build-arg',  f'BASE_IMAGE={base_image}', '--build-arg',  f'FOLDER_NAME={algorithm_folder_name}', '-t', image_name, '-f', dockerfile_path, 'src/build')
     elif interface == 'jupyter':
-        session.run('docker', 'build', '-f', 'Jupyter.Dockerfile', '--build-arg',  f'BASE_IMAGE={base_image}', '--build-arg',  f'FOLDER_NAME={algorithm_folder_name}', '-t', image_name, '-f', dockerfile_path, 'src/build')
+        session.run('docker', 'buildx', 'build', '--platform', platform, '-f', 'Jupyter.Dockerfile', '--build-arg',  f'BASE_IMAGE={base_image}', '--build-arg',  f'FOLDER_NAME={algorithm_folder_name}', '-t', image_name, '-f', dockerfile_path, 'src/build')
 
 @nox.session
 def install_gradio(session):

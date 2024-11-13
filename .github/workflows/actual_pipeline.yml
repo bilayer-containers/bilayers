@@ -1,0 +1,53 @@
+name: Temporary Pipeline
+
+on:
+  push:
+    branches:
+      - actual_pipeline_fix
+
+jobs:
+    try-which-machine:
+        name: Try which machine
+        runs-on: ubuntu-latest
+
+        steps: 
+            - name: Run architecture check
+              run: |
+                echo "Runner architecture: $(uname -a)"
+                docker run --rm ubuntu:latest uname -a
+
+            - name: Checkout Repository
+              uses: actions/checkout@v3
+        
+            - name: Set up Python 3.9
+              uses: actions/setup-python@v3
+              with:
+                python-version: 3.9
+        
+            - name: Install nox
+              run: |
+                pip install nox
+                # TODO: remove this as a sessiond dependency
+                pip install pyyaml
+
+            - name: Set up QEMU for multi-architecture support
+              uses: docker/setup-qemu-action@v2
+        
+            - name: Set up Docker Buildx (for multi-arch builds)
+              uses: docker/setup-buildx-action@v2
+              with:
+                install: true
+        
+            - name: Run parse,generate and build docker images
+              run: |
+                  chmod +x build_docker.sh
+                  ./build_docker.sh
+
+        
+            - name: Cleanup Docker images
+              if: always()
+              run: |
+                docker image prune -f
+                docker container prune -f
+
+        

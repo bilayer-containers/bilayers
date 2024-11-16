@@ -152,7 +152,9 @@ acc.children = acc.children + (VBox(advanced_widgets),)
 acc.set_title(1, "Advanced Section")
 
 def option_to_append(cli_tag, value):
-    if cli_tag == "":
+    if cli_tag == "None":
+        return None  # Ignore the cli_tag and value pair
+    elif cli_tag == "":
         return str(value)  # Append only the value
     else:
         if "=" in cli_tag:
@@ -169,7 +171,8 @@ def insert_into_jagged_array(jagged_array, cli_order, cli_tag, value):
     
     # Append the cli_tag and value to the appropriate sublist
     result = option_to_append(cli_tag, value)
-    jagged_array[abs(cli_order)].append(result)
+    if result is not None: # Only append if the result is not None
+        jagged_array[abs(cli_order)].append(result)
 
 
 def construct_cli_command():
@@ -198,7 +201,7 @@ def construct_cli_command():
             while len(jagged_positive_array) <= cli_order:
                 jagged_positive_array.append(None)  # Append None to fill gaps
 
-            if isinstance(value, bool):
+            if isinstance(value, bool): # Special case for boolean values
                 if append_value:
                     if cli_order < 0:
                         insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)
@@ -208,12 +211,16 @@ def construct_cli_command():
                     if value:
                         if cli_order < 0:
                             jagged_negative_array[abs(cli_order)] = jagged_negative_array[abs(cli_order)] or []
-                            jagged_negative_array[abs(cli_order)].append(cli_tag)
+                            # Usually, the whole pair is ignored if cli_tag is "None" but since, here we are appending only cli_tag and not value, we need to check for "None" value
+                            # Same case are followed for param_vars below (In total, 4 places we are manually checking for "None" value)
+                            if cli_tag != "None": # Ignore the cli_tag and value pair if cli_tag is "None"
+                                jagged_negative_array[abs(cli_order)].append(cli_tag)
                         else:
                             jagged_positive_array[abs(cli_order)] = jagged_positive_array[abs(cli_order)] or []
-                            jagged_positive_array[abs(cli_order)].append(cli_tag)
+                            if cli_tag != "None": # Ignore the cli_tag and value pair if cli_tag is "None"
+                                jagged_positive_array[abs(cli_order)].append(cli_tag)
 
-            else:
+            else: # For all other types except boolean
                 if cli_order < 0:
                     insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)
                 else:
@@ -247,12 +254,14 @@ def construct_cli_command():
                             while len(jagged_negative_array) <= abs(cli_order):
                                 jagged_negative_array.append(None)
                             jagged_negative_array[abs(cli_order)] = jagged_negative_array[abs(cli_order)] or []
-                            jagged_negative_array[abs(cli_order)].append(cli_tag)
+                            if cli_tag != "None":
+                                jagged_negative_array[abs(cli_order)].append(cli_tag)
                         else:
                             while len(jagged_positive_array) <= abs(cli_order):
                                 jagged_positive_array.append(None)
                             jagged_positive_array[abs(cli_order)] = jagged_positive_array[abs(cli_order)] or []
-                            jagged_positive_array[abs(cli_order)].append(cli_tag)
+                            if cli_tag != "None":
+                                jagged_positive_array[abs(cli_order)].append(cli_tag)
             
         else:  # Handling other types then Files and Checkbox
             if isinstance(widget, widgets.RadioButtons):

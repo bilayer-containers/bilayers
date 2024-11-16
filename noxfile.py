@@ -98,9 +98,9 @@ def build_interface(session):
         algorithm_folder_name = file.read().strip()
         
     if interface == 'gradio':
-        session.run('docker', 'build', '--platform', 'linux/amd64', '-f', 'Gradio.Dockerfile', '--build-arg',  f'BASE_IMAGE={base_image}', '--build-arg',  f'FOLDER_NAME={algorithm_folder_name}', '-t', image_name, '-f', dockerfile_path, 'src/build')
+        session.run('docker', 'buildx', 'build', '--platform', 'linux/amd64', '-f', 'Gradio.Dockerfile', '--build-arg',  f'BASE_IMAGE={base_image}', '--build-arg',  f'FOLDER_NAME={algorithm_folder_name}', '-t', image_name, '-f', dockerfile_path, 'src/build')
     elif interface == 'jupyter':
-        session.run('docker', 'build', '--platform', 'linux/amd64', '-f', 'Jupyter.Dockerfile', '--build-arg',  f'BASE_IMAGE={base_image}', '--build-arg',  f'FOLDER_NAME={algorithm_folder_name}', '-t', image_name, '-f', dockerfile_path, 'src/build')
+        session.run('docker', 'buildx', 'build', '--platform', 'linux/amd64', '-f', 'Jupyter.Dockerfile', '--build-arg',  f'BASE_IMAGE={base_image}', '--build-arg',  f'FOLDER_NAME={algorithm_folder_name}', '-t', image_name, '-f', dockerfile_path, 'src/build')
 
 @nox.session
 def install_gradio(session):

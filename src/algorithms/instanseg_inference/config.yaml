@@ -97,16 +97,17 @@ parameters:
     optional: True
     section_id: "advanced-args"
     mode: "advanced"
-  - name: save_geojson
-    type: checkbox
-    label: "Save GeoJSON"
-    description: "Output geojson files of the segmentation"
-    default: False
-    cli_tag: "--save_geojson"
-    append_value: True
-    optional: True
-    section_id: "advanced-args"
-    mode: "advanced"
+  # save_geojson throws an error: OS module not found - hence commented out
+  # - name: save_geojson
+  #   type: checkbox
+  #   label: "Save GeoJSON"
+  #   description: "Output geojson files of the segmentation"
+  #   default: False
+  #   cli_tag: "--save_geojson"
+  #   append_value: True
+  #   optional: True
+  #   section_id: "advanced-args"
+  #   mode: "advanced"
 
 display_only:
   - name: exclude_str

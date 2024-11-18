@@ -12,7 +12,7 @@ jobs:
           matrix:
             algorithm_name: [classical_segmentation, cellpose_inference]
             interface_name: [gradio, jupyter]
-          max-parallel: 1
+          max-parallel: 2
         runs-on: ubuntu-latest
 
         steps: 

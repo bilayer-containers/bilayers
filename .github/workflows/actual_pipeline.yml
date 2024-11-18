@@ -49,11 +49,11 @@ jobs:
               run: |
                   echo "Processing Algorithm: ${{ matrix.algorithm_name }}, Interface: ${{ matrix.interface_name }}"
 
-                  # Change to the root directory - since noxfile.py lives there
-                  cd $GITHUB_WORKSPACE
+                  # # Change to the root directory - since noxfile.py lives there
+                  # cd $GITHUB_WORKSPACE
 
                   # Run the parse script
-                  CONFIG_PATH=src/algorithms/${{ matrix.algorithm_name }}/config.yaml
+                  CONFIG_PATH="../../../src/algorithms/${{ matrix.algorithm_name }}/config.yaml"
                   nox -s run_parse -- $CONFIG_PATH
         
                   # Run the generate script

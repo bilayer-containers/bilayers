@@ -50,8 +50,9 @@ jobs:
                 ALGORITHM_NAME: ${{ matrix.algorithm }}
                 INTERFACE_NAME: ${{ matrix.interface }}
               run: |
-                  echo "Processing Algorithm: $ALGORITHM_NAME, Interface: $INTERFACE_NAME"
-            
+                  echo "Processing Algorithm: ${{ matrix.algorithm_name }}, Interface: ${{ matrix.algorithm_name }}
+                  cd $GITHUB_WORKSPACE
+                  
                   # Run the parse script
                   CONFIG_PATH=src/algorithms/${ALGORITHM_NAME}/config.yaml
                   nox -s run_parse -- $CONFIG_PATH
@@ -68,5 +69,5 @@ jobs:
             - name: Install Gradio Interface
               if: matrix.interface == 'gradio'
               run: |
-                    nox -s install_gradio
+                  nox -s install_gradio
             

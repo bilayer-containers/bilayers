@@ -34,8 +34,8 @@ jobs:
                 echo "Freeing up space on the runner..."
                 docker system prune -af || true
                 docker volume prune -f || true
-                rm -rf /usr/local/share/boost /usr/local/share/doc /usr/share/doc
-                rm -rf ~/.cache/pip
+                # rm -rf /usr/local/share/boost /usr/local/share/doc /usr/share/doc
+                # rm -rf ~/.cache/pip
                 echo "Disk space after cleanup:"
                 df -h
         

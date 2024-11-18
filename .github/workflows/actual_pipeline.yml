@@ -10,8 +10,9 @@ jobs:
         name: Try which machine
         strategy:
           matrix:
-            algorithm_name: [classical_segmentation, cellpose_inference]
+            algorithm_name: [classical_segmentation]
             interface_name: [gradio, jupyter]
+          max-parallel: 1
         runs-on: ubuntu-latest
 
         steps: 
@@ -27,6 +28,16 @@ jobs:
               uses: actions/setup-python@v4
               with:
                 python-version: 3.9
+
+            - name: Free up Disk Space
+              run: |
+                echo "Freeing up space on the runner..."
+                docker system prune -af || true
+                docker volume prune -f || true
+                rm -rf /usr/local/share/boost /usr/local/share/doc /usr/share/doc
+                rm -rf ~/.cache/pip
+                echo "Disk space after cleanup:"
+                df -h
         
             - name: Install nox
               run: |

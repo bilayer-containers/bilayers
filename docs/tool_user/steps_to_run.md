@@ -26,6 +26,14 @@ authors:
   ```{code}
   docker pull bilayer/cellpose:1.0.0-jupyter
   ```
+- instanseg_inference X Gradio :
+  ```{code}
+  docker pull bilayer/instanseg:1.0.2_pixi_gradio
+  ```
+- instanseg_inference X Jupyter :
+  ```{code}
+  docker pull bilayer/instanseg:1.0.2_pixi_jupyter
+  ```
 
 **Using CLI:**
 - Open a terminal and run:

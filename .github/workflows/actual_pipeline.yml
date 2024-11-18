@@ -47,7 +47,7 @@ jobs:
 
             - name: Process Algorithm-Interface Pair
               run: |
-                  echo "Processing Algorithm: ${{ matrix.algorithm_name }}, Interface: ${{ matrix.interface_name }}
+                  echo "Processing Algorithm: ${{ matrix.algorithm_name }}, Interface: ${{ matrix.interface_name }}"
 
                   # Change to the root directory - since noxfile.py lives there
                   cd $GITHUB_WORKSPACE

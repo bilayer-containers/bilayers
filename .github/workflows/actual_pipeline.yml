@@ -46,28 +46,27 @@ jobs:
                   ${{ runner.os }}-buildx-
 
             - name: Process Algorithm-Interface Pair
-              env:
-                ALGORITHM_NAME: ${{ matrix.algorithm }}
-                INTERFACE_NAME: ${{ matrix.interface }}
               run: |
-                  echo "Processing Algorithm: ${{ matrix.algorithm_name }}, Interface: ${{ matrix.interface }}
+                  echo "Processing Algorithm: ${{ matrix.algorithm_name }}, Interface: ${{ matrix.interface_name }}
+
+                  # Change to the root directory - since noxfile.py lives there
                   cd $GITHUB_WORKSPACE
 
                   # Run the parse script
-                  CONFIG_PATH=src/algorithms/${ALGORITHM_NAME}/config.yaml
+                  CONFIG_PATH=src/algorithms/${{ matrix.algorithm_name }}/config.yaml
                   nox -s run_parse -- $CONFIG_PATH
         
                   # Run the generate script
                   nox -s run_generate -- $CONFIG_PATH
           
                   # Build the Algorithm Docker image
-                  nox -s build_algorithm -- $ALGORITHM_NAME   
+                  nox -s build_algorithm -- ${{ matrix.algorithm_name }}   
 
                   # Build the Interface Docker image
-                  nox -s build_interface -- $INTERFACE_NAME $ALGORITHM_NAME
+                  nox -s build_interface -- ${{ matrix.interface_name }} ${{ matrix.algorithm_name }}
             
             - name: Install Gradio Interface
-              if: matrix.interface == 'gradio'
+              if: matrix.interface_name == 'gradio'
               run: |
                   nox -s install_gradio
             

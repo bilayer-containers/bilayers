@@ -33,5 +33,17 @@ test.ipynb
 .pixi
 *.egg-info
 # Documentation
-docs/
-_build/
+
+
+# MyST build outputs
+_build
+
+# Sphinx and MyST documentation outputs
+_build/                # Ignore all Sphinx build directories
+_build/html/           # Specifically ignore HTML build output if only HTML is used
+_build/doctrees/       # Ignore doctree files created during Sphinx builds
+_build/latex/          # Ignore LaTeX build output if used
+docs/_build/           # Ignore _build within the docs directory if that's your Sphinx root
+
+# Additional MyST outputs
+*.nbconvert/           # Ignore any nbconvert artifacts if notebooks are used

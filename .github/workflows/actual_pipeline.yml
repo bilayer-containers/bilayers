@@ -10,7 +10,7 @@ jobs:
         name: Try which machine
         strategy:
           matrix:
-            algorithm_name: [classical_segmentation]
+            algorithm_name: [classical_segmentation, cellpose_inference]
             interface_name: [gradio, jupyter]
           max-parallel: 1
         runs-on: ubuntu-latest
@@ -34,8 +34,6 @@ jobs:
                 echo "Freeing up space on the runner..."
                 docker system prune -af || true
                 docker volume prune -f || true
-                # rm -rf /usr/local/share/boost /usr/local/share/doc /usr/share/doc
-                # rm -rf ~/.cache/pip
                 echo "Disk space after cleanup:"
                 df -h
         

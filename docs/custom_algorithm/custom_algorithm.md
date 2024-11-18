@@ -24,9 +24,6 @@ Before you begin, let’s break down the key elements you need to know -
     - [Requirements for the Algorithm (Base) Docker Image](/right-base-docker-image#requirements-for-the-algorithm-base-docker-image)
     - [Adapting Non-Compliant Base Images](/right-base-docker-image#adapting-non-compliant-base-images)
 4. [Steps to create your custom Algorithm’s Interfaces](/steps-to-create)
-    - Step 0: Clone the repo
-    - Step 1: Create your own Algorithm spec-file
-    - Step 2: Use the custom Docker Images
-    - Step 3: Raise the PR → Bilayers Team will approve and can publish the docker-image on docker-hub
+    
 
 

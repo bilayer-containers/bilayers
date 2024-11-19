@@ -21,6 +21,14 @@ jobs:
                 echo "Runner architecture: $(uname -a)"
                 docker run --rm ubuntu:latest uname -a
 
+            - name: Free up Disk Space
+              run: |
+                echo "Freeing up space on the runner..."
+                docker system prune -af || true
+                docker volume prune -f || true
+                echo "Disk space after cleanup:"
+                df -h
+                
             - name: Checkout Repository
               uses: actions/checkout@v3
         
@@ -29,13 +37,7 @@ jobs:
               with:
                 python-version: 3.9
 
-            - name: Free up Disk Space
-              run: |
-                echo "Freeing up space on the runner..."
-                docker system prune -af || true
-                docker volume prune -f || true
-                echo "Disk space after cleanup:"
-                df -h
+            
         
             - name: Install nox
               run: |

@@ -10,9 +10,9 @@ jobs:
         name: Try which machine
         strategy:
           matrix:
-            algorithm_name: [classical_segmentation, cellpose_inference]
+            algorithm_name: [cellpose_inference]
             interface_name: [gradio, jupyter]
-          max-parallel: 2
+          max-parallel: 1
         runs-on: ubuntu-latest
 
         steps: 

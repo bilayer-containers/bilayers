@@ -1,0 +1,133 @@
+parameters:
+  # Checkbox Parameter Test Cases
+  # 1. Checkbox with append_value. append_value's value is False
+  - name: append_value_false_correct
+    type: checkbox
+    label: "checkbox append_value correct"
+    description: "checkbox with it's own extra flag i.e. append_value. Value of append_value is False This is correct"
+    default: False
+    cli_tag: "--use_gpu"
+    optional: True
+    append_value: False
+    section_id: "hardware-args"
+    mode: "advanced"
+  # 2. Checkbox without append_value. append_value's value is True
+  - name: append_value_true_correct
+    type: checkbox
+    label: "checkbox append_value correct"
+    description: "checkbox with it's own extra flag i.e. append_value. This is correct"
+    default: False
+    cli_tag: "--use_gpu"
+    optional: True
+    append_value: True
+    section_id: "hardware-args"
+    mode: "advanced"
+  # 3. Checkbox with some random extra flags
+  - name: append_value_false_incorrect
+    type: checkbox
+    label: "checkbox append_value incorrect"
+    description: "checkbox with some random extra flags. This is incorrect"
+    default: False
+    cli_tag: "--use_gpu"
+    optional: True
+    append_value: False
+    folder_name: "/bilayers/input_images"
+    section_id: "hardware-args"
+    mode: "advanced"
+  # 4. Checkbox without optional flag
+  - name: checkbox_without_optional
+    type: checkbox
+    label: "checkbox append_value incorrect"
+    description: "checkbox without optional flag. This is incorrect"
+    default: False
+    cli_tag: "--use_gpu"
+    append_value: False
+    section_id: "hardware-args"
+    mode: "advanced"
+  # 5. Checkbox with cli_order
+  - name: checkbox_with_cli_order
+    type: checkbox
+    label: "checkbox append_value incorrect"
+    description: "checkbox without optional flag. This is incorrect"
+    default: False
+    cli_tag: "--use_gpu"
+    cli_order: 3
+    append_value: False
+    section_id: "hardware-args"
+    mode: "advanced"
+  
+  # 1. Integer Correct version
+  - name: integer_correct
+    type: integer
+    label: "GPU Device"
+    description: "which GPU device to use - Integer for torch or mps for M1"
+    default: 0
+    cli_tag: "--gpu_device"
+    interactive: True
+    optional: True
+    section_id: "hardware-args"
+    mode: "advanced"
+  # 6. Integer Optional flag False : So must be appended
+  - name: gpu_device
+    type: integer
+    label: "GPU Device"
+    description: "which GPU device to use - Integer for torch or mps for M1"
+    default: 0
+    cli_tag: "--gpu_device"
+    interactive: True
+    optional: False
+    section_id: "hardware-args"
+    mode: "beginner"
+  
+  - name: gpu_device
+    type: integer
+    label: "GPU Device"
+    description: "which GPU device to use - Integer for torch or mps for M1"
+    default: 0
+    cli_tag: "--gpu_device"
+    interactive: True
+    optional: True
+    section_id: "hardware-args"
+    mode: "advanced"
+ 
+    
+
+# Display_only Section
+display_only:
+  # dummy example : DONOT PUT CLI_TAG FLAG AT ALL. THESE ARE JUST FOR DISPLAY
+  
+results:
+  - name: output_dir
+    type: files
+    label: "Download Outputs"
+    file_count: "multiple"
+    description: "Directory containing the output files"
+    cli_tag : "None"
+    optional: True
+    section_id: "output-section"
+    mode: "beginner"
+
+exec_function: 
+  name: "generate_cli_command"
+  script: "cellpose_inference"
+  module: "algorithms.cellpose_inference"
+  cli_command: "python -m cellpose --verbose"
+  hidden_args: 
+    # dummy example
+    # - cli_tag: "--save_png"
+    #   value: "True"
+    #   append_value: False
+    #   cli_order: 3
+
+docker_image:
+  org: cellprofiler
+  name: runcellpose_no_pretrained
+  tag: "2.3.2"
+
+algorithm_folder_name: "cellpose_inference"
+
+citations:
+  algorithm: 
+    - name: "Cellpose"
+      doi: 10.1038/s41592-020-01018-x
+      description: "Deep Learning algorithm for cell segmentation in microscopy images"

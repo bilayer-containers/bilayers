@@ -22,7 +22,7 @@ parameters:
     append_value: True
     section_id: "hardware-args"
     mode: "advanced"
-  # 3. Checkbox with some random extra flags
+  # 4. Checkbox with some random extra flags
   - name: append_value_false_incorrect
     type: checkbox
     label: "checkbox append_value incorrect"
@@ -34,7 +34,7 @@ parameters:
     folder_name: "/bilayers/input_images"
     section_id: "hardware-args"
     mode: "advanced"
-  # 4. Checkbox without optional flag
+  # 5. Checkbox without optional flag
   - name: checkbox_without_optional
     type: checkbox
     label: "checkbox append_value incorrect"
@@ -44,7 +44,7 @@ parameters:
     append_value: False
     section_id: "hardware-args"
     mode: "advanced"
-  # 5. Checkbox with cli_order
+  # 6. Checkbox with cli_order
   - name: checkbox_with_cli_order
     type: checkbox
     label: "checkbox append_value incorrect"
@@ -55,46 +55,296 @@ parameters:
     append_value: False
     section_id: "hardware-args"
     mode: "advanced"
-  
+  # 7. Checkbox with optional flag False
+  - name: checkbox_optional_false
+    type: checkbox
+    label: "checkbox append_value incorrect"
+    description: "checkbox without optional flag. This is incorrect"
+    default: False
+    cli_tag: "--use_gpu"
+    append_value: False
+    section_id: "hardware-args"
+    mode: "advanced"
+    optional: False
+
+  # Integer Parameter Test Cases
   # 1. Integer Correct version
-  - name: integer_correct
+  - name: integer_correct_true
     type: integer
-    label: "GPU Device"
-    description: "which GPU device to use - Integer for torch or mps for M1"
+    label: "Integer Correct Version with optional flag True"
+    description: "Integer with optional flag True"
     default: 0
-    cli_tag: "--gpu_device"
+    cli_tag: "--integer_correct_true"
     interactive: True
     optional: True
     section_id: "hardware-args"
     mode: "advanced"
-  # 6. Integer Optional flag False : So must be appended
-  - name: gpu_device
+  # 3. Integer version with optional flag False
+  - name: integer_correct_false
     type: integer
-    label: "GPU Device"
-    description: "which GPU device to use - Integer for torch or mps for M1"
+    label: "Integer Correct Version with optional flag False"
+    description: "Integer with optional flag False"
     default: 0
-    cli_tag: "--gpu_device"
+    cli_tag: "--integer_correct_false"
     interactive: True
     optional: False
     section_id: "hardware-args"
+    mode: "advanced"
+
+  # Float Parameter Test Cases
+  # 1. Float Correct version
+  - name: float_correct_true
+    type: float
+    label: "float Correct Version with optional flag True"
+    description: "Float with optional flag True"
+    default: 3.23
+    cli_tag: "--float_correct_true"
+    cli_order: 0
+    optional: True
+    section_id: "input-args"
+    mode: "beginner"
+  # 2. Float version with optional flag False
+  - name: float_correct_false
+    type: float
+    label: "float Correct Version with optional flag False"
+    description: "Float with optional flag False"
+    default: 6.23
+    cli_tag: "--float_correct_false"
+    optional: False
+    section_id: "input-args"
+    mode: "advanced"
+
+
+  # Files Parameter Test Cases
+  # 1. files correct version
+  - name: Files_correct_true
+    type: files
+    label: "files correct version"
+    description: "Files correct version. with optional flag True"
+    file_count: "single"
+    default: "single"
+    cli_tag: "--files_correct_true"
+    cli_order: 0
+    optional: True
+    section_id: ""
+    folder_name: "/bilayers/input_images"
+    mode: "beginner"
+  # 2. Files version with optional flag False
+  - name: Files_correct_false
+    type: files
+    label: "files correct version"
+    description: "Files correct version. with optional flag False"
+    file_count: "single"
+    default: "single"
+    cli_tag: "--files_correct_false"
+    optional: False
+    section_id: "input-args"
+    folder_name: "/bilayers/input_images"
     mode: "beginner"
   
-  - name: gpu_device
-    type: integer
-    label: "GPU Device"
-    description: "which GPU device to use - Integer for torch or mps for M1"
-    default: 0
-    cli_tag: "--gpu_device"
-    interactive: True
+  # Radio Parameter Test Cases
+  # 1. Radio correct version
+  - name: radio_correct_true
+    type: radio
+    label: "radio correct version"
+    description: "radio correct version. with optional flag True"
+    options: 
+      - label: red
+        value: 0
+      - label: green
+        value: 1
+    default: 1
+    cli_tag: "--radio_correct_true"
+    cli_order: 0
     optional: True
-    section_id: "hardware-args"
-    mode: "advanced"
- 
+    section_id: "input-args"
+    mode: "beginner"
+  # 2. Radio version with optional flag False
+  - name: radio_correct_false
+    type: radio
+    label: "radio correct version"
+    description: "radio correct version. with optional flag False"
+    options: 
+      - label: red
+        value: 0
+      - label: green
+        value: 1
+    default: 1
+    cli_tag: "--radio_correct_false"
+    optional: False
+    section_id: "input-args"
+    mode: "beginner"
+  # 3. Radio with default value / selected value as None. So, it should ignore the whole pair
+  - name: radio_default_none
+    type: radio
+    label: "radio default none"
+    description: "radio default none. And also one option would be given as Ignore i.e. None. Should ignore the pair from appending to command. with optional flag True"
+    options: 
+      - label: Ignore
+        value: None
+      - label: GRAY
+        value: 2
+    default: None
+    cli_tag: "--radio_default_none"
+    optional: True
+    section_id: "input-args"
+    mode: "beginner"
+  
+  # Dropdown Parameter Test Cases
+  # 1. Dropdown correct version
+  - name: dropdown_correct_true
+    type: dropdown
+    label: "dropdown correct version"
+    description: "dropdown correct version. with optional flag True"
+    options: 
+      - label: red
+        value: 0
+      - label: green
+        value: 1
+    default: 1
+    multiselect: False
+    cli_tag: "--dropdown_correct_true"
+    cli_order: 0
+    optional: True
+    section_id: "input-args"
+    mode: "beginner"
+  # 2. Dropdown version with optional flag False
+  - name: dropdown_correct_false
+    type: dropdown
+    label: "dropdown correct version"
+    description: "dropdown correct version. with optional flag False"
+    options: 
+      - label: red
+        value: 0
+      - label: green
+        value: 1
+    default: 1
+    multiselect: False
+    cli_tag: "--dropdown_correct_false"
+    optional: False
+    section_id: "input-args"
+    mode: "beginner"
+  # 3. Dropdown with default value / selected value as None. So, it should ignore the whole pair
+  - name: dropdown_default_none
+    type: dropdown
+    label: "dropdown default none"
+    description: "dropdown default none. And also one option would be given as Ignore i.e. None. Should ignore the pair from appending to command. with optional flag True"
+    options: 
+      - label: Ignore
+        value: None
+      - label: GRAY
+        value: 2
+    default: None
+    multiselect: False
+    cli_tag: "--dropdown_default_none"
+    optional: True
+    section_id: "input-args"
+    mode: "beginner"
+  # 5. Dropdown with multiselect passed as True
+  - name: dropdown_multiselect_true
+    type: dropdown
+    label: "dropdown multiselect true"
+    description: "dropdown multiselect true. with optional flag True"
+    options: 
+      - label: red
+        value: 0
+      - label: green
+        value: 1
+    default: 1
+    multiselect: True
+    cli_tag: "--dropdown_multiselect_true"
+    optional: True
+    section_id: "input-args"
+    mode: "beginner"
+  
+  # Textbox Parameter Test Cases
+  # 1. Textbox correct version
+  - name: Textbox_correct_true
+    type: textbox
+    label: "textbox correct version"
+    description: "Textbox correct version. with optional flag True"
+    default: ""
+    cli_tag: "--textbox_correct_true"
+    cli_order: 0
+    optional: True
+    section_id: "input-args"
+    mode: "beginner"
+  # 2. Textbox version with optional flag False
+  - name: Textbox_correct_false
+    type: textbox
+    label: "textbox correct version"
+    description: "Textbox correct version. with optional flag False"
+    default: ""
+    cli_tag: "--textbox_correct_false"
+    cli_order: 0
+    optional: False
+    section_id: "input-args"
+    mode: "beginner"
+  # 3. Textbox with some default value. Optional is True
+  - name: Textbox_default_value
+    type: textbox
+    label: "textbox default value"
+    description: "Textbox default value. with optional flag True"
+    default: "xyz"
+    cli_tag: "--textbox_default_value"
+    cli_order: 0
+    optional: True
+    section_id: "input-args"
+    mode: "beginner"
+  # 4. Textbox with output_dir_set as True. This will help create a folder with the same name as the textbox value
+  - name: Textbox_output_dir_set_true
+    type: textbox
+    label: "textbox output_dir_set_true"
+    description: "Textbox output_dir_set is true. with optional flag True"
+    default: "/myfolder/check"
+    output_dir_set: True
+    cli_tag: "--textbox_output_dir_set_true"
+    cli_order: 0
+    optional: True
+    section_id: "input-args"
+    mode: "beginner"
+  # 5. Textbox with output_dir_set as False. This will create a folder with the same name as the default value. But interactive is disabled - to put in the user defined value 
+  - name: Textbox_output_dir_set_false
+    type: textbox
+    label: "textbox output_dir_set_false"
+    description: "Textbox output_dir_set is false. with optional flag True"
+    default: "/myfolder/notinteractive"
+    output_dir_set: False
+    cli_tag: "--textbox_output_dir_set_false"
+    cli_order: 0
+    optional: True
+    section_id: "input-args"
+    mode: "beginner"
+  # 6. Textbox with output_dir_set as False, but default value is not passed. Default flag is created without any value
+  - name: Textbox_output_dir_set_false_no_default
+    type: textbox
+    label: "textbox output_dir_set_false_no_default"
+    description: "Textbox output_dir_set is false. with optional flag True"
+    output_dir_set: False
+    cli_tag: "--textbox_output_dir_set_false_no_default"
+    cli_order: 0
+    default: ""
+    optional: True
+    section_id: "input-args"
+    mode: "beginner"
+
+  
+
+  # Stuff this with all the wrong doings
+  
     
 
 # Display_only Section
 display_only:
   # dummy example : DONOT PUT CLI_TAG FLAG AT ALL. THESE ARE JUST FOR DISPLAY
+  # Test: Putting out cli_tag and cli_order. Should throw error at validation level
+  - name: display_only_example
+    type: textbox
+    label: "Display Only Example"
+    description: "This is just for display"
+    default: "This is just for display"
+    section_id: "display-only-section"
+    mode: "beginner"
   
 results:
   - name: output_dir
@@ -102,7 +352,6 @@ results:
     label: "Download Outputs"
     file_count: "multiple"
     description: "Directory containing the output files"
-    cli_tag : "None"
     optional: True
     section_id: "output-section"
     mode: "beginner"
@@ -114,15 +363,22 @@ exec_function:
   cli_command: "python -m cellpose --verbose"
   hidden_args: 
     # dummy example
-    # - cli_tag: "--save_png"
-    #   value: "True"
-    #   append_value: False
-    #   cli_order: 3
+    # correct version
+    - cli_tag: "--save_png"
+      value: "True"
+      append_value: False
+      cli_order: 3
+    # incorrect version
+    - cli_tag: "--save_png"
+      value: ""
+      append_value: True
+      cli_order: 4
 
 docker_image:
   org: cellprofiler
   name: runcellpose_no_pretrained
   tag: "2.3.2"
+  platform: "linux/amd64"
 
 algorithm_folder_name: "cellpose_inference"
 

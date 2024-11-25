@@ -77,6 +77,7 @@ parameters:
     mode: "advanced"
     optional: False
 
+  # Integer Parameter Test Cases
   # 1. Integer Correct version
   - name: integer_correct_true
     type: integer
@@ -112,6 +113,7 @@ parameters:
     section_id: "hardware-args"
     mode: "advanced"
 
+  # Float Parameter Test Cases
   # 1. Float Correct version
   - name: float_correct_true
     type: float
@@ -135,6 +137,7 @@ parameters:
     mode: "advanced"
 
 
+  # Files Parameter Test Cases
   # 1. files correct version
   - name: Files_correct_true
     type: files
@@ -170,7 +173,7 @@ parameters:
     optional: True
     section_id: "input-args"
     mode: "beginner"
-  # 4. Textbox with values other than single/multiple : Should throw error at validation end
+  # 4. Files with values other than single/multiple : Should throw error at validation end
   - name: Files_invalid_file_count
     type: files
     label: "files invalid file count"
@@ -183,6 +186,7 @@ parameters:
     section_id: "input-args"
     mode: "beginner"
   
+  # Radio Parameter Test Cases
   # 1. Radio correct version
   - name: radio_correct_true
     type: radio
@@ -230,6 +234,7 @@ parameters:
     section_id: "input-args"
     mode: "beginner"
   
+  # Dropdown Parameter Test Cases
   # 1. Dropdown correct version
   - name: dropdown_correct_true
     type: dropdown
@@ -311,6 +316,7 @@ parameters:
     section_id: "input-args"
     mode: "beginner"
   
+  # Textbox Parameter Test Cases
   # 1. Textbox correct version
   - name: Textbox_correct_true
     type: textbox
@@ -383,8 +389,9 @@ parameters:
 
   
 
-  # 0. Stuff this with all the wrong doings
-  - name: Textbox_all_wrong
+  # Stuff this with all the wrong doings
+  # 1. type as checkbox, but put in extra flags of files. Should throw errors at validation end
+  - name: Test_with_all_wrongdoing
     type: checkbox
     label: "textbox invalid file count"
     description: "Textbox invalid file count. with optional flag True"
@@ -402,6 +409,7 @@ parameters:
 # Display_only Section
 display_only:
   # dummy example : DONOT PUT CLI_TAG FLAG AT ALL. THESE ARE JUST FOR DISPLAY
+  # Test: Putting out cli_tag and cli_order. Should throw error at validation level
   - name: display_only_example
     type: textbox
     label: "Display Only Example"
@@ -430,10 +438,16 @@ exec_function:
   cli_command: "python -m cellpose --verbose"
   hidden_args: 
     # dummy example
-    # - cli_tag: "--save_png"
-    #   value: "True"
-    #   append_value: False
-    #   cli_order: 3
+    # correct version
+    - cli_tag: "--save_png"
+      value: "True"
+      append_value: False
+      cli_order: 3
+    # incorrect version
+    - cli_tag: "--save_png"
+      value: ""
+      append_value: True
+      cli_order: 4
 
 docker_image:
   org: cellprofiler

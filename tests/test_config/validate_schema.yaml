@@ -46,6 +46,7 @@ classes:
       - options
       - interactive
       - append_value
+      - multiselect
     rules:
       - description: "Extra flags needed iff type is checkbox"
         preconditions:
@@ -145,6 +146,7 @@ classes:
       - org
       - name
       - tag
+      - platform
 
   TypeCitations:
     aliases: ["citations"]
@@ -162,11 +164,19 @@ classes:
 
   HiddenArgs:
     description: "Hidden arguments for the Algorithm"
-    slots:
-      - cli_tag
-      - value
-      - append_value
-      - cli_order
+    attributes:
+      cli_tag:
+        range: string
+        required: true
+      value:
+        range: string
+        required: true
+      append_value:
+        range: boolean
+        required: false
+      cli_order:  
+        range: integer
+        required: false
   
   RadioOptions:
     description: "Options of the Radio button in parameters, display_only, results"
@@ -179,17 +189,21 @@ slots:
     description: "Parameters of a specific Algorithm"
     range: TypeParameter
     multivalued: true
+    required: true
   display_only:
     description: "Display only parameters of a specific Algorithm"
     range: TypeDisplayOnly
     multivalued: true
+    required: true
   results:
     description: "Results of a specific Algorithm"
     range: TypeResults
     multivalued: true
+    required: true
   exec_function:
     description: "Function to execute the Algorithm"
     range: ExecFunction
+    required: true
   script:
     description: "Script to execute the Algorithm"
     range: string
@@ -204,6 +218,7 @@ slots:
     required: true
   hidden_args:
     description: "Hidden arguments for the Algorithm"
+    multivalued: true
     range: HiddenArgs
   docker_image:
     description: "Description of docker_image for the specific algorithm"
@@ -218,6 +233,10 @@ slots:
     range: string
   tag:
     description: "Tag of the docker image"
+    required: true
+    range: string
+  platform:
+    description: "Platform on which the docker image was built"
     required: true
     range: string
   algorithm_folder_name:
@@ -292,6 +311,10 @@ slots:
     range: boolean
   append_value:
     description: "Append value of the hidden argument"
+    required: false
+    range: boolean
+  multiselect:
+    description: "Multiselect value of the dropdown"
     required: false
     range: boolean
   cli_order:

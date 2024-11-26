@@ -1,6 +1,6 @@
 #!/bin/bash
 cd "$(dirname "$0")"
-SCHEMA_FILE=${1:-"../schema/validate_schema.yaml"}
+SCHEMA_FILE=${1:-"../tests/test_config/validate_schema.yaml"}
 
 echo "Linting the schema: $SCHEMA_FILE"
 linkml-lint "$SCHEMA_FILE"

@@ -128,6 +128,7 @@ classes:
     description: "Results of a specific Algorithm"
     is_a: AbstractUserInterface
     slots:
+      - cli_tag
 
   ExecFunction:
     aliases: ["exec_function", "generate_cli_command", "construct_cli_command"]
@@ -160,6 +161,7 @@ classes:
     slots:
       - name
       - doi
+      - license
       - description
 
   HiddenArgs:
@@ -194,7 +196,6 @@ slots:
     description: "Display only parameters of a specific Algorithm"
     range: TypeDisplayOnly
     multivalued: true
-    required: true
   results:
     description: "Results of a specific Algorithm"
     range: TypeResults
@@ -254,6 +255,9 @@ slots:
   doi:
     description: "DOI of the Algorithm"
     range: string
+  license:
+    description: "License of the Algorithm"
+    range: string
   description:
     description: "Description of the Algorithm"
     range: string
@@ -275,7 +279,7 @@ slots:
     range: string
   optional:
     description: "Optional value of the object"
-    required: false
+    required: true
     range: boolean
   section_id:
     description: "Section ID of the object"

@@ -105,3 +105,20 @@ def build_interface(session):
 def install_gradio(session):
     """Install Gradio"""
     session.install('gradio')
+
+# Testing sessions
+@nox.session
+def test_parse(session):
+    session.install('pyyaml')
+    session.cd('src/build/parse')
+    config_path = session.posargs[0]
+    session.run("python", "parse.py", config_path)
+    session.cd('../../..')
+
+@nox.session
+def test_generate(session):
+    session.install('pyyaml','jinja2', 'nbformat', 'ipython', 'ipywidgets')
+    session.cd('src/build/parse')
+    config_path = session.posargs[0]
+    session.run('python', 'generate.py', config_path)
+    session.cd('../../..')

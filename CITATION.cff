@@ -1,0 +1,32 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: Bilayers
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Rajavi
+    family-names: Shah
+    email: rajavishah2000@gmail.com
+    affiliation: Broad Institute of MIT and Harvard
+    orcid: 'https://orcid.org/0009-0009-5177-8254'
+  - given-names: Nodar
+    family-names: Gogoberidze
+    email: gnodar01@gmail.com
+    affiliation: Broad Institute of MIT and Harvard
+    orcid: 'https://orcid.org/0000-0002-9395-4676'
+  - given-names: Beth
+    family-names: Cimini
+    email: bcimini@broadinstitute.org
+    affiliation: Broad Institute of MIT and Harvard
+    orcid: 'https://orcid.org/0000-0001-9640-9318'
+repository-code: 'https://github.com/bilayer-containers/bilayers'
+url: 'https://bilayers.org/'
+abstract: >
+  A Container Specification and CI/CD  built for
+  whole-community support
+license: BSD-3-Clause
+version: '0.1'

@@ -46,7 +46,8 @@ algorithm_folder_name:
 citations:
  Algorithm:
    - name: ""
-     doi: xxxx
+     doi: ""
+     license: ""
      description: ""
 ```
 
@@ -545,16 +546,18 @@ This specifies the folder where the generated Gradio and Jupyter Notebook interf
 Example: algorithm_folder_name: "cellpose_inference"
 
 ## Defining citations
-Citations are used to credit the relevant works associated with the algorithm. Include the correct name, DOI, and description of the algorithm. Guidelines on how to find citations can be found here. Note that interface citations are added dynamically, so you don’t need to include them manually.
+Citations are used to credit the relevant works associated with the algorithm. Include the correct name, doi, license and description of the algorithm. Guidelines on how to find citations can be found here. Note that interface citations are added dynamically, so you don’t need to include them manually.
 ```{code} yaml
 :filename: config.yml
 citations:
  Algorithm:
    - name: "cite-1"
-     doi: 
+     doi: ""
+     license: ""
      description: ""
    - name: "cite-2"
-     doi: 
+     doi: ""
+     license: ""
      description: ""
 ```
 
@@ -565,5 +568,6 @@ citations:
  Algorithm:
    - name: "Cellpose"
      doi: 10.1038/s41592-020-01018-x
+     license: "BSD 3-Clause"
      description: "Deep Learning algorithm for cell segmentation in microscopy images"
 ```

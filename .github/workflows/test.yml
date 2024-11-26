@@ -1,0 +1,35 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - main
+  # TODO: disable until caching system is implemented
+  # pull_request:
+  #   types: [opened, reopened, synchronize, ready_for_review, review_requested]
+  #   branches:
+  #     - main
+  workflow_dispatch:
+
+jobs:
+  testing-validation-of-config:
+    name: Running tests for validation of config files
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.9
+
+      - name: Install dependencies
+        run: |
+          pip install pytest pyyaml linkml nox
+
+      - name: Lint code with LinkML
+        run: |
+          chmod +x test_docker.sh
+          ./test_docker.sh

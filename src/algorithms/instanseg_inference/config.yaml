@@ -11,15 +11,18 @@ parameters:
     folder_name: "input_images"
     mode: "beginner"
   - name: model_folder
-    type: textbox
+    type: radio
     label: "Model Folder"
     description: "Upload the model folder"
-    # file_count: single
-    # default: "single"
+    options:
+      - label: "Brightfield Nuclei"
+        value: "brightfield_nuclei"
+      - label: "Fluorescence Nuclei and Cells"
+        value: "fluorescence_nuclei_and_cells"
+    default: "brightfield_nuclei"
     cli_tag: "--model_folder"
     optional: False
     section_id: "input-args"
-    folder_name: "model_folder"
     mode: "beginner"
   - name: device
     type: radio
@@ -101,7 +104,6 @@ display_only:
     label: "Exclude String"
     description: "Exclude images with this string in their path"
     default: "mask prediction geojson zip"
-    cli_tag: "--exclude_str"
     optional: True
     section_id: "display_only-args"
     mode: "beginner"
@@ -128,6 +130,7 @@ docker_image:
   org: bethcimini
   name: instanseg_mamba
   tag: "latest"
+  platform: "linux/amd64"
 
 algorithm_folder_name: "instanseg_inference"
 
@@ -135,7 +138,9 @@ citations:
   algorithm: 
     - name: "InstanSeg for Nucleus Segmentation in Brightfield Images"
       doi: 10.48550/arXiv.2408.15954
+      license: "Apache License 2.0"
       description: "This is instanseg algorithm"
     - name: "InstanSeg for Nucleus/Cell Segmentation in Fluorescence Images"
       doi: 10.1101/2024.09.04.611150
+      license: "Apache License 2.0"
       description: "This is instanseg algorithm"

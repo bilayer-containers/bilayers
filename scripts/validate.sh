@@ -1,7 +1,7 @@
 #!/bin/bash
 
 cd "$(dirname "$0")"
-SCHEMA_FILE=${1:-"../schema/validate_schema.yaml"}
+SCHEMA_FILE=${1:-"../tests/test_config/validate_schema.yaml"}
 # List of algorithms and interfaces
 ALGORITHM_NAMES=("cellpose_inference" "classical_segmentation") 
 # INTERFACE_NAMES=("gradio" "jupyter") 

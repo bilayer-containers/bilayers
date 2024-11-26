@@ -4,7 +4,7 @@ parameters:
   - name: append_value_false_correct
     type: checkbox
     label: "checkbox append_value correct"
-    description: "checkbox with it's own extra flag i.e. append_value. Value of append_value is False This is correct"
+    description: "checkbox with its own extra flag i.e. append_value. Value of append_value is False This is correct"
     default: False
     cli_tag: "--use_gpu"
     optional: True
@@ -15,11 +15,21 @@ parameters:
   - name: append_value_true_correct
     type: checkbox
     label: "checkbox append_value correct"
-    description: "checkbox with it's own extra flag i.e. append_value. This is correct"
+    description: "checkbox with its own extra flag i.e. append_value. This is correct"
     default: False
     cli_tag: "--use_gpu"
     optional: True
     append_value: True
+    section_id: "hardware-args"
+    mode: "advanced"
+  # 3. Checkbox without append_value
+  - name: append_value_false_incorrect
+    type: checkbox
+    label: "checkbox append_value incorrect"
+    description: "checkbox without its own extra flag i.e. append_value. This is incorrect"
+    default: False
+    cli_tag: "--use_gpu"
+    optional: True
     section_id: "hardware-args"
     mode: "advanced"
   # 4. Checkbox with some random extra flags
@@ -79,6 +89,18 @@ parameters:
     optional: True
     section_id: "hardware-args"
     mode: "advanced"
+  # 2. Extra Random Flags added
+  - name: gpu_device
+    type: integer
+    label: "GPU Device"
+    description: "which GPU device to use - Integer for torch or mps for M1"
+    default: 0
+    cli_tag: "--gpu_device"
+    interactive: True
+    optional: True
+    extra_random_flag: "random"
+    section_id: "hardware-args"
+    mode: "beginner"
   # 3. Integer version with optional flag False
   - name: integer_correct_false
     type: integer
@@ -140,6 +162,28 @@ parameters:
     optional: False
     section_id: "input-args"
     folder_name: "/bilayers/input_images"
+    mode: "beginner"
+  # 3. Textbox version without their extra flags. Optional is True : Should throw error at validation end
+  - name: Files_no_specialflag_true
+    type: files
+    label: "textbox no special flags"
+    description: "Textbox no special flags(file_count, folder_name). with optional flag False"
+    default: "single"
+    cli_tag: "--textbox_no_specialflag_true"
+    optional: True
+    section_id: "input-args"
+    mode: "beginner"
+  # 4. Files with values other than single/multiple : Should throw error at validation end
+  - name: Files_invalid_file_count
+    type: files
+    label: "files invalid file count"
+    description: "Textbox invalid file count. with optional flag True"
+    file_count: "random"
+    default: "single"
+    cli_tag: "--files_invalid_file_count"
+    optional: True
+    folder_name: "/bilayers/input_images"
+    section_id: "input-args"
     mode: "beginner"
   
   # Radio Parameter Test Cases
@@ -240,6 +284,21 @@ parameters:
     optional: True
     section_id: "input-args"
     mode: "beginner"
+  # 4. Dropdown with multiselect not passed
+  - name: dropdown_multiselect_not_passed
+    type: dropdown
+    label: "dropdown multiselect not passed"
+    description: "dropdown multiselect not passed. with optional flag True"
+    options: 
+      - label: red
+        value: 0
+      - label: green
+        value: 1
+    default: 1
+    cli_tag: "--dropdown_multiselect_not_passed"
+    optional: True
+    section_id: "input-args"
+    mode: "beginner"
   # 5. Dropdown with multiselect passed as True
   - name: dropdown_multiselect_true
     type: dropdown
@@ -331,6 +390,19 @@ parameters:
   
 
   # Stuff this with all the wrong doings
+  # 1. type as checkbox, but put in extra flags of files. Should throw errors at validation end
+  - name: Test_with_all_wrongdoing
+    type: checkbox
+    label: "textbox invalid file count"
+    description: "Textbox invalid file count. with optional flag True"
+    file_count: "single"
+    default: "single"
+    output_dir_set: True
+    cli_tag: "--textbox_invalid_file_count"
+    optional: True
+    folder_name: "/bilayers/input_images"
+    section_id: "input-args"
+    mode: "beginner"
   
     
 
@@ -345,6 +417,8 @@ display_only:
     default: "This is just for display"
     section_id: "display-only-section"
     mode: "beginner"
+    cli_tag: "--trial"
+    cli_order: 0
   
 results:
   - name: output_dir
@@ -352,6 +426,7 @@ results:
     label: "Download Outputs"
     file_count: "multiple"
     description: "Directory containing the output files"
+    cli_tag : "None"
     optional: True
     section_id: "output-section"
     mode: "beginner"
@@ -386,4 +461,5 @@ citations:
   algorithm: 
     - name: "Cellpose"
       doi: 10.1038/s41592-020-01018-x
+      license: "sample license"
       description: "Deep Learning algorithm for cell segmentation in microscopy images"

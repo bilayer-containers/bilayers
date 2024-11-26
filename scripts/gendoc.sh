@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCHEMA_FILE=schema/validate_schema.yaml
+SCHEMA_FILE=tests/test_config/validate_schema.yaml
 DOCS_DIR=docs/developer
 # DOCS_OUTPUT = $(DOCS_DIR)/schema_docs.md
 

@@ -1,0 +1,488 @@
+inputs:
+  - name: input_images
+    type: collection
+    subtype: [grayscale_image, rgb_image, multichannel_image]
+    description: "Input images to be segmented"
+    path: "src/build/parse/dummy/input_images"
+    mode: [RGB, L]
+    channels_possible: [1, 3]
+    dtype: [uint8, uint16]
+  
+  - name: anything_that_has_value_as_string # i.e. textbox
+    type: string
+    description: "Any string value"
+  
+  - name: for_integer
+    type: integer
+    description: "Any integer value"
+
+  - name: for_float
+    type: float
+    description: "Any float value"
+
+  - name: for_boolean
+    type: boolean
+    description: "boolean value"
+
+  - name: for_enum_of_string_or_number # i.e. radio, dropdown
+    type: enum
+    subtype: [string, number]
+    description: "Any enum value"
+
+outputs:
+  - name: masks_png
+    type: collection
+    subtype: grayscale_image
+    description: "Segmentation masks in PNG format. This is generated if --save_png is True"
+    path: "src/build/parse/dummy/output_images"
+    mode: [I]
+    channels_possible: [1]
+    dtype: [int32]
+  - name: masks_tif
+    type: collection
+    subtype: grayscale_image
+    description: "Segmentation masks in TIF format. This is generated if --save_tif is True"
+    path: "src/build/parse/dummy/output_images"
+    mode: [I]
+    channels_possible: [1]
+    dtype: [uint16]
+  - name: dP_tif
+    type: collection
+    subtype: grayscale_image
+    description: "Deep learning probability maps in TIF format. This is generated if --save_flows is True"
+    path: "src/build/parse/dummy/output_images"
+    mode: [F]
+    channels_possible: [1]
+    dtype: [float32]
+  - name: flows_tif
+    type: collection
+    subtype: rgb_image
+    description: "Flow maps in TIF format. This is generated if --save_flows is True"
+    path: "src/build/parse/dummy/output_images/sample_flows.tif"
+    mode: [RGB]
+    channels_possible: [3]
+    dtype: [uint8]
+  - name: outlines_png
+    type: collection
+    subtype: rgb_image
+    description: "Outlines of the segmented objects in PNG format. This is generated if --save_outlines is True"
+    path: "src/build/parse/dummy/output_images"
+    mode: [RGB]
+    channels_possible: [3]
+    dtype: [uint8]
+  - name: npy_array
+    type: array
+    subtype: npy_array
+    description: "Numpy array of the segmentation masks"
+    path: "src/build/parse/dummy/input_images"
+
+
+parameters:
+  # Hardware Arguments
+  - name: use_gpu
+    type: checkbox
+    label: "Use GPU"
+    description: "use GPU for processing"
+    default: False
+    cli_tag: "--use_gpu"
+    optional: True
+    section_id: "hardware-args"
+    mode: "advanced"
+  - name: gpu_device
+    type: integer
+    label: "GPU Device"
+    description: "which GPU device to use - Integer for torch or mps for M1"
+    default: 0
+    cli_tag: "--gpu_device"
+    interactive: True
+    optional: True
+    section_id: "hardware-args"
+    mode: "advanced"
+ 
+  # Input Image Arguments
+  - name: dir
+    type: files
+    label: "Input Image Directory"
+    description: "Path to the directory of input images"
+    file_count: "multiple"
+    default: "directory"
+    cli_tag: "--dir"
+    optional: False
+    section_id: "input-args"
+    folder_name: "src/build/parse/dummy/input_images"
+    mode: "beginner"
+  - name: look_one_level_down
+    type: checkbox
+    label: "Look One Level Down"
+    description: "look one level down in folder structure for images"
+    default: False
+    cli_tag: "--look_one_level_down"
+    optional: True
+    section_id: "input-args"
+    mode: "advanced"
+  # - name: image_filter
+  #   type: textbox
+  #   label: "Image Filter"
+  #   description: "filter for image files"
+  #   default: ""
+  #   cli_tag: "--img_filter"
+  #   optional: True
+  #   section_id: "input-args"
+  #   mode: "advanced" 
+  - name: channel_axis
+    type: radio
+    label: "Channel Axis"
+    description: "axis of image which corresponds to image channels"
+    options: 
+      - label: 0
+        value: 0
+      - label: 2
+        value: 2
+    default: 0
+    cli_tag: "--channel_axis"
+    optional: True
+    section_id: "input-args"
+    mode: "advanced"
+  # - name: z_axis
+  #   type: integer
+  #   label: "Z Axis"
+  #   description: "axis of image which corresponds to z dimension"
+  #   default: None
+  #   cli_tag: "--z_axis"
+  #   optional: True
+  #   section_id: "input-args"
+  #   mode: "advanced"
+  - name: chan
+    type: radio
+    label: "Chan To Segment"
+    description: "channel to segment"
+    options: 
+      - label: GRAY 
+        value: 0
+      - label: RED
+        value: 1
+      - label: GREEN
+        value: 2
+      - label: BLUE
+        value: 3
+    default: 0
+    cli_tag: "--chan"
+    optional: False
+    section_id: "input-args"
+    mode: "beginner"
+  - name: chan2
+    type: radio
+    label: "Chan2"
+    description: "Nuclear Channel, if cyto then optional"
+    options: 
+      - label: None  
+        value: 0
+      - label: RED
+        value: 1
+      - label: GREEN
+        value: 2
+      - label: BLUE
+        value: 3
+    default: 0
+    cli_tag: "--chan2"
+    optional: True
+    section_id: "input-args"
+    mode: "advanced"
+  - name: invert
+    type: checkbox
+    label: "Invert"
+    description: "invert grayscale channel"
+    default: False
+    cli_tag: "--invert"
+    optional: True
+    section_id: "input-args"
+    mode: "advanced"
+  - name: all_channels
+    type: checkbox
+    label: "All Channels"
+    description: "use all channels in image"
+    default: False
+    append_value: False
+    cli_tag: "--all_channels"
+    optional: True
+    section_id: "input-args"
+    mode: "advanced"  
+
+  # Model Arguments
+  - name: pretrained_model
+    type: radio
+    label: "PreTrained Model"
+    description: "type of model to use"
+    options: 
+      - label: Cyto
+        value: "cyto"
+      - label: Nuclei
+        value: "nuclei"
+      - label: Cyto2
+        value: "cyto2" 
+      - label: Ignore
+        value: "None"
+    default: "cyto"
+    cli_tag: "--pretrained_model"
+    optional: False
+    section_id: "model-args"
+    mode: "beginner"
+  # - name: add_models
+  #   type: files
+  #   label: "Add Model"
+  #   description: "add custom model to use"
+  #   file_count: "single"
+  #   default: "single"
+  #   cli_tag: "--add_model"
+  #   optional: True
+  #   section_id: "model-args"
+  #   folder_name: "dummy/models"
+  #   mode: "advanced"
+
+    # Algorithm Arguments
+  - name: no_resample
+    type: checkbox
+    label: "No Resample"
+    description: "do not resample image"
+    default: False
+    cli_tag: "--no_resample"
+    optional: True
+    section_id: "algorithm-args"
+    mode: "advanced"
+  - name: no_interp
+    type: checkbox
+    label: "No Interp"
+    description: "do not interpolate image"
+    default: False
+    cli_tag: "--no_interp"
+    optional: True
+    section_id: "algorithm-args"
+    mode: "advanced"
+  - name: no_norm
+    type: checkbox
+    label: "No Norm"
+    description: "do not normalize image"
+    default: False
+    cli_tag: "--no_norm"
+    optional: True
+    section_id: "algorithm-args"
+    mode: "advanced"
+  - name: do_3D
+    type: checkbox
+    label: "Do 3D"
+    description: "process 3D image"
+    append_value: False
+    default: False
+    cli_tag: "--do_3D"
+    optional: True
+    section_id: "algorithm-args"
+    mode: "advanced"
+  - name: diameter
+    type: float
+    label: "Diameter"
+    description: "estimated diameter of cells in pixels"
+    default: 30
+    cli_tag: "--diameter"
+    optional: True
+    section_id: "algorithm-args"
+    mode: "beginner"
+  - name: stitch_threshold
+    type: float
+    label: "Stitch Threshold"
+    description: "stitching threshold"
+    default: 0.0
+    cli_tag: "--stitch_threshold"
+    optional: True
+    section_id: "algorithm-args"
+    mode: "advanced"
+  - name: min_size
+    type: integer
+    label: "Min Size"
+    description: "minimum size of objects in pixels"
+    default: 15
+    cli_tag: "--min_size"
+    optional: True
+    section_id: "algorithm-args"
+    mode: "advanced"
+  - name: fast_mode
+    type: checkbox
+    label: "Fast Mode"
+    description: "fast mode"
+    default: False
+    cli_tag: "--fast_mode"
+    optional: True
+    section_id: "algorithm-args"
+    mode: "advanced"
+  - name: flow_threshold
+    type: float
+    label: "Flow Threshold"
+    description: "flow error threshold"
+    default: 0.4
+    cli_tag: "--flow_threshold"
+    optional: True
+    section_id: "algorithm-args"
+    mode: "advanced"
+  - name: cellprob_threshold
+    type: float
+    label: "Cellprob Threshold"
+    description: "cell probability threshold"
+    default: 0.0
+    cli_tag: "--cellprob_threshold"
+    optional: True
+    section_id: "algorithm-args"
+    mode: "advanced"
+  - name: anisotropy
+    type: float
+    label: "Anisotropy"
+    description: "anisotropy of image"
+    default: 1.0
+    cli_tag: "--anisotropy"
+    optional: True
+    section_id: "algorithm-args"
+    mode: "advanced"
+  - name: exclude_on_edges
+    type: checkbox
+    label: "Exclude On Edges"
+    description: "exclude cells on edges"
+    default: False
+    cli_tag: "--exclude_on_edges"
+    optional: True
+    section_id: "algorithm-args"
+    mode: "advanced"
+
+# Output Arguments
+  - name: save_png
+    type: checkbox
+    label: "Save PNG"
+    description: "save segmentation as PNG"
+    append_value: False 
+    default: False
+    cli_tag: "--save_png"
+    optional: True
+    section_id: "output-args"
+    mode: "beginner"
+  - name: save_tif
+    type: checkbox
+    label: "Save TIF"
+    description: "save segmentation as TIF"
+    append_value: False
+    default: False
+    cli_tag: "--save_tif"
+    optional: True
+    section_id: "output-args"
+    mode: "beginner"
+  - name: no_npy
+    type: checkbox
+    label: "No NPY"
+    description: "do not save npy"
+    default: False
+    cli_tag: "--no_npy"
+    optional: True
+    section_id: "output-args"
+    mode: "advanced"
+  - name: save_dir
+    type: textbox
+    label: "Save Directory"
+    description: "directory to save output files"
+    output_dir_set: True
+    default: "src/build/parse/dummy/output_images"
+    cli_tag: "--savedir"
+    optional: True
+    section_id: "output-args"
+    mode: "advanced"
+  - name: dir_above
+    type: checkbox
+    label: "Dir Above"
+    description: "save output in directory above"
+    default: False
+    cli_tag: "--dir_above"
+    optional: True
+    section_id: "output-args" 
+    mode: "advanced"
+  - name: in_folders
+    type: checkbox
+    label: "In Folders"
+    description: "save output in folders"
+    default: False
+    cli_tag: "--in_folders"
+    optional: True
+    section_id: "output-args"
+    mode: "advanced"
+  - name: save_flows  
+    type: checkbox
+    label: "Save Flows"
+    description: "save flows"
+    default: True
+    cli_tag: "--save_flows"
+    optional: True
+    section_id: "output-args"
+    mode: "advanced"
+  - name: save_outlines
+    type: checkbox
+    label: "Save Outlines"
+    description: "save outlines"
+    default: True
+    cli_tag: "--save_outlines"
+    optional: True
+    section_id: "output-args"
+    mode: "advanced"
+  - name: save_ncolor
+    type: checkbox
+    label: "Save NColor"
+    description: "save ncolor"
+    default: False
+    cli_tag: "--save_ncolor"
+    optional: True
+    section_id: "output-args"
+    mode: "advanced"
+  - name: save_txt
+    type: checkbox
+    label: "Save TXT"
+    description: "save txt"
+    default: True
+    cli_tag: "--save_txt"
+    optional: True
+    section_id: "output-args"
+    mode: "advanced"
+    
+
+# Display_only Section
+display_only:
+  # dummy example : DONOT PUT CLI_TAG FLAG AT ALL. THESE ARE JUST FOR DISPLAY
+  
+results:
+  - name: output_dir
+    type: files
+    label: "Download Outputs"
+    file_count: "multiple"
+    description: "Directory containing the output files"
+    cli_tag : "None"
+    optional: True
+    section_id: "output-section"
+    mode: "beginner"
+
+exec_function: 
+  name: "generate_cli_command"
+  script: "cellpose_inference"
+  module: "algorithms.cellpose_inference"
+  cli_command: "python -m cellpose --verbose"
+  hidden_args: 
+    # dummy example
+    # - cli_tag: "--save_png"
+    #   value: "True"
+    #   append_value: False
+    #   cli_order: 3
+
+docker_image:
+  org: cellprofiler
+  name: runcellpose_no_pretrained
+  tag: "2.3.2"
+  platform: "linux/amd64"
+
+algorithm_folder_name: "cellpose_inference"
+
+citations:
+  algorithm: 
+    - name: "Cellpose"
+      doi: 10.1038/s41592-020-01018-x
+      description: "Deep Learning algorithm for cell segmentation in microscopy images"

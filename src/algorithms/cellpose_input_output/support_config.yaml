@@ -1,0 +1,78 @@
+inputs:
+  - name: input_images # i.e. files
+    type: collection
+    subtype: [grayscale_image, rgb_image, multichannel_image]
+    description: "supported input images"
+    path: "path/to/image"
+    mode: [RGB, RGBA, L, LA, CMYK, YCbCr, HSV, LAB, XYZ, YUV, I, F]
+    channels_possible: [1,2,3,4,5,6,7,8,9,10]
+    dtype: [uint8, uint16, uint32, uint64, int8, int16, int32, int64, float16, float32, float64, bool, complex64, complex128, string, object]
+  
+  - name: anything_that_has_value_as_string # i.e. textbox
+    type: string
+    description: "Any string value"
+  
+  - name: for_integer
+    type: integer
+    description: "Any integer value"
+
+  - name: for_float
+    type: float
+    description: "Any float value"
+
+  - name: for_boolean
+    type: boolean
+    description: "boolean value"
+
+  - name: for_enum_of_string_or_number # i.e. radio, dropdown
+    type: enum
+    subtype: [string, number]
+    description: "Any enum value"
+
+# Inputs for reference
+  - name: source_image
+    type: image
+    subtype: multichannel_image
+    channels_possible: [1,2,3,4,5,6,7,8,9,10]
+    bitdepths_possible: [8,16]
+    optional: False
+    description: "The input image to be turned into objects"
+
+outputs:
+  - name: something_that_array
+    type: array
+    subtype: [npy_array]
+    description: "Array of images"
+    path: "path/to/array"
+    dtype: [int8, int16, int32, int64, uint8, uint16, uint32, uint64, float16, float32, float64, bool, complex64, complex128, string, object]
+    channels: [x, y, z, c, t]
+    dimension: [1, 2, 3, 4, 5]
+  - name: something_that_image
+    type: collection
+    subtype: [grayscale_image, rgb_image, multichannel_image]
+    description: "Image file format"
+    path: "path/to/image"
+    mode: [RGB, RGBA, L, LA, CMYK, YCbCr, HSV, LAB, XYZ, YUV, I, F]
+    channels_possible: [1,2,3,4,5,6,7,8,9,10]
+    dtype: [uint8, uint16, uint32, uint64, int8, int16, int32, int64, float16, float32, float64, bool, complex64, complex128, string, object]
+  
+# Outputs for reference
+  - name: output_flows
+    type: array
+    subtype: npy_array
+    optional: False
+    description: "The 'flows' array, which contains thisthing, thisotherthing, and thisotherotherthing. See the Cellpose documentation for more detail."
+  - name: output_mask_png
+    type: image
+    subtype: grayscale_image
+    channels_possible: [1]
+    bitdepths_possible: [16]
+    optional: True
+    description: "The output object masks in png form. Only created if --save_png is used."
+  - name: output_mask_tif
+    type: image
+    subtype: grayscale_image
+    channels_possible: [1]
+    bitdepths_possible: [16]
+    optional: True
+    description: "The output object masks in png form. Only created if --save_tif is used."

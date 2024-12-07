@@ -306,7 +306,7 @@ def on_submit(
         
 
 {% if parameters is not none -%}
-{% for param_conf in parameters -%}
+{% for param_conf in parameters %}
 
 {% if param_conf.type == 'radio' -%}
 {{ param_conf.label | lower | replace(" ", "_") }} = gr.Radio(label="{{ param_conf.label }}", info="{{ param_conf.description }}",  choices=[{% for option in param_conf.options %}"{{ option.label }}"{% if not loop.last %}, {% endif %}{% endfor %}], value="{{ param_conf.default }}")
@@ -328,7 +328,7 @@ def on_submit(
 {% endif %}
 
 
-{%- endfor %}  
+{% endfor %}  
 {%- endif %}
 
 {% if display_only is not none -%}
@@ -359,37 +359,40 @@ def on_submit(
 
 
 {% set DEFAULT_CITATIONS = {
-    "Bilayers": [
-        {
-            "name" : "Bilayers",
-            "license" : "xxxx",
-            "description" : "GUI interfaces for deep learning-based cell segmentation algorithms"
-        },
-    ],
     "Gradio": [
         {
             "name" : "Gradio",
             "doi" : "10.48550/arXiv.190602569",
+            "license" : "Apache License 2.0",
             "description" : "A simple web interface for deploying machine learning models"
+        },
+    ],
+    "Bilayers": [
+        {
+            "name" : "Bilayers",
+            "license" : "BSD 3-Clause",
+            "description" : "A Container Specification and CI/CD  built for whole-community support"
         },
     ],
 } %}
 
-description_text = "Please cite the following while using Bilayers - Gradio Interface!\n\n"
+description_text = "Please cite the following while using Bilayers X Gradio Interface!\n\n"
+
+{% for citation in citations.algorithm %}
+description_text += f"{{ citation.name }} under {{ citation.license }} License: {{ citation.doi }} -- {{ citation.description }}\n\n"
+{% endfor %}
 
 {% for citation_type, citation_list in DEFAULT_CITATIONS.items() -%}
 {% for citation in citation_list -%}
-{% if citation_type == "Bilayers" -%}
-description_text += f"{{ citation.name }}: {{ citation.license }} - {{ citation.description }}\n\n"
-{% elif citation_type == "Gradio" %}
-description_text += f"{{ citation.name }}: {{ citation.doi }} - {{ citation.description }}\n\n"
+{% if citation_type == "Gradio" -%}
+description_text += f"{{ citation.name }} under {{ citation.license }} License : {{ citation.doi }} -- {{ citation.description }}\n\n"
+{% elif citation_type == "Bilayers" %}
+description_text += f"{{ citation.name }} under {{ citation.license }} License : {{ citation.description }}\n\n"
 {%- endif %}
 {%- endfor %}
 {%- endfor %}
 
-{% for citation in citations.algorithm -%}
-description_text += f"{{citation.name}}: {{citation.doi}} - {{citation.description}}\n\n"
-{%- endfor %}
+
 
 
 {% for result_conf in results -%}

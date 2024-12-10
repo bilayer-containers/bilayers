@@ -4,30 +4,14 @@ inputs:
     subtype: [grayscale_image, rgb_image, multichannel_image]
     description: "Input images to be segmented"
     path: "src/build/parse/dummy/input_images"
-    mode: [RGB, L]
-    channels_possible: [1, 3]
-    dtype: [uint8, uint16]
+    format: ["png", "tif", "ome-tif", "jpg", "jpeg"]
+  - name: custom_model
+    type: file
+    subtype: executable
+    description: "Custom model to use for segmentation"
+    path: "src/build/parse/dummy/models"
+    format: 
   
-  - name: anything_that_has_value_as_string # i.e. textbox
-    type: string
-    description: "Any string value"
-  
-  - name: for_integer
-    type: integer
-    description: "Any integer value"
-
-  - name: for_float
-    type: float
-    description: "Any float value"
-
-  - name: for_boolean
-    type: boolean
-    description: "boolean value"
-
-  - name: for_enum_of_string_or_number # i.e. radio, dropdown
-    type: enum
-    subtype: [string, number]
-    description: "Any enum value"
 
 outputs:
   - name: masks_png
@@ -35,47 +19,49 @@ outputs:
     subtype: grayscale_image
     description: "Segmentation masks in PNG format. This is generated if --save_png is True"
     path: "src/build/parse/dummy/output_images"
-    mode: [I]
-    channels_possible: [1]
-    dtype: [int32]
+    format: "png"
+    depends_on:
+      - input_images
   - name: masks_tif
     type: collection
     subtype: grayscale_image
     description: "Segmentation masks in TIF format. This is generated if --save_tif is True"
     path: "src/build/parse/dummy/output_images"
-    mode: [I]
-    channels_possible: [1]
-    dtype: [uint16]
+    format: "tif"
+    depends_on:
+      - input_images
   - name: dP_tif
     type: collection
     subtype: grayscale_image
     description: "Deep learning probability maps in TIF format. This is generated if --save_flows is True"
     path: "src/build/parse/dummy/output_images"
-    mode: [F]
-    channels_possible: [1]
-    dtype: [float32]
+    format: "tif"
+    depends_on:
+      - input_images
   - name: flows_tif
     type: collection
     subtype: rgb_image
     description: "Flow maps in TIF format. This is generated if --save_flows is True"
-    path: "src/build/parse/dummy/output_images/sample_flows.tif"
-    mode: [RGB]
-    channels_possible: [3]
-    dtype: [uint8]
+    path: "src/build/parse/dummy/output_images"
+    format: "tif"
+    depends_on:
+      - input_images
   - name: outlines_png
     type: collection
     subtype: rgb_image
     description: "Outlines of the segmented objects in PNG format. This is generated if --save_outlines is True"
     path: "src/build/parse/dummy/output_images"
-    mode: [RGB]
-    channels_possible: [3]
-    dtype: [uint8]
+    format: "png"
+    depends_on:
+      - input_images
   - name: npy_array
     type: array
-    subtype: npy_array
+    subtype: numpy
     description: "Numpy array of the segmentation masks"
     path: "src/build/parse/dummy/input_images"
-
+    format: "npy"
+    depends_on:
+      - input_images
 
 parameters:
   # Hardware Arguments

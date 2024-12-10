@@ -13,7 +13,7 @@ jobs:
             algorithm_name: [cellpose_inference]
             interface_name: [gradio, jupyter]
           max-parallel: 1
-        runs-on: ubuntu-latest
+        runs-on: self-hosted
 
         steps: 
             - name: Run architecture check

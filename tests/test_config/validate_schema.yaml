@@ -19,6 +19,8 @@ classes:
   Container:
     description: "Container class which holds all the high_level keywords from config.yaml file of specific algorithm"
     slots: 
+    - inputs
+    - outputs
     - parameters
     - display_only
     - results
@@ -26,6 +28,71 @@ classes:
     - docker_image
     - algorithm_folder_name
     - citations
+
+  AbstractWorkflowDetails:
+    aliases: ["inputs", "outputs"]
+    description: "Abstract class for details needed to fit config in the workflow"
+    abstract: true
+    slots:
+      - name
+      - type
+      - description
+      - optional
+      - path
+      - format
+      - collection
+      # Conditional w.r.t to type (if type == image, then include below flags)
+      - subtype
+      - z
+      - t
+      - tiled
+      - pyramidal
+       
+  TypeInput:
+    aliases: ["inputs"]
+    description: "Inputs to the algorithm from the last step of the workflow"
+    is_a: AbstractWorkflowDetails
+    rules: 
+      - description: "Extra flags needed iff type is image"
+        preconditions:
+          slot_conditions:
+            type:
+              equals_string: "image"
+        postconditions:
+          slot_conditions:
+            subtype:
+              required: true
+            z:
+              required: true
+            t:
+              required: true
+            tiled:
+              required: true
+            pyramidal:
+              required: true
+  
+  TypeOutput:
+    aliases: ["outputs"]
+    description: "Outputs of the algorithm to the next step in the workflow"
+    is_a: AbstractWorkflowDetails
+    rules: 
+      - description: "Extra flags needed iff type is image"
+        preconditions:
+          slot_conditions:
+            type:
+              equals_string: "image"
+        postconditions:
+          slot_conditions:
+            subtype:
+              required: true
+            z:
+              required: true
+            t:
+              required: true
+            tiled:
+              required: true
+            pyramidal:
+              required: true
 
   AbstractUserInterface:
     aliases: ["parameters", "display_only", "results"]  
@@ -187,6 +254,16 @@ classes:
       - value
 
 slots:
+  inputs:
+    description: "Inputs to the algorithm from the last step of the workflow"
+    range: TypeInput
+    multivalued: true
+    required: true
+  outputs:
+    description: "Outputs of the algorithm to the next step in the workflow"
+    range: TypeOutput
+    multivalued: true
+    required: true
   parameters:
     description: "Parameters of a specific Algorithm"
     range: TypeParameter
@@ -262,7 +339,7 @@ slots:
     description: "Description of the Algorithm"
     range: string
   type:
-    description: "Type of the parameter"
+    description: "Type of the inputs, parameters and outputs"
     required: true
     range: TypeEnum
   label:
@@ -325,6 +402,35 @@ slots:
     description: "Order of the CLI arguments"
     required: false
     range: integer
+  # slots specific to inputs and outputs
+  path:
+    description: "Path of the inputs and outputs"
+    range: string
+  format:
+    description: "Format of the inputs and outputs"
+    range: string
+    multivalued: true
+  collection:
+    description: "Collection of the inputs and outputs"
+    range: boolean
+  # slots specific to inputs and outputs, if type is image
+  subtype:
+    description: "Subtype of the inputs and outputs"
+    range: SubTypeEnum
+    multivalued: true
+  z:
+    description: "whether z-dimension is accepted via tool"
+    range: boolean
+  t: 
+    description: "whether t-dimension is accepted via tool"
+    range: boolean
+  tiled:
+    description: "whether tiled images are accepted via tool"
+    range: boolean
+  pyramidal:
+    description: "whether pyramidal images are accepted via tool"
+    range: boolean
+  
   
 
 enums:
@@ -339,6 +445,12 @@ enums:
       dropdown:
       radio:
       textbox:
+      # types for inputs and outputs
+      image:
+      measurement:
+      array:
+      file:
+      executable:
   ModeEnum:
     description: "Mode of the parameters, display_only, results"
     permissible_values:
@@ -349,4 +461,12 @@ enums:
     permissible_values:
       single:
       multiple:
+  # enums specific to inputs and outputs
+  SubTypeEnum:
+    description: "Subtype of the inputs and outputs, iff type is image"
+    permissible_values:
+      grayscale:
+      color:
+      binary:
+      labeled:
   

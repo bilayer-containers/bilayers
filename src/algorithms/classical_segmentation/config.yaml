@@ -1,3 +1,46 @@
+inputs:
+  - name: input_images
+    type: image
+    subtype: 
+      - grayscale
+      - color
+      - binary
+      - labeled
+    description: "Input images to be analyzed"
+    optional: False
+    path: "/bilayers/input_images"
+    format: 
+      - tiff
+      - ometiff
+      - png
+      - jpg
+      - jpeg
+    collection: True
+    z: True
+    t: True
+    tiled: True
+    pyramidal: True
+
+outputs:
+  - name: segmented_images
+    type: image
+    subtype: 
+      - grayscale
+      - color
+      - binary
+      - labeled
+    description: "Segmented images"
+    optional: False 
+    path: "/bilayers/input_images" # discuss
+    format: 
+      - tiff
+      - ometiff
+    collection: True
+    z: True
+    t: True
+    tiled: True
+    pyramidal: True
+
 parameters:
   - name: input_ images
     type: files

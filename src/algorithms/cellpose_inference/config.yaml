@@ -1,3 +1,121 @@
+inputs:
+  - name: input_images
+    type: image
+    subtype: 
+      - grayscale
+      - color
+      - binary
+      - labeled
+    description: "Input images to be segmented"
+    optional: False
+    path: "/bilayers/input_images"
+    format: 
+      - tiff
+      - ometiff
+      - png
+    collection: True
+    z: True
+    t: True
+    tiled: True
+    pyramidal: True
+  - name: custom_model
+    type: file
+    description: "Custom model to be used for segmentation, if not using pretrained model"
+    optional: True
+    path: "/bilayers/models"
+    format: 
+      - unix
+    collection: False
+
+outputs:
+  - name: png_images
+    type: image
+    subtype: 
+      - grayscale
+      - color
+      - binary
+      - labeled
+    description: "Segmented image if --save_png flag is true."
+    optional: True
+    path: # discuss - it depends on what user inputs
+    format: 
+      - png
+    collection: True
+    z: True
+    t: True
+    tiled: True
+    pyramidal: True
+  - name: tiff_images
+    type: image
+    subtype: 
+      - grayscale
+      - color
+      - binary
+      - labeled
+    description: "Segmented image if --save_tif flag is true."
+    optional: True
+    path: # discuss - it depends on what user inputs
+    format: 
+      - tiff
+      - ometiff
+    collection: True
+    z: True
+    t: True
+    tiled: True
+    pyramidal: True
+  - name: npy_file
+    type: array
+    description: "Numpy file containing the segmentation mask. Only if --no_npy flag is not set."
+    optional: True
+    path: "/bilayers/input_images" # for cellpose, it would be same as input_images
+    format: 
+      - npy
+    collection: False
+  - name: flows
+    type: image
+    subtype: 
+      - grayscale
+      - color
+      - binary
+      - labeled
+    description: "Flows image if --save_flows flag is true."
+    optional: True
+    path: # discuss - it depends on what user inputs
+    format: 
+      - tiff
+      - ometiff
+    collection: True
+    z: True
+    t: True
+    tiled: True
+    pyramidal: True
+  - name: outlines
+    type: image
+    subtype: 
+      - grayscale
+      - color
+      - binary
+      - labeled
+    description: "Outlines image if --save_outlines flag is true."
+    optional: True
+    path: # discuss - it depends on what user inputs
+    format: 
+      - tiff
+      - ometiff
+    collection: True
+    z: True
+    t: True
+    tiled: True
+    pyramidal: True
+  - name: txt_file
+    type: file
+    description: "TXT file containing the segmentation mask. Only if --save_txt flag is true."
+    optional: True
+    path: # discuss - it depends on what user inputs
+    format: 
+      - txt
+    collection: True
+
 parameters:
   # Hardware Arguments
   - name: use_gpu
@@ -378,7 +496,6 @@ results:
     file_count: "multiple"
     description: "Directory containing the output files"
     cli_tag : "None"
-    file_count: multiple
     optional: True
     section_id: "output-section"
     mode: "beginner"

@@ -10,7 +10,7 @@ Docker images serve as the backbone for containerized applications, bundling all
 
 In Bilayers, choosing the right base image is particularly important. The ```Base Docker Image``` — contains all the specific dependencies and settings required for your algorithm to function — referred to here as the ```Algorithm Docker Image``` or ```wrappee image```. Bilayers then automatically layers an ```Interface Docker Image```— or ```wrapper image``` — on top, adding dependencies for respective interfaces.
 
-To ensure this layering works seamlessly, Bilayers expects the base image to meet a few key requirements:
+To ensure this layering works seamlessly, Bilayers expects the base image to meet a few key requirements.
 
 ## Requirements for the Algorithm (Base) Docker Image
 

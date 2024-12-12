@@ -1,0 +1,379 @@
+parameters:
+  # Checkbox Parameter Test Cases
+  # 1. Checkbox with append_value. append_value's value is False
+  - name: c_append_value_false_correct
+    type: checkbox
+    label: "c_append_value_false_correct"
+    description: "checkbox with its own extra flag i.e. append_value. Value of append_value is False This is correct"
+    default: False
+    cli_tag: "--use_gpu"
+    optional: True
+    append_value: False
+    section_id: "hardware-args"
+    mode: "advanced"
+  # 2. Checkbox without append_value. append_value's value is True
+  - name: c_append_value_true_correct
+    type: checkbox
+    label: "c_append_value_true_correct"
+    description: "checkbox with its own extra flag i.e. append_value. This is correct"
+    default: False
+    cli_tag: "--use_gpu"
+    optional: True
+    append_value: True
+    section_id: "hardware-args"
+    mode: "advanced"
+  # 3. Checkbox with some random extra flags (i.e. folder_name). But it should generate the expected command as extra flags would be ignored in parsing
+  - name: c_append_value_false_incorrect
+    type: checkbox
+    label: "c_append_value_false_incorrect"
+    description: "checkbox with some random extra flags. This is incorrect"
+    default: False
+    cli_tag: "--use_gpu"
+    optional: True
+    append_value: False
+    folder_name: "/bilayers/input_images"
+    section_id: "hardware-args"
+    mode: "advanced"
+  # 4. Checkbox with cli_order
+  - name: c_with_cli_order
+    type: checkbox
+    label: "c_with_cli_order"
+    description: "checkbox without optional flag. This is incorrect"
+    default: False
+    cli_tag: "--use_gpu"
+    cli_order: 3
+    append_value: False
+    section_id: "hardware-args"
+    mode: "advanced"
+    optional: True
+  # 5. Checkbox with optional flag False. So, if any value isn't passed, should raise the error but since it has default value, it would be considered. (Hence, no error raised)
+  - name: c_optional_false_correct
+    type: checkbox
+    label: "c_optional_false_correct"
+    description: "checkbox without optional flag. This is incorrect"
+    default: False
+    cli_tag: "--use_gpu"
+    append_value: False
+    section_id: "hardware-args"
+    mode: "advanced"
+    optional: False
+
+  # Integer Parameter Test Cases
+  # 1. Integer Correct version
+  - name: i_optional_true_correct
+    type: integer
+    label: "i_optional_true_correct"
+    description: "Integer with optional flag True"
+    default: 0
+    cli_tag: "--integer_correct_true"
+    interactive: True
+    optional: True
+    section_id: "hardware-args"
+    mode: "advanced"
+  # 2. Integer version with optional flag False
+  - name: i_optional_false_correct
+    type: integer
+    label: "i_optional_false_correct"
+    description: "Integer with optional flag False"
+    default: -1
+    cli_tag: "--integer_correct_false"
+    interactive: True
+    optional: False
+    section_id: "hardware-args"
+    mode: "advanced"
+
+  # Float Parameter Test Cases
+  # 3. Float Correct version
+  - name: float_optional_true_correct
+    type: float
+    label: "float_optional_true_correct"
+    description: "Float with optional flag True"
+    default: 3.23
+    cli_tag: "--float_correct_true"
+    cli_order: 0
+    optional: True
+    section_id: "input-args"
+    mode: "beginner"
+  # 4. Float version with optional flag False
+  - name: float_optional_false_correct
+    type: float
+    label: "float_optional_false_correct"
+    description: "Float with optional flag False"
+    default: 6.23
+    cli_tag: "--float_correct_false"
+    optional: False
+    section_id: "input-args"
+    mode: "advanced"
+
+
+  # Files Parameter Test Cases
+  # 1. files correct version
+  - name: files_optional_true_correct
+    type: files
+    label: "files_optional_true_correct"
+    description: "Files correct version. with optional flag True"
+    file_count: "single"
+    default: "single"
+    cli_tag: "--files_correct_true"
+    cli_order: 0
+    optional: True
+    section_id: ""
+    folder_name: "/bilayers/input_images"
+    mode: "beginner"
+  # 2. Files version with optional flag False
+  - name: files_optional_false_correct
+    type: files
+    label: "files_optional_false_correct"
+    description: "Files correct version. with optional flag False"
+    file_count: "single"
+    default: "single"
+    cli_tag: "--files_correct_false"
+    optional: False
+    section_id: "input-args"
+    folder_name: "/bilayers/input_images"
+    mode: "beginner"
+  
+  # Radio Parameter Test Cases
+  # 1. Radio correct version
+  - name: r_true_correct
+    type: radio
+    label: "r_true_correct"
+    description: "radio correct version. with optional flag True"
+    options: 
+      - label: red
+        value: 0
+      - label: green
+        value: 1
+    default: 1
+    cli_tag: "--radio_correct_true"
+    cli_order: 0
+    optional: True
+    section_id: "input-args"
+    mode: "beginner"
+  # 2. Radio version with optional flag False
+  - name: r_false_correct
+    type: radio
+    label: "r_false_correct"
+    description: "radio correct version. with optional flag False"
+    options: 
+      - label: red
+        value: 0
+      - label: green
+        value: 1
+    default: 1
+    cli_tag: "--radio_correct_false"
+    optional: False
+    section_id: "input-args"
+    mode: "beginner"
+  # 3. Radio with default value / selected value as None. So, it should ignore the whole pair
+  - name: r_default_none
+    type: radio
+    label: "r_default_none"
+    description: "radio default none. And also one option would be given as Ignore i.e. None. Should ignore the pair from appending to command. with optional flag True"
+    options: 
+      - label: Ignore
+        value: None
+      - label: GRAY
+        value: 2
+    default: None
+    cli_tag: "--radio_default_none"
+    optional: True
+    section_id: "input-args"
+    mode: "beginner"
+  
+  # Dropdown Parameter Test Cases
+  # 1. Dropdown correct version
+  - name: d_true_correct
+    type: dropdown
+    label: "d_true_correct"
+    description: "dropdown correct version. with optional flag True"
+    options: 
+      - label: red
+        value: 0
+      - label: green
+        value: 1
+    default: 1
+    multiselect: False
+    cli_tag: "--dropdown_correct_true"
+    cli_order: 0
+    optional: True
+    section_id: "input-args"
+    mode: "beginner"
+  # 2. Dropdown version with optional flag False
+  - name: d_false_correct
+    type: dropdown
+    label: "d_false_correct"
+    description: "dropdown correct version. with optional flag False"
+    options: 
+      - label: red
+        value: 0
+      - label: green
+        value: 1
+    default: 1
+    multiselect: False
+    cli_tag: "--dropdown_correct_false"
+    optional: False
+    section_id: "input-args"
+    mode: "beginner"
+  # 3. Dropdown with default value / selected value as None. So, it should ignore the whole pair
+  - name: d_default_none
+    type: dropdown
+    label: "d_default_none"
+    description: "dropdown default none. And also one option would be given as Ignore i.e. None. Should ignore the pair from appending to command. with optional flag True"
+    options: 
+      - label: Ignore
+        value: None
+      - label: GRAY
+        value: 2
+    default: None
+    multiselect: False
+    cli_tag: "--dropdown_default_none"
+    optional: True
+    section_id: "input-args"
+    mode: "beginner"
+  # 4. Dropdown with multiselect passed as True. It should fail, since we dont support multiselect as True, till now
+  - name: d_multiselect_true
+    type: dropdown
+    label: "d_multiselect_true"
+    description: "dropdown multiselect true. with optional flag True"
+    options: 
+      - label: red
+        value: 0
+      - label: green
+        value: 1
+    default: 1
+    multiselect: True
+    cli_tag: "--dropdown_multiselect_true"
+    optional: True
+    section_id: "input-args"
+    mode: "beginner"
+  
+  # Textbox Parameter Test Cases
+  # 1. Textbox correct version
+  - name: t_true_correct
+    type: textbox
+    label: "t_true_correct"
+    description: "Textbox correct version. with optional flag True"
+    default: ""
+    cli_tag: "--textbox_correct_true"
+    cli_order: 0
+    optional: True
+    section_id: "input-args"
+    mode: "beginner"
+  # 2. Textbox version with optional flag False
+  - name: t_false_correct
+    type: textbox
+    label: "t_false_correct"
+    description: "Textbox correct version. with optional flag False"
+    default: ""
+    cli_tag: "--textbox_correct_false"
+    cli_order: 0
+    optional: False
+    section_id: "input-args"
+    mode: "beginner"
+  # 3. Textbox with some default value. Optional is True
+  - name: t_default_value
+    type: textbox
+    label: "t_default_value"
+    description: "Textbox default value. with optional flag True"
+    default: "xyz"
+    cli_tag: "--textbox_default_value"
+    cli_order: 0
+    optional: True
+    section_id: "input-args"
+    mode: "beginner"
+  # 4. Textbox with output_dir_set as True. This will help create a folder with the same name as the textbox value
+  - name: t_output_dir_set_true
+    type: textbox
+    label: "t_output_dir_set_true"
+    description: "Textbox output_dir_set is true. with optional flag True"
+    default: "/myfolder/check"
+    output_dir_set: True
+    cli_tag: "--textbox_output_dir_set_true"
+    cli_order: 0
+    optional: True
+    section_id: "input-args"
+    mode: "beginner"
+  # 5. Textbox with output_dir_set as False. This will create a folder with the same name as the default value. But interactive is disabled - to put in the user defined value 
+  - name: t_output_dir_set_false
+    type: textbox
+    label: "t_output_dir_set_false"
+    description: "Textbox output_dir_set is false. with optional flag True"
+    default: "/myfolder/notinteractive"
+    output_dir_set: False
+    cli_tag: "--textbox_output_dir_set_false"
+    cli_order: 0
+    optional: True
+    section_id: "input-args"
+    mode: "beginner"
+  # 6. Textbox with output_dir_set as False, but default value is not passed. Default flag is created without any value
+  - name: t_output_dir_set_false_no_default
+    type: textbox
+    label: "t_output_dir_set_false_no_default"
+    description: "Textbox output_dir_set is false. with optional flag True"
+    output_dir_set: False
+    cli_tag: "--textbox_output_dir_set_false_no_default"
+    cli_order: 0
+    default: ""
+    optional: True
+    section_id: "input-args"
+    mode: "beginner"
+
+    
+
+# Display_only Section
+display_only:
+  # dummy example : DONOT PUT CLI_TAG FLAG AT ALL. THESE ARE JUST FOR DISPLAY
+  # Test: Putting out cli_tag and cli_order. Should throw error at validation level
+  - name: display_only_example
+    type: textbox
+    label: "Display Only Example"
+    description: "This is just for display"
+    default: "This is just for display"
+    section_id: "display-only-section"
+    mode: "beginner"
+    optional: True
+  
+results:
+  - name: output_dir
+    type: files
+    label: "Download Outputs"
+    file_count: "multiple"
+    description: "Directory containing the output files"
+    cli_tag: "None"
+    optional: True
+    section_id: "output-section"
+    mode: "beginner"
+
+exec_function: 
+  name: "generate_cli_command"
+  script: "cellpose_inference"
+  module: "algorithms.cellpose_inference"
+  cli_command: "python -m cellpose --verbose"
+  hidden_args: 
+    # dummy example
+    # correct version
+    - cli_tag: "--save_png"
+      value: "True"
+      append_value: False
+      cli_order: 3
+    # incorrect version
+    - cli_tag: "--save_png"
+      value: ""
+      append_value: True
+      cli_order: 4
+
+docker_image:
+  org: cellprofiler
+  name: runcellpose_no_pretrained
+  tag: "2.3.2"
+  platform: "linux/amd64"
+
+algorithm_folder_name: "testing_inference"
+
+citations:
+  algorithm: 
+    - name: "Testing"
+      doi: xyz
+      license: "sample license"
+      description: "Deep Learning algorithm for cell segmentation in microscopy images"

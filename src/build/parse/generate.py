@@ -58,14 +58,15 @@ def generate_jupyter_notebook(template_path, parameters, display_only, results, 
         "Bilayers": [
             {
                 "name" : "Bilayers",
-                "license" : "xxxx",
-                "description" : "GUI interfaces for deep learning-based cell segmentation algorithms"
+                "license" : "BSD 3-Clause",
+                "description" : "A Container Specification and CI/CD  built for whole-community support"
             },
         ],
         "Jupyter": [
             {
                 "name" : "Jupyter",
                 "doi" : "10.1109/MCSE.2007.53",
+                "license" : "BSD 3-Clause",
                 "description" : "Interactive, code-driven documents for data analysis and visualization"
             },
         ],
@@ -76,14 +77,14 @@ def generate_jupyter_notebook(template_path, parameters, display_only, results, 
     # Create a markdown cell for instructions or say citations
     nb.cells.append(create_markdown_cell("## Set Variables and Run the cell"))
 
-    for citation in DEFAULT_CITATIONS['Bilayers']:
-        citation_cell = f"- {citation['name']} : {citation['license']} --> {citation['description']}\n"
+    for citation in citations['algorithm']:
+        citation_cell = f"- {citation['name']} under {citation['license']} License : {citation['doi']} --> {citation['description']}\n"
 
     for citation in DEFAULT_CITATIONS['Jupyter']:
-        citation_cell += f"- {citation['name']} : {citation['doi']} --> {citation['description']}\n"
+        citation_cell += f"- {citation['name']} under {citation['license']} License : {citation['doi']} --> {citation['description']}\n"
 
-    for citation in citations['algorithm']:
-        citation_cell += f"- {citation['name']} : {citation['doi']} --> {citation['description']}\n"
+    for citation in DEFAULT_CITATIONS['Bilayers']:
+        citation_cell += f"- {citation['name']} : {citation['license']} --> {citation['description']}\n"
 
     # Add a markdown cell with the formatted citations
     nb.cells.append(create_markdown_cell(citation_cell))

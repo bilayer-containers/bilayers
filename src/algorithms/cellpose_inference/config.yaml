@@ -1,3 +1,121 @@
+inputs:
+  - name: input_images
+    type: image
+    subtype: 
+      - grayscale
+      - color
+      - binary
+      - labeled
+    description: "Input images to be segmented"
+    optional: False
+    path: "/bilayers/input_images"
+    format: 
+      - tiff
+      - ometiff
+      - png
+    collection: True
+    z: True
+    t: True
+    tiled: True
+    pyramidal: True
+  - name: custom_model
+    type: file
+    description: "Custom model to be used for segmentation, if not using pretrained model"
+    optional: True
+    path: "/bilayers/models"
+    format: 
+      - unix
+    collection: False
+
+outputs:
+  - name: png_images
+    type: image
+    subtype: 
+      - grayscale
+      - color
+      - binary
+      - labeled
+    description: "Segmented image if --save_png flag is true."
+    optional: True
+    path: # discuss - it depends on what user inputs
+    format: 
+      - png
+    collection: True
+    z: True
+    t: True
+    tiled: True
+    pyramidal: True
+  - name: tiff_images
+    type: image
+    subtype: 
+      - grayscale
+      - color
+      - binary
+      - labeled
+    description: "Segmented image if --save_tif flag is true."
+    optional: True
+    path: # discuss - it depends on what user inputs
+    format: 
+      - tiff
+      - ometiff
+    collection: True
+    z: True
+    t: True
+    tiled: True
+    pyramidal: True
+  - name: npy_file
+    type: array
+    description: "Numpy file containing the segmentation mask. Only if --no_npy flag is not set."
+    optional: True
+    path: "/bilayers/input_images" # for cellpose, it would be same as input_images
+    format: 
+      - npy
+    collection: False
+  - name: flows
+    type: image
+    subtype: 
+      - grayscale
+      - color
+      - binary
+      - labeled
+    description: "Flows image if --save_flows flag is true."
+    optional: True
+    path: # discuss - it depends on what user inputs
+    format: 
+      - tiff
+      - ometiff
+    collection: True
+    z: True
+    t: True
+    tiled: True
+    pyramidal: True
+  - name: outlines
+    type: image
+    subtype: 
+      - grayscale
+      - color
+      - binary
+      - labeled
+    description: "Outlines image if --save_outlines flag is true."
+    optional: True
+    path: # discuss - it depends on what user inputs
+    format: 
+      - tiff
+      - ometiff
+    collection: True
+    z: True
+    t: True
+    tiled: True
+    pyramidal: True
+  - name: txt_file
+    type: file
+    description: "TXT file containing the segmentation mask. Only if --save_txt flag is true."
+    optional: True
+    path: # discuss - it depends on what user inputs
+    format: 
+      - txt
+    collection: True
+    
 parameters:
   # Hardware Arguments
   - name: use_gpu
@@ -6,6 +124,7 @@ parameters:
     description: "use GPU for processing"
     default: False
     cli_tag: "--use_gpu"
+    append_value: False
     optional: True
     section_id: "hardware-args"
     mode: "advanced"
@@ -39,6 +158,7 @@ parameters:
     default: False
     cli_tag: "--look_one_level_down"
     optional: True
+    append_value: False
     section_id: "input-args"
     mode: "advanced"
   - name: image_filter
@@ -116,6 +236,7 @@ parameters:
     default: False
     cli_tag: "--invert"
     optional: True
+    append_value: False
     section_id: "input-args"
     mode: "advanced"
   - name: all_channels
@@ -168,6 +289,7 @@ parameters:
     default: False
     cli_tag: "--no_resample"
     optional: True
+    append_value: False
     section_id: "algorithm-args"
     mode: "advanced"
   - name: no_interp
@@ -177,6 +299,7 @@ parameters:
     default: False
     cli_tag: "--no_interp"
     optional: True
+    append_value: False
     section_id: "algorithm-args"
     mode: "advanced"
   - name: no_norm
@@ -186,6 +309,7 @@ parameters:
     default: False
     cli_tag: "--no_norm"
     optional: True
+    append_value: False
     section_id: "algorithm-args"
     mode: "advanced"
   - name: do_3D
@@ -232,6 +356,7 @@ parameters:
     default: False
     cli_tag: "--fast_mode"
     optional: True
+    append_value: False
     section_id: "algorithm-args"
     mode: "advanced"
   - name: flow_threshold
@@ -268,6 +393,7 @@ parameters:
     default: False
     cli_tag: "--exclude_on_edges"
     optional: True
+    append_value: False
     section_id: "algorithm-args"
     mode: "advanced"
 
@@ -299,6 +425,7 @@ parameters:
     default: False
     cli_tag: "--no_npy"
     optional: True
+    append_value: False
     section_id: "output-args"
     mode: "advanced"
   - name: save_dir
@@ -318,6 +445,7 @@ parameters:
     default: False
     cli_tag: "--dir_above"
     optional: True
+    append_value: False
     section_id: "output-args" 
     mode: "advanced"
   - name: in_folders
@@ -327,6 +455,7 @@ parameters:
     default: False
     cli_tag: "--in_folders"
     optional: True
+    append_value: False
     section_id: "output-args"
     mode: "advanced"
   - name: save_flows  
@@ -336,6 +465,7 @@ parameters:
     default: False
     cli_tag: "--save_flows"
     optional: True
+    append_value: False
     section_id: "output-args"
     mode: "advanced"
   - name: save_outlines
@@ -345,6 +475,7 @@ parameters:
     default: False
     cli_tag: "--save_outlines"
     optional: True
+    append_value: False
     section_id: "output-args"
     mode: "advanced"
   - name: save_ncolor
@@ -354,6 +485,7 @@ parameters:
     default: False
     cli_tag: "--save_ncolor"
     optional: True
+    append_value: False
     section_id: "output-args"
     mode: "advanced"
   - name: save_txt
@@ -363,6 +495,7 @@ parameters:
     default: False
     cli_tag: "--save_txt"
     optional: True
+    append_value: False
     section_id: "output-args"
     mode: "advanced"
     
@@ -377,8 +510,7 @@ results:
     label: "Download Outputs"
     file_count: "multiple"
     description: "Directory containing the output files"
-    cli_tag : "None"
-    file_count: multiple
+    cli_tag: "None"
     optional: True
     section_id: "output-section"
     mode: "beginner"
@@ -399,6 +531,7 @@ docker_image:
   org: cellprofiler
   name: runcellpose_no_pretrained
   tag: "2.3.2"
+  platform: "linux/amd64"
 
 algorithm_folder_name: "cellpose_inference"
 
@@ -406,4 +539,5 @@ citations:
   algorithm: 
     - name: "Cellpose"
       doi: 10.1038/s41592-020-01018-x
+      license: "BSD 3-Clause"
       description: "Deep Learning algorithm for cell segmentation in microscopy images"

@@ -1,0 +1,140 @@
+inputs: 
+  - name: input_images
+    type: image
+    subtype: # ONLY IF TYPE IS IMAGE. Can list all those relevant subtypes out of these 4, supported by the tool
+      - grayscale
+      - color
+      - binary
+      - labeled
+    description: "these are accepted input_images for xyz algorithm"
+    optional: (True | False) # if input is optional
+    path: "/path/to/input_images" # folder_path
+    format: # can include all those relevant formats supported by the tool
+      - tif
+      - png
+      - jpg
+      - jpeg
+      - tiff
+      - ometiff
+    collection: (True | False) # if the input is a collection of files (~ can think of it as a folder)
+    z: (True | False) # ONLY IF TYPE IS IMAGE. If tool accepts images, with z-dimension, then set it to True
+    t: (True | False) # ONLY IF TYPE IS IMAGE. If tool accepts images, with t-dimension, then set it to True
+    tiled: (True | False) # ONLY IF TYPE IS IMAGE. If tool accepts images, with tiled format, then set it to True
+    pyramidal: (True | False) # ONLY IF TYPE IS IMAGE. If tool accepts images, with pyramidal format, then set it to True
+  - name: input_measurement # a meaningful name for measurement file(/s) which can be self-explanatory for user 
+    type: measurement
+    description: "these are accepted measurement_related_info for xyz algorithm"
+    optional: (True | False) # True, if input is optional; False, if input is mandatory
+    path: "/path/to/measurement/files" # folder_path or file_path if single file
+    format: # either or all of those depending on the tool, and if collection is True
+      - csv # any csv format files included here eg. csv, tsv etc.
+      - parquet # any binary format files included here
+      - feather
+    collection: (True | False) # if the input is a collection of files (~ can think of it as a folder)
+  - name: input_array # a meaningful name for array(/s) which can be self-explanatory for user
+    type: array
+    description: "these are accepted array for xyz algorithm"
+    optional: (True | False) # True, if input is optional; False, if input is mandatory
+    path: "/path/to/array" # folder_path or file_path if single file
+    format: # either or all of those, depending on collection is True or False
+      - npy
+      - npz
+    collection: (True | False)
+  - name: input_file
+    type: file
+    description: "these are accepted input_files for xyz algorithm"
+    optional: (True | False)
+    path: "/path/to/input_files" # folder_path or file_path if single file
+    format: # can include all those relevant formats supported by the tool
+      - log
+      - unix
+    collection: (True | False) # if the input is a collection of files (~ can think of it as a folder)
+  - name: input_executable
+    type: executable
+    description: "these are accepted input_executables for xyz algorithm"
+    optional: (True | False)
+    path: "/path/to/executable" # folder_path or file_path if single file
+    format: # can include all those relevant formats supported by the tool
+      - ipynb
+      - sh
+      - bash
+      - csh
+      - zsh
+      - ksh
+      - py
+      - pyw
+      - js
+      - cmd
+      - bat
+    collection: (True | False) # if the input is a collection of files (~ can think of it as a folder)
+
+outputs:
+  - name: output_images
+    type: image
+    subtype: # ONLY IF TYPE IS IMAGE. Can list all those relevant subtypes out of these 4, supported by the tool
+      - grayscale
+      - color
+      - binary
+      - labeled
+    description: "these are potential output_images for xyz algorithm"
+    optional: (True | False)
+    path: "/path/to/output_images" # folder_path
+    format: # can include all those relevant formats supported by the tool
+      - tif
+      - png
+      - jpg
+      - jpeg
+      - tiff
+      - ometiff
+    collection: (True | False) # if the output is a collection of files (~ can think of it as a folder)
+    z: (True | False) # ONLY IF TYPE IS IMAGE. If tool spits out images, with z-dimension, then set it to True
+    t: (True | False) # ONLY IF TYPE IS IMAGE. If tool spits out images, with t-dimension, then set it to True
+    tiled: (True | False) # ONLY IF TYPE IS IMAGE. If tool spits out images, with tiled format, then set it to True
+    pyramidal: (True | False) # ONLY IF TYPE IS IMAGE. If tool spits out images, with pyramidal format, then set it to True
+  - name: output_measurement # a meaningful name for measurement file(/s) which can be self-explanatory for user
+    type: measurement
+    description: "this is measurement_related_info after segmentating"
+    optional: (True | False)
+    path: "/path/to/measurement/files" # folder_path or file_path if single file
+    format: # either or all of those depending on the tool, and if collection is True
+      - csv # any csv format files included here eg. csv, tsv etc.
+      - parquet # any binary format files included here
+      - feather
+    collection: (True | False) # if the output is a collection of files (~ can think of it as a folder)
+  - name: output_array # a meaningful name for array(/s) which can be self-explanatory for user
+    type: array
+    description: "these are accepted array for xyz algorithm"
+    optional: (True | False)
+    path: "/path/to/array" # folder_path or file_path if single file
+    format: # either or all of those, depending on collection is True or False
+      - npy
+      - npz
+    collection: (True | False) # if the output is a collection of files (~ can think of it as a folder)
+  - name: output_file
+    type: file
+    description: "these are accepted output_files for xyz algorithm"
+    optional: (True | False)
+    path: "/path/to/output_files" # folder_path or file_path if single file
+    format: # can include all those relevant formats supported by the tool
+      - log
+      - unix
+    collection: (True | False) # if the output is a collection of files (~ can think of it as a folder)
+  - name: output_executable
+    type: executable
+    description: "these are potential output_executables for xyz algorithm"
+    optional: (True | False)
+    path: "/path/to/executable" # folder_path or file_path if single file
+    format: # can include all those relevant formats supported by the tool
+      - ipynb
+      - sh
+      - bash
+      - csh
+      - zsh
+      - ksh
+      - py
+      - pyw
+      - js
+      - cmd
+      - bat
+    collection: (True | False) # if the output is a collection of files (~ can think of it as a folder)
+  

@@ -5,10 +5,14 @@ authors:
     affiliations:
       - Broad Institute of MIT and Harvard
 ---
+<!-- Add 2 spaces at the end of the line to get the newlines to be rendered as a list -->
+Docker images serve as the backbone for containerized applications, bundling all necessary code, libraries, and dependencies.  
+When building modular systems, a ```Base Docker Image``` acts as the foundational layer, setting up the core environment on which other layers can be added.  
+This approach allows containers to be built on top of a common base, ensuring consistency and simplifying dependency management.
 
-Docker images serve as the backbone for containerized applications, bundling all necessary code, libraries, and dependencies. When building modular systems, a ```Base Docker Image``` acts as the foundational layer, setting up the core environment on which other layers can be added. This approach allows containers to be built on top of a common base, ensuring consistency and simplifying dependency management.
-
-In Bilayers, choosing the right base image is particularly important. The ```Base Docker Image``` — contains all the specific dependencies and settings required for your algorithm to function — referred to here as the ```Algorithm Docker Image``` or ```wrappee image```. Bilayers then automatically layers an ```Interface Docker Image```— or ```wrapper image``` — on top, adding dependencies for respective interfaces.
+In Bilayers, choosing the right base image is particularly important.  
+The ```Base Docker Image``` — contains all the specific dependencies and settings required for your algorithm to function — referred to here as the ```Algorithm Docker Image``` or ```wrappee image```.  
+Bilayers then automatically layers an ```Interface Docker Image```— or ```wrapper image``` — on top, adding dependencies for respective interfaces.
 
 To ensure this layering works seamlessly, Bilayers expects the base image to meet a few key requirements.
 

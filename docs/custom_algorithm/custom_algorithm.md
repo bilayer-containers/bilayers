@@ -9,7 +9,7 @@ authors:
 Bilayers allows you to easily create a web interface (using Gradio) or a Jupyter Notebook interface for any deep-learning cell segmentation algorithm by filling out a simple configuration file in YAML format. It’s as simple as filling out a Google Form!
 Before you begin, let’s break down the key elements you need to know - 
 
-1. [Supported Interface](/supported-interfaces)
+1. [Supported Interfaces](/supported-interfaces)
     - [Gradio](/supported-interfaces#gradio)
     - [Jupyter Notebook](/supported-interfaces#jupyter-notebook)
 2. [Understanding config.yaml requirements](/understanding-config)

@@ -9,6 +9,7 @@ inputs:
       - labeled
     description: "Path to the directory of input images"
     cli_tag: "--dir"
+    cli_order: 0
     default: "directory"
     optional: False
     format: 
@@ -30,6 +31,7 @@ inputs:
     label: "Add Model"
     description: "Custom model to be used for segmentation, if not using pretrained model"
     cli_tag: "--add_model"
+    cli_order: 0
     default: "single"
     optional: True
     format: 
@@ -50,6 +52,7 @@ outputs:
       - labeled
     description: "Segmented image if --save_png flag is true."
     cli_tag: "None"
+    cli_order: 0
     default: "directory"
     optional: True
     format: 
@@ -72,6 +75,7 @@ outputs:
       - labeled
     description: "Segmented image if --save_tif flag is true."
     cli_tag: "None"
+    cli_order: 0
     default: "directory"
     optional: True
     format: 
@@ -90,6 +94,7 @@ outputs:
     label: "Segmentation Mask"
     description: "Numpy file containing the segmentation mask. Only if --no_npy flag is not set."
     cli_tag: "None"
+    cli_order: 0
     default: "directory"
     optional: True
     format: 
@@ -108,6 +113,7 @@ outputs:
       - labeled
     description: "Flows image if --save_flows flag is true."
     cli_tag: "None"
+    cli_order: 0
     default: "directory"
     optional: True
     format: 
@@ -131,6 +137,7 @@ outputs:
       - labeled
     description: "Outlines image if --save_outlines flag is true."
     cli_tag: "None"
+    cli_order: 0
     default: "directory"
     optional: True
     format: 
@@ -149,6 +156,7 @@ outputs:
     label: "txt file"
     description: "TXT file containing the segmentation mask. Only if --save_txt flag is true."
     cli_tag: "None"
+    cli_order: 0
     default: "directory"
     optional: True
     format: 

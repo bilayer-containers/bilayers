@@ -9,6 +9,7 @@ inputs:
       - labeled
     description: "these are accepted input_images for xyz algorithm"
     cli_tag: "--input_images" # tag to be used in CLI
+    cli_order: Integer # default is 0. Could be positive, negative or zero. If negative, then it will be appended at the end of the command. BUT IT IS OPTIONAL TO PROVIDE THIS FLAG.
     default: ("single" | "directory") # if it is a single file or a folder
     optional: (True | False) # if input is optional
     format: # can include all those relevant formats supported by the tool
@@ -32,6 +33,7 @@ inputs:
     label: "Input Measurement" # label would be shown in the UI (only for inputs it matters)
     description: "these are accepted measurement_related_info for xyz algorithm"
     cli_tag: "--input_measurement" # tag to be used in CLI
+    cli_order: Integer # default is 0. Could be positive, negative or zero. If negative, then it will be appended at the end of the command. BUT IT IS OPTIONAL TO PROVIDE THIS FLAG.
     default: ("single" | "directory")
     optional: (True | False) # True, if input is optional; False, if input is mandatory
     format: # either or all of those depending on the tool, and if default is directory, or file_count is multiple
@@ -47,6 +49,7 @@ inputs:
     label: "Input Array" # label would be shown in the UI
     description: "these are accepted array for xyz algorithm"
     cli_tag: "--input_array" # tag to be used in CLI
+    cli_order: Integer # default is 0. Could be positive, negative or zero. If negative, then it will be appended at the end of the command. BUT IT IS OPTIONAL TO PROVIDE THIS FLAG.
     default: ("single" | "directory") # if it is a single file or a folder
     optional: (True | False) # True, if input is optional; False, if input is mandatory
     format: # either or all of those, depending on default is directory, or file_count is multiple
@@ -61,6 +64,7 @@ inputs:
     label: "Input File" # label would be shown in the UI
     description: "these are accepted input_files for xyz algorithm"
     cli_tag: "--input_file" # tag to be used in CLI
+    cli_order: Integer # default is 0. Could be positive, negative or zero. If negative, then it will be appended at the end of the command. BUT IT IS OPTIONAL TO PROVIDE THIS FLAG.
     default: ("single" | "directory") # if it is a single file or a folder
     optional: (True | False)
     format: # can include all those relevant formats supported by the tool
@@ -75,6 +79,7 @@ inputs:
     label: "Input Executable" # label would be shown in the UI
     description: "these are accepted input_executables for xyz algorithm"
     cli_tag: "--input_executable" # tag to be used in CLI
+    cli_order: Integer # default is 0. Could be positive, negative or zero. If negative, then it will be appended at the end of the command. BUT IT IS OPTIONAL TO PROVIDE THIS FLAG.
     default: ("single" | "directory") # if it is a single file or a folder
     optional: (True | False)
     format: # can include all those relevant formats supported by the tool
@@ -105,6 +110,7 @@ outputs:
     label: "Output Images"
     description: "these are potential output_images for xyz algorithm"
     cli_tag: "--output_images" # tag to be used in CLI
+    cli_order: Integer # default is 0. Could be positive, negative or zero. If negative, then it will be appended at the end of the command. BUT IT IS OPTIONAL TO PROVIDE THIS FLAG.
     default: ("single" | "directory")
     optional: (True | False)
     format: # can include all those relevant formats supported by the tool
@@ -128,6 +134,7 @@ outputs:
     label: "Output Measurement" # label would be shown in the UI (for outputs it doesnt matter much). Yet, its mandatory to include label for uniformity
     description: "this is measurement_related_info after segmentating"
     cli_tag: "--output_measurement" # "None" - component would be not shown on UI. "" {empty string} - component would be shown on UI, but only value would be apppended to exec_command. "--output_measurement" - component would be shown on UI, and value would be appended to exec_command with tag
+    cli_order: Integer # default is 0. Could be positive, negative or zero. If negative, then it will be appended at the end of the command. BUT IT IS OPTIONAL TO PROVIDE THIS FLAG.
     default: ("single" | "directory")
     optional: (True | False)
     format: # either or all of those depending on the tool, and if default is directory, or file_count is multiple
@@ -143,6 +150,7 @@ outputs:
     label: "Output Array" # label would be shown in the UI
     description: "these are accepted array for xyz algorithm"
     cli_tag: "--output_array" # "None" - component would be not shown on UI. "" {empty string} - component would be shown on UI, but only value would be apppended to exec_command. "--output_measurement" - component would be shown on UI, and value would be appended to exec_command with tag
+    cli_order: Integer # default is 0. Could be positive, negative or zero. If negative, then it will be appended at the end of the command. BUT IT IS OPTIONAL TO PROVIDE THIS FLAG.
     default: ("single" | "directory")
     optional: (True | False)
     format: # either or all of those, depending on default is directory, or file_count is multiple
@@ -157,6 +165,7 @@ outputs:
     label: "Output File" # label would be shown in the UI
     description: "these are accepted output_files for xyz algorithm"
     cli_tag: "--output_file" # "None" - component would be not shown on UI. "" {empty string} - component would be shown on UI, but only value would be apppended to exec_command. "--output_measurement" - component would be shown on UI, and value would be appended to exec_command with tag
+    cli_order: Integer # default is 0. Could be positive, negative or zero. If negative, then it will be appended at the end of the command. BUT IT IS OPTIONAL TO PROVIDE THIS FLAG.
     default: ("single" | "directory")
     optional: (True | False)
     format: # can include all those relevant formats supported by the tool
@@ -171,6 +180,7 @@ outputs:
     label: "Output Executable" # label would be shown in the UI
     description: "these are potential output_executables for xyz algorithm"
     cli_tag: "--output_executable" # "None" - component would be not shown on UI. "" {empty string} - component would be shown on UI, but only value would be apppended to exec_command. "--output_measurement" - component would be shown on UI, and value would be appended to exec_command with tag
+    cli_order: Integer # default is 0. Could be positive, negative or zero. If negative, then it will be appended at the end of the command. BUT IT IS OPTIONAL TO PROVIDE THIS FLAG.
     default: ("single" | "directory")
     optional: (True | False)
     format: # can include all those relevant formats supported by the tool

@@ -1,12 +1,15 @@
 inputs:
   - name: input_images
     type: image
+    label: Drag and drop all images to be analyzed
     subtype: 
       - grayscale
       - color
       - binary
       - labeled
     description: "Input images to be analyzed"
+    cli_tag: "--image_path"
+    default: "directory"
     optional: False
     format: 
       - tiff
@@ -14,43 +17,53 @@ inputs:
       - png
       - jpg
       - jpeg
-    collection: True
-    z: True
-    t: True
+    folder_name: "input_images"
+    file_count: multiple
+    section_id: "inputs"
+    mode: "beginner"
+    depth: True
+    timepoints: True
     tiled: True
     pyramidal: True
 
 outputs: 
   - name: output_images
     type: image
+    label: "Output Images"
     subtype: 
       - grayscale
       - color
       - binary
       - labeled
     description: "Output images"
+    cli_tag: "None"
+    default: "directory"
     optional: False
     format: 
       - tiff
       - ometiff
-    collection: True
-    z: True
-    t: True
+    folder_name: "/bilayers/input_images"
+    file_count: multiple
+    section_id: "outputs"
+    mode: "beginner"
+    depth: True
+    timepoints: True
     tiled: True
     pyramidal: True
     
 parameters:
-  - name: image_path
-    type: files
-    label: "Drag and drop all images to be analyzed"
-    description: "Upload all images to be analyzed"
-    file_count: multiple
-    default: "directory"
-    cli_tag: "--image_path"
-    optional: False
-    section_id: "input-args"
-    folder_name: "input_images"
-    mode: "beginner"
+  # Since, this was moved to inputs section, it is commented out (can get rid of it in future)
+  # - name: image_path
+  #   type: files
+  #   label: "Drag and drop all images to be analyzed"
+  #   description: "Upload all images to be analyzed"
+  #   file_count: multiple
+  #   default: "directory"
+  #   cli_tag: "--image_path"
+  #   optional: False
+  #   section_id: "input-args"
+  #   folder_name: "input_images"
+  #   mode: "beginner"
   - name: model_folder
     type: radio
     label: "Model Folder"

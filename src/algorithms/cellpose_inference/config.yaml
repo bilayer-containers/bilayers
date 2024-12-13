@@ -1,105 +1,162 @@
 inputs:
-  - name: input_images
+  - name: dir
     type: image
+    label: "Input Image Directory"
     subtype: 
       - grayscale
       - color
       - binary
       - labeled
-    description: "Input images to be segmented"
+    description: "Path to the directory of input images"
+    cli_tag: "--dir"
+    default: "directory"
     optional: False
     format: 
       - tiff
       - ometiff
       - png
-    collection: True
-    z: True
-    t: True
+      - jpg
+      - jpeg
+    folder_name: "/bilayers/input_images"
+    file_count: "multiple"
+    section_id: "inputs"
+    mode: "beginner"
+    depth: True
+    timepoints: True
     tiled: True
     pyramidal: True
   - name: custom_model
     type: file
+    label: "Add Model"
     description: "Custom model to be used for segmentation, if not using pretrained model"
+    cli_tag: "--add_model"
+    default: "single"
     optional: True
     format: 
       - unix
-    collection: False
+    folder_name: "/bilayers/models"
+    file_count: "single"
+    section_id: "inputs"
+    mode: "advanced"
 
 outputs:
   - name: png_images
     type: image
+    label: "Segmented png images"
     subtype: 
       - grayscale
       - color
       - binary
       - labeled
+    description: "Segmented image if --save_png flag is true."
+    cli_tag: "None"
+    default: "directory"
     optional: True
     format: 
       - png
-    z: True
-    t: True
+    folder_name: # depends on --save_dir
+    file_count: "multiple"
+    section_id: "outputs"
+    mode: "beginner"
+    depth: True
+    timepoints: True
     tiled: True
     pyramidal: True
   - name: tiff_images
     type: image
+    label: "Segmented tiff images"
     subtype: 
       - grayscale
       - color
       - binary
       - labeled
     description: "Segmented image if --save_tif flag is true."
+    cli_tag: "None"
+    default: "directory"
     optional: True
     format: 
       - tiff
       - ometiff
-    z: True
-    t: True
+    folder_name: # discuss - it depends on --save_dir
+    file_count: "multiple"
+    section_id: "outputs"
+    mode: "beginner"
+    depth: True
+    timepoints: True
     tiled: True
     pyramidal: True
   - name: npy_file
     type: array
+    label: "Segmentation Mask"
     description: "Numpy file containing the segmentation mask. Only if --no_npy flag is not set."
+    cli_tag: "None"
+    default: "directory"
     optional: True
     format: 
       - npy
+    folder_name: "/bilayers/input_images" # for cellpose, it would be same as input_images
+    file_count: "single"
+    section_id: "outputs"
+    mode: "advanced"
   - name: flows
     type: image
+    label: "Flows"
     subtype: 
       - grayscale
       - color
       - binary
       - labeled
     description: "Flows image if --save_flows flag is true."
+    cli_tag: "None"
+    default: "directory"
     optional: True
     format: 
       - tiff
       - ometiff
-    z: True
-    t: True
+    folder_name: # it depends on what user inputs
+    file_count: "multiple"
+    section_id: "outputs"
+    mode: "advanced"
+    depth: True
+    timepoints: True
     tiled: True
     pyramidal: True
   - name: outlines
     type: image
+    label: "Outlines"
     subtype: 
       - grayscale
       - color
       - binary
       - labeled
     description: "Outlines image if --save_outlines flag is true."
+    cli_tag: "None"
+    default: "directory"
     optional: True
     format: 
       - tiff
       - ometiff
-    z: True
-    t: True
+    folder_name: # depends on what user inputs at --save_dir
+    file_count: "multiple"
+    section_id: "outputs"
+    mode: "advanced"
+    depth: True
+    timepoints: True
     tiled: True
     pyramidal: True
   - name: txt_file
     type: file
+    label: "txt file"
     description: "TXT file containing the segmentation mask. Only if --save_txt flag is true."
+    cli_tag: "None"
+    default: "directory"
     optional: True
     format: 
       - txt
+    folder_name: # depends on what user inputs at --save_dir
+    file_count: "single"
+    section_id: "outputs"
+    mode: "advanced"
     
 parameters:
   # Hardware Arguments
@@ -125,17 +182,17 @@ parameters:
     mode: "advanced"
  
   # Input Image Arguments
-  - name: dir
-    type: files
-    label: "Input Image Directory"
-    description: "Path to the directory of input images"
-    file_count: "multiple"
-    default: "directory"
-    cli_tag: "--dir"
-    optional: False
-    section_id: "input-args"
-    folder_name: "/bilayers/input_images"
-    mode: "beginner"
+  # - name: dir
+  #   type: files
+  #   label: "Input Image Directory"
+  #   description: "Path to the directory of input images"
+  #   file_count: "multiple"
+  #   default: "directory"
+  #   cli_tag: "--dir"
+  #   optional: False
+  #   section_id: "input-args"
+  #   folder_name: "/bilayers/input_images"
+  #   mode: "beginner"
   - name: look_one_level_down
     type: checkbox
     label: "Look One Level Down"
@@ -254,17 +311,17 @@ parameters:
     optional: False
     section_id: "model-args"
     mode: "beginner"
-  - name: add_models
-    type: files
-    label: "Add Model"
-    description: "add custom model to use"
-    file_count: "single"
-    default: "single"
-    cli_tag: "--add_model"
-    optional: True
-    section_id: "model-args"
-    folder_name: "/bilayers/models"
-    mode: "advanced"
+  # - name: add_models
+  #   type: files
+  #   label: "Add Model"
+  #   description: "add custom model to use"
+  #   file_count: "single"
+  #   default: "single"
+  #   cli_tag: "--add_model"
+  #   optional: True
+  #   section_id: "model-args"
+  #   folder_name: "/bilayers/models"
+  #   mode: "advanced"
 
     # Algorithm Arguments
   - name: no_resample

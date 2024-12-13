@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd "$(dirname "$0")"
+cd "$(dirname "$0")" || exit
 SCHEMA_FILE=${1:-"../tests/test_config/validate_schema.yaml"}
 # List of algorithms and interfaces
 ALGORITHM_NAMES=("cellpose_inference" "classical_segmentation") 

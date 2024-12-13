@@ -38,9 +38,7 @@ classes:
       - type
       - description
       - optional
-      - path
       - format
-      - collection
       # Conditional w.r.t to type (if type == image, then include below flags)
       - subtype
       - z

@@ -1,5 +1,5 @@
 #!/bin/bash
-cd "$(dirname "$0")"
+cd "$(dirname "$0")" || exit
 SCHEMA_FILE=${1:-"../tests/test_config/validate_schema.yaml"}
 
 echo "Linting the schema: $SCHEMA_FILE"

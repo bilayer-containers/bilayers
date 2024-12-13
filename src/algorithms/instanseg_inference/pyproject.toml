@@ -1,0 +1,26 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "instanseg-torch"
+version = "0.0.5"
+authors = [
+  { name="Thibaut Goldsborough", email="thibaut.golds@gmail.com" },
+]
+description = "Package for instanseg-torch PyPi"
+readme = "README.md"
+requires-python = ">=3.9, <3.12"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+]
+
+[tool.hatch.build]
+include = ["instanseg/**"]
+exclude = ["notebooks/**", "instanseg/examples/*", "assets/**"]
+
+[project.urls]
+Homepage = "https://github.com/instanseg/instanseg"
+Issues = "https://github.com/instanseg/instanseg/issues"

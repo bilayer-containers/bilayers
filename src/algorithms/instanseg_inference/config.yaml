@@ -110,6 +110,16 @@ parameters:
     optional: True
     section_id: "input-args"
     mode: "beginner"
+  - name: output_dir
+    type: textbox
+    label: "Output Directory"
+    description: "Output directory to save the segmented images"
+    output_dir_set: False
+    default: "/bilayers/input_images"
+    cli_tag: "None"
+    optional: True
+    section_id: "input-args"
+    mode: "beginner"
 
   # Advanced Usage
   - name: tile_size
@@ -121,25 +131,26 @@ parameters:
     optional: True
     section_id: "advanced-args"
     mode: "advanced"
-  # - name: batch_size
-  #   type: integer
-  #   label: "Batch Size"
-  #   description: "batch size, only useful for large images"
-  #   default: 1
-  #   cli_tag: "--batch_size"
-  #   optional: True
-  #   section_id: "advanced-args"
-  #   mode: "advanced"
-  - name: save_geojson
-    type: checkbox
-    label: "Save GeoJSON"
-    description: "Output geojson files of the segmentation"
-    default: False
-    cli_tag: "--output_geojson"
-    append_value: False
+  - name: batch_size
+    type: integer
+    label: "Batch Size"
+    description: "batch size, only useful for large images"
+    default: 1
+    cli_tag: "--batch_size"
     optional: True
     section_id: "advanced-args"
     mode: "advanced"
+  # save_geojson throws an error: OS module not found - hence commented out
+  # - name: save_geojson
+  #   type: checkbox
+  #   label: "Save GeoJSON"
+  #   description: "Output geojson files of the segmentation"
+  #   default: False
+  #   cli_tag: "--output_geojson"
+  #   append_value: False
+  #   optional: True
+  #   section_id: "advanced-args"
+  #   mode: "advanced"
 
 display_only:
   - name: exclude_str
@@ -170,20 +181,18 @@ exec_function:
   hidden_args:
 
 docker_image:
-  org: bethcimini
-  name: instanseg_mamba
-  tag: "latest"
+  org: bilayer
+  name: instanseg
+  tag: "1.0.2"
   platform: "linux/amd64"
 
 algorithm_folder_name: "instanseg_inference"
 
 citations:
   algorithm: 
-    - name: "InstanSeg for Nucleus Segmentation in Brightfield Images"
+    - name: "InstanSeg in Brightfield Images"
       doi: 10.48550/arXiv.2408.15954
-      license: "Apache License 2.0"
-      description: "This is instanseg algorithm"
-    - name: "InstanSeg for Nucleus/Cell Segmentation in Fluorescence Images"
+      description: "InstanSeg for Nucleus Segmentation in Brightfield Images"
+    - name: "InstanSeg in Fluorescence Images"
       doi: 10.1101/2024.09.04.611150
-      license: "Apache License 2.0"
-      description: "This is instanseg algorithm"
+      description: "InstanSeg for Nucleus/Cell Segmentation in Fluorescence Images"

@@ -112,7 +112,7 @@ def generate_cli_command(cli_tags, **kwargs):
                             raise gr.Error(error_message, duration = None)
                         else:
                             continue
-                # If the parameter is a list (mainly for parameter files), convert it to a string
+                # If the parameter is a list (mainly for parameter files and/or inputs image, file, measurement, array, executable), convert it to a string
                 elif isinstance(value, list):
                     folder_name = cli_tags[key].get("folder_name")
                     print("Folder Name:", folder_name)
@@ -213,6 +213,16 @@ def generate_cli_command(cli_tags, **kwargs):
 
 # Dynamically define on_submit with the exact parameter arguments
 def on_submit(
+{% if inputs is not none -%}
+{% for input_conf in inputs -%}
+{% if input_conf.type in ['image', 'measurement', 'array', 'file', 'executable'] %}
+{{input_conf.label | lower | replace(" ", "_")}}_description,
+{{ input_conf.label | lower | replace(" ", "_") }},
+{% else %}
+{{ input_conf.label | lower | replace(" ", "_") }},
+{%- endif %}
+{%- endfor %}
+{%- endif %}
 {% if parameters is not none -%}
 {% for param_conf in parameters -%}
 {% if param_conf.type == 'files' -%}
@@ -236,6 +246,11 @@ def on_submit(
 ):
 
     kwargs = {
+    {% if inputs is not none %}
+    {% for input_conf in inputs %}
+        "{{ input_conf.label | lower | replace(' ', '_') }}": {{ input_conf.label | lower | replace(' ', '_') }},
+    {% endfor %}
+    {% endif %}
     {% if parameters is not none %}
     {% for param_conf in parameters %}
         "{{ param_conf.label | lower | replace(' ', '_') }}": {{ param_conf.label | lower | replace(' ', '_') }},
@@ -245,6 +260,18 @@ def on_submit(
 
     # Mapping of parameter tags to CLI tags
     cli_tags = {
+    {% for input_conf in inputs %}
+    "{{ input_conf.label | lower | replace(' ', '_') }}": {
+        "cli_tag": "{{ input_conf.cli_tag }}",
+        "default": "{{ input_conf.default }}",
+        "cli_order": {{ input_conf.cli_order | default(0) }},
+        "optional": {{ input_conf.optional }},
+        "label": "{{ input_conf.label }}",
+        {% if input_conf.type in ['image', 'measurement', 'file', 'array', 'executable'] %}
+        "folder_name": "{{ input_conf.folder_name }}"
+        {% endif %}
+    },
+    {% endfor %}
     {% for param_conf in parameters %}
     "{{ param_conf.label | lower | replace(' ', '_') }}": {
         "cli_tag": "{{ param_conf.cli_tag }}",
@@ -295,6 +322,33 @@ def on_submit(
         error_message = "Please take a screenshot of this error and raise an issue at the Bilayers repository on GitHub."
         error_message += f"Command failed with error: {e.stderr.decode()}\n\n"
         raise gr.Error(error_message, duration = None)
+<<<<<<< HEAD
+=======
+        
+{% if inputs is not none -%}
+{% for input_conf in inputs %}
+
+{% if input_conf.type == 'image' %}
+{{ input_conf.label | lower | replace(" ", "_") }}_description = gr.Markdown(value="{{ input_conf.description }}")
+{{ input_conf.label | lower | replace(" ", "_") }} = gr.Files(label="{{ input_conf.label }}", file_count="{{ input_conf.file_count }}")
+{% elif input_conf.type == 'measurement' %}
+{{ input_conf.label | lower | replace(" ", "_") }}_description = gr.Markdown(value="{{ input_conf.description }}")
+{{ input_conf.label | lower | replace(" ", "_") }} = gr.Files(label="{{ input_conf.label }}", file_count="{{ input_conf.file_count }}")
+{% elif input_conf.type == 'array' %}
+{{ input_conf.label | lower | replace(" ", "_") }}_description = gr.Markdown(value="{{ input_conf.description }}")
+{{ input_conf.label | lower | replace(" ", "_") }} = gr.Files(label="{{ input_conf.label }}", file_count="{{ input_conf.file_count }}")
+{% elif input_conf.type == 'file' %}
+{{ input_conf.label | lower | replace(" ", "_") }}_description = gr.Markdown(value="{{ input_conf.description }}")
+{{ input_conf.label | lower | replace(" ", "_") }} = gr.Files(label="{{ input_conf.label }}", file_count="{{ input_conf.file_count }}")
+{% elif input_conf.type == 'executable' %}
+{{ input_conf.label | lower | replace(" ", "_") }}_description = gr.Markdown(value="{{ input_conf.description }}")
+{{ input_conf.label | lower | replace(" ", "_") }} = gr.Files(label="{{ input_conf.label }}", file_count="{{ input_conf.file_count }}")
+{% endif %}
+
+
+{% endfor %}
+{%- endif %}
+>>>>>>> 6488c24 (linkml rules for ip_op and gradio support part-2)
 
 {% if parameters is not none -%}
 {% for param_conf in parameters %}
@@ -391,6 +445,18 @@ description_text += f"{{ citation.name }} under {{ citation.license }} License :
 
 
 all_parameters = [
+{# Getting stuff from inputs #}
+{% if inputs is not none -%}
+{% for input_conf in inputs -%}
+{% if input_conf.type in ['image', 'measurement', 'array', 'file', 'executable'] -%}
+    {{input_conf.label | lower | replace(" ", "_")}}_description,
+    {{ input_conf.label | lower | replace(" ", "_") }},
+{% else %}
+    {{ input_conf.label | lower | replace(" ", "_") }},
+{%- endif %}
+{%- endfor %}
+{%- endif %}
+{# Getting stuff from parameters #}
 {% if parameters is not none -%}
 {% for param_conf in parameters -%}
 {% if param_conf.type == 'files' -%}
@@ -401,6 +467,7 @@ all_parameters = [
 {%- endif %}
 {%- endfor %}
 {%- endif %}
+{# Getting stuff from display_only #}
 {% if display_only is not none -%}
 {% for display_only_conf in display_only -%}
 {% if display_only_conf.type == 'files' -%}

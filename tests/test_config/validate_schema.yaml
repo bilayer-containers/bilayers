@@ -36,13 +36,20 @@ classes:
     slots:
       - name
       - type
+      - label
       - description
+      - cli_tag
+      - default
       - optional
       - format
+      - folder_name
+      - file_count
+      - section_id
+      - mode
       # Conditional w.r.t to type (if type == image, then include below flags)
       - subtype
-      - z
-      - t
+      - depth
+      - timepoints
       - tiled
       - pyramidal
 
@@ -60,9 +67,9 @@ classes:
           slot_conditions:
             subtype:
               required: true
-            z:
+            depth:
               required: true
-            t:
+            timepoints:
               required: true
             tiled:
               required: true
@@ -83,9 +90,9 @@ classes:
           slot_conditions:
             subtype:
               required: true
-            z:
+            depth:
               required: true
-            t:
+            timepoints:
               required: true
             tiled:
               required: true
@@ -416,11 +423,11 @@ slots:
     description: "Subtype of the inputs and outputs"
     range: SubTypeEnum
     multivalued: true
-  z:
-    description: "whether z-dimension is accepted via tool"
+  depth:
+    description: "whether z-dimension i.e. depth is accepted via tool"
     range: boolean
-  t: 
-    description: "whether t-dimension is accepted via tool"
+  timepoints: 
+    description: "whether t-dimension i.e. timepoints are accepted via tool"
     range: boolean
   tiled:
     description: "whether tiled images are accepted via tool"
@@ -437,7 +444,7 @@ enums:
       float:
       boolean:
       checkbox:
-      files:
+      files: # after adding inputs-outputs, we have removed type=files support. As of now, just kept for 'results' section
       dropdown:
       radio:
       textbox:

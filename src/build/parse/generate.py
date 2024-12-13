@@ -6,7 +6,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 import nbformat as nbf 
 
 
-def generate_gradio_app(template_path, parameters, display_only, results, exec_function, citations):
+def generate_gradio_app(template_path, inputs, outputs, parameters, display_only, results, exec_function, citations):
     env = Environment(
         loader=FileSystemLoader(searchpath=os.path.dirname(template_path)),
         autoescape=select_autoescape(['j2'])
@@ -23,7 +23,7 @@ def generate_gradio_app(template_path, parameters, display_only, results, exec_f
 
     template = env.get_template(os.path.basename(template_path))
 
-    gradio_app_code = template.render(parameters=parameters, display_only=display_only, results=results, exec_function=exec_function, citations=citations)
+    gradio_app_code = template.render(inputs=inputs, outputs=outputs, parameters=parameters, display_only=display_only, results=results, exec_function=exec_function, citations=citations)
 
     return gradio_app_code
 
@@ -112,7 +112,7 @@ def main():
     else:
         config_path = None
 
-    parameters, display_only, results, exec_function, algorithm_folder_name, citations = parse_config(config_path)
+    inputs, outputs, parameters, display_only, results, exec_function, algorithm_folder_name, citations = parse_config(config_path)
 
     ########################################
     # Logic for generating Gradio App
@@ -127,7 +127,7 @@ def main():
     gradio_template_path = "gradio_template.py.j2"
 
     # Generating the gradio algorithm+interface app dynamically
-    gradio_app_code = generate_gradio_app(gradio_template_path, parameters, display_only, results, exec_function, citations)
+    gradio_app_code = generate_gradio_app(gradio_template_path, inputs, outputs, parameters, display_only, results, exec_function, citations)
 
     # Join folders and file name
     gradio_app_path = os.path.join(folderA, folderB, 'app.py')

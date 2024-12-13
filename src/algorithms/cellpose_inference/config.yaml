@@ -8,7 +8,6 @@ inputs:
       - labeled
     description: "Input images to be segmented"
     optional: False
-    path: "/bilayers/input_images"
     format: 
       - tiff
       - ometiff
@@ -22,7 +21,6 @@ inputs:
     type: file
     description: "Custom model to be used for segmentation, if not using pretrained model"
     optional: True
-    path: "/bilayers/models"
     format: 
       - unix
     collection: False
@@ -35,12 +33,9 @@ outputs:
       - color
       - binary
       - labeled
-    description: "Segmented image if --save_png flag is true."
     optional: True
-    path: # discuss - it depends on what user inputs
     format: 
       - png
-    collection: True
     z: True
     t: True
     tiled: True
@@ -54,11 +49,9 @@ outputs:
       - labeled
     description: "Segmented image if --save_tif flag is true."
     optional: True
-    path: # discuss - it depends on what user inputs
     format: 
       - tiff
       - ometiff
-    collection: True
     z: True
     t: True
     tiled: True
@@ -67,10 +60,8 @@ outputs:
     type: array
     description: "Numpy file containing the segmentation mask. Only if --no_npy flag is not set."
     optional: True
-    path: "/bilayers/input_images" # for cellpose, it would be same as input_images
     format: 
       - npy
-    collection: False
   - name: flows
     type: image
     subtype: 
@@ -80,11 +71,9 @@ outputs:
       - labeled
     description: "Flows image if --save_flows flag is true."
     optional: True
-    path: # discuss - it depends on what user inputs
     format: 
       - tiff
       - ometiff
-    collection: True
     z: True
     t: True
     tiled: True
@@ -98,11 +87,9 @@ outputs:
       - labeled
     description: "Outlines image if --save_outlines flag is true."
     optional: True
-    path: # discuss - it depends on what user inputs
     format: 
       - tiff
       - ometiff
-    collection: True
     z: True
     t: True
     tiled: True
@@ -111,10 +98,8 @@ outputs:
     type: file
     description: "TXT file containing the segmentation mask. Only if --save_txt flag is true."
     optional: True
-    path: # discuss - it depends on what user inputs
     format: 
       - txt
-    collection: True
     
 parameters:
   # Hardware Arguments

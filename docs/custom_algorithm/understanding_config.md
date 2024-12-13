@@ -10,7 +10,7 @@ To create your interface, you need to understand the structure of the config.yam
 
 The config.yaml file defines how the interface interacts with your algorithm. At the code level, it's located at `bilayers/src/algorithms/algorithm_name/config.yaml`. The algorithm_name should reflect the task, such as cellpose_inference or cellpose_training, so name it accordingly.
 
-Each config.yaml contains key sections: `parameters`, `display_only`, `results`, `exec_function`, `docker_image`, `algorithm_folder_name`, and `citations`. You can copy the basic structure from an existing example.
+Each config.yaml contains key sections: `inputs`, `outputs`, `parameters`, `display_only`, `results`, `exec_function`, `docker_image`, `algorithm_folder_name`, and `citations`. You can copy the basic structure from an existing example.
 
 This file is then converted into a CLI command, where user-provided inputs are passed as command-line arguments, enabling the retrieval of the desired output.
 - **parameters**: These are key in building command-line arguments. Each object under this keyword forms part of the command line, with arguments either taken from the user or using default values.

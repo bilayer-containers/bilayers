@@ -214,20 +214,95 @@ parameters:
     section_id: "" # categorizing the parameters for cleaner specification file. Not much of use anywhere beyond this file, as of now.
     mode: ("beginner" | "advanced")
   # Example of type: checkbox
-  - name: threshold_method
+  - name: use_gpu
     type: checkbox
-    label: "Select a Threshold Method"
-    description: "Select a threshold method to segment the image"
-    options:
-      - label: "otsu"
-        value: "otsu"
-      - label: "li"
-        value: "li"
+    label: "use GPU"
+    description: "whether to use GPU or not"
     default: "otsu"
     cli_tag: "--threshold_method"
+    cli_order: 0
+    optional: False
+    append_value: False # SPECIAL FLAG FOR CHECKBOX
+    section_id: "input-args"
+    mode: "beginner"
+  # Example of type: integer
+  - name: min_diameter
+    type: integer
+    label: "Object Minimum Diameter Size"
+    description: "Minimum diameter of objects in pixels"
+    default: 5
+    cli_tag: "--min_size"
+    cli_order: 0
+    optional: True
+    section_id: "input-args"
+    mode: "beginner"
+  # Example of type: float
+  - name: pixel_size
+    type: float
+    label: "Pixel Size"
+    description: "Pixel size of the input image in microns"
+    default: 0.5
+    cli_tag: "--pixel_size"
+    cli_order: 0
+    optional: True
+    section_id: "input-args"
+    mode: "beginner"
+  # Example of type: radio
+  - name: model_folder
+    type: radio
+    label: "Model Folder"
+    description: "Upload the model folder"
+    options: # SPECIAL FLAG FOR RADIO
+      - label: "Brightfield Nuclei"
+        value: "brightfield_nuclei"
+      - label: "Fluorescence Nuclei and Cells"
+        value: "fluorescence_nuclei_and_cells"
+    default: "brightfield_nuclei"
+    cli_tag: "--model_folder"
+    cli_order: 0
     optional: False
     section_id: "input-args"
     mode: "beginner"
+  # Example of type: dropdown
+  - name: device
+    type: dropdown
+    label: "Device"
+    description: "Select the device to run the model"
+    options: # SPECIAL FLAG FOR DROPDOWN
+      - label: "CPU"
+        value: "cpu"
+      - label: "GPU"
+        value: "cuda"
+    default: "cpu"
+    multiselect: False # as of now, only multiselect=false is supported. SPECIAL FLAG FOR DROPDOWN
+    cli_tag: "--device"
+    cli_order: 0
+    optional: False
+    section_id: "input-args"
+    mode: "beginner"
+  # Example of type: textbox. THIS IS EXAMPLE OF STANDARD TEXTBOX. FOR SPECIFYING FOLDER PATH SEE THE NEXT EXAMPLE.
+  - name: image_filter
+    type: textbox
+    label: "Image Filter"
+    description: "Filtering the files on the name basis"
+    default: ""
+    cli_tag: "--image_filter"
+    cli_order: 0
+    optional: True
+    section_id: "input-args"
+    mode: "beginner"
+  # Example of type: textbox. (which helps specify output folder path). NOTE SOME SPECIAL FLAGS ARE INCLUDED HERE.
+  - name: save_dir
+    type: textbox
+    label: "Save Directory"
+    description: "directory to save output files"
+    output_dir_set: True # SPECIAL FLAG TO SPECIFY THAT THIS TEXTBOX IS FOR OUTPUT DIRECTORY
+    default: "/bilayers/input_images"
+    cli_tag: "--save_dir"
+    cli_order: 0
+    optional: True
+    section_id: "output-args"
+    mode: "advanced"
   
 
 display_only:

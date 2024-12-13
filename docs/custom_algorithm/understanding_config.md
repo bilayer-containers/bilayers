@@ -13,6 +13,8 @@ The config.yaml file defines how the interface interacts with your algorithm. At
 Each config.yaml contains key sections: `inputs`, `outputs`, `parameters`, `display_only`, `results`, `exec_function`, `docker_image`, `algorithm_folder_name`, and `citations`. You can copy the basic structure from an existing example.
 
 This file is then converted into a CLI command, where user-provided inputs are passed as command-line arguments, enabling the retrieval of the desired output.
+- **inputs**:
+- **outputs**:
 - **parameters**: These are key in building command-line arguments. Each object under this keyword forms part of the command line, with arguments either taken from the user or using default values.
 - **display_only**: These fields are displayed on the interface but aren’t included in the CLI command. No cli_tag should be passed to these objects; otherwise, they function like parameters.
 - **results**: Similar to parameters, but they define the expected output type and label it on the UI as the output. Typically, this is a file type.
@@ -23,6 +25,10 @@ This file is then converted into a CLI command, where user-provided inputs are p
 
 ```{code} yaml
 :filename: config.yml
+inputs:
+
+outputs:
+
 parameters:
 
 display_only:
@@ -40,18 +46,19 @@ docker-image:
  org:
  name:
  tag:
+ platform:
 
 algorithm_folder_name:
 
 citations:
- Algorithm:
+ algorithm:
    - name: ""
      doi: ""
      license: ""
      description: ""
 ```
 
-Before you start working on the `config.yaml` file, we recommend reviewing the command-line usage of the specific algorithm you're building an interface for. This will help you determine what should go in `parameters`, `display_only`, `results`, and `exec_function`'s `hidden_args`.
+Before you start working on the `config.yaml` file, we recommend reviewing the command-line usage of the specific algorithm you're building an interface for. This will help you determine what should go in `inputs`, `outputs`, `parameters`, `display_only`, `results`, and `exec_function`'s `hidden_args`.
 
 ## Understanding `cli_command`
 
@@ -59,9 +66,178 @@ The `cli_command` is the starting point for executing the command line, like `py
 
 ## Organizing Parameters from the Algorithm's Command-Line Usage
 
+- inputs: If parameter is about providing any input files eg. image, measurement files, numpy array files, executable files etc.
+- outputs: A way to show what are potential outputs that would spit out post segmentating. Those could be presented under umbrella of various types of files. eg. image, measurement files, numpy array files, executable files or some other files.
 - parameters: If the parameter and its argument need to be passed in the command line, include them in `parameters`.
 - display_only: If you want to show some information to the user without appending it to the command line, include it in `display_only`.
 - results: Anything that you want to appear as output should go under `results`. For these, you can set the `cli_tag` as `None`.
+
+## Defining inputs 
+```{code} yaml
+:filename: config.yml
+name: 
+type: 
+label: ""
+description: ""
+cli_tag: 
+cli_order:
+default: 
+optional: True
+format:
+folder_name:
+file_count:
+section_id: ""
+mode: ""
+```
+- **name**: This should be a simple name, for self-identification purpose. Ideally matching the `cli_tag` (without hyphens). Use underscores instead of spaces. 
+  Example: ```name: use_gpu```. 
+
+- **type**: This defines the `type` of the `inputs` and `outputs`. Its an umbrella of type `files`. So, ideally, it's categorized in 5 `types of files`. Those are `image`, `measurement`, `array`, `file`, `executable`. 
+
+  :::{dropdown} type: image
+    ```{code} yaml
+    - name: input_images
+      type: image
+      label: "Input Images"
+      subtype: # ONLY IFF TYPE==IMAGE. Can list all those relevant subtypes out of these 4, supported by the tool
+        - grayscale
+        - color
+        - binary
+        - labeled
+      description: "these are accepted input_images for xyz algorithm"
+      cli_tag: "--input_images" # tag to be used in CLI
+      cli_order: Integer # default is 0. Could be positive, negative or zero. If negative, then it will be appended at the end of the command. BUT IT IS OPTIONAL TO PROVIDE THIS FLAG.
+      default: ("single" | "directory") # if it is a single file or a folder
+      optional: (True | False) # if input is optional
+      format: # can include all those relevant formats supported by the tool
+        - tif
+        - png
+        - jpg
+        - jpeg
+        - tiff
+        - ometiff
+      folder_name: "/path/to/input_images" # folder_path
+      file_count: ("single" | "multiple") # if it accepts single file or multiple files. If multiple, then it will be a folder
+      section_id: "inputs" # section_id to group the inputs together
+      mode: ("beginner" | "advanced")
+      # Extra flags ONLY IFF TYPE==IMAGE
+      depth: (True | False) # ONLY IF TYPE IS IMAGE. If tool accepts images, with z-dimension i.e. depth, then set it to True
+      timepoints: (True | False) # ONLY IF TYPE IS IMAGE. If tool accepts images, with t-dimension i.e. timepoints, then set it to True
+      tiled: (True | False) # ONLY IF TYPE IS IMAGE. If tool accepts images, with tiled format, then set it to True
+      pyramidal: (True | False) # ONLY IF TYPE IS IMAGE. If tool accepts images, with pyramidal format, then set it to True
+  
+    ```
+    :::
+
+  :::{dropdown} type: measurement
+    ```{code} yaml
+    - name: input_measurement # a meaningful name for measurement file(/s) which can be self-explanatory for user 
+      type: measurement
+      label: "Input Measurement" # label would be shown in the UI (only for inputs it matters)
+      description: "these are accepted measurement_related_info for xyz algorithm"
+      cli_tag: "--input_measurement" # tag to be used in CLI
+      cli_order: Integer # default is 0. Could be positive, negative or zero. If negative, then it will be appended at the end of the command. BUT IT IS OPTIONAL TO PROVIDE THIS FLAG.
+      default: ("single" | "directory")
+      optional: (True | False) # True, if input is optional; False, if input is mandatory
+      format: # either or all of those depending on the tool, and if default is directory, or file_count is multiple
+        - csv # any csv format files included here eg. csv, tsv etc.
+        - parquet # any binary format files included here
+        - feather
+      folder_name: "/path/to/measurement/files" # folder_path or file_path if single file
+      file_count: ("single" | "multiple") # if it accepts single file or multiple files. If multiple, then it will be a folder
+      section_id: "inputs"
+      mode: ("beginner" | "advanced") # mode just for clean UI, to show objects in segregated sections
+    ```
+    :::
+  
+  :::{dropdown} type: array
+    ```{code} yaml
+    - name: input_array # a meaningful name for array(/s) which can be self-explanatory for user
+      type: array
+      label: "Input Array" # label would be shown in the UI
+      description: "these are accepted array for xyz algorithm"
+      cli_tag: "--input_array" # tag to be used in CLI
+      cli_order: Integer # default is 0. Could be positive, negative or zero. If negative, then it will be appended at the end of the command. BUT IT IS OPTIONAL TO PROVIDE THIS FLAG.
+      default: ("single" | "directory") # if it is a single file or a folder
+      optional: (True | False) # True, if input is optional; False, if input is mandatory
+      format: # either or all of those, depending on default is directory, or file_count is multiple
+        - npy
+        - npz
+      folder_name: "/path/to/array" # folder_path or file_path if single file
+      file_count: ("single" | "multiple") # if it accepts single file or multiple files. If multiple, then it will be a folder
+      section_id: "inputs"
+      mode: ("beginner" | "advanced") # mode just for clean UI, to show objects in segregated sections
+    ```
+    :::
+
+  :::{dropdown} type: file
+    ```{code} yaml
+    - name: input_file
+      type: file
+      label: "Input File" # label would be shown in the UI
+      description: "these are accepted input_files for xyz algorithm"
+      cli_tag: "--input_file" # tag to be used in CLI
+      cli_order: Integer # default is 0. Could be positive, negative or zero. If negative, then it will be appended at the end of the command. BUT IT IS OPTIONAL TO PROVIDE THIS FLAG.
+      default: ("single" | "directory") # if it is a single file or a folder
+      optional: (True | False)
+      format: # can include all those relevant formats supported by the tool
+        - log
+        - unix
+      folder_name: "/path/to/input_files" # folder_path or file_path if single file
+      file_count: ("single" | "multiple") # if it accepts single file or multiple files. If multiple, then it will be a folder
+      section_id: "inputs"
+      mode: ("beginner" | "advanced")
+    ```
+    :::
+
+  :::{dropdown} type: executable
+    ```{code} yaml
+    - name: input_executable
+      type: executable
+      label: "Input Executable" # label would be shown in the UI
+      description: "these are accepted input_executables for xyz algorithm"
+      cli_tag: "--input_executable" # tag to be used in CLI
+      cli_order: Integer # default is 0. Could be positive, negative or zero. If negative, then it will be appended at the end of the command. BUT IT IS OPTIONAL TO PROVIDE THIS FLAG.
+      default: ("single" | "directory") # if it is a single file or a folder
+      optional: (True | False)
+      format: # can include all those relevant formats supported by the tool
+        - ipynb
+        - sh
+        - bash
+        - csh
+        - zsh
+        - ksh
+        - py
+        - pyw
+        - js
+        - cmd
+        - bat
+      folder_name: "/path/to/executable" # folder_path or file_path if single file
+      file_count: ("single" | "multiple") # if it accepts single file or multiple files. If multiple, then it will be a folder
+      section_id: "inputs"
+      mode: ("beginner" | "advanced")
+    ```
+    :::
+
+## Defining outputs
+```{code} yaml
+:filename: config.yml
+name: 
+type: 
+label: ""
+description: ""
+cli_tag: 
+cli_order:
+default: 
+optional: True
+format:
+folder_name:
+file_count:
+section_id: ""
+mode: ""
+```
+
+`outputs` follow same schema as `inputs` in the spec file.
 
 ## Defining parameters
 
@@ -529,6 +705,7 @@ For instance, `cellprofiler/runcellpose_no_pretrained:0.1` can be broken down in
 - **org**: The part before `/` is the username or organization (e.g., `cellprofiler`).
 - **name**: The part between `/` and `:` is the image name (e.g., `runcellpose_no_pretrained`).
 - **tag**: The part after `:` is the tag, which can be a version number or a term like `latest` (e.g., `0.1`).
+- **platform**: Platform on which base_docker_image was built. Can find the details on dockerhub.
 
 To learn more about docker image naming, refer to [What are Docker tags?](https://medium.com/free-code-camp/an-introduction-to-docker-tags-9b5395636c2a)
 
@@ -539,6 +716,7 @@ docker-image:
  org: 
  name: 
  tag: 
+ platform:
 ```
 
 ## Defining algorithm_folder_name

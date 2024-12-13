@@ -80,7 +80,6 @@ def generate_cli_command(cli_tags, **kwargs):
             cli_order = cli_tags[key].get("cli_order", 0)
             label = cli_tags[key].get("label", None)
             optional = cli_tags[key].get("optional", False)
-            print("Will every cli_tag come here? - even if we r not touching it?", cli_tag)
 
             # First, check the condition if cli_order is negative then dynamically append the size of jagged_negative_array
             if cli_order < 0:

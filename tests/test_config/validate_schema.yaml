@@ -39,6 +39,7 @@ classes:
       - label
       - description
       - cli_tag
+      - cli_order
       - default
       - optional
       - format
@@ -415,9 +416,6 @@ slots:
     description: "Format of the inputs and outputs"
     range: string
     multivalued: true
-  collection:
-    description: "Collection of the inputs and outputs"
-    range: boolean
   # slots specific to inputs and outputs, if type is image
   subtype:
     description: "Subtype of the inputs and outputs"

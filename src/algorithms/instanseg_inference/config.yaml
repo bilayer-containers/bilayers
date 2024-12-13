@@ -9,6 +9,7 @@ inputs:
       - labeled
     description: "Input images to be analyzed"
     cli_tag: "--image_path"
+    cli_order: 0
     default: "directory"
     optional: False
     format: 
@@ -37,6 +38,7 @@ outputs:
       - labeled
     description: "Output images"
     cli_tag: "None"
+    cli_order: 0
     default: "directory"
     optional: False
     format: 
@@ -188,7 +190,7 @@ exec_function:
   name: "generate_cli_command"
   script: "instanseg_inference"
   module: "algorithms.instanseg_inference"
-  cli_command: "python /instanseg/InstanSeg/scripts/inference.py"
+  cli_command: "python /instanseg/instanseg/scripts/inference.py"
   hidden_args:
 
 docker_image:

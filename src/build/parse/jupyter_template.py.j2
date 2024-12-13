@@ -2,6 +2,8 @@ from ipywidgets import widgets, VBox, HBox, Tab, Accordion
 from IPython.display import display
 
 {% autoescape false %}
+inputs = {{inputs}}
+outputs = {{outputs}}
 parameters = {{parameters}}
 display_only = {{display_only}}
 exec_function = {{exec_function}}
@@ -54,6 +56,39 @@ radio_options = {
     {% endif -%}
     }
 
+{# Parsing inputs section #}
+{% if inputs is not none -%}
+{% for input_conf in inputs -%}
+
+{% if input_conf.type in ['image', 'measurement', 'array', 'file', 'executable'] and input_conf.file_count == "multiple" %}
+{{ input_conf.label | lower | replace(" ", "_") }} = widgets.FileUpload(multiple=True)
+{% elif input_conf.type in ['image', 'measurement', 'array', 'file', 'executable'] and input_conf.file_count == "single" %}
+{{ input_conf.label | lower | replace(" ", "_") }} = widgets.FileUpload(multiple=False)
+{%- endif %}
+
+# Add a description label
+{{ "desc_" + input_conf.label | lower | replace(" ", "_") }}  = widgets.HTML(value = "<b>{{ input_conf['label'] }} </b> :  {{ input_conf.get('description', '') }}")
+
+# Add widget and description to accordion
+tab = Tab(children=[HBox([widgets.Label("{{ input_conf['label'] }}"), {{ input_conf.label | lower | replace(" ", "_") }}]), {{ "desc_" + input_conf.label | lower | replace(" ", "_") }}])
+tab.set_title(0, "{{ input_conf['label'] }}")
+tab.set_title(1, "Description")
+
+# Append the corresponding cli_tag, widget to param_vars
+{% if input_conf.type in ['image', 'measurement', 'array', 'file', 'executable'] %}
+param_vars.append(("{{ input_conf['cli_tag'] }}", {{ input_conf.label | lower | replace(" ", "_") }}, {{ input_conf.get('cli_order', 0) }}, "{{ input_conf.get('folder_name', '') }}"))
+{%- endif %}
+
+{% if input_conf.mode == 'beginner' -%}
+beginner_widgets.append(tab)
+{% else %}
+advanced_widgets.append(tab)
+{%- endif %}
+
+{%- endfor %}
+{%- endif %}
+
+{# Parsing parameters section #}
 {% if parameters is not none -%}
 {% for param_conf in parameters -%}
 {% if param_conf.type == 'files' and param_conf.file_count == "multiple" %}

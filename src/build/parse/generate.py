@@ -10,6 +10,52 @@ from zipfile import ZipFile, ZIP_DEFLATED
 from pathlib import Path
 
 
+def generate_top_level_text(interface, citations):
+
+    DEFAULT_CITATIONS = {
+        "Bilayers": [
+            {
+                "name" : "Bilayers",
+                "license" : "BSD 3-Clause",
+                "description" : "A Container Specification and CI/CD  built for whole-community support"
+            },
+        ],
+        "Jupyter": [
+            {
+                "name" : "Jupyter",
+                "doi" : "10.1109/MCSE.2007.53",
+                "license" : "BSD 3-Clause",
+                "description" : "Interactive, code-driven documents for data analysis and visualization"
+            },
+        ],
+        "Gradio": [
+            {
+                "name" : "Gradio",
+                "doi" : "10.48550/arXiv.190602569",
+                "license" : "Apache License 2.0",
+                "description" : "A simple web interface for deploying machine learning models"
+            },
+        ],
+          }
+    app_descriptions = "This interface provides the following tool(s):\n"
+    citation_text = "This project relies on citations! Please cite ALL of the following if you find this application useful in your research!\n"
+    license_info = "The licenses of the components of this project are provided below. Please ensure these licenses are compatible with your work before using these tools.\n"
+    app_names = ""
+    for citation in citations:
+        app_descriptions+= f"{ citation["name"] }: { citation["description"] }\n" 
+        citation_text += f"Cite { citation["name"] } using { citation["doi"] }\n"
+        license_info += f"{ citation["name"] } is provided under the { citation["license"] } license\n"
+        app_names += f"{ citation["name"] }+"
+    for default_thing in ["Bilayers",interface]:
+        citation = DEFAULT_CITATIONS[default_thing]
+        if "doi" in citation.keys():
+            citation_text += f"Cite { citation["name"] } using { citation["doi"] }\n"
+        license_info += f"{ citation["name"] } is provided under the { citation["license"] } license\n"
+    title = app_names[:-1]+ f" - Brought to you in {interface} by Bilayers"
+    full_description = "\n\n".join([app_descriptions,citation_text,license_info])
+    return title, full_description
+
+
 def generate_gradio_app(template_path, parameters, display_only, results, exec_function, citations):
     env = Environment(
         loader=FileSystemLoader(searchpath=os.path.dirname(template_path)),
@@ -27,7 +73,10 @@ def generate_gradio_app(template_path, parameters, display_only, results, exec_f
 
     template = env.get_template(os.path.basename(template_path))
 
-    gradio_app_code = template.render(parameters=parameters, display_only=display_only, results=results, exec_function=exec_function, citations=citations)
+    title, full_description = generate_top_level_text('Gradio',citations)
+
+    gradio_app_code = template.render(parameters=parameters, display_only=display_only, results=results, exec_function=exec_function, 
+                                      citations=citations,title=title, description=full_description)
 
     return gradio_app_code
 
@@ -54,40 +103,13 @@ def generate_jupyter_notebook(template_path, parameters, display_only, results, 
     print("To check the type of parameters: ", type(parameters))
     notebook_content = template.render(parameters=parameters, display_only=display_only, results=results, exec_function=exec_function)
 
-    DEFAULT_CITATIONS = {
-        "Bilayers": [
-            {
-                "name" : "Bilayers",
-                "license" : "BSD 3-Clause",
-                "description" : "A Container Specification and CI/CD  built for whole-community support"
-            },
-        ],
-        "Jupyter": [
-            {
-                "name" : "Jupyter",
-                "doi" : "10.1109/MCSE.2007.53",
-                "license" : "BSD 3-Clause",
-                "description" : "Interactive, code-driven documents for data analysis and visualization"
-            },
-        ],
-    }
+    title, full_description = generate_top_level_text('Jupyter',citations)
 
     nb = nbf.v4.new_notebook()
     
-    # Create a markdown cell for instructions or say citations
-    nb.cells.append(create_markdown_cell("## Set Variables and Run the cell"))
-
-    for citation in citations['algorithm']:
-        citation_cell = f"- {citation['name']} under {citation['license']} License : {citation['doi']} --> {citation['description']}\n"
-
-    for citation in DEFAULT_CITATIONS['Jupyter']:
-        citation_cell += f"- {citation['name']} under {citation['license']} License : {citation['doi']} --> {citation['description']}\n"
-
-    for citation in DEFAULT_CITATIONS['Bilayers']:
-        citation_cell += f"- {citation['name']} : {citation['license']} --> {citation['description']}\n"
-
-    # Add a markdown cell with the formatted citations
-    nb.cells.append(create_markdown_cell(citation_cell))
+    # Add markdown cells with the formatted title and descriptions
+    nb.cells.append(create_markdown_cell(f"# {title}"))
+    nb.cells.append(create_markdown_cell(full_description))
 
     # Create a hidden code cell for widget creation
     hidden_cell = create_code_cell(notebook_content)

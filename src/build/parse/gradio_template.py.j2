@@ -357,42 +357,6 @@ def on_submit(
 {%- endfor %}
 
 
-{% set DEFAULT_CITATIONS = {
-    "Gradio": [
-        {
-            "name" : "Gradio",
-            "doi" : "10.48550/arXiv.190602569",
-            "license" : "Apache License 2.0",
-            "description" : "A simple web interface for deploying machine learning models"
-        },
-    ],
-    "Bilayers": [
-        {
-            "name" : "Bilayers",
-            "license" : "BSD 3-Clause",
-            "description" : "A Container Specification and CI/CD  built for whole-community support"
-        },
-    ],
-} %}
-
-description_text = "Please cite the following while using Bilayers X Gradio Interface!\n\n"
-
-{% for citation in citations.algorithm %}
-description_text += f"{{ citation.name }} under {{ citation.license }} License: {{ citation.doi }} -- {{ citation.description }}\n\n"
-{% endfor %}
-
-{% for citation_type, citation_list in DEFAULT_CITATIONS.items() -%}
-{% for citation in citation_list -%}
-{% if citation_type == "Gradio" -%}
-description_text += f"{{ citation.name }} under {{ citation.license }} License : {{ citation.doi }} -- {{ citation.description }}\n\n"
-{% elif citation_type == "Bilayers" %}
-description_text += f"{{ citation.name }} under {{ citation.license }} License : {{ citation.description }}\n\n"
-{%- endif %}
-{%- endfor %}
-{%- endfor %}
-
-
-
 
 {% for result_conf in results -%}
 {% if result_conf.type == 'files' -%}
@@ -437,8 +401,8 @@ app = gr.Interface(
     fn=on_submit, 
     inputs=all_parameters,
     outputs=results, 
-    title="Gradio App",
-    description=f"<div style='text-align: center'>{description_text}</div>"
+    title="{{title}}",
+    description=f"<div style='text-align: center'>{{description}}</div>"
 )
 
 if __name__ == "__main__":

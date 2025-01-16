@@ -66,8 +66,8 @@ jobs:
 
       - name: Run parse,generate and build docker images
         run: |
-          chmod +x build_docker.sh
-          ./build_docker.sh
+          chmod +x ./scripts/build_docker.sh
+          ./scripts/build_docker.sh
 
       - name: Run gradio Docker Container
         run: |

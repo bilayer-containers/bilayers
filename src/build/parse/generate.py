@@ -102,6 +102,7 @@ def generate_jupyter_notebook(template_path, parameters, display_only, results, 
     nb.cells.append(create_code_cell(run_command_cell))
 
     return nb
+
 def main():
     print("Parsing config...")
 

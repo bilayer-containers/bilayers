@@ -73,8 +73,9 @@ def generate_jupyter_notebook(template_path, parameters, display_only, results, 
     # Create a markdown cell for instructions or say citations
     nb.cells.append(create_markdown_cell("## Set Variables and Run the cell"))
 
+    citation_cell = ""
     for citation in citations['algorithm']:
-        citation_cell = f"- {citation['name']} under {citation['license']} License : {citation['doi']} --> {citation['description']}\n"
+        citation_cell += f"- {citation['name']} under {citation['license']} License : {citation['doi']} --> {citation['description']}\n"
 
     for citation in DEFAULT_CITATIONS['Jupyter']:
         citation_cell += f"- {citation['name']} under {citation['license']} License : {citation['doi']} --> {citation['description']}\n"

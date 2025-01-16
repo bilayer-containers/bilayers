@@ -64,7 +64,7 @@ citations:
 
 ## 3. Update CI/CD Configuration
 - To enable automated interface generation and testing, update the following files:
-  `build_docker.sh`: Edit your algorithm name to `line #7`:
+  `scripts/build_docker.sh`: Edit your algorithm name to `line #7`:
   ```{code}
   ALGORITHM_NAMES=(“your_algorithm”)
   ```
@@ -76,7 +76,7 @@ citations:
 ## 4. Test on your end 
 - Build and test your Docker images locally. 
   ```{code}
-  ./build_docker.sh
+  ./scripts/build_docker.sh
   ```
 - Push them to your personal DockerHub repository for validation:
   ```{code}

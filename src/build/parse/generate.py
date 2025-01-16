@@ -4,10 +4,6 @@ import sys
 from parse import main as parse_config
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 import nbformat as nbf 
-import ipywidgets as widgets
-from IPython.display import display, HTML, FileLink
-from zipfile import ZipFile, ZIP_DEFLATED
-from pathlib import Path
 
 
 def generate_gradio_app(template_path, parameters, display_only, results, exec_function, citations):

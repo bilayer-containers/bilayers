@@ -1,7 +1,5 @@
 import pytest
 import subprocess
-import os
-import subprocess
 
 @pytest.fixture
 def schema_path():

@@ -43,7 +43,7 @@ def generate_jupyter_notebook(template_path, parameters, display_only, results, 
 
     def replace(text, old, new):
         return text.replace(old, new)
-    
+
     def create_code_cell(content):
         return nbf.v4.new_code_cell(content)
 
@@ -73,7 +73,7 @@ def generate_jupyter_notebook(template_path, parameters, display_only, results, 
     }
 
     nb = nbf.v4.new_notebook()
-    
+
     # Create a markdown cell for instructions or say citations
     nb.cells.append(create_markdown_cell("## Set Variables and Run the cell"))
 
@@ -91,17 +91,17 @@ def generate_jupyter_notebook(template_path, parameters, display_only, results, 
 
     # Create a hidden code cell for widget creation
     hidden_cell = create_code_cell(notebook_content)
-    
+
     hidden_cell.metadata.jupyter = {"source_hidden": True}
     nb.cells.append(hidden_cell)
 
     nb.cells.append(create_code_cell(f"print({{cli_command.value}})"))
-    
+
     # jupyter_shell_command_template_path
     jupyter_shell_command_template_path = "jupyter_shell_command_template.py.j2"
     shell_command_template = env.get_template(os.path.basename(jupyter_shell_command_template_path))
     run_command_cell = shell_command_template.render(cli_command=exec_function['cli_command'])
-    
+
     # Append the try-except cell to the notebook
     nb.cells.append(create_code_cell(run_command_cell))
 
@@ -115,7 +115,6 @@ def main():
         config_path = None
 
     parameters, display_only, results, exec_function, algorithm_folder_name, citations = parse_config(config_path)
-
 
     ########################################
     # Logic for generating Gradio App
@@ -140,7 +139,6 @@ def main():
         f.write(gradio_app_code)
     print("app.py generated successfully!!")
 
-
     ################################################
     # Logic for generating Jupyter Notebook
     ################################################
@@ -159,7 +157,7 @@ def main():
 
     # Join folders and file name
     jupyter_notebook_path = os.path.join(folderA, folderB, 'generated_notebook.ipynb')
-    
+
     with open(jupyter_notebook_path, "w") as f:
         nbf.write(jupyter_app_code, f)
     print("Jupyter notebook saved at generated_notebook.ipynb")

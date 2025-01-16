@@ -47,7 +47,7 @@ classes:
       - t
       - tiled
       - pyramidal
-       
+
   TypeInput:
     aliases: ["inputs"]
     description: "Inputs to the algorithm from the last step of the workflow"
@@ -70,7 +70,7 @@ classes:
               required: true
             pyramidal:
               required: true
-  
+
   TypeOutput:
     aliases: ["outputs"]
     description: "Outputs of the algorithm to the next step in the workflow"
@@ -153,7 +153,7 @@ classes:
               required: true
             multiselect:
               required: true
-     
+
   TypeParameter:
     aliases: ["parameters"]
     description: "Parameters of a specific Algorithm"
@@ -221,7 +221,7 @@ classes:
     description: "Citations of the Algorithm"
     slots:
       - algorithm
-  
+
   TypeAlgorithmFromCitation:
     aliases: ["Algorithm", "citations"]
     description: "Algorithm's citations"
@@ -246,7 +246,7 @@ classes:
       cli_order:  
         range: integer
         required: false
-  
+
   RadioOptions:
     description: "Options of the Radio button in parameters, display_only, results"
     slots:
@@ -430,8 +430,6 @@ slots:
   pyramidal:
     description: "whether pyramidal images are accepted via tool"
     range: boolean
-  
-  
 
 enums:
   TypeEnum:
@@ -469,4 +467,3 @@ enums:
       color:
       binary:
       labeled:
-  

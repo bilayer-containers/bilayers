@@ -132,7 +132,7 @@ parameters:
     section_id: "input-args"
     folder_name: "/bilayers/input_images"
     mode: "beginner"
-  
+
   # Radio Parameter Test Cases
   # 1. Radio correct version
   - name: r_true_correct
@@ -180,7 +180,7 @@ parameters:
     optional: True
     section_id: "input-args"
     mode: "beginner"
-  
+
   # Dropdown Parameter Test Cases
   # 1. Dropdown correct version
   - name: d_true_correct
@@ -247,7 +247,7 @@ parameters:
     optional: True
     section_id: "input-args"
     mode: "beginner"
-  
+
   # Textbox Parameter Test Cases
   # 1. Textbox correct version
   - name: t_true_correct
@@ -319,7 +319,7 @@ parameters:
     section_id: "input-args"
     mode: "beginner"
 
-    
+
 
 # Display_only Section
 display_only:
@@ -333,7 +333,7 @@ display_only:
     section_id: "display-only-section"
     mode: "beginner"
     optional: True
-  
+
 results:
   - name: output_dir
     type: files

@@ -19,7 +19,7 @@ def insert_into_jagged_array(jagged_array, cli_order, cli_tag, value):
 
     # Initialize the sublist if it's not already
     jagged_array[abs(cli_order)] = jagged_array[abs(cli_order)] or []
-    
+
     # Append the cli_tag and value to the appropriate sublist
     result = option_to_append(cli_tag, value)
     jagged_array[abs(cli_order)].append(result)
@@ -62,7 +62,6 @@ def generate_cli_command(cli_tags, **kwargs):
     {%- endfor %}
     {%- endif %}
     }
-
 
     folder_name = None
     output_folder_name = None
@@ -136,7 +135,7 @@ def generate_cli_command(cli_tags, **kwargs):
                         os.makedirs(default, exist_ok=True)
                         if cli_tag != "None":
                             value = default
-            
+
                 # If the value of (textbox) is empty string, set it to None
                 if value == "":
                     value = None
@@ -150,7 +149,6 @@ def generate_cli_command(cli_tags, **kwargs):
                             insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)
                         else:
                             insert_into_jagged_array(jagged_positive_array, cli_order, cli_tag, value)
-
 
     # Add hidden arguments to the command
     {% autoescape false %}
@@ -187,7 +185,7 @@ def generate_cli_command(cli_tags, **kwargs):
                         else:
                             jagged_positive_array[cli_order] = jagged_positive_array[cli_order] or []
                             jagged_positive_array[cli_order].append(cli_tag)
-            
+
             else:
                 if cli_order < 0:
                     insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)
@@ -197,7 +195,7 @@ def generate_cli_command(cli_tags, **kwargs):
     # Debug if Jagged Array is storing the correct values
     print("Jagged Positive Array:", jagged_positive_array)
     print("Jagged Negative Array:", jagged_negative_array)
-    
+
     # Append Positive ordered elements
     for index in range(1, len(jagged_positive_array)):
         if jagged_positive_array[index]:
@@ -206,7 +204,7 @@ def generate_cli_command(cli_tags, **kwargs):
     # Append elements with cli_order == 0
     if jagged_positive_array and jagged_positive_array[0]:
         cli_command.extend(jagged_positive_array[0])
-    
+
     # Append Negative ordered elements
     for index in range(len(jagged_negative_array) - 1, 0, -1):
         if jagged_negative_array[index]:
@@ -270,8 +268,7 @@ def on_submit(
         {% endif %}
     }{% if not loop.last %},{% endif %}
     {% endfor %}
-}
-
+    }
 
     print("Received parameters:", kwargs)
 
@@ -279,13 +276,11 @@ def on_submit(
     cli_command, folder_name, output_folder_name = generate_cli_command(cli_tags, **kwargs)
     print("Generated CLI command:", cli_command)
 
-  
-
     # Execute the CLI command
     try:
         result = subprocess.run(cli_command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         print("Command executed successfully")
-        
+
         # Check if output_folder_name is not None and is a directory
         if output_folder_name and os.path.exists(output_folder_name) and os.path.isdir(output_folder_name):
             print("Folder exists")
@@ -294,7 +289,6 @@ def on_submit(
         else:
             print("Folder does not exist or output_folder_name is None")
             output_files = []
-        
 
         return output_files
 
@@ -302,7 +296,6 @@ def on_submit(
         error_message = "Please take a screenshot of this error and raise an issue at the Bilayers repository on GitHub."
         error_message += f"Command failed with error: {e.stderr.decode()}\n\n"
         raise gr.Error(error_message, duration = None)
-        
 
 {% if parameters is not none -%}
 {% for param_conf in parameters %}
@@ -392,14 +385,10 @@ description_text += f"{{ citation.name }} under {{ citation.license }} License :
 {%- endfor %}
 
 
-
-
 {% for result_conf in results -%}
 {% if result_conf.type == 'files' -%}
 {%- endif %}
 {%- endfor %}
-
-
 
 
 all_parameters = [

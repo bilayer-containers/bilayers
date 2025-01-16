@@ -498,12 +498,11 @@ parameters:
     append_value: False
     section_id: "output-args"
     mode: "advanced"
-    
 
 # Display_only Section
 display_only:
   # dummy example : DONOT PUT CLI_TAG FLAG AT ALL. THESE ARE JUST FOR DISPLAY
-  
+
 results:
   - name: output_dir
     type: files
@@ -536,7 +535,7 @@ docker_image:
 algorithm_folder_name: "cellpose_inference"
 
 citations:
-  algorithm: 
+  algorithm:
     - name: "Cellpose"
       doi: 10.1038/s41592-020-01018-x
       license: "BSD 3-Clause"

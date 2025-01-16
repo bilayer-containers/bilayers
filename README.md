@@ -1,5 +1,7 @@
 ## BiLayers 
 
+![Bilayers Logo](./assets/logo_full.png)
+
 [bilayers overview](./assets/bilayers.png)
 
 ## Summary

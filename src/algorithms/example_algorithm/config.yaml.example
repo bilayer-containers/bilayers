@@ -1,4 +1,4 @@
-inputs: 
+inputs:
   - name: input_images
     type: image
     subtype: # ONLY IF TYPE IS IMAGE. Can list all those relevant subtypes out of these 4, supported by the tool
@@ -137,4 +137,3 @@ outputs:
       - cmd
       - bat
     collection: (True | False) # if the output is a collection of files (~ can think of it as a folder)
-  

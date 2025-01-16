@@ -185,7 +185,7 @@ parameters:
     folder_name: "/bilayers/input_images"
     section_id: "input-args"
     mode: "beginner"
-  
+
   # Radio Parameter Test Cases
   # 1. Radio correct version
   - name: radio_correct_true
@@ -233,7 +233,7 @@ parameters:
     optional: True
     section_id: "input-args"
     mode: "beginner"
-  
+
   # Dropdown Parameter Test Cases
   # 1. Dropdown correct version
   - name: dropdown_correct_true
@@ -315,7 +315,7 @@ parameters:
     optional: True
     section_id: "input-args"
     mode: "beginner"
-  
+
   # Textbox Parameter Test Cases
   # 1. Textbox correct version
   - name: Textbox_correct_true
@@ -387,7 +387,6 @@ parameters:
     section_id: "input-args"
     mode: "beginner"
 
-  
 
   # Stuff this with all the wrong doings
   # 1. type as checkbox, but put in extra flags of files. Should throw errors at validation end
@@ -403,8 +402,6 @@ parameters:
     folder_name: "/bilayers/input_images"
     section_id: "input-args"
     mode: "beginner"
-  
-    
 
 # Display_only Section
 display_only:
@@ -419,7 +416,7 @@ display_only:
     mode: "beginner"
     cli_tag: "--trial"
     cli_order: 0
-  
+
 results:
   - name: output_dir
     type: files

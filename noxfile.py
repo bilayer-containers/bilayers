@@ -9,7 +9,7 @@ def run_parse(session):
     config_path = session.posargs[0]
     session.run("python", "parse.py", config_path)
     session.cd('../../..')
-    
+
 @nox.session
 def run_generate(session):
     session.install('pyyaml','jinja2', 'nbformat', 'ipython', 'ipywidgets')
@@ -26,7 +26,7 @@ def build_algorithm(session):
         print("Algorithm Name in build_algorithm session: ", algorithm)
     else:
         algorithm = 'classical_segmentation'
-    
+
     print("Building Algorithm Nox-File: ", algorithm)
     image_name = f'{algorithm}'
     print("Image Name: ", image_name)
@@ -38,7 +38,7 @@ def build_algorithm(session):
         print(f'Checking config file at {config_file_path}')
         with open(config_file_path, 'r') as file:
             config = yaml.safe_load(file)
-        
+
         org = config.get('docker_image', {}).get('org')
         name = config.get('docker_image', {}).get('name')
         tag = config.get('docker_image', {}).get('tag')
@@ -104,7 +104,7 @@ def build_interface(session):
 
     with open('/tmp/algorithm_folder_name.txt', 'r') as file:
         algorithm_folder_name = file.read().strip()
-        
+
     if interface == 'gradio':
         session.run('docker', 'buildx', 'build', '--platform', platform, '-f', 'Gradio.Dockerfile', '--build-arg',  f'BASE_IMAGE={base_image}', '--build-arg',  f'FOLDER_NAME={algorithm_folder_name}', '-t', image_name, '-f', dockerfile_path, 'src/build')
     elif interface == 'jupyter':

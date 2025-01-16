@@ -14,13 +14,12 @@ def main(config_path=None):
 
     config = parse_config(config_path)
 
-
     parameters = config.get('parameters', [])
 
     display_only = config.get('display_only', [])
 
     results = config.get('results', [])
-    
+
     # Exec function whole logic from threshold.py instead of just the function name
     exec_function = config.get('exec_function', {})
 
@@ -39,5 +38,3 @@ if __name__ == "__main__":
     print(f"Exec Function: {exec_function}")
     print(f"Folder Name: {algorithm_folder_name}")
     print(f"Citations: {citations}")
-
-    

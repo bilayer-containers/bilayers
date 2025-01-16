@@ -13,7 +13,6 @@ results = {{results}}
 
 {% endautoescape %}
 
-
 beginner_widgets = []
 advanced_widgets = []
 
@@ -168,7 +167,7 @@ def insert_into_jagged_array(jagged_array, cli_order, cli_tag, value):
 
     # Initialize the sublist if it's not already
     jagged_array[abs(cli_order)] = jagged_array[abs(cli_order)] or []
-    
+
     # Append the cli_tag and value to the appropriate sublist
     result = option_to_append(cli_tag, value)
     if result is not None: # Only append if the result is not None
@@ -226,12 +225,11 @@ def construct_cli_command():
                 else:
                     insert_into_jagged_array(jagged_positive_array, cli_order, cli_tag, value)
 
-
     for param_var in param_vars:
         cli_tag = param_var[0]
         widget = param_var[1]
         cli_order = param_var[2]
-            
+
         if len(param_var) == 4:  
             if isinstance(widget, widgets.FileUpload): # This is a 'Files' type
                 folder_name = param_var[3]
@@ -262,7 +260,7 @@ def construct_cli_command():
                             jagged_positive_array[abs(cli_order)] = jagged_positive_array[abs(cli_order)] or []
                             if cli_tag != "None":
                                 jagged_positive_array[abs(cli_order)].append(cli_tag)
-            
+
         else:  # Handling other types then Files and Checkbox
             if isinstance(widget, widgets.RadioButtons):
                 value = widget.value
@@ -284,7 +282,7 @@ def construct_cli_command():
                     insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)
                 else:
                     insert_into_jagged_array(jagged_positive_array, cli_order, cli_tag, value)
-                
+
 
     # Append Positive ordered elements
     for index in range(1, len(jagged_positive_array)):
@@ -312,7 +310,6 @@ for param_var in param_vars:
     widget.observe(update_command, names='value')
 
 display(acc, cli_command)
-
 
 if __name__ == "main":
     print("Hello World")

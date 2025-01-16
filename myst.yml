@@ -35,10 +35,10 @@ project:
           title: Steps to create a custom algorithm's interface
     # - file: docs/developer/developer.md
     #   title: Developer
-        
+
   exports:
     - format: md
-    
+
 site:
   template: book-theme
   options:

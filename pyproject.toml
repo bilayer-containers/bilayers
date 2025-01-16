@@ -5,23 +5,34 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "bilayers"
 version = "0.1.0"
-description = "GUI interfaces for deep learning-based cell segmentation algorithms"
+description = "Specifications and automated interfaces for wrapped tools"
 authors = [
     {name = "Rajavi Shah", email = "shahraja@broadinstitute.org"},
     {name = "Nodar Gogoberidze", email = "gnodar01@gmail.com"},
     {name = "Beth Cimini", email = "bcimini@broadinstitute.org"}
 ]
+requires-python = ">=3.9"
 dependencies = [
-    "python>=3.9",
     "nox>=2024.4.15,<2025",
     "pyyaml>=6.0.1,<7",
     "jinja2>=3.1.4,<4"
 ]
-
+optional-dependencies = { docs = ["mystmd>=1.3.17,<2"] }
 
 [tool.setuptools.packages.find]
 exclude = ["tests", "*.tests", "*.tests.*", "tests.*"]
 
-[tool.pixi]
+[tool.pixi.project]
 channels = ["conda-forge"]
 platforms = ["win-64", "linux-64", "osx-64", "osx-arm64"]
+
+[tool.pixi.tasks]
+
+[tool.pixi.dependencies]
+python = ">=3.9"
+
+[tool.pixi.pypi-dependencies]
+bilayers = { path = ".", extras = ["docs"], editable = true }
+
+[tool.pixi.environments]
+default = ["docs"]

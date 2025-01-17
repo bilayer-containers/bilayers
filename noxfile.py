@@ -21,6 +21,21 @@ def run_generate(session):
 @nox.session
 def build_algorithm(session):
     """Build the Algorithm docker Image"""
+
+    def _fallback(platform: str | None, image_name: str, algorithm: str) -> None:
+        dockerfile_path = f'src/algorithms/{algorithm}/Dockerfile'
+        platform_opt = "--platform" if platform else ""
+        platform = platform or ""
+        # Proceed to build from Dockerfile if pull fails
+        if os.path.exists(dockerfile_path):
+            print("Pull failed; attempting to build locally from Dockerfile.")
+            session.run('docker', 'buildx', 'build', platform_opt, platform, '-t', image_name, '-f', dockerfile_path, f'src/algorithms/{algorithm}')
+            # Save the locally built Docker image name in a file
+            with open('/tmp/docker_image_name.txt', 'w') as file:
+                file.write(image_name)
+        else:
+            session.error(f'Neither Docker image on DockerHub nor Dockerfile found for {algorithm}')
+
     if len(session.posargs) > 0:
         algorithm = session.posargs[0]
         print("Algorithm Name in build_algorithm session: ", algorithm)
@@ -30,7 +45,6 @@ def build_algorithm(session):
     print("Building Algorithm Nox-File: ", algorithm)
     image_name = f'{algorithm}'
     print("Image Name: ", image_name)
-    dockerfile_path = f'src/algorithms/{algorithm}/Dockerfile'
     config_file_path = f'src/algorithms/{algorithm}/config.yaml'
 
     # Start by checking the config file for DockerHub image details
@@ -39,16 +53,21 @@ def build_algorithm(session):
         with open(config_file_path, 'r') as file:
             config = yaml.safe_load(file)
 
-        org = config.get('docker_image', {}).get('org')
-        name = config.get('docker_image', {}).get('name')
-        tag = config.get('docker_image', {}).get('tag')
-        platform = config.get('docker_image', {}).get('platform')
-        docker_image_name = f'{org}/{name}:{tag}' if org and name and tag else None
+        org: str | None = config.get('docker_image', {}).get('org')
+        name: str | None = config.get('docker_image', {}).get('name')
+        tag: str | None = config.get('docker_image', {}).get('tag')
+        platform: str | None = config.get('docker_image', {}).get('platform')
+
+        if not org or not name or not tag:
+            _fallback(platform, image_name, algorithm)
+            return
+
+        docker_image_name = f'{org}/{name}:{tag}'
         algorithm_folder_name = config.get('algorithm_folder_name', None)
 
         # Save the platform details in a file
         with open('/tmp/platform.txt', 'w') as file:
-            file.write(platform)
+            file.write(platform or "<none>")
 
         # Save the algorithm folder name in a file
         with open('/tmp/algorithm_folder_name.txt', 'w') as file:
@@ -64,15 +83,7 @@ def build_algorithm(session):
                 file.write(docker_image_name)
         except Exception as e:
             print(f'Failed to pull Docker image from DockerHub. Error: {e}')
-            # Proceed to build from Dockerfile if pull fails
-            if os.path.exists(dockerfile_path):
-                print("Pull failed; attempting to build locally from Dockerfile.")
-                session.run('docker', 'buildx', 'build', "--platform", platform, '-t', image_name, '-f', dockerfile_path, f'src/algorithms/{algorithm}')
-                # Save the locally built Docker image name in a file
-                with open('/tmp/docker_image_name.txt', 'w') as file:
-                    file.write(image_name)
-            else:
-                session.error(f'Neither Docker image on DockerHub nor Dockerfile found for {algorithm}')
+            _fallback(platform, image_name, algorithm)
 
     else:
         # If the config file does not exist, report an error
@@ -81,11 +92,11 @@ def build_algorithm(session):
 @nox.session
 def build_interface(session):
     """Build the Gradio docker Image"""
-    if len(session.posargs) > 0:
-        interface = session.posargs[0]
-        algorithm = session.posargs[1]
-    else:
-        interface = 'gradio'
+    if len(session.posargs) != 2:
+        session.error("Must provide interface and algorithm arguments")
+
+    interface = session.posargs[0]
+    algorithm = session.posargs[1]
     print("Building Interface Nox-File: ", interface)
 
     image_name = f'{algorithm}_{interface}_image'

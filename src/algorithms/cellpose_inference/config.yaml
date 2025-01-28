@@ -1,3 +1,30 @@
+citations:
+  algorithm:
+    - name: "Cellpose"
+      doi: 10.1038/s41592-020-01018-x
+      license: "BSD 3-Clause"
+      description: "Deep Learning algorithm for cell segmentation in microscopy images"
+
+docker_image:
+  org: cellprofiler
+  name: runcellpose_no_pretrained
+  tag: "2.3.2"
+  platform: "linux/amd64"
+
+algorithm_folder_name: "cellpose_inference"
+
+exec_function: 
+  name: "generate_cli_command"
+  script: "cellpose_inference"
+  module: "algorithms.cellpose_inference"
+  cli_command: "python -m cellpose --verbose"
+  hidden_args: 
+    # dummy example
+    # - cli_tag: "--save_png"
+    #   value: "True"
+    #   append_value: False
+    #   cli_order: 3
+
 inputs:
   - name: dir
     type: image
@@ -552,31 +579,3 @@ parameters:
 # Display_only Section
 display_only:
   # dummy example : DONOT PUT CLI_TAG FLAG AT ALL. THESE ARE JUST FOR DISPLAY
-
-
-exec_function: 
-  name: "generate_cli_command"
-  script: "cellpose_inference"
-  module: "algorithms.cellpose_inference"
-  cli_command: "python -m cellpose --verbose"
-  hidden_args: 
-    # dummy example
-    # - cli_tag: "--save_png"
-    #   value: "True"
-    #   append_value: False
-    #   cli_order: 3
-
-docker_image:
-  org: cellprofiler
-  name: runcellpose_no_pretrained
-  tag: "2.3.2"
-  platform: "linux/amd64"
-
-algorithm_folder_name: "cellpose_inference"
-
-citations:
-  algorithm:
-    - name: "Cellpose"
-      doi: 10.1038/s41592-020-01018-x
-      license: "BSD 3-Clause"
-      description: "Deep Learning algorithm for cell segmentation in microscopy images"

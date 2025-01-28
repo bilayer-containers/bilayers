@@ -1,3 +1,29 @@
+citations:
+  algorithm: 
+    - name: "InstanSeg in Brightfield Images"
+      doi: 10.48550/arXiv.2408.15954
+      license: "Apache-2.0"
+      description: "InstanSeg for Nucleus Segmentation in Brightfield Images"
+    - name: "InstanSeg in Fluorescence Images"
+      doi: 10.1101/2024.09.04.611150
+      license: "Apache-2.0"
+      description: "InstanSeg for Nucleus/Cell Segmentation in Fluorescence Images"
+
+docker_image:
+  org: bilayer
+  name: instanseg
+  tag: "1.0.2"
+  platform: "linux/amd64"
+
+algorithm_folder_name: "instanseg_inference"
+
+exec_function: 
+  name: "generate_cli_command"
+  script: "instanseg_inference"
+  module: "algorithms.instanseg_inference"
+  cli_command: "python /instanseg/instanseg/scripts/inference.py"
+  hidden_args:
+
 inputs:
   - name: input_images
     type: image
@@ -174,29 +200,3 @@ display_only:
     optional: True
     section_id: "display_only-args"
     mode: "beginner"
-
-exec_function: 
-  name: "generate_cli_command"
-  script: "instanseg_inference"
-  module: "algorithms.instanseg_inference"
-  cli_command: "python /instanseg/instanseg/scripts/inference.py"
-  hidden_args:
-
-docker_image:
-  org: bilayer
-  name: instanseg
-  tag: "1.0.2"
-  platform: "linux/amd64"
-
-algorithm_folder_name: "instanseg_inference"
-
-citations:
-  algorithm: 
-    - name: "InstanSeg in Brightfield Images"
-      doi: 10.48550/arXiv.2408.15954
-      license: "Apache-2.0"
-      description: "InstanSeg for Nucleus Segmentation in Brightfield Images"
-    - name: "InstanSeg in Fluorescence Images"
-      doi: 10.1101/2024.09.04.611150
-      license: "Apache-2.0"
-      description: "InstanSeg for Nucleus/Cell Segmentation in Fluorescence Images"

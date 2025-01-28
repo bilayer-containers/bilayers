@@ -1,3 +1,25 @@
+citations:
+ algorithm:
+   - name: ""
+     doi: ""
+     license: ""
+     description: ""
+
+docker-image:
+  org: ""
+  name: ""
+  tag: ""
+  platform: "" # eg. linux/amd64, linux/arm64, linux/arm/v7 etc.
+
+algorithm_folder_name:
+
+exec_function:
+  name: "generate_cli_command"
+  script:
+  module:
+  cli_command:
+  hidden_args:
+
 inputs: 
   - name: input_images
     type: image
@@ -304,29 +326,4 @@ parameters:
     section_id: "output-args"
     mode: "advanced"
   
-
 display_only:
-  
-
-exec_function:
- name: "generate_cli_command"
- script:
- module:
- cli_command:
- hidden_args:
-
-docker-image:
- org: ""
- name: ""
- tag: ""
- platform: "" # eg. linux/amd64, linux/arm64, linux/arm/v7 etc.
-
-algorithm_folder_name:
-
-citations:
- algorithm:
-   - name: ""
-     doi: ""
-     license: ""
-     description: ""
-

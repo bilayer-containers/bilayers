@@ -30,30 +30,35 @@ Use the provided skeleton as a starting point
 :::{dropdown} config.yaml
 :open:
 ```{code} yaml
-parameters:
- 
-display_only:
-  
-exec_function:
- name: "generate_cli_command"
- script:
- module:
- cli_command:
- hidden_args:
+citations:
+  algorithm:
+    - name: ""
+      doi: ""
+      license: ""
+      description: ""
 
 docker-image:
- org:
- name:
- tag:
- platform: 
+  org:
+  name:
+  tag:
+  platform:
 
 algorithm_folder_name:
 
-citations:
- Algorithm:
-   - name: ""
-     doi: xxxx
-     description: ""
+exec_function:
+  name: "generate_cli_command"
+  script:
+  module:
+  cli_command:
+  hidden_args:
+
+inputs:
+
+outputs:
+
+parameters:
+
+display_only:
 ```
 :::
 

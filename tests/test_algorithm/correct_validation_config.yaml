@@ -1,3 +1,36 @@
+citations:
+  algorithm: 
+    - name: "Testing"
+      doi: xyz
+      license: "sample license"
+      description: "Deep Learning algorithm for cell segmentation in microscopy images"
+
+docker_image:
+  org: cellprofiler
+  name: runcellpose_no_pretrained
+  tag: "2.3.2"
+  platform: "linux/amd64"
+
+algorithm_folder_name: "testing_inference"
+
+exec_function: 
+  name: "generate_cli_command"
+  script: "cellpose_inference"
+  module: "algorithms.cellpose_inference"
+  cli_command: "python -m cellpose --verbose"
+  hidden_args: 
+    # dummy example
+    # correct version
+    - cli_tag: "--save_png"
+      value: "True"
+      append_value: False
+      cli_order: 3
+    # incorrect version
+    - cli_tag: "--save_png"
+      value: ""
+      append_value: True
+      cli_order: 4
+
 parameters:
   # Checkbox Parameter Test Cases
   # 1. Checkbox with append_value. append_value's value is False
@@ -332,38 +365,4 @@ display_only:
     default: "This is just for display"
     section_id: "display-only-section"
     mode: "beginner"
-    optional: True
-
-
-exec_function: 
-  name: "generate_cli_command"
-  script: "cellpose_inference"
-  module: "algorithms.cellpose_inference"
-  cli_command: "python -m cellpose --verbose"
-  hidden_args: 
-    # dummy example
-    # correct version
-    - cli_tag: "--save_png"
-      value: "True"
-      append_value: False
-      cli_order: 3
-    # incorrect version
-    - cli_tag: "--save_png"
-      value: ""
-      append_value: True
-      cli_order: 4
-
-docker_image:
-  org: cellprofiler
-  name: runcellpose_no_pretrained
-  tag: "2.3.2"
-  platform: "linux/amd64"
-
-algorithm_folder_name: "testing_inference"
-
-citations:
-  algorithm: 
-    - name: "Testing"
-      doi: xyz
-      license: "sample license"
-      description: "Deep Learning algorithm for cell segmentation in microscopy images"
+    optional: True\

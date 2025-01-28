@@ -13,16 +13,15 @@ Before you begin, let’s break down the key elements you need to know -
     - [Gradio](/supported-interfaces#gradio)
     - [Jupyter Notebook](/supported-interfaces#jupyter-notebook)
 2. [Understanding config.yaml requirements](/understanding-config)
-    - [parameters](/understanding-config#defining-parameters)
-    - [display_only](/understanding-config#defining-display-only)
-    - [exec_function](/understanding-config#defining-exec-function)
+    - [citations](/understanding-config#defining-citations)
     - [docker_image](/understanding-config#defining-docker-image)
     - [algorithm_folder_name](/understanding-config#defining-algorithm-folder-name)
-    - [citations](/understanding-config#defining-citations)
+    - [exec_function](/understanding-config#defining-exec-function)
+    - [inputs](/understanding-config#defining-inputs)
+    - [outputs](/understanding-config#defining-outputs)
+    - [parameters](/understanding-config#defining-parameters)
+    - [display_only](/understanding-config#defining-display-only)
 3. [Choosing the right base docker image](/right-base-docker-image)
     - [Requirements for the Algorithm (Base) Docker Image](/right-base-docker-image#requirements-for-the-algorithm-base-docker-image)
     - [Adapting Non-Compliant Base Images](/right-base-docker-image#adapting-non-compliant-base-images)
 4. [Steps to create your custom Algorithm’s Interfaces](/steps-to-create)
-    
-
-

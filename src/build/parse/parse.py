@@ -22,7 +22,6 @@ def main(config_path=None):
 
     display_only = config.get('display_only', [])
 
-    # Exec function whole logic from threshold.py instead of just the function name
     exec_function = config.get('exec_function', {})
 
     algorithm_folder_name = config.get('algorithm_folder_name', None)
@@ -38,7 +37,6 @@ if __name__ == "__main__":
     print(f"Outputs: {outputs}")
     print(f"Parameters: {parameters}")
     print(f"Display Only: {display_only}")
-    # print(f"Results: {results}")
     print(f"Exec Function: {exec_function}")
     print(f"Folder Name: {algorithm_folder_name}")
     print(f"Citations: {citations}")

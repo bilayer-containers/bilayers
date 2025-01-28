@@ -307,16 +307,6 @@ parameters:
 
 display_only:
   
-results: # Translated to Gradio's UI as "Download Outputs". Usually, results section would be same for every algorithm. Not much functional except for UI.
-  - name: output_dir
-    type: files
-    label: "Download Outputs"
-    file_count: "multiple"
-    description: "Directory containing the output files"
-    cli_tag: "None"
-    optional: True
-    section_id: "output-section"
-    mode: "beginner"
 
 exec_function:
  name: "generate_cli_command"

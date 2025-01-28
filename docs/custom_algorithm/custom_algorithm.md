@@ -15,7 +15,6 @@ Before you begin, let’s break down the key elements you need to know -
 2. [Understanding config.yaml requirements](/understanding-config)
     - [parameters](/understanding-config#defining-parameters)
     - [display_only](/understanding-config#defining-display-only)
-    - [results](/understanding-config#defining-results)
     - [exec_function](/understanding-config#defining-exec-function)
     - [docker_image](/understanding-config#defining-docker-image)
     - [algorithm_folder_name](/understanding-config#defining-algorithm-folder-name)

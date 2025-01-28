@@ -10,14 +10,13 @@ To create your interface, you need to understand the structure of the config.yam
 
 The config.yaml file defines how the interface interacts with your algorithm. At the code level, it's located at `bilayers/src/algorithms/algorithm_name/config.yaml`. The algorithm_name should reflect the task, such as cellpose_inference or cellpose_training, so name it accordingly.
 
-Each config.yaml contains key sections: `inputs`, `outputs`, `parameters`, `display_only`, `results`, `exec_function`, `docker_image`, `algorithm_folder_name`, and `citations`. You can copy the basic structure from an existing example.
+Each config.yaml contains key sections: `inputs`, `outputs`, `parameters`, `display_only`, `exec_function`, `docker_image`, `algorithm_folder_name`, and `citations`. You can copy the basic structure from an existing example.
 
 This file is then converted into a CLI command, where user-provided inputs are passed as command-line arguments, enabling the retrieval of the desired output.
 - **inputs**:
 - **outputs**:
 - **parameters**: These are key in building command-line arguments. Each object under this keyword forms part of the command line, with arguments either taken from the user or using default values.
 - **display_only**: These fields are displayed on the interface but aren’t included in the CLI command. No cli_tag should be passed to these objects; otherwise, they function like parameters.
-- **results**: Similar to parameters, but they define the expected output type and label it on the UI as the output. Typically, this is a file type.
 - **exec_function**: Defines the function that converts the config.yaml into a Gradio or Jupyter Notebook interface. It also includes the initial part of the CLI command and a special hidden_args section if applicable.
 - **docker_image**: Contains details of the base image (organization, name, and tag) used to build the Docker image for each interface.
 - **algorithm_folder_name**: Specifies the folder where the generated Gradio and Jupyter Notebook files are stored.
@@ -32,8 +31,6 @@ outputs:
 parameters:
 
 display_only:
-
-results:
   
 exec_function:
  name: "generate_cli_command"
@@ -58,7 +55,7 @@ citations:
      description: ""
 ```
 
-Before you start working on the `config.yaml` file, we recommend reviewing the command-line usage of the specific algorithm you're building an interface for. This will help you determine what should go in `inputs`, `outputs`, `parameters`, `display_only`, `results`, and `exec_function`'s `hidden_args`.
+Before you start working on the `config.yaml` file, we recommend reviewing the command-line usage of the specific algorithm you're building an interface for. This will help you determine what should go in `inputs`, `outputs`, `parameters`, `display_only`, and `exec_function`'s `hidden_args`.
 
 ## Understanding `cli_command`
 
@@ -67,10 +64,9 @@ The `cli_command` is the starting point for executing the command line, like `py
 ## Organizing Parameters from the Algorithm's Command-Line Usage
 
 - inputs: If parameter is about providing any input files eg. image, measurement files, numpy array files, executable files etc.
-- outputs: A way to show what are potential outputs that would spit out post segmentating. Those could be presented under umbrella of various types of files. eg. image, measurement files, numpy array files, executable files or some other files.
+- outputs: A way to show what are potential outputs that would spit out post segmenting. Those could be presented under the umbrella of various types of files. eg. image, measurement files, numpy array files, executable files or some other files.
 - parameters: If the parameter and its argument need to be passed in the command line, include them in `parameters`.
 - display_only: If you want to show some information to the user without appending it to the command line, include it in `display_only`.
-- results: Anything that you want to appear as output should go under `results`. For these, you can set the `cli_tag` as `None`.
 
 ## Defining inputs 
 ```{code} yaml
@@ -596,25 +592,7 @@ mode: ""
 
 Since they are not part of the `cli_command`, you can omit `cli_tag` and `cli_order`. For the rest of the structure, you can reuse the template from `parameters` based on the object type.
 
-## Defining results
-`results` represent the outputs or results generated after executing the command. In most cases, this will be defined as `type: files`. The structure follows the same format as `parameters`, but currently, Bilayers only supports `type: files`. If you require additional result types, please submit a feature request here.
 
-For `results`, the `cli_tag` should always be set to "None," and there's no need to specify `cli_order`.
-
-Note that `results` are not typically sourced from the documentation. 
-
-```{code} yaml
-:filename: config.yml
-results:
-  - name: output_dir
-    type: Files
-    label: "Download Outputs"
-    description: ""
-    cli_tag : "None"
-    optional: True
-    section_id: "output-section"
-    mode: ""
-```
 
 ## Defining exec_function
 exec_function is instrumental in converting the yaml file to desired interface. It defines the specific function responsible for this conversion. The `exec_function` consists of the following components: `name`, `script`, `module`, `cli_command`, and `hidden_args`.

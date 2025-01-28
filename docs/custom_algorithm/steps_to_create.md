@@ -33,8 +33,6 @@ Use the provided skeleton as a starting point
 parameters:
  
 display_only:
-
-results:
   
 exec_function:
  name: "generate_cli_command"

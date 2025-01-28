@@ -322,8 +322,6 @@ def on_submit(
         error_message = "Please take a screenshot of this error and raise an issue at the Bilayers repository on GitHub."
         error_message += f"Command failed with error: {e.stderr.decode()}\n\n"
         raise gr.Error(error_message, duration = None)
-<<<<<<< HEAD
-=======
         
 {% if inputs is not none -%}
 {% for input_conf in inputs %}
@@ -348,7 +346,6 @@ def on_submit(
 
 {% endfor %}
 {%- endif %}
->>>>>>> 6488c24 (linkml rules for ip_op and gradio support part-2)
 
 {% if parameters is not none -%}
 {% for param_conf in parameters %}

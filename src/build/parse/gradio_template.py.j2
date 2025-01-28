@@ -394,10 +394,6 @@ def on_submit(
 {%- endfor %}
 {%- endif %}
 
-{% for result_conf in results -%}
-{% if result_conf.type == 'files' -%}
-{%- endif %}
-{%- endfor %}
 
 
 {% set DEFAULT_CITATIONS = {
@@ -435,10 +431,6 @@ description_text += f"{{ citation.name }} under {{ citation.license }} License :
 {%- endfor %}
 
 
-{% for result_conf in results -%}
-{% if result_conf.type == 'files' -%}
-{%- endif %}
-{%- endfor %}
 
 
 all_parameters = [
@@ -477,18 +469,12 @@ all_parameters = [
 {%- endif %}
 ]
 
-results = [
-{% for result_conf in results -%}
-{% if result_conf.type == 'files' -%}
-gr.Files(label="{{ result_conf.label }}", file_count="{{ result_conf.file_count }}")
-{%- endif %}
-{%- endfor %}
-]
+download_results_from_here = gr.Files(label = "Download Output", file_count = "multiple")
 
 app = gr.Interface(
     fn=on_submit, 
     inputs=all_parameters,
-    outputs=results, 
+    outputs=download_results_from_here, 
     title="Gradio App",
     description=f"<div style='text-align: center'>{description_text}</div>"
 )

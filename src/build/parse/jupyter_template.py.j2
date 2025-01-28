@@ -7,7 +7,6 @@ outputs = {{outputs}}
 parameters = {{parameters}}
 display_only = {{display_only}}
 exec_function = {{exec_function}}
-results = {{results}}
 
 {% endautoescape %}
 
@@ -178,7 +177,7 @@ acc = Accordion()
 acc.children = [VBox(beginner_widgets)]
 acc.set_title(0, "Beginner's Section")
 # Add advanced_widgets to the second section
-acc.children = acc.children + [VBox(advanced_widgets),]
+acc.children = acc.children + (VBox(advanced_widgets),)
 acc.set_title(1, "Advanced Section")
 
 def option_to_append(cli_tag, value):

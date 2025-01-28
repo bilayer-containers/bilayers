@@ -23,7 +23,6 @@ classes:
     - outputs
     - parameters
     - display_only
-    - results
     - exec_function
     - docker_image
     - algorithm_folder_name
@@ -101,7 +100,7 @@ classes:
               required: true
 
   AbstractUserInterface:
-    aliases: ["parameters", "display_only", "results"]  
+    aliases: ["parameters", "display_only"]  
     description: "Abstract class for user interface"
     abstract: true
     slots:
@@ -196,12 +195,6 @@ classes:
             folder_name:
               required: true
 
-  TypeResults:
-    aliases: ["results"]
-    description: "Results of a specific Algorithm"
-    is_a: AbstractUserInterface
-    slots:
-      - cli_tag
 
   ExecFunction:
     aliases: ["exec_function", "generate_cli_command", "construct_cli_command"]
@@ -254,7 +247,7 @@ classes:
         required: false
 
   RadioOptions:
-    description: "Options of the Radio button in parameters, display_only, results"
+    description: "Options of the Radio button in parameters, display_only"
     slots:
       - label
       - value
@@ -279,11 +272,6 @@ slots:
     description: "Display only parameters of a specific Algorithm"
     range: TypeDisplayOnly
     multivalued: true
-  results:
-    description: "Results of a specific Algorithm"
-    range: TypeResults
-    multivalued: true
-    required: true
   exec_function:
     description: "Function to execute the Algorithm"
     range: ExecFunction
@@ -312,7 +300,7 @@ slots:
     required: true
     range: string
   name:
-    description: "Name of the docker_image, algorithm, parameter, display_only, results"
+    description: "Name of the docker_image, algorithm, parameter, display_only"
     required: true
     range: string
   tag:
@@ -385,7 +373,7 @@ slots:
     range: FileTypeEnum
     required: false
   options:
-    description: "Options of the Radio button in parameters, display_only, results" 
+    description: "Options of the Radio button in parameters, display_only" 
     range: RadioOptions
     multivalued: true
     required: false
@@ -436,13 +424,13 @@ slots:
 
 enums:
   TypeEnum:
-    description: "Type of the parameters, display_only, results"
+    description: "Type of the parameters, display_only"
     permissible_values:
       integer:
       float:
       boolean:
       checkbox:
-      files: # after adding inputs-outputs, we have removed type=files support. As of now, just kept for 'results' section
+      # files: # after adding inputs-outputs, we have removed type=files support. As of now, just kept for 'results' section
       dropdown:
       radio:
       textbox:
@@ -453,7 +441,7 @@ enums:
       file:
       executable:
   ModeEnum:
-    description: "Mode of the parameters, display_only, results"
+    description: "Mode of the parameters, display_only"
     permissible_values:
       beginner:
       advanced:

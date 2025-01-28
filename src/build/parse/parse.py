@@ -14,13 +14,10 @@ def main(config_path=None):
 
     config = parse_config(config_path)
 
-<<<<<<< HEAD
-=======
     inputs = config.get('inputs', [])
 
     outputs = config.get('outputs', [])
 
->>>>>>> 6488c24 (linkml rules for ip_op and gradio support part-2)
     parameters = config.get('parameters', [])
 
     display_only = config.get('display_only', [])

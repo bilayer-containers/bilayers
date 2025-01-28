@@ -175,17 +175,6 @@ display_only:
     section_id: "display_only-args"
     mode: "beginner"
 
-results:
-  - name: output_dir
-    type: files
-    label: "Download Output"
-    description: "Download the output files"
-    file_count: multiple
-    cli_tag: "None"
-    optional: True
-    section_id: "output-args"
-    mode: "beginner"
-    
 exec_function: 
   name: "generate_cli_command"
   script: "instanseg_inference"

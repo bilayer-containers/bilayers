@@ -334,16 +334,6 @@ display_only:
     mode: "beginner"
     optional: True
 
-results:
-  - name: output_dir
-    type: files
-    label: "Download Outputs"
-    file_count: "multiple"
-    description: "Directory containing the output files"
-    cli_tag: "None"
-    optional: True
-    section_id: "output-section"
-    mode: "beginner"
 
 exec_function: 
   name: "generate_cli_command"

@@ -1,5 +1,6 @@
 from ipywidgets import widgets, VBox, HBox, Tab, Accordion
 from IPython.display import display
+from typing import List, Tuple, Dict, Any, Optional, Union
 
 {% autoescape false %}
 inputs = {{inputs}}
@@ -180,7 +181,17 @@ acc.set_title(0, "Beginner's Section")
 acc.children = acc.children + (VBox(advanced_widgets),)
 acc.set_title(1, "Advanced Section")
 
-def option_to_append(cli_tag, value):
+def option_to_append(cli_tag: str, value: Any) -> Optional[str]:
+    """
+    Formats CLI options for appending to the command.
+
+    Args:
+        cli_tag (str): CLI tag (e.g., "--option").
+        value (Any): The value to append.
+
+    Returns:
+        Optional[str]: The formatted CLI option or None if ignored.
+    """
     if cli_tag == "None":
         return None # Ignore the cli_tag and value pair
     elif cli_tag == "":
@@ -190,7 +201,21 @@ def option_to_append(cli_tag, value):
             return f"{cli_tag}{value}"  # Append cli_tag and value with "="
         return f"{cli_tag} {value}"  # Append cli_tag and value
 
-def insert_into_jagged_array(jagged_array, cli_order, cli_tag, value):
+def insert_into_jagged_array(
+    jagged_array: List[Optional[List[str]]], 
+    cli_order: int, 
+    cli_tag: str, 
+    value: Any
+    ) -> None:
+    """
+    Inserts CLI arguments into a structured array to maintain ordering.
+
+    Args:
+        jagged_array (List[Optional[List[str]]]): The structured array for CLI options.
+        cli_order (int): The order in which arguments should appear.
+        cli_tag (str): The CLI tag.
+        value (Any): The value to append.
+    """
     # Check the length of Jagged Array and dynamically append with None if required
     while len(jagged_array) <= abs(cli_order):
         jagged_array.append(None)
@@ -204,12 +229,18 @@ def insert_into_jagged_array(jagged_array, cli_order, cli_tag, value):
         jagged_array[abs(cli_order)].append(result)
 
 
-def construct_cli_command():
-    cli_command = ["{{ exec_function.cli_command }}"]
+def construct_cli_command() -> str:
+    """
+    Constructs the CLI command dynamically based on selected widgets.
+
+    Returns:
+        str: The constructed CLI command string.
+    """
+    cli_command: List[str] = ["{{ exec_function.cli_command }}"]
 
     # Initialize jagged arrays
-    jagged_positive_array = []
-    jagged_negative_array = []
+    jagged_positive_array: List[Optional[List[str]]] = []
+    jagged_negative_array: List[Optional[List[str]]] = []
 
     {% autoescape false %}
     hidden_args = {{ exec_function.get("hidden_args", []) }}
@@ -256,20 +287,20 @@ def construct_cli_command():
                     insert_into_jagged_array(jagged_positive_array, cli_order, cli_tag, value)
 
     for param_var in param_vars:
-        cli_tag = param_var[0]
-        widget = param_var[1]
-        cli_order = param_var[2]
+        cli_tag: str = param_var[0]
+        widget: Union[widgets.Widget, widgets.FileUpload, widgets.Checkbox] = param_var[1]
+        cli_order: int = param_var[2]
 
         if len(param_var) == 4:  
             if isinstance(widget, widgets.FileUpload): # This is a 'Files' type
-                folder_name = param_var[3]
+                folder_name: str = param_var[3]
                 value = folder_name
                 if cli_order < 0:
                     insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)
                 else:
                     insert_into_jagged_array(jagged_positive_array, cli_order, cli_tag, value)
             elif isinstance(widget, widgets.Checkbox):  # This is a 'Checkbox' type
-                append_value = param_var[3]
+                append_value: bool = param_var[3]
                 value = widget.value
                 if append_value: # If value needs to appended along with cli_tag - Special case for Checkbox
                     if cli_order < 0:
@@ -330,10 +361,16 @@ def construct_cli_command():
 
     return " ".join(cli_command)
 
-def update_command(change):
+def update_command(change: Any) -> None:
+    """
+    Updates the CLI command when a widget value changes.
+
+    Args:
+        change (Any): The event triggering the update.
+    """
     cli_command.value = construct_cli_command()
 
-cli_command = widgets.Textarea(value=construct_cli_command(), description="CLI Command")
+cli_command: widgets.Textarea = widgets.Textarea(value=construct_cli_command(), description="CLI Command")
 
 for param_var in param_vars:
     widget = param_var[1]

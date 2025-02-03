@@ -3,7 +3,17 @@ import gradio as gr
 import subprocess
 import shutil
 
-def option_to_append(cli_tag, value):
+def option_to_append(cli_tag: str, value: Any) -> str:
+    """
+    Formats CLI options for appending to the command.
+
+    Args:
+        cli_tag (str): CLI tag (e.g., "--option").
+        value (Any): The value to append.
+
+    Returns:
+        str: The formatted CLI option.
+    """
     if cli_tag == "":
         return str(value)  # Append only the value
     else:
@@ -11,7 +21,20 @@ def option_to_append(cli_tag, value):
             return f"{cli_tag}{value}"
         return f"{cli_tag} {value}"  # Append cli_tag and value
 
-def insert_into_jagged_array(jagged_array, cli_order, cli_tag, value):
+def insert_into_jagged_array(
+    jagged_array: List[Optional[List[str]]], 
+    cli_order: int, 
+    cli_tag: str, 
+    value: Any) -> None:
+    """
+    Inserts CLI arguments into a structured array to maintain ordering.
+
+    Args:
+        jagged_array (List[Optional[List[str]]]): The structured array for CLI options.
+        cli_order (int): The order in which arguments should appear.
+        cli_tag (str): The CLI tag.
+        value (Any): The value to append.
+    """
     # Check the length of Jagged Array and dynamically append with None if required
     while len(jagged_array) <= abs(cli_order):
         jagged_array.append(None)
@@ -23,7 +46,17 @@ def insert_into_jagged_array(jagged_array, cli_order, cli_tag, value):
     result = option_to_append(cli_tag, value)
     jagged_array[abs(cli_order)].append(result)
 
-def generate_cli_command(cli_tags, **kwargs):
+def generate_cli_command(cli_tags: Dict[str, Dict[str, Any]], **kwargs: Any) -> Tuple[str, Optional[str], Optional[str]]:
+    """
+    Generates the CLI command dynamically based on user inputs.
+
+    Args:
+        cli_tags (Dict[str, Dict[str, Any]]): Mapping of parameters to CLI tags.
+        **kwargs (Any): User-provided parameter values.
+
+    Returns:
+        Tuple[str, Optional[str], Optional[str]]: CLI command, folder_name, and output_folder_name.
+    """
     cli_command = ["{{ exec_function.cli_command }}"]
 
     # Radio options mapping
@@ -73,11 +106,11 @@ def generate_cli_command(cli_tags, **kwargs):
     # Update cli_args with user parameters or defaults
     for key, value in kwargs.items():
         if key in cli_tags:
-            cli_tag = cli_tags[key].get("cli_tag", None)
-            default = cli_tags[key].get("default", None)
-            cli_order = cli_tags[key].get("cli_order", 0)
-            label = cli_tags[key].get("label", None)
-            optional = cli_tags[key].get("optional", False)
+            cli_tag: str = cli_tags[key].get("cli_tag", None)
+            default: Any = cli_tags[key].get("default", None)
+            cli_order: int = cli_tags[key].get("cli_order", 0)
+            label: str = cli_tags[key].get("label", None)
+            optional: bool = cli_tags[key].get("optional", False)
 
             # First, check the condition if cli_order is negative then dynamically append the size of jagged_negative_array
             if cli_order < 0:

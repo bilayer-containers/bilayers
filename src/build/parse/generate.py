@@ -1,21 +1,46 @@
 import os
 import sys
+from typing import List, Optional, Dict
 # Importing parse function from parse.py
-from parse import main as parse_config
+from parse import main as parse_config # type: ignore
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 import nbformat as nbf 
 
+# Import TypedDict definitions from parse.py
+from parse import Config, InputOutput, Parameter, ExecFunction, Citations # type: ignore
 
-def generate_gradio_app(template_path, inputs, outputs, parameters, display_only, exec_function, citations):
+def generate_gradio_app(
+        template_path: str, 
+        inputs: List[InputOutput], 
+        outputs: List[InputOutput], 
+        parameters: List[Parameter], 
+        display_only: Optional[List[Parameter]], 
+        exec_function: ExecFunction, 
+        citations: Citations) -> str:
+    """
+    Generates a Gradio application dynamically using Jinja2 templates.
+
+    Args:
+        template_path (str): Path to the Gradio template file.
+        inputs (List[InputOutput]): List of input configurations.
+        outputs (List[InputOutput]): List of output configurations.
+        parameters (List[Parameter]): List of parameter configurations.
+        display_only (Optional[List[Parameter]]): List of display-only parameters, or None.
+        exec_function (ExecFunction): Execution function details.
+        citations (Citations): Citations information.
+
+    Returns:
+        str: The rendered Gradio application code.
+    """
     env = Environment(
         loader=FileSystemLoader(searchpath=os.path.dirname(template_path)),
         autoescape=select_autoescape(['j2'])
     )
 
-    def lower(text):
+    def lower(text: str) -> str:
         return text.lower()
 
-    def replace(text, old, new):
+    def replace(text: str, old: str, new: str) -> str:
         return text.replace(old, new)
 
     env.filters['lower'] = lower
@@ -23,34 +48,56 @@ def generate_gradio_app(template_path, inputs, outputs, parameters, display_only
 
     template = env.get_template(os.path.basename(template_path))
 
-    gradio_app_code = template.render(inputs=inputs, outputs=outputs, parameters=parameters, display_only=display_only, exec_function=exec_function, citations=citations)
+    gradio_app_code: str = template.render(inputs=inputs, outputs=outputs, parameters=parameters, display_only=display_only, exec_function=exec_function, citations=citations)
 
     return gradio_app_code
 
 
-def generate_jupyter_notebook(template_path, inputs, outputs, parameters, display_only, exec_function, citations):
+def generate_jupyter_notebook(
+        template_path: str, 
+        inputs: List[InputOutput],
+        outputs: List[InputOutput], 
+        parameters: List[Parameter], 
+        display_only: Optional[List[Parameter]], 
+        exec_function: ExecFunction, 
+        citations: Citations) -> nbf.NotebookNode:
+    """
+    Generates a Jupyter Notebook dynamically using Jinja2 templates.
+
+    Args:
+        template_path (str): Path to the Jupyter Notebook template file.
+        inputs (List[InputOutput]): List of input configurations.
+        outputs (List[InputOutput]): List of output configurations.
+        parameters (List[Parameter]): List of parameter configurations.
+        display_only (Optional[List[Parameter]]): List of display-only parameters, or None.
+        exec_function (ExecFunction): Execution function details.
+        citations (Citations): Citations information.
+
+    Returns:
+        nbf.NotebookNode: The generated Jupyter Notebook object.
+    """
     env = Environment(
         loader=FileSystemLoader(searchpath=os.path.dirname(template_path)),
         autoescape=select_autoescape(['j2'])
     )
 
-    def lower(text):
+    def lower(text: str) -> str:
         return text.lower()
 
-    def replace(text, old, new):
+    def replace(text: str, old: str, new: str) -> str:
         return text.replace(old, new)
 
-    def create_code_cell(content):
+    def create_code_cell(content) -> nbf.NotebookNode:
         return nbf.v4.new_code_cell(content)
 
-    def create_markdown_cell(content):
+    def create_markdown_cell(content) -> nbf.NotebookNode:
         return nbf.v4.new_markdown_cell(content)
 
     template = env.get_template(os.path.basename(template_path))
-    print("To check the type of parameters: ", type(parameters))
-    notebook_content = template.render(inputs=inputs, outputs=outputs, parameters=parameters, display_only=display_only, exec_function=exec_function)
+    notebook_content: str = template.render(
+        inputs=inputs, outputs=outputs, parameters=parameters, display_only=display_only, exec_function=exec_function)
 
-    DEFAULT_CITATIONS = {
+    DEFAULT_CITATIONS: Dict[str, List[Dict[str, str]]] = {
         "Bilayers": [
             {
                 "name" : "Bilayers",
@@ -68,12 +115,12 @@ def generate_jupyter_notebook(template_path, inputs, outputs, parameters, displa
         ],
     }
 
-    nb = nbf.v4.new_notebook()
+    nb: nbf.NotebookNode = nbf.v4.new_notebook()
 
     # Create a markdown cell for instructions or say citations
     nb.cells.append(create_markdown_cell("## Set Variables and Run the cell"))
 
-    citation_cell = ""
+    citation_cell: str = ""
     for citation in citations['algorithm']:
         citation_cell += f"- {citation['name']} under {citation['license']} License : {citation['doi']} --> {citation['description']}\n"
 
@@ -97,18 +144,19 @@ def generate_jupyter_notebook(template_path, inputs, outputs, parameters, displa
     # jupyter_shell_command_template_path
     jupyter_shell_command_template_path = "jupyter_shell_command_template.py.j2"
     shell_command_template = env.get_template(os.path.basename(jupyter_shell_command_template_path))
-    run_command_cell = shell_command_template.render(cli_command=exec_function['cli_command'])
+    run_command_cell: str = shell_command_template.render(cli_command=exec_function['cli_command'])
 
     # Append the try-except cell to the notebook
     nb.cells.append(create_code_cell(run_command_cell))
 
     return nb
 
-def main():
+def main() -> None:
+    """Main function to parse config and generate Gradio and Jupyter notebook files."""
     print("Parsing config...")
 
     if len(sys.argv) > 1:
-        config_path = sys.argv[1]
+        config_path: Optional[str] = sys.argv[1]
     else:
         config_path = None
 
@@ -118,19 +166,19 @@ def main():
     # Logic for generating Gradio App
     ########################################
 
-    folderA = "generated_folders"
-    folderB = algorithm_folder_name
-    # CreAate Directory if they don't exist
+    folderA: str = "generated_folders"
+    folderB: str = algorithm_folder_name
+    # Create Directory if they don't exist
     os.makedirs(os.path.join(folderA, folderB), exist_ok=True)
 
     # Template path for the Gradio app
-    gradio_template_path = "gradio_template.py.j2"
+    gradio_template_path: str = "gradio_template.py.j2"
 
     # Generating the gradio algorithm+interface app dynamically
-    gradio_app_code = generate_gradio_app(gradio_template_path, inputs, outputs, parameters, display_only, exec_function, citations)
+    gradio_app_code: str = generate_gradio_app(gradio_template_path, inputs, outputs, parameters, display_only, exec_function, citations)
 
     # Join folders and file name
-    gradio_app_path = os.path.join(folderA, folderB, 'app.py')
+    gradio_app_path: str = os.path.join(folderA, folderB, 'app.py')
 
     # Generating Gradio app file dynamically
     with open(gradio_app_path, 'w') as f:
@@ -148,13 +196,13 @@ def main():
     os.makedirs(os.path.join(folderA, folderB), exist_ok=True)
 
     # Template path for the Jupyter Notebook
-    jupyter_template_path = "jupyter_template.py.j2"
+    jupyter_template_path: str = "jupyter_template.py.j2"
 
     # Generating Jupyter Notebook file dynamically
-    jupyter_app_code = generate_jupyter_notebook(jupyter_template_path, inputs, outputs, parameters, display_only, exec_function, citations)
+    jupyter_app_code: nbf.NotebookNode = generate_jupyter_notebook(jupyter_template_path, inputs, outputs, parameters, display_only, exec_function, citations)
 
     # Join folders and file name
-    jupyter_notebook_path = os.path.join(folderA, folderB, 'generated_notebook.ipynb')
+    jupyter_notebook_path: str = os.path.join(folderA, folderB, 'generated_notebook.ipynb')
 
     with open(jupyter_notebook_path, "w") as f:
         nbf.write(jupyter_app_code, f)

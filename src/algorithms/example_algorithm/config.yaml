@@ -92,6 +92,7 @@ inputs:
     format: # can include all those relevant formats supported by the tool
       - log
       - unix
+      - notebook
     folder_name: "/path/to/input_files" # folder_path or file_path if single file
     file_count: ("single" | "multiple") # if it accepts single file or multiple files. If multiple, then it will be a folder
     section_id: "inputs"

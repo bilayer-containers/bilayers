@@ -365,4 +365,4 @@ display_only:
     default: "This is just for display"
     section_id: "display-only-section"
     mode: "beginner"
-    optional: True\
+    optional: True

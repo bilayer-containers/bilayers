@@ -1,9 +1,16 @@
 import nox
 import os
 import yaml
+from typing import Optional
 
 @nox.session
-def run_parse(session):
+def run_parse(session: nox.Session) -> None:
+    """
+    Runs the parse.py script with a specified configuration file.
+
+    Args:
+        session (nox.Session): The Nox session object.
+    """
     session.install('pyyaml')
     session.cd('src/build/parse')
     config_path = session.posargs[0]
@@ -11,20 +18,39 @@ def run_parse(session):
     session.cd('../../..')
 
 @nox.session
-def run_generate(session):
+def run_generate(session: nox.Session) -> None:
+    """
+    Runs the generate.py script with a specified configuration file.
+
+    Args:
+        session (nox.Session): The Nox session object.
+    """
     session.install('pyyaml','jinja2', 'nbformat', 'ipython', 'ipywidgets')
     session.cd('src/build/parse')
-    config_path = session.posargs[0]
+    config_path: str = session.posargs[0]
     session.run('python', 'generate.py', config_path)
     session.cd('../../..')
 
 @nox.session
-def build_algorithm(session):
-    """Build the Algorithm docker Image"""
+def build_algorithm(session: nox.Session) -> None:
+    """
+    Build the Algorithm docker Image
+    Args:
+        session (nox.Session): The Nox session object    
+    """
 
-    def _fallback(platform: str | None, image_name: str, algorithm: str) -> None:
-        dockerfile_path = f'src/algorithms/{algorithm}/Dockerfile'
-        platform_opt = "--platform" if platform else ""
+    def _fallback(platform: Optional[str], image_name: str, algorithm: str) -> None:
+        """
+        Handles fallback if pulling a Docker image fails by attempting to build locally.
+
+        Args:
+            session (nox.Session): The Nox session object.
+            platform (Optional[str]): The target platform (e.g., "linux/arm64").
+            image_name (str): The name of the Docker image.
+            algorithm (str): The name of the algorithm.
+        """
+        dockerfile_path: str = f'src/algorithms/{algorithm}/Dockerfile'
+        platform_opt: str = "--platform" if platform else ""
         platform = platform or ""
         # Proceed to build from Dockerfile if pull fails
         if os.path.exists(dockerfile_path):
@@ -53,17 +79,17 @@ def build_algorithm(session):
         with open(config_file_path, 'r') as file:
             config = yaml.safe_load(file)
 
-        org: str | None = config.get('docker_image', {}).get('org')
-        name: str | None = config.get('docker_image', {}).get('name')
-        tag: str | None = config.get('docker_image', {}).get('tag')
-        platform: str | None = config.get('docker_image', {}).get('platform')
+        org: Optional[str] = config.get('docker_image', {}).get('org')
+        name: Optional[str] = config.get('docker_image', {}).get('name')
+        tag: Optional[str] = config.get('docker_image', {}).get('tag')
+        platform: Optional[str] = config.get('docker_image', {}).get('platform')
 
         if not org or not name or not tag:
             _fallback(platform, image_name, algorithm)
             return
 
-        docker_image_name = f'{org}/{name}:{tag}'
-        algorithm_folder_name = config.get('algorithm_folder_name', None)
+        docker_image_name: str = f'{org}/{name}:{tag}'
+        algorithm_folder_name: str = config.get('algorithm_folder_name', None)
 
         # Save the platform details in a file
         with open('/tmp/platform.txt', 'w') as file:
@@ -90,13 +116,17 @@ def build_algorithm(session):
         session.error(f'Config file not found at {config_file_path}')
 
 @nox.session
-def build_interface(session):
-    """Build the Gradio docker Image"""
+def build_interface(session: nox.Session) -> None:
+    """
+    Build the Gradio docker Image
+    Args:
+        session (nox.Session): The Nox session object.
+    """
     if len(session.posargs) != 2:
         session.error("Must provide interface and algorithm arguments")
 
-    interface = session.posargs[0]
-    algorithm = session.posargs[1]
+    interface: str = session.posargs[0]
+    algorithm: str = session.posargs[1]
     print("Building Interface Nox-File: ", interface)
 
     image_name = f'{algorithm}_{interface}_image'
@@ -122,13 +152,13 @@ def build_interface(session):
         session.run('docker', 'buildx', 'build', '--platform', platform, '-f', 'Jupyter.Dockerfile', '--build-arg',  f'BASE_IMAGE={base_image}', '--build-arg',  f'FOLDER_NAME={algorithm_folder_name}', '-t', image_name, '-f', dockerfile_path, 'src/build')
 
 @nox.session
-def install_gradio(session):
+def install_gradio(session: nox.Session) -> None:
     """Install Gradio"""
     session.install('gradio')
 
 # Testing sessions
 @nox.session
-def test_parse(session):
+def test_parse(session: nox.Session) -> None:
     session.install('pyyaml')
     session.cd('src/build/parse')
     config_path = session.posargs[0]
@@ -136,7 +166,7 @@ def test_parse(session):
     session.cd('../../..')
 
 @nox.session
-def test_generate(session):
+def test_generate(session: nox.Session) -> None:
     session.install('pyyaml','jinja2', 'nbformat', 'ipython', 'ipywidgets')
     session.cd('src/build/parse')
     config_path = session.posargs[0]

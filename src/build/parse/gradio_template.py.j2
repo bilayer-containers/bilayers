@@ -3,7 +3,17 @@ import gradio as gr
 import subprocess
 import shutil
 
-def option_to_append(cli_tag, value):
+def option_to_append(cli_tag: str, value: Any) -> str:
+    """
+    Formats CLI options for appending to the command.
+
+    Args:
+        cli_tag (str): CLI tag (e.g., "--option").
+        value (Any): The value to append.
+
+    Returns:
+        str: The formatted CLI option.
+    """
     if cli_tag == "":
         return str(value)  # Append only the value
     else:
@@ -11,7 +21,20 @@ def option_to_append(cli_tag, value):
             return f"{cli_tag}{value}"
         return f"{cli_tag} {value}"  # Append cli_tag and value
 
-def insert_into_jagged_array(jagged_array, cli_order, cli_tag, value):
+def insert_into_jagged_array(
+    jagged_array: List[Optional[List[str]]], 
+    cli_order: int, 
+    cli_tag: str, 
+    value: Any) -> None:
+    """
+    Inserts CLI arguments into a structured array to maintain ordering.
+
+    Args:
+        jagged_array (List[Optional[List[str]]]): The structured array for CLI options.
+        cli_order (int): The order in which arguments should appear.
+        cli_tag (str): The CLI tag.
+        value (Any): The value to append.
+    """
     # Check the length of Jagged Array and dynamically append with None if required
     while len(jagged_array) <= abs(cli_order):
         jagged_array.append(None)
@@ -23,7 +46,17 @@ def insert_into_jagged_array(jagged_array, cli_order, cli_tag, value):
     result = option_to_append(cli_tag, value)
     jagged_array[abs(cli_order)].append(result)
 
-def generate_cli_command(cli_tags, **kwargs):
+def generate_cli_command(cli_tags: Dict[str, Dict[str, Any]], **kwargs: Any) -> Tuple[str, Optional[str], Optional[str]]:
+    """
+    Generates the CLI command dynamically based on user inputs.
+
+    Args:
+        cli_tags (Dict[str, Dict[str, Any]]): Mapping of parameters to CLI tags.
+        **kwargs (Any): User-provided parameter values.
+
+    Returns:
+        Tuple[str, Optional[str], Optional[str]]: CLI command, folder_name, and output_folder_name.
+    """
     cli_command = ["{{ exec_function.cli_command }}"]
 
     # Radio options mapping
@@ -73,11 +106,11 @@ def generate_cli_command(cli_tags, **kwargs):
     # Update cli_args with user parameters or defaults
     for key, value in kwargs.items():
         if key in cli_tags:
-            cli_tag = cli_tags[key].get("cli_tag", None)
-            default = cli_tags[key].get("default", None)
-            cli_order = cli_tags[key].get("cli_order", 0)
-            label = cli_tags[key].get("label", None)
-            optional = cli_tags[key].get("optional", False)
+            cli_tag: str = cli_tags[key].get("cli_tag", None)
+            default: Any = cli_tags[key].get("default", None)
+            cli_order: int = cli_tags[key].get("cli_order", 0)
+            label: str = cli_tags[key].get("label", None)
+            optional: bool = cli_tags[key].get("optional", False)
 
             # First, check the condition if cli_order is negative then dynamically append the size of jagged_negative_array
             if cli_order < 0:
@@ -112,7 +145,7 @@ def generate_cli_command(cli_tags, **kwargs):
                             raise gr.Error(error_message, duration = None)
                         else:
                             continue
-                # If the parameter is a list (mainly for parameter files), convert it to a string
+                # If the parameter is a list (mainly for parameter files and/or inputs image, file, measurement, array, executable), convert it to a string
                 elif isinstance(value, list):
                     folder_name = cli_tags[key].get("folder_name")
                     print("Folder Name:", folder_name)
@@ -213,6 +246,16 @@ def generate_cli_command(cli_tags, **kwargs):
 
 # Dynamically define on_submit with the exact parameter arguments
 def on_submit(
+{% if inputs is not none -%}
+{% for input_conf in inputs -%}
+{% if input_conf.type in ['image', 'measurement', 'array', 'file', 'executable'] %}
+{{input_conf.label | lower | replace(" ", "_")}}_description,
+{{ input_conf.label | lower | replace(" ", "_") }},
+{% else %}
+{{ input_conf.label | lower | replace(" ", "_") }},
+{%- endif %}
+{%- endfor %}
+{%- endif %}
 {% if parameters is not none -%}
 {% for param_conf in parameters -%}
 {% if param_conf.type == 'files' -%}
@@ -236,6 +279,11 @@ def on_submit(
 ):
 
     kwargs = {
+    {% if inputs is not none %}
+    {% for input_conf in inputs %}
+        "{{ input_conf.label | lower | replace(' ', '_') }}": {{ input_conf.label | lower | replace(' ', '_') }},
+    {% endfor %}
+    {% endif %}
     {% if parameters is not none %}
     {% for param_conf in parameters %}
         "{{ param_conf.label | lower | replace(' ', '_') }}": {{ param_conf.label | lower | replace(' ', '_') }},
@@ -245,6 +293,18 @@ def on_submit(
 
     # Mapping of parameter tags to CLI tags
     cli_tags = {
+    {% for input_conf in inputs %}
+    "{{ input_conf.label | lower | replace(' ', '_') }}": {
+        "cli_tag": "{{ input_conf.cli_tag }}",
+        "default": "{{ input_conf.default }}",
+        "cli_order": {{ input_conf.cli_order | default(0) }},
+        "optional": {{ input_conf.optional }},
+        "label": "{{ input_conf.label }}",
+        {% if input_conf.type in ['image', 'measurement', 'file', 'array', 'executable'] %}
+        "folder_name": "{{ input_conf.folder_name }}"
+        {% endif %}
+    },
+    {% endfor %}
     {% for param_conf in parameters %}
     "{{ param_conf.label | lower | replace(' ', '_') }}": {
         "cli_tag": "{{ param_conf.cli_tag }}",
@@ -295,6 +355,30 @@ def on_submit(
         error_message = "Please take a screenshot of this error and raise an issue at the Bilayers repository on GitHub."
         error_message += f"Command failed with error: {e.stderr.decode()}\n\n"
         raise gr.Error(error_message, duration = None)
+        
+{% if inputs is not none -%}
+{% for input_conf in inputs %}
+
+{% if input_conf.type == 'image' %}
+{{ input_conf.label | lower | replace(" ", "_") }}_description = gr.Markdown(value="{{ input_conf.description }}")
+{{ input_conf.label | lower | replace(" ", "_") }} = gr.Files(label="{{ input_conf.label }}", file_count="{{ input_conf.file_count }}")
+{% elif input_conf.type == 'measurement' %}
+{{ input_conf.label | lower | replace(" ", "_") }}_description = gr.Markdown(value="{{ input_conf.description }}")
+{{ input_conf.label | lower | replace(" ", "_") }} = gr.Files(label="{{ input_conf.label }}", file_count="{{ input_conf.file_count }}")
+{% elif input_conf.type == 'array' %}
+{{ input_conf.label | lower | replace(" ", "_") }}_description = gr.Markdown(value="{{ input_conf.description }}")
+{{ input_conf.label | lower | replace(" ", "_") }} = gr.Files(label="{{ input_conf.label }}", file_count="{{ input_conf.file_count }}")
+{% elif input_conf.type == 'file' %}
+{{ input_conf.label | lower | replace(" ", "_") }}_description = gr.Markdown(value="{{ input_conf.description }}")
+{{ input_conf.label | lower | replace(" ", "_") }} = gr.Files(label="{{ input_conf.label }}", file_count="{{ input_conf.file_count }}")
+{% elif input_conf.type == 'executable' %}
+{{ input_conf.label | lower | replace(" ", "_") }}_description = gr.Markdown(value="{{ input_conf.description }}")
+{{ input_conf.label | lower | replace(" ", "_") }} = gr.Files(label="{{ input_conf.label }}", file_count="{{ input_conf.file_count }}")
+{% endif %}
+
+
+{% endfor %}
+{%- endif %}
 
 {% if parameters is not none -%}
 {% for param_conf in parameters %}
@@ -343,10 +427,6 @@ def on_submit(
 {%- endfor %}
 {%- endif %}
 
-{% for result_conf in results -%}
-{% if result_conf.type == 'files' -%}
-{%- endif %}
-{%- endfor %}
 
 
 {% set DEFAULT_CITATIONS = {
@@ -384,13 +464,21 @@ description_text += f"{{ citation.name }} under {{ citation.license }} License :
 {%- endfor %}
 
 
-{% for result_conf in results -%}
-{% if result_conf.type == 'files' -%}
-{%- endif %}
-{%- endfor %}
 
 
 all_parameters = [
+{# Getting stuff from inputs #}
+{% if inputs is not none -%}
+{% for input_conf in inputs -%}
+{% if input_conf.type in ['image', 'measurement', 'array', 'file', 'executable'] -%}
+    {{input_conf.label | lower | replace(" ", "_")}}_description,
+    {{ input_conf.label | lower | replace(" ", "_") }},
+{% else %}
+    {{ input_conf.label | lower | replace(" ", "_") }},
+{%- endif %}
+{%- endfor %}
+{%- endif %}
+{# Getting stuff from parameters #}
 {% if parameters is not none -%}
 {% for param_conf in parameters -%}
 {% if param_conf.type == 'files' -%}
@@ -401,6 +489,7 @@ all_parameters = [
 {%- endif %}
 {%- endfor %}
 {%- endif %}
+{# Getting stuff from display_only #}
 {% if display_only is not none -%}
 {% for display_only_conf in display_only -%}
 {% if display_only_conf.type == 'files' -%}
@@ -413,18 +502,12 @@ all_parameters = [
 {%- endif %}
 ]
 
-results = [
-{% for result_conf in results -%}
-{% if result_conf.type == 'files' -%}
-gr.Files(label="{{ result_conf.label }}", file_count="{{ result_conf.file_count }}")
-{%- endif %}
-{%- endfor %}
-]
+download_results_from_here = gr.Files(label = "Download Output", file_count = "multiple")
 
 app = gr.Interface(
     fn=on_submit, 
     inputs=all_parameters,
-    outputs=results, 
+    outputs=download_results_from_here, 
     title="Gradio App",
     description=f"<div style='text-align: center'>{description_text}</div>"
 )

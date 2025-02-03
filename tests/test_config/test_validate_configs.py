@@ -1,9 +1,14 @@
 import pytest
 import subprocess
+from typing import List
 
 @pytest.fixture
-def schema_path():
-    """Fixture for the path to the validation schema."""
+def schema_path() -> str:
+    """
+    Fixture for the path to the validation schema.
+    Returns:
+        str: The path to the validation schema.
+    """
     return "tests/test_config/validate_schema.yaml"
 
 @pytest.mark.parametrize(
@@ -35,14 +40,22 @@ def schema_path():
         ),
     ],
 )
-def test_specific_validation_errors(schema_path, config_path, expected_error): 
+def test_specific_validation_errors(
+    schema_path: str, 
+    config_path: str, 
+    expected_error: List[str]
+    ) -> None: 
     """
     Test that the validation throws the exact expected error for multiple configurations.
     Test cases would bark at LinkML Validation level if any extra flags are passed.
     But they wouldn't bark if types are different and still you have added some special flag from different type
+    Args:
+        schema_path (str): The file path to the validation schema.
+        config_path (str): The path to the configuration file to be validated.
+        expected_error (List[str]): The expected validation error messages.
     """
     # for config_path, expected_errors in config_files:
-    result = subprocess.run(
+    result: subprocess.CompletedProcess[str] = subprocess.run(
         ["linkml", "validate", "--schema", schema_path, "--target-class", "Container", config_path],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
@@ -50,4 +63,5 @@ def test_specific_validation_errors(schema_path, config_path, expected_error):
     )
 
     # Process the results
-    assert expected_error == result.stdout.strip().split("\n")
+    actual_output: List[str] = result.stdout.strip().split("\n")
+    assert expected_error == actual_output, f"Expected: {expected_error}, Got: {actual_output}"

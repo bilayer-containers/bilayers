@@ -10,58 +10,365 @@ To create your interface, you need to understand the structure of the config.yam
 
 The config.yaml file defines how the interface interacts with your algorithm. At the code level, it's located at `bilayers/src/algorithms/algorithm_name/config.yaml`. The algorithm_name should reflect the task, such as cellpose_inference or cellpose_training, so name it accordingly.
 
-Each config.yaml contains key sections: `parameters`, `display_only`, `results`, `exec_function`, `docker_image`, `algorithm_folder_name`, and `citations`. You can copy the basic structure from an existing example.
+Each config.yaml contains key sections: `citations`, `docker_image`, `algorithm_folder_name`, `exec_function`, `inputs`, `outputs`, `parameters`, and `display_only`. You can copy the basic structure from an existing example.
 
 This file is then converted into a CLI command, where user-provided inputs are passed as command-line arguments, enabling the retrieval of the desired output.
-- **parameters**: These are key in building command-line arguments. Each object under this keyword forms part of the command line, with arguments either taken from the user or using default values.
-- **display_only**: These fields are displayed on the interface but aren’t included in the CLI command. No cli_tag should be passed to these objects; otherwise, they function like parameters.
-- **results**: Similar to parameters, but they define the expected output type and label it on the UI as the output. Typically, this is a file type.
-- **exec_function**: Defines the function that converts the config.yaml into a Gradio or Jupyter Notebook interface. It also includes the initial part of the CLI command and a special hidden_args section if applicable.
+- **citations**: Used to reference relevant research or materials related to the algorithm.
 - **docker_image**: Contains details of the base image (organization, name, and tag) used to build the Docker image for each interface.
 - **algorithm_folder_name**: Specifies the folder where the generated Gradio and Jupyter Notebook files are stored.
-- **citations**: Used to reference relevant research or materials related to the algorithm.
+- **exec_function**: Defines the function that converts the config.yaml into a Gradio or Jupyter Notebook interface. It also includes the initial part of the CLI command and a special hidden_args section if applicable.
+- **inputs**:
+- **outputs**:
+- **parameters**: These are key in building command-line arguments. Each object under this keyword forms part of the command line, with arguments either taken from the user or using default values.
+- **display_only**: These fields are displayed on the interface but aren’t included in the CLI command. No cli_tag should be passed to these objects; otherwise, they function like parameters.
 
 ```{code} yaml
 :filename: config.yml
-parameters:
-
-display_only:
-
-results:
-  
-exec_function:
- name: "generate_cli_command"
- script:
- module:
- cli_command:
- hidden_args:
+citations:
+  algorithm:
+    - name: ""
+      doi: ""
+      license: ""
+      description: ""
 
 docker-image:
- org:
- name:
- tag:
+  org:
+  name:
+  tag:
+  platform:
 
 algorithm_folder_name:
 
-citations:
- Algorithm:
-   - name: ""
-     doi: ""
-     license: ""
-     description: ""
+exec_function:
+  name: "generate_cli_command"
+  script:
+  module:
+  cli_command:
+  hidden_args:
+
+inputs:
+
+outputs:
+
+parameters:
+
+display_only:
 ```
 
-Before you start working on the `config.yaml` file, we recommend reviewing the command-line usage of the specific algorithm you're building an interface for. This will help you determine what should go in `parameters`, `display_only`, `results`, and `exec_function`'s `hidden_args`.
+Before you start working on the `config.yaml` file, we recommend reviewing the command-line usage of the specific algorithm you're building an interface for. This will help you determine what should go in `inputs`, `outputs`, `parameters`, `display_only`, and `exec_function`'s `hidden_args`.
 
 ## Understanding `cli_command`
 
 The `cli_command` is the starting point for executing the command line, like `python -m cellpose`, which is then followed by appending parameters and their arguments. We will cover more about `cli_command` in the context of the `exec_function`, but for now, it's important to understand its role.
 
+## Defining citations
+Citations are used to credit the relevant works associated with the algorithm. Include the correct name, doi, license and description of the algorithm. Guidelines on how to find citations can be found here. Note that interface citations are added dynamically, so you don’t need to include them manually.
+```{code} yaml
+:filename: config.yml
+citations:
+  algorithm:
+    - name: "cite-1"
+      doi: ""
+      license: ""
+      description: ""
+    - name: "cite-2"
+      doi: ""
+      license: ""
+      description: ""
+```
+
+Sample Example:
+```{code} yaml
+:filename: config.yml
+citations:
+  algorithm:
+    - name: "Cellpose"
+      doi: 10.1038/s41592-020-01018-x
+      license: "BSD 3-Clause"
+      description: "Deep Learning algorithm for cell segmentation in microscopy images"
+```
+
+## Defining docker_image
+Each interface’s Docker image is built on top of the base Docker image specific to the algorithm. Therefore, it's highly recommended to choose an algorithm with a pre-built Docker image available on DockerHub.
+
+For guidance on selecting a compatible base image, refer [Choosing the Right Base Docker Image](right_base_docker_image)
+
+To specify the image, select one from DockerHub. Here's how it works with an example:  
+For instance, `cellprofiler/runcellpose_no_pretrained:0.1` can be broken down into three parts:
+
+- **org**: The part before `/` is the username or organization (e.g., `cellprofiler`).
+- **name**: The part between `/` and `:` is the image name (e.g., `runcellpose_no_pretrained`).
+- **tag**: The part after `:` is the tag, which can be a version number or a term like `latest` (e.g., `0.1`).
+- **platform**: Platform on which base_docker_image was built. Can find the details on dockerhub.
+
+To learn more about docker image naming, refer to [What are Docker tags?](https://medium.com/free-code-camp/an-introduction-to-docker-tags-9b5395636c2a)
+
+Also, here’s the template to directly paste in your config.yaml file
+```{code} yaml
+:filename: config.yml
+docker-image:
+  org: 
+  name: 
+  tag: 
+  platform:
+```
+
+## Defining algorithm_folder_name
+This specifies the folder where the generated Gradio and Jupyter Notebook interface files will be stored. The folder name should follow the convention of the `config.yaml`'s parent folder, such as `algorithm_inference` or `algorithm_training`.  
+Example: algorithm_folder_name: "cellpose_inference"
+
+## Defining exec_function
+exec_function is instrumental in converting the yaml file to desired interface. It defines the specific function responsible for this conversion. The `exec_function` consists of the following components: `name`, `script`, `module`, `cli_command`, and `hidden_args`.
+
+Below is the template to attach directly to your configuration file, followed by a breakdown:
+```{code} yaml
+:filename: config.yml
+exec_function:
+  name: "generate_cli_command"
+  script: ""
+  module: "algorithms."
+  cli_command: ""
+  hidden_args:
+    # dummy example
+    # - cli_tag: "--save_png"
+    #   value: "True"
+    #   append_value: False
+    #   cli_order: 3
+```
+
+Below is an example to follow, along with a breakdown of each component:
+```{code} yaml
+:filename: config.yml
+exec_function:
+  name: "generate_cli_command"
+  script: "cellpose_inference"
+  module: "algorithms.cellpose_inference"
+  cli_command: "python -m cellpose --verbose"
+  hidden_args:
+    # dummy example
+    # - cli_tag: "--save_png"
+    #   value: "True"
+    #   append_value: False
+    #   cli_order: 3
+```
+- name: This is the name of the function that converts the `yaml` file into the interface dynamically. It remains the same for all algorithms, so no changes are needed. 
+ name: "generate_cli_command"
+
+- script: The name of the algorithm’s parent folder, which can either be `algorithm_inference` or `algorithm_training`.  
+Example: script: "cellpose_inference"
+
+- module: The module name for the algorithm, followed by the script name, separated by a dot.
+Example: module: "Algorithms.cellpose_inference"
+
+- cli_command: As mentioned earlier, the cli_command refers to the `module execution` in the documentation. This serves as the starting point, and the cli_tag and argument pairs are appended to it. Refer to the documentation for proper configuration.
+
+In command-line systems, there are several common command line patterns used for constructing a cli_command. Here, we support several widely used patterns: [Explore the full discussion here](https://github.com/bilayer-containers/bilayers/issues/37)
+1. someexecutable --unordered_flag_1 unordered_value_1  --unordered_flag_2 unordered_value_2
+2. someexecutable unordered_value_1 unordered_value_2
+3. someexecutable ordered_value_1 unordered_value_2
+4. someexecutable --ordered_flag_1 ordered_value_1 unordered_value_2
+5. someexecutable ordered_value_1 --unordered_flag_2 unordered_value_2
+6. someexecutable --unordered_flag_1=unordered_value_1 --unordered_flag_2 unordered_value_2
+7. someexecutable --ordered_flag_1=ordered_value_1 unordered_value_2
+
+#### What are ordered_flag and unordered_flag?
+In some cases, cli_command requires flags in fixed positions (e.g., always the 1st or last argument). To handle this, we use the cli_order flag. Here's how it works:
+- Specify a positive number (1 to n) in cli_order to fix the position of the cli_flag and argument pair.
+- If cli_order is set to 0 or not specified, it will be treated as an unordered_flag, and all such flags will appear after ordered ones.
+- Negative numbers in cli_order will place the flag in the last position, after all unordered flags.
+
+#### How to specify --flag_1=value_1?
+By default, flags and their arguments are appended with a space between them. If you want to use = between the flag and value, simply add an = at the end of cli_tag.
+For example, 
+cli_tag: “--savedir=”
+default: “/bilayers/my_outputs”
+This will generate: someexecutable --savedir=/bilayers/my_outputs
+
+#### hidden_args: Need of hidden_args?
+Sometimes, certain `cli_tag` and argument values should always be included in the `cli_command`, but you don’t want to expose them in the user interface. In these cases, use `hidden_args`.
+
+#### Where can it be used?
+A potential use case for hidden_args is ensuring output files are saved to a specific folder without allowing the user to modify it. If the algorithm's command-line usage includes a specific cli_tag for this, you can define it as a hidden_arg. Use the following fields to configure hidden_args:
+
+  - `cli_tag`: The command-line tag to be used.
+  - `value`: The fixed value for the tag.
+  - `append_value`: (Optional) Used for checkbox type to specify whether the value should be appended with the cli_tag.
+  - `cli_order`: (Optional) Specifies the order in which this tag should appear in the `cli_command`. If not set, it will appear after all ordered tags but before any negatively indexed ones.
+
+
 ## Organizing Parameters from the Algorithm's Command-Line Usage
 
+- inputs: If parameter is about providing any input files eg. image, measurement files, numpy array files, executable files etc.
+- outputs: A way to show what are potential outputs that would spit out post segmenting. Those could be presented under the umbrella of various types of files. eg. image, measurement files, numpy array files, executable files or some other files.
 - parameters: If the parameter and its argument need to be passed in the command line, include them in `parameters`.
 - display_only: If you want to show some information to the user without appending it to the command line, include it in `display_only`.
-- results: Anything that you want to appear as output should go under `results`. For these, you can set the `cli_tag` as `None`.
+
+## Defining inputs 
+```{code} yaml
+:filename: config.yml
+name: 
+type: 
+label: ""
+description: ""
+cli_tag: 
+cli_order:
+default: 
+optional: True
+format:
+folder_name:
+file_count:
+section_id: ""
+mode: ""
+```
+- **name**: This should be a simple name, for self-identification purpose. Ideally matching the `cli_tag` (without hyphens). Use underscores instead of spaces. 
+  Example: ```name: use_gpu```. 
+
+- **type**: This defines the `type` of the `inputs` and `outputs`. Its an umbrella of type `files`. So, ideally, it's categorized in 5 `types of files`. Those are `image`, `measurement`, `array`, `file`, `executable`. 
+
+  :::{dropdown} type: image
+    ```{code} yaml
+    - name: input_images
+      type: image
+      label: "Input Images"
+      subtype: # ONLY IFF TYPE==IMAGE. Can list all those relevant subtypes out of these 4, supported by the tool
+        - grayscale
+        - color
+        - binary
+        - labeled
+      description: "these are accepted input_images for xyz algorithm"
+      cli_tag: "--input_images" # tag to be used in CLI
+      cli_order: Integer # default is 0. Could be positive, negative or zero. If negative, then it will be appended at the end of the command. BUT IT IS OPTIONAL TO PROVIDE THIS FLAG.
+      default: ("single" | "directory") # if it is a single file or a folder
+      optional: (True | False) # if input is optional
+      format: # can include all those relevant formats supported by the tool
+        - tif
+        - png
+        - jpg
+        - jpeg
+        - tiff
+        - ometiff
+      folder_name: "/path/to/input_images" # folder_path
+      file_count: ("single" | "multiple") # if it accepts single file or multiple files. If multiple, then it will be a folder
+      section_id: "inputs" # section_id to group the inputs together
+      mode: ("beginner" | "advanced")
+      # Extra flags ONLY IFF TYPE==IMAGE
+      depth: (True | False) # ONLY IF TYPE IS IMAGE. If tool accepts images, with z-dimension i.e. depth, then set it to True
+      timepoints: (True | False) # ONLY IF TYPE IS IMAGE. If tool accepts images, with t-dimension i.e. timepoints, then set it to True
+      tiled: (True | False) # ONLY IF TYPE IS IMAGE. If tool accepts images, with tiled format, then set it to True
+      pyramidal: (True | False) # ONLY IF TYPE IS IMAGE. If tool accepts images, with pyramidal format, then set it to True
+  
+    ```
+    :::
+
+  :::{dropdown} type: measurement
+    ```{code} yaml
+    - name: input_measurement # a meaningful name for measurement file(/s) which can be self-explanatory for user 
+      type: measurement
+      label: "Input Measurement" # label would be shown in the UI (only for inputs it matters)
+      description: "these are accepted measurement_related_info for xyz algorithm"
+      cli_tag: "--input_measurement" # tag to be used in CLI
+      cli_order: Integer # default is 0. Could be positive, negative or zero. If negative, then it will be appended at the end of the command. BUT IT IS OPTIONAL TO PROVIDE THIS FLAG.
+      default: ("single" | "directory")
+      optional: (True | False) # True, if input is optional; False, if input is mandatory
+      format: # either or all of those depending on the tool, and if default is directory, or file_count is multiple
+        - csv # any csv format files included here eg. csv, tsv etc.
+        - parquet # any binary format files included here
+        - feather
+      folder_name: "/path/to/measurement/files" # folder_path or file_path if single file
+      file_count: ("single" | "multiple") # if it accepts single file or multiple files. If multiple, then it will be a folder
+      section_id: "inputs"
+      mode: ("beginner" | "advanced") # mode just for clean UI, to show objects in segregated sections
+    ```
+    :::
+  
+  :::{dropdown} type: array
+    ```{code} yaml
+    - name: input_array # a meaningful name for array(/s) which can be self-explanatory for user
+      type: array
+      label: "Input Array" # label would be shown in the UI
+      description: "these are accepted array for xyz algorithm"
+      cli_tag: "--input_array" # tag to be used in CLI
+      cli_order: Integer # default is 0. Could be positive, negative or zero. If negative, then it will be appended at the end of the command. BUT IT IS OPTIONAL TO PROVIDE THIS FLAG.
+      default: ("single" | "directory") # if it is a single file or a folder
+      optional: (True | False) # True, if input is optional; False, if input is mandatory
+      format: # either or all of those, depending on default is directory, or file_count is multiple
+        - npy
+        - npz
+      folder_name: "/path/to/array" # folder_path or file_path if single file
+      file_count: ("single" | "multiple") # if it accepts single file or multiple files. If multiple, then it will be a folder
+      section_id: "inputs"
+      mode: ("beginner" | "advanced") # mode just for clean UI, to show objects in segregated sections
+    ```
+    :::
+
+  :::{dropdown} type: file
+    ```{code} yaml
+    - name: input_file
+      type: file
+      label: "Input File" # label would be shown in the UI
+      description: "these are accepted input_files for xyz algorithm"
+      cli_tag: "--input_file" # tag to be used in CLI
+      cli_order: Integer # default is 0. Could be positive, negative or zero. If negative, then it will be appended at the end of the command. BUT IT IS OPTIONAL TO PROVIDE THIS FLAG.
+      default: ("single" | "directory") # if it is a single file or a folder
+      optional: (True | False)
+      format: # can include all those relevant formats supported by the tool
+        - log
+        - unix
+      folder_name: "/path/to/input_files" # folder_path or file_path if single file
+      file_count: ("single" | "multiple") # if it accepts single file or multiple files. If multiple, then it will be a folder
+      section_id: "inputs"
+      mode: ("beginner" | "advanced")
+    ```
+    :::
+
+  :::{dropdown} type: executable
+    ```{code} yaml
+    - name: input_executable
+      type: executable
+      label: "Input Executable" # label would be shown in the UI
+      description: "these are accepted input_executables for xyz algorithm"
+      cli_tag: "--input_executable" # tag to be used in CLI
+      cli_order: Integer # default is 0. Could be positive, negative or zero. If negative, then it will be appended at the end of the command. BUT IT IS OPTIONAL TO PROVIDE THIS FLAG.
+      default: ("single" | "directory") # if it is a single file or a folder
+      optional: (True | False)
+      format: # can include all those relevant formats supported by the tool
+        - ipynb
+        - sh
+        - bash
+        - csh
+        - zsh
+        - ksh
+        - py
+        - pyw
+        - js
+        - cmd
+        - bat
+      folder_name: "/path/to/executable" # folder_path or file_path if single file
+      file_count: ("single" | "multiple") # if it accepts single file or multiple files. If multiple, then it will be a folder
+      section_id: "inputs"
+      mode: ("beginner" | "advanced")
+    ```
+    :::
+
+## Defining outputs
+```{code} yaml
+:filename: config.yml
+name: 
+type: 
+label: ""
+description: ""
+cli_tag: 
+cli_order:
+default: 
+optional: True
+format:
+folder_name:
+file_count:
+section_id: ""
+mode: ""
+```
+
+`outputs` follow same schema as `inputs` in the spec file.
 
 ## Defining parameters
 
@@ -419,155 +726,3 @@ mode: ""
 `display_only` functions similarly to `parameters`, but the key difference is that these objects are only displayed in the user interface and are not appended to the `cli_command`. They are non-interactive, meaning users cannot modify the values, which will always reflect the default specified in the `config.yaml` file.
 
 Since they are not part of the `cli_command`, you can omit `cli_tag` and `cli_order`. For the rest of the structure, you can reuse the template from `parameters` based on the object type.
-
-## Defining results
-`results` represent the outputs or results generated after executing the command. In most cases, this will be defined as `type: files`. The structure follows the same format as `parameters`, but currently, Bilayers only supports `type: files`. If you require additional result types, please submit a feature request here.
-
-For `results`, the `cli_tag` should always be set to "None," and there's no need to specify `cli_order`.
-
-Note that `results` are not typically sourced from the documentation. 
-
-```{code} yaml
-:filename: config.yml
-results:
-  - name: output_dir
-    type: Files
-    label: "Download Outputs"
-    description: ""
-    cli_tag : "None"
-    optional: True
-    section_id: "output-section"
-    mode: ""
-```
-
-## Defining exec_function
-exec_function is instrumental in converting the yaml file to desired interface. It defines the specific function responsible for this conversion. The `exec_function` consists of the following components: `name`, `script`, `module`, `cli_command`, and `hidden_args`.
-
-Below is the template to attach directly to your configuration file, followed by a breakdown:
-```{code} yaml
-:filename: config.yml
-exec_function:
- name: "generate_cli_command"
- script: ""
- module: "Algorithms."
- cli_command: ""
- hidden_args:
-   # dummy example
-   # - cli_tag: "--save_png"
-   #   value: "True"
-   #   append_value: False
-   #   cli_order: 3
-```
-
-Below is an example to follow, along with a breakdown of each component:
-```{code} yaml
-:filename: config.yml
-exec_function:
- name: "generate_cli_command"
- script: "cellpose_inference"
- module: "Algorithms.cellpose_inference"
- cli_command: "python -m cellpose --verbose"
- hidden_args:
-   # dummy example
-   # - cli_tag: "--save_png"
-   #   value: "True"
-   #   append_value: False
-   #   cli_order: 3
-```
-- name: This is the name of the function that converts the `yaml` file into the interface dynamically. It remains the same for all algorithms, so no changes are needed. 
- name: "generate_cli_command"
-
-- script: The name of the algorithm’s parent folder, which can either be `algorithm_inference` or `algorithm_training`.  
-Example: script: "cellpose_inference"
-
-- module: The module name for the algorithm, followed by the script name, separated by a dot.
-Example: module: "Algorithms.cellpose_inference"
-
-- cli_command: As mentioned earlier, the cli_command refers to the `module execution` in the documentation. This serves as the starting point, and the cli_tag and argument pairs are appended to it. Refer to the documentation for proper configuration.
-
-In command-line systems, there are several common command line patterns used for constructing a cli_command. Here, we support several widely used patterns: [Explore the full discussion here](https://github.com/bilayer-containers/bilayers/issues/37)
-1. someexecutable --unordered_flag_1 unordered_value_1  --unordered_flag_2 unordered_value_2
-2. someexecutable unordered_value_1 unordered_value_2
-3. someexecutable ordered_value_1 unordered_value_2
-4. someexecutable --ordered_flag_1 ordered_value_1 unordered_value_2
-5. someexecutable ordered_value_1 --unordered_flag_2 unordered_value_2
-6. someexecutable --unordered_flag_1=unordered_value_1 --unordered_flag_2 unordered_value_2
-7. someexecutable --ordered_flag_1=ordered_value_1 unordered_value_2
-
-#### What are ordered_flag and unordered_flag?
-In some cases, cli_command requires flags in fixed positions (e.g., always the 1st or last argument). To handle this, we use the cli_order flag. Here's how it works:
-- Specify a positive number (1 to n) in cli_order to fix the position of the cli_flag and argument pair.
-- If cli_order is set to 0 or not specified, it will be treated as an unordered_flag, and all such flags will appear after ordered ones.
-- Negative numbers in cli_order will place the flag in the last position, after all unordered flags.
-
-#### How to specify --flag_1=value_1?
-By default, flags and their arguments are appended with a space between them. If you want to use = between the flag and value, simply add an = at the end of cli_tag.
-For example, 
-cli_tag: “--savedir=”
-default: “/bilayers/my_outputs”
-This will generate: someexecutable --savedir=/bilayers/my_outputs
-
-#### hidden_args: Need of hidden_args?
-Sometimes, certain `cli_tag` and argument values should always be included in the `cli_command`, but you don’t want to expose them in the user interface. In these cases, use `hidden_args`.
-
-#### Where can it be used?
-A potential use case for hidden_args is ensuring output files are saved to a specific folder without allowing the user to modify it. If the algorithm's command-line usage includes a specific cli_tag for this, you can define it as a hidden_arg. Use the following fields to configure hidden_args:
-
-  - `cli_tag`: The command-line tag to be used.
-  - `value`: The fixed value for the tag.
-  - `append_value`: (Optional) Used for checkbox type to specify whether the value should be appended with the cli_tag.
-  - `cli_order`: (Optional) Specifies the order in which this tag should appear in the `cli_command`. If not set, it will appear after all ordered tags but before any negatively indexed ones.
-
-## Defining docker_image
-Each interface’s Docker image is built on top of the base Docker image specific to the algorithm. Therefore, it's highly recommended to choose an algorithm with a pre-built Docker image available on DockerHub.
-
-For guidance on selecting a compatible base image, refer [Choosing the Right Base Docker Image](right_base_docker_image)
-
-To specify the image, select one from DockerHub. Here's how it works with an example:  
-For instance, `cellprofiler/runcellpose_no_pretrained:0.1` can be broken down into three parts:
-
-- **org**: The part before `/` is the username or organization (e.g., `cellprofiler`).
-- **name**: The part between `/` and `:` is the image name (e.g., `runcellpose_no_pretrained`).
-- **tag**: The part after `:` is the tag, which can be a version number or a term like `latest` (e.g., `0.1`).
-
-To learn more about docker image naming, refer to [What are Docker tags?](https://medium.com/free-code-camp/an-introduction-to-docker-tags-9b5395636c2a)
-
-Also, here’s the template to directly paste in your config.yaml file
-```{code} yaml
-:filename: config.yml
-docker-image:
- org: 
- name: 
- tag: 
-```
-
-## Defining algorithm_folder_name
-This specifies the folder where the generated Gradio and Jupyter Notebook interface files will be stored. The folder name should follow the convention of the `config.yaml`'s parent folder, such as `algorithm_inference` or `algorithm_training`.  
-Example: algorithm_folder_name: "cellpose_inference"
-
-## Defining citations
-Citations are used to credit the relevant works associated with the algorithm. Include the correct name, doi, license and description of the algorithm. Guidelines on how to find citations can be found here. Note that interface citations are added dynamically, so you don’t need to include them manually.
-```{code} yaml
-:filename: config.yml
-citations:
- Algorithm:
-   - name: "cite-1"
-     doi: ""
-     license: ""
-     description: ""
-   - name: "cite-2"
-     doi: ""
-     license: ""
-     description: ""
-```
-
-Sample Example:
-```{code} yaml
-:filename: config.yml
-citations:
- Algorithm:
-   - name: "Cellpose"
-     doi: 10.1038/s41592-020-01018-x
-     license: "BSD 3-Clause"
-     description: "Deep Learning algorithm for cell segmentation in microscopy images"
-```

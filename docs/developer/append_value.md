@@ -24,10 +24,9 @@ URI: [https://w3id.org/my-org/validate_schema/:append_value](https://w3id.org/my
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
 | [HiddenArgs](HiddenArgs.md) | Hidden arguments for the Algorithm |  no  |
-| [TypeParameter](TypeParameter.md) | Parameters of a specific Algorithm |  no  |
 | [AbstractUserInterface](AbstractUserInterface.md) | Abstract class for user interface |  no  |
-| [TypeResults](TypeResults.md) | Results of a specific Algorithm |  no  |
 | [TypeDisplayOnly](TypeDisplayOnly.md) | Display only parameters of a specific Algorithm |  no  |
+| [TypeParameter](TypeParameter.md) | Parameters of a specific Algorithm |  no  |
 
 
 

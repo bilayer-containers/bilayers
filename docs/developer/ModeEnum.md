@@ -3,7 +3,7 @@
 
 
 
-_Mode of the parameters, display_only, results_
+_Mode of the parameters, display_only_
 
 
 
@@ -53,7 +53,7 @@ URI: [ModeEnum](ModeEnum.md)
 <details>
 ```yaml
 name: ModeEnum
-description: Mode of the parameters, display_only, results
+description: Mode of the parameters, display_only
 from_schema: https://w3id.org/my-org/validate_schema
 rank: 1000
 permissible_values:

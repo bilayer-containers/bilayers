@@ -23,8 +23,11 @@ URI: [https://w3id.org/my-org/validate_schema/:cli_order](https://w3id.org/my-or
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [HiddenArgs](HiddenArgs.md) | Hidden arguments for the Algorithm |  no  |
+| [TypeOutput](TypeOutput.md) | Outputs of the algorithm to the next step in the workflow |  no  |
 | [TypeParameter](TypeParameter.md) | Parameters of a specific Algorithm |  no  |
+| [AbstractWorkflowDetails](AbstractWorkflowDetails.md) | Abstract class for details needed to fit config in the workflow |  no  |
+| [HiddenArgs](HiddenArgs.md) | Hidden arguments for the Algorithm |  no  |
+| [TypeInput](TypeInput.md) | Inputs to the algorithm from the last step of the workflow |  no  |
 
 
 
@@ -76,6 +79,7 @@ from_schema: https://w3id.org/my-org/validate_schema
 rank: 1000
 alias: cli_order
 domain_of:
+- AbstractWorkflowDetails
 - TypeParameter
 - HiddenArgs
 range: integer

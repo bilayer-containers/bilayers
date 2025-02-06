@@ -430,7 +430,8 @@ enums:
       float:
       boolean:
       checkbox:
-      # files: # after adding inputs-outputs, we have removed type=files support. As of now, just kept for 'results' section
+      # files: # after adding inputs-outputs, we have removed type=files support. It was only kept for 'results' section. Since, that is also removed, we are completely taking this off!
+               # In case, we wish to readd - just uncomment this line.
       dropdown:
       radio:
       textbox:

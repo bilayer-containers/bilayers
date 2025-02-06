@@ -42,7 +42,7 @@ URI: [https://w3id.org/my-org/validate_schema/:DockerImage](https://w3id.org/my-
 | Name | Cardinality and Range | Description | Inheritance |
 | ---  | --- | --- | --- |
 | [org](org.md) | 1 <br/> [String](String.md) | Organization of the docker image | direct |
-| [name](name.md) | 1 <br/> [String](String.md) | Name of the docker_image, algorithm, parameter, display_only, results | direct |
+| [name](name.md) | 1 <br/> [String](String.md) | Name of the docker_image, algorithm, parameter, display_only | direct |
 | [tag](tag.md) | 1 <br/> [String](String.md) | Tag of the docker image | direct |
 | [platform](platform.md) | 1 <br/> [String](String.md) | Platform on which the docker image was built | direct |
 
@@ -140,12 +140,13 @@ attributes:
     required: true
   name:
     name: name
-    description: Name of the docker_image, algorithm, parameter, display_only, results
+    description: Name of the docker_image, algorithm, parameter, display_only
     from_schema: https://w3id.org/my-org/validate_schema
     rank: 1000
     alias: name
     owner: DockerImage
     domain_of:
+    - AbstractWorkflowDetails
     - AbstractUserInterface
     - ExecFunction
     - DockerImage

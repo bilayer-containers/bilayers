@@ -22,7 +22,7 @@ class ExecFunction(TypedDict):
     script: str
     module: str
     cli_command: str
-    hidden_args: Optional[HiddenArgs]
+    hidden_args: Optional[List[HiddenArgs]]
 
 class InputOutput(TypedDict, total=False):
     name: str
@@ -115,13 +115,13 @@ def main(config_path: Optional[str] = None) -> Tuple[
 
     parameters: List[Parameter] = config.get('parameters', [])
 
-    display_only: Optional[List[Parameter]] = config.get('display_only', [])
+    display_only: Optional[List[Parameter]] = config.get('display_only', []) or []
 
-    exec_function: ExecFunction = config.get('exec_function', {})
+    exec_function: ExecFunction = config.get('exec_function', ExecFunction(name="", script="", module="", cli_command="", hidden_args=[]))
 
     algorithm_folder_name: str = config.get('algorithm_folder_name', None)
 
-    citations: Citations = config.get('citations', [])
+    citations: Citations = config.get('citations', {"algorithm": []})
 
     return inputs, outputs, parameters, display_only, exec_function, algorithm_folder_name, citations
 

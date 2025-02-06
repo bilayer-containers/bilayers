@@ -50,7 +50,7 @@ URI: [https://w3id.org/my-org/validate_schema/:ExecFunction](https://w3id.org/my
 
 | Name | Cardinality and Range | Description | Inheritance |
 | ---  | --- | --- | --- |
-| [name](name.md) | 1 <br/> [String](String.md) | Name of the docker_image, algorithm, parameter, display_only, results | direct |
+| [name](name.md) | 1 <br/> [String](String.md) | Name of the docker_image, algorithm, parameter, display_only | direct |
 | [script](script.md) | 1 <br/> [String](String.md) | Script to execute the Algorithm | direct |
 | [module](module.md) | 1 <br/> [String](String.md) | Module to execute the Algorithm | direct |
 | [cli_command](cli_command.md) | 1 <br/> [String](String.md) | CLI command to execute the Algorithm | direct |
@@ -146,12 +146,13 @@ aliases:
 attributes:
   name:
     name: name
-    description: Name of the docker_image, algorithm, parameter, display_only, results
+    description: Name of the docker_image, algorithm, parameter, display_only
     from_schema: https://w3id.org/my-org/validate_schema
     rank: 1000
     alias: name
     owner: ExecFunction
     domain_of:
+    - AbstractWorkflowDetails
     - AbstractUserInterface
     - ExecFunction
     - DockerImage

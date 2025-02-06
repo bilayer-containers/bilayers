@@ -5,25 +5,28 @@ authors:
     affiliations:
       - Broad Institute of MIT and Harvard
 ---
+To define an interface for your algorithm, it is essential to understand the structure and key components of the `config.yaml` file (aka spec file).
 
-To create your interface, you need to understand the structure of the config.yaml file and its key components:
+The config.yaml file specifies how the interface interacts with the algorithm and is located at: `bilayers/src/algorithms/algorithm_name/config.yaml`.   
+Here, `algorithm_name` should accurately represent the task, such as `cellpose_inference` or `cellpose_training`.
 
-The config.yaml file defines how the interface interacts with your algorithm. At the code level, it's located at `bilayers/src/algorithms/algorithm_name/config.yaml`. The algorithm_name should reflect the task, such as cellpose_inference or cellpose_training, so name it accordingly.
+Each config.yaml contains key sections  that define how an algorithm integrates with an interface. These sections include: `citations`, `docker_image`, `algorithm_folder_name`, `exec_function`, `inputs`, `outputs`, `parameters`, and `display_only`. The skeleton structure can be copied from an existing example.
 
-Each config.yaml contains key sections: `citations`, `docker_image`, `algorithm_folder_name`, `exec_function`, `inputs`, `outputs`, `parameters`, and `display_only`. You can copy the basic structure from an existing example.
+Once defined, the config.yaml is processed to generate an executable CLI command, where user-specified inputs are mapped to command-line arguments, facilitating algorithm execution and output retrieval.
 
-This file is then converted into a CLI command, where user-provided inputs are passed as command-line arguments, enabling the retrieval of the desired output.
-- **citations**: Used to reference relevant research or materials related to the algorithm.
-- **docker_image**: Contains details of the base image (organization, name, and tag) used to build the Docker image for each interface.
-- **algorithm_folder_name**: Specifies the folder where the generated Gradio and Jupyter Notebook files are stored.
-- **exec_function**: Defines the function that converts the config.yaml into a Gradio or Jupyter Notebook interface. It also includes the initial part of the CLI command and a special hidden_args section if applicable.
-- **inputs**:
-- **outputs**:
-- **parameters**: These are key in building command-line arguments. Each object under this keyword forms part of the command line, with arguments either taken from the user or using default values.
-- **display_only**: These fields are displayed on the interface but aren’t included in the CLI command. No cli_tag should be passed to these objects; otherwise, they function like parameters.
+## Key Sections of `config.yaml`
+
+- **citations**: References relevant research citation, doi, and/or license associated with the algorithm.
+- **docker_image**: Defines the Docker image used for execution, including the organization, repository name, and tag.
+- **algorithm_folder_name**: Specifies the directory where the generated Gradio and Jupyter Notebook interface files are stored.
+- **exec_function**: Defines the function that converts the config.yaml (i.e. spec file) into a Gradio or Jupyter Notebook interface. It also includes the base command (e.g., python -m cellpose) that serves as the entry point for execution and a special **`hidden_args`** section if applicable.
+- **inputs**: Refers to the elements that are translated into command-line arguments for our supported interfaces. Additionally, they contribute to adapting the Bilayers specification for integration with workflow management tools such as Snakemake, Nextflow, or WDL.
+- **outputs**: Primarily used for refining the Bilayers specification to be compatible with workflow management tools like Snakemake, Nextflow, or WDL. While they may or may not include a cli_tag, they are **NOT** involved in generating our interfaces.
+- **parameters**: Defines arguments that contribute to CLI command construction. Each parameter under this section either takes user-specified values or defaults when not explicitly provided.
+- **display_only**: Contains fields that are displayed on the interface but do not affect CLI execution. These objects must not include a cli_tag.
 
 ```{code} yaml
-:filename: config.yml
+:filename: config.yaml
 citations:
   algorithm:
     - name: ""
@@ -45,6 +48,9 @@ exec_function:
   module:
   cli_command:
   hidden_args:
+    # - cli_tag:
+    #   value:
+    #   cli_order:
 
 inputs:
 
@@ -93,13 +99,13 @@ Each interface’s Docker image is built on top of the base Docker image specifi
 
 For guidance on selecting a compatible base image, refer [Choosing the Right Base Docker Image](right_base_docker_image)
 
-To specify the image, select one from DockerHub. Here's how it works with an example:  
-For instance, `cellprofiler/runcellpose_no_pretrained:0.1` can be broken down into three parts:
+To define the container image, select one from DockerHub by specifying its full reference. The image identifier follows a structured format, which can be deconstructed as follows:  
+For instance, `cellprofiler/runcellpose_no_pretrained:0.1` consists of four components:
 
-- **org**: The part before `/` is the username or organization (e.g., `cellprofiler`).
-- **name**: The part between `/` and `:` is the image name (e.g., `runcellpose_no_pretrained`).
-- **tag**: The part after `:` is the tag, which can be a version number or a term like `latest` (e.g., `0.1`).
-- **platform**: Platform on which base_docker_image was built. Can find the details on dockerhub.
+- **Organization/Namespace `(org)`**: The segment preceding `/`, represents the DockerHub username or organization (e.g., `cellprofiler`).
+- **Repository Name `(name)`**: The section between `/` and `:` specifies the image repository (e.g., `runcellpose_no_pretrained`).
+- **Tag `(tag)`**: The portion after `:`, indicates the image version or a specific label such as `latest` (e.g., `0.1`).
+- **Platform `(platform)`**: The architecture or operating system on which the base Docker image was built. Platform details can be found in the image metadata on DockerHub.
 
 To learn more about docker image naming, refer to [What are Docker tags?](https://medium.com/free-code-camp/an-introduction-to-docker-tags-9b5395636c2a)
 
@@ -314,6 +320,7 @@ mode: ""
       format: # can include all those relevant formats supported by the tool
         - log
         - unix
+        - notebook
       folder_name: "/path/to/input_files" # folder_path or file_path if single file
       file_count: ("single" | "multiple") # if it accepts single file or multiple files. If multiple, then it will be a folder
       section_id: "inputs"

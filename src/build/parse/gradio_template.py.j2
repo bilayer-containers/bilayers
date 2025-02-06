@@ -2,6 +2,7 @@ import os
 import gradio as gr
 import subprocess
 import shutil
+from typing import List, Optional, Dict, Any, Tuple
 
 def option_to_append(cli_tag: str, value: Any) -> str:
     """
@@ -25,7 +26,8 @@ def insert_into_jagged_array(
     jagged_array: List[Optional[List[str]]], 
     cli_order: int, 
     cli_tag: str, 
-    value: Any) -> None:
+    value: Any
+    ) -> None:
     """
     Inserts CLI arguments into a structured array to maintain ordering.
 
@@ -46,7 +48,10 @@ def insert_into_jagged_array(
     result = option_to_append(cli_tag, value)
     jagged_array[abs(cli_order)].append(result)
 
-def generate_cli_command(cli_tags: Dict[str, Dict[str, Any]], **kwargs: Any) -> Tuple[str, Optional[str], Optional[str]]:
+def generate_cli_command(
+    cli_tags: Dict[str, Dict[str, Any]], 
+    **kwargs: Any
+    ) -> Tuple[str, Optional[str], Optional[str]]:
     """
     Generates the CLI command dynamically based on user inputs.
 
@@ -184,7 +189,7 @@ def generate_cli_command(cli_tags: Dict[str, Dict[str, Any]], **kwargs: Any) -> 
 
     # Add hidden arguments to the command
     {% autoescape false %}
-    hidden_args = {{ exec_function.get("hidden_args", []) }}
+    hidden_args = {{ exec_function.get("hidden_args", []) or []}}
     print("Hidden Args:", hidden_args)
     {% endautoescape %}
 
@@ -466,7 +471,7 @@ description_text += f"{{ citation.name }} under {{ citation.license }} License :
 
 
 
-all_parameters = [
+all_parameters: List[Any] = [
 {# Getting stuff from inputs #}
 {% if inputs is not none -%}
 {% for input_conf in inputs -%}

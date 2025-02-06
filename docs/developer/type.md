@@ -3,7 +3,7 @@
 # Slot: type
 
 
-_Type of the parameter_
+_Type of the inputs, parameters and outputs_
 
 
 
@@ -23,10 +23,12 @@ URI: [https://w3id.org/my-org/validate_schema/:type](https://w3id.org/my-org/val
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [TypeDisplayOnly](TypeDisplayOnly.md) | Display only parameters of a specific Algorithm |  no  |
-| [TypeResults](TypeResults.md) | Results of a specific Algorithm |  no  |
+| [TypeOutput](TypeOutput.md) | Outputs of the algorithm to the next step in the workflow |  no  |
 | [TypeParameter](TypeParameter.md) | Parameters of a specific Algorithm |  no  |
+| [AbstractWorkflowDetails](AbstractWorkflowDetails.md) | Abstract class for details needed to fit config in the workflow |  no  |
+| [TypeDisplayOnly](TypeDisplayOnly.md) | Display only parameters of a specific Algorithm |  no  |
 | [AbstractUserInterface](AbstractUserInterface.md) | Abstract class for user interface |  no  |
+| [TypeInput](TypeInput.md) | Inputs to the algorithm from the last step of the workflow |  no  |
 
 
 
@@ -75,11 +77,12 @@ URI: [https://w3id.org/my-org/validate_schema/:type](https://w3id.org/my-org/val
 <details>
 ```yaml
 name: type
-description: Type of the parameter
+description: Type of the inputs, parameters and outputs
 from_schema: https://w3id.org/my-org/validate_schema
 rank: 1000
 alias: type
 domain_of:
+- AbstractWorkflowDetails
 - AbstractUserInterface
 range: TypeEnum
 required: true

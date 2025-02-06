@@ -3,7 +3,7 @@
 # Class: RadioOptions
 
 
-_Options of the Radio button in parameters, display_only, results_
+_Options of the Radio button in parameters, display_only_
 
 
 
@@ -65,7 +65,6 @@ URI: [https://w3id.org/my-org/validate_schema/:RadioOptions](https://w3id.org/my
 | [AbstractUserInterface](AbstractUserInterface.md) | [options](options.md) | range | [RadioOptions](RadioOptions.md) |
 | [TypeParameter](TypeParameter.md) | [options](options.md) | range | [RadioOptions](RadioOptions.md) |
 | [TypeDisplayOnly](TypeDisplayOnly.md) | [options](options.md) | range | [RadioOptions](RadioOptions.md) |
-| [TypeResults](TypeResults.md) | [options](options.md) | range | [RadioOptions](RadioOptions.md) |
 
 
 
@@ -110,7 +109,7 @@ URI: [https://w3id.org/my-org/validate_schema/:RadioOptions](https://w3id.org/my
 <details>
 ```yaml
 name: RadioOptions
-description: Options of the Radio button in parameters, display_only, results
+description: Options of the Radio button in parameters, display_only
 from_schema: https://w3id.org/my-org/validate_schema
 slots:
 - label
@@ -124,7 +123,7 @@ slots:
 <details>
 ```yaml
 name: RadioOptions
-description: Options of the Radio button in parameters, display_only, results
+description: Options of the Radio button in parameters, display_only
 from_schema: https://w3id.org/my-org/validate_schema
 attributes:
   label:
@@ -135,6 +134,7 @@ attributes:
     alias: label
     owner: RadioOptions
     domain_of:
+    - AbstractWorkflowDetails
     - AbstractUserInterface
     - RadioOptions
     range: Any

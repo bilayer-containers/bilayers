@@ -3,7 +3,7 @@
 
 
 
-_Type of the parameters, display_only, results_
+_Type of the parameters, display_only_
 
 
 
@@ -17,10 +17,14 @@ URI: [TypeEnum](TypeEnum.md)
 | float | None |  |
 | boolean | None |  |
 | checkbox | None |  |
-| files | None |  |
 | dropdown | None |  |
 | radio | None |  |
 | textbox | None |  |
+| image | None |  |
+| measurement | None |  |
+| array | None |  |
+| file | None |  |
+| executable | None |  |
 
 
 
@@ -29,7 +33,7 @@ URI: [TypeEnum](TypeEnum.md)
 
 | Name | Description |
 | ---  | --- |
-| [type](type.md) | Type of the parameter |
+| [type](type.md) | Type of the inputs, parameters and outputs |
 
 
 
@@ -59,7 +63,7 @@ URI: [TypeEnum](TypeEnum.md)
 <details>
 ```yaml
 name: TypeEnum
-description: Type of the parameters, display_only, results
+description: Type of the parameters, display_only
 from_schema: https://w3id.org/my-org/validate_schema
 rank: 1000
 permissible_values:
@@ -71,14 +75,22 @@ permissible_values:
     text: boolean
   checkbox:
     text: checkbox
-  files:
-    text: files
   dropdown:
     text: dropdown
   radio:
     text: radio
   textbox:
     text: textbox
+  image:
+    text: image
+  measurement:
+    text: measurement
+  array:
+    text: array
+  file:
+    text: file
+  executable:
+    text: executable
 
 ```
 </details>

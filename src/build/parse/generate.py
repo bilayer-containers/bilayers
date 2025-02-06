@@ -48,7 +48,7 @@ def generate_gradio_app(
 
     template = env.get_template(os.path.basename(template_path))
 
-    gradio_app_code: str = template.render(inputs=inputs, outputs=outputs, parameters=parameters, display_only=display_only, exec_function=exec_function, citations=citations)
+    gradio_app_code: str = template.render(inputs=inputs, outputs=outputs, parameters=parameters, display_only=display_only or [], exec_function=exec_function, citations=citations)
 
     return gradio_app_code
 
@@ -87,15 +87,15 @@ def generate_jupyter_notebook(
     def replace(text: str, old: str, new: str) -> str:
         return text.replace(old, new)
 
-    def create_code_cell(content) -> nbf.NotebookNode:
+    def create_code_cell(content: str) -> nbf.NotebookNode:
         return nbf.v4.new_code_cell(content)
 
-    def create_markdown_cell(content) -> nbf.NotebookNode:
+    def create_markdown_cell(content: str) -> nbf.NotebookNode:
         return nbf.v4.new_markdown_cell(content)
 
     template = env.get_template(os.path.basename(template_path))
     notebook_content: str = template.render(
-        inputs=inputs, outputs=outputs, parameters=parameters, display_only=display_only, exec_function=exec_function)
+        inputs=inputs, outputs=outputs, parameters=parameters, display_only=display_only or [], exec_function=exec_function)
 
     DEFAULT_CITATIONS: Dict[str, List[Dict[str, str]]] = {
         "Bilayers": [
@@ -122,13 +122,12 @@ def generate_jupyter_notebook(
 
     citation_cell: str = ""
     for citation in citations['algorithm']:
-        citation_cell += f"- {citation['name']} under {citation['license']} License : {citation['doi']} --> {citation['description']}\n"
-
+        citation_cell += f"- {citation.get('name', 'Unknown Name')} under {citation.get('license', 'Unknown')} License : {citation.get('doi', 'No Description Available')} --> {citation.get('description', 'No Description Available')}\n"
     for citation in DEFAULT_CITATIONS['Jupyter']:
-        citation_cell += f"- {citation['name']} under {citation['license']} License : {citation['doi']} --> {citation['description']}\n"
+        citation_cell += f"- {citation.get('name', 'Unknown Name')} under {citation.get('license', 'Unknown')} License : {citation.get('doi', 'No Description Available')} --> {citation.get('description', 'No Description Available')}\n"
 
     for citation in DEFAULT_CITATIONS['Bilayers']:
-        citation_cell += f"- {citation['name']} : {citation['license']} --> {citation['description']}\n"
+        citation_cell += f"- {citation.get('name', 'Unknown Name')} : {citation.get('license', 'Unknown License')} --> {citation.get('description', 'No Description Available')}\n"
 
     # Add a markdown cell with the formatted citations
     nb.cells.append(create_markdown_cell(citation_cell))
@@ -144,7 +143,7 @@ def generate_jupyter_notebook(
     # jupyter_shell_command_template_path
     jupyter_shell_command_template_path = "jupyter_shell_command_template.py.j2"
     shell_command_template = env.get_template(os.path.basename(jupyter_shell_command_template_path))
-    run_command_cell: str = shell_command_template.render(cli_command=exec_function['cli_command'])
+    run_command_cell: str = shell_command_template.render(cli_command=exec_function.get('cli_command', ''))
 
     # Append the try-except cell to the notebook
     nb.cells.append(create_code_cell(run_command_cell))
@@ -162,14 +161,15 @@ def main() -> None:
 
     inputs, outputs, parameters, display_only, exec_function, algorithm_folder_name, citations = parse_config(config_path)
 
-    ########################################
-    # Logic for generating Gradio App
-    ########################################
 
     folderA: str = "generated_folders"
     folderB: str = algorithm_folder_name
     # Create Directory if they don't exist
     os.makedirs(os.path.join(folderA, folderB), exist_ok=True)
+
+    ########################################
+    # Logic for generating Gradio App
+    ########################################
 
     # Template path for the Gradio app
     gradio_template_path: str = "gradio_template.py.j2"
@@ -188,12 +188,6 @@ def main() -> None:
     ################################################
     # Logic for generating Jupyter Notebook
     ################################################
-
-    folderA = "generated_folders"
-    folderB = algorithm_folder_name
-    print("Folder Name: ", folderB)
-    # Create Directory if they don't exist
-    os.makedirs(os.path.join(folderA, folderB), exist_ok=True)
 
     # Template path for the Jupyter Notebook
     jupyter_template_path: str = "jupyter_template.py.j2"

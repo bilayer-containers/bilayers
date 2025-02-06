@@ -24,6 +24,8 @@ URI: [https://w3id.org/my-org/validate_schema/:TypeAlgorithmFromCitation](https:
         
       TypeAlgorithmFromCitation : doi
         
+      TypeAlgorithmFromCitation : license
+        
       TypeAlgorithmFromCitation : name
         
       
@@ -39,8 +41,9 @@ URI: [https://w3id.org/my-org/validate_schema/:TypeAlgorithmFromCitation](https:
 
 | Name | Cardinality and Range | Description | Inheritance |
 | ---  | --- | --- | --- |
-| [name](name.md) | 1 <br/> [String](String.md) | Name of the docker_image, algorithm, parameter, display_only, results | direct |
+| [name](name.md) | 1 <br/> [String](String.md) | Name of the docker_image, algorithm, parameter, display_only | direct |
 | [doi](doi.md) | 0..1 <br/> [String](String.md) | DOI of the Algorithm | direct |
+| [license](license.md) | 0..1 <br/> [String](String.md) | License of the Algorithm | direct |
 | [description](description.md) | 0..1 <br/> [String](String.md) | Description of the Algorithm | direct |
 
 
@@ -110,6 +113,7 @@ aliases:
 slots:
 - name
 - doi
+- license
 - description
 
 ```
@@ -128,12 +132,13 @@ aliases:
 attributes:
   name:
     name: name
-    description: Name of the docker_image, algorithm, parameter, display_only, results
+    description: Name of the docker_image, algorithm, parameter, display_only
     from_schema: https://w3id.org/my-org/validate_schema
     rank: 1000
     alias: name
     owner: TypeAlgorithmFromCitation
     domain_of:
+    - AbstractWorkflowDetails
     - AbstractUserInterface
     - ExecFunction
     - DockerImage
@@ -150,6 +155,16 @@ attributes:
     domain_of:
     - TypeAlgorithmFromCitation
     range: string
+  license:
+    name: license
+    description: License of the Algorithm
+    from_schema: https://w3id.org/my-org/validate_schema
+    rank: 1000
+    alias: license
+    owner: TypeAlgorithmFromCitation
+    domain_of:
+    - TypeAlgorithmFromCitation
+    range: string
   description:
     name: description
     description: Description of the Algorithm
@@ -158,6 +173,7 @@ attributes:
     alias: description
     owner: TypeAlgorithmFromCitation
     domain_of:
+    - AbstractWorkflowDetails
     - AbstractUserInterface
     - TypeAlgorithmFromCitation
     range: string

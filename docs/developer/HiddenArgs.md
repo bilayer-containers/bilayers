@@ -106,8 +106,8 @@ attributes:
     name: cli_tag
     from_schema: https://w3id.org/my-org/validate_schema
     domain_of:
+    - AbstractWorkflowDetails
     - TypeParameter
-    - TypeResults
     - HiddenArgs
     range: string
     required: true
@@ -131,6 +131,7 @@ attributes:
     name: cli_order
     from_schema: https://w3id.org/my-org/validate_schema
     domain_of:
+    - AbstractWorkflowDetails
     - TypeParameter
     - HiddenArgs
     range: integer
@@ -153,8 +154,8 @@ attributes:
     alias: cli_tag
     owner: HiddenArgs
     domain_of:
+    - AbstractWorkflowDetails
     - TypeParameter
-    - TypeResults
     - HiddenArgs
     range: string
     required: true
@@ -184,6 +185,7 @@ attributes:
     alias: cli_order
     owner: HiddenArgs
     domain_of:
+    - AbstractWorkflowDetails
     - TypeParameter
     - HiddenArgs
     range: integer

@@ -23,10 +23,9 @@ URI: [https://w3id.org/my-org/validate_schema/:multiselect](https://w3id.org/my-
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [TypeDisplayOnly](TypeDisplayOnly.md) | Display only parameters of a specific Algorithm |  no  |
-| [TypeResults](TypeResults.md) | Results of a specific Algorithm |  no  |
-| [TypeParameter](TypeParameter.md) | Parameters of a specific Algorithm |  no  |
 | [AbstractUserInterface](AbstractUserInterface.md) | Abstract class for user interface |  no  |
+| [TypeDisplayOnly](TypeDisplayOnly.md) | Display only parameters of a specific Algorithm |  no  |
+| [TypeParameter](TypeParameter.md) | Parameters of a specific Algorithm |  no  |
 
 
 

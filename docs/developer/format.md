@@ -1,15 +1,15 @@
 
 
-# Slot: cli_tag
+# Slot: format
 
 
-_CLI tag of the object_
+_Format of the inputs and outputs_
 
 
 
 
 
-URI: [https://w3id.org/my-org/validate_schema/:cli_tag](https://w3id.org/my-org/validate_schema/:cli_tag)
+URI: [https://w3id.org/my-org/validate_schema/:format](https://w3id.org/my-org/validate_schema/:format)
 
 
 
@@ -24,10 +24,8 @@ URI: [https://w3id.org/my-org/validate_schema/:cli_tag](https://w3id.org/my-org/
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
 | [TypeOutput](TypeOutput.md) | Outputs of the algorithm to the next step in the workflow |  no  |
-| [TypeParameter](TypeParameter.md) | Parameters of a specific Algorithm |  no  |
-| [AbstractWorkflowDetails](AbstractWorkflowDetails.md) | Abstract class for details needed to fit config in the workflow |  no  |
-| [HiddenArgs](HiddenArgs.md) | Hidden arguments for the Algorithm |  no  |
 | [TypeInput](TypeInput.md) | Inputs to the algorithm from the last step of the workflow |  no  |
+| [AbstractWorkflowDetails](AbstractWorkflowDetails.md) | Abstract class for details needed to fit config in the workflow |  no  |
 
 
 
@@ -39,7 +37,7 @@ URI: [https://w3id.org/my-org/validate_schema/:cli_tag](https://w3id.org/my-org/
 
 * Range: [String](String.md)
 
-* Required: True
+* Multivalued: True
 
 
 
@@ -65,8 +63,8 @@ URI: [https://w3id.org/my-org/validate_schema/:cli_tag](https://w3id.org/my-org/
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | https://w3id.org/my-org/validate_schema/:cli_tag |
-| native | https://w3id.org/my-org/validate_schema/:cli_tag |
+| self | https://w3id.org/my-org/validate_schema/:format |
+| native | https://w3id.org/my-org/validate_schema/:format |
 
 
 
@@ -75,17 +73,15 @@ URI: [https://w3id.org/my-org/validate_schema/:cli_tag](https://w3id.org/my-org/
 
 <details>
 ```yaml
-name: cli_tag
-description: CLI tag of the object
+name: format
+description: Format of the inputs and outputs
 from_schema: https://w3id.org/my-org/validate_schema
 rank: 1000
-alias: cli_tag
+alias: format
 domain_of:
 - AbstractWorkflowDetails
-- TypeParameter
-- HiddenArgs
 range: string
-required: true
+multivalued: true
 
 ```
 </details>

@@ -3,7 +3,7 @@
 # Slot: options
 
 
-_Options of the Radio button in parameters, display_only, results_
+_Options of the Radio button in parameters, display_only_
 
 
 
@@ -23,10 +23,9 @@ URI: [https://w3id.org/my-org/validate_schema/:options](https://w3id.org/my-org/
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [TypeDisplayOnly](TypeDisplayOnly.md) | Display only parameters of a specific Algorithm |  no  |
-| [TypeResults](TypeResults.md) | Results of a specific Algorithm |  no  |
-| [TypeParameter](TypeParameter.md) | Parameters of a specific Algorithm |  no  |
 | [AbstractUserInterface](AbstractUserInterface.md) | Abstract class for user interface |  no  |
+| [TypeDisplayOnly](TypeDisplayOnly.md) | Display only parameters of a specific Algorithm |  no  |
+| [TypeParameter](TypeParameter.md) | Parameters of a specific Algorithm |  no  |
 
 
 
@@ -75,7 +74,7 @@ URI: [https://w3id.org/my-org/validate_schema/:options](https://w3id.org/my-org/
 <details>
 ```yaml
 name: options
-description: Options of the Radio button in parameters, display_only, results
+description: Options of the Radio button in parameters, display_only
 from_schema: https://w3id.org/my-org/validate_schema
 rank: 1000
 alias: options

@@ -42,12 +42,17 @@ URI: [linkml:Any](https://w3id.org/linkml/Any)
 
 | used by | used in | type | used |
 | ---  | --- | --- | --- |
+| [AbstractWorkflowDetails](AbstractWorkflowDetails.md) | [label](label.md) | range | [Any](Any.md) |
+| [AbstractWorkflowDetails](AbstractWorkflowDetails.md) | [default](default.md) | range | [Any](Any.md) |
+| [TypeInput](TypeInput.md) | [label](label.md) | range | [Any](Any.md) |
+| [TypeInput](TypeInput.md) | [default](default.md) | range | [Any](Any.md) |
+| [TypeOutput](TypeOutput.md) | [label](label.md) | range | [Any](Any.md) |
+| [TypeOutput](TypeOutput.md) | [default](default.md) | range | [Any](Any.md) |
 | [AbstractUserInterface](AbstractUserInterface.md) | [label](label.md) | range | [Any](Any.md) |
 | [TypeParameter](TypeParameter.md) | [default](default.md) | range | [Any](Any.md) |
 | [TypeParameter](TypeParameter.md) | [label](label.md) | range | [Any](Any.md) |
 | [TypeDisplayOnly](TypeDisplayOnly.md) | [default](default.md) | range | [Any](Any.md) |
 | [TypeDisplayOnly](TypeDisplayOnly.md) | [label](label.md) | range | [Any](Any.md) |
-| [TypeResults](TypeResults.md) | [label](label.md) | range | [Any](Any.md) |
 | [RadioOptions](RadioOptions.md) | [label](label.md) | range | [Any](Any.md) |
 | [RadioOptions](RadioOptions.md) | [value](value.md) | range | [Any](Any.md) |
 

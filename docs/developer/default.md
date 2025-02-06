@@ -23,8 +23,11 @@ URI: [https://w3id.org/my-org/validate_schema/:default](https://w3id.org/my-org/
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [TypeDisplayOnly](TypeDisplayOnly.md) | Display only parameters of a specific Algorithm |  no  |
+| [TypeOutput](TypeOutput.md) | Outputs of the algorithm to the next step in the workflow |  no  |
 | [TypeParameter](TypeParameter.md) | Parameters of a specific Algorithm |  no  |
+| [AbstractWorkflowDetails](AbstractWorkflowDetails.md) | Abstract class for details needed to fit config in the workflow |  no  |
+| [TypeDisplayOnly](TypeDisplayOnly.md) | Display only parameters of a specific Algorithm |  no  |
+| [TypeInput](TypeInput.md) | Inputs to the algorithm from the last step of the workflow |  no  |
 
 
 
@@ -78,6 +81,7 @@ from_schema: https://w3id.org/my-org/validate_schema
 rank: 1000
 alias: default
 domain_of:
+- AbstractWorkflowDetails
 - TypeParameter
 - TypeDisplayOnly
 range: Any

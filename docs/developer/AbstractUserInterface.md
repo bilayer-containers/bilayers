@@ -26,8 +26,6 @@ URI: [https://w3id.org/my-org/validate_schema/:AbstractUserInterface](https://w3
         click TypeParameter href "../TypeParameter"
       AbstractUserInterface <|-- TypeDisplayOnly
         click TypeDisplayOnly href "../TypeDisplayOnly"
-      AbstractUserInterface <|-- TypeResults
-        click TypeResults href "../TypeResults"
       
       AbstractUserInterface : append_value
         
@@ -103,7 +101,6 @@ URI: [https://w3id.org/my-org/validate_schema/:AbstractUserInterface](https://w3
 * **AbstractUserInterface**
     * [TypeParameter](TypeParameter.md)
     * [TypeDisplayOnly](TypeDisplayOnly.md)
-    * [TypeResults](TypeResults.md)
 
 
 
@@ -111,8 +108,8 @@ URI: [https://w3id.org/my-org/validate_schema/:AbstractUserInterface](https://w3
 
 | Name | Cardinality and Range | Description | Inheritance |
 | ---  | --- | --- | --- |
-| [name](name.md) | 1 <br/> [String](String.md) | Name of the docker_image, algorithm, parameter, display_only, results | direct |
-| [type](type.md) | 1 <br/> [TypeEnum](TypeEnum.md) | Type of the parameter | direct |
+| [name](name.md) | 1 <br/> [String](String.md) | Name of the docker_image, algorithm, parameter, display_only | direct |
+| [type](type.md) | 1 <br/> [TypeEnum](TypeEnum.md) | Type of the inputs, parameters and outputs | direct |
 | [label](label.md) | 1 <br/> [Any](Any.md) | Label of the object, but also Radio button's label | direct |
 | [description](description.md) | 0..1 <br/> [String](String.md) | Description of the Algorithm | direct |
 | [optional](optional.md) | 1 <br/> [Boolean](Boolean.md) | Optional value of the object | direct |
@@ -121,7 +118,7 @@ URI: [https://w3id.org/my-org/validate_schema/:AbstractUserInterface](https://w3
 | [output_dir_set](output_dir_set.md) | 0..1 <br/> [Boolean](Boolean.md) | Output directory set | direct |
 | [folder_name](folder_name.md) | 0..1 <br/> [String](String.md) | Folder name of the object | direct |
 | [file_count](file_count.md) | 0..1 <br/> [FileTypeEnum](FileTypeEnum.md) | Type of Number of files | direct |
-| [options](options.md) | * <br/> [RadioOptions](RadioOptions.md) | Options of the Radio button in parameters, display_only, results | direct |
+| [options](options.md) | * <br/> [RadioOptions](RadioOptions.md) | Options of the Radio button in parameters, display_only | direct |
 | [interactive](interactive.md) | 0..1 <br/> [Boolean](Boolean.md) | Whether the object is interactive on UI | direct |
 | [append_value](append_value.md) | 0..1 <br/> [Boolean](Boolean.md) | Append value of the hidden argument | direct |
 | [multiselect](multiselect.md) | 0..1 <br/> [Boolean](Boolean.md) | Multiselect value of the dropdown | direct |
@@ -137,7 +134,6 @@ URI: [https://w3id.org/my-org/validate_schema/:AbstractUserInterface](https://w3
 
 * parameters
 * display_only
-* results
 
 
 
@@ -184,7 +180,6 @@ from_schema: https://w3id.org/my-org/validate_schema
 aliases:
 - parameters
 - display_only
-- results
 abstract: true
 slots:
 - name
@@ -263,17 +258,17 @@ from_schema: https://w3id.org/my-org/validate_schema
 aliases:
 - parameters
 - display_only
-- results
 abstract: true
 attributes:
   name:
     name: name
-    description: Name of the docker_image, algorithm, parameter, display_only, results
+    description: Name of the docker_image, algorithm, parameter, display_only
     from_schema: https://w3id.org/my-org/validate_schema
     rank: 1000
     alias: name
     owner: AbstractUserInterface
     domain_of:
+    - AbstractWorkflowDetails
     - AbstractUserInterface
     - ExecFunction
     - DockerImage
@@ -282,12 +277,13 @@ attributes:
     required: true
   type:
     name: type
-    description: Type of the parameter
+    description: Type of the inputs, parameters and outputs
     from_schema: https://w3id.org/my-org/validate_schema
     rank: 1000
     alias: type
     owner: AbstractUserInterface
     domain_of:
+    - AbstractWorkflowDetails
     - AbstractUserInterface
     range: TypeEnum
     required: true
@@ -299,6 +295,7 @@ attributes:
     alias: label
     owner: AbstractUserInterface
     domain_of:
+    - AbstractWorkflowDetails
     - AbstractUserInterface
     - RadioOptions
     range: Any
@@ -311,6 +308,7 @@ attributes:
     alias: description
     owner: AbstractUserInterface
     domain_of:
+    - AbstractWorkflowDetails
     - AbstractUserInterface
     - TypeAlgorithmFromCitation
     range: string
@@ -322,6 +320,7 @@ attributes:
     alias: optional
     owner: AbstractUserInterface
     domain_of:
+    - AbstractWorkflowDetails
     - AbstractUserInterface
     range: boolean
     required: true
@@ -333,6 +332,7 @@ attributes:
     alias: section_id
     owner: AbstractUserInterface
     domain_of:
+    - AbstractWorkflowDetails
     - AbstractUserInterface
     range: string
     required: true
@@ -344,6 +344,7 @@ attributes:
     alias: mode
     owner: AbstractUserInterface
     domain_of:
+    - AbstractWorkflowDetails
     - AbstractUserInterface
     range: ModeEnum
     required: true
@@ -366,6 +367,7 @@ attributes:
     alias: folder_name
     owner: AbstractUserInterface
     domain_of:
+    - AbstractWorkflowDetails
     - AbstractUserInterface
     range: string
     required: false
@@ -377,12 +379,13 @@ attributes:
     alias: file_count
     owner: AbstractUserInterface
     domain_of:
+    - AbstractWorkflowDetails
     - AbstractUserInterface
     range: FileTypeEnum
     required: false
   options:
     name: options
-    description: Options of the Radio button in parameters, display_only, results
+    description: Options of the Radio button in parameters, display_only
     from_schema: https://w3id.org/my-org/validate_schema
     rank: 1000
     alias: options

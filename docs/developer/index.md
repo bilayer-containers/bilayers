@@ -15,13 +15,15 @@ Name: validate_schema
 | [AbstractUserInterface](AbstractUserInterface.md) | Abstract class for user interface |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[TypeDisplayOnly](TypeDisplayOnly.md) | Display only parameters of a specific Algorithm |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[TypeParameter](TypeParameter.md) | Parameters of a specific Algorithm |
-| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[TypeResults](TypeResults.md) | Results of a specific Algorithm |
+| [AbstractWorkflowDetails](AbstractWorkflowDetails.md) | Abstract class for details needed to fit config in the workflow |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[TypeInput](TypeInput.md) | Inputs to the algorithm from the last step of the workflow |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[TypeOutput](TypeOutput.md) | Outputs of the algorithm to the next step in the workflow |
 | [Any](Any.md) | Any type |
 | [Container](Container.md) | Container class which holds all the high_level keywords from config.yaml file of specific algorithm |
 | [DockerImage](DockerImage.md) | Description of docker_image for the specific algorithm |
 | [ExecFunction](ExecFunction.md) | Function to execute the Algorithm |
 | [HiddenArgs](HiddenArgs.md) | Hidden arguments for the Algorithm |
-| [RadioOptions](RadioOptions.md) | Options of the Radio button in parameters, display_only, results |
+| [RadioOptions](RadioOptions.md) | Options of the Radio button in parameters, display_only |
 | [TypeAlgorithmFromCitation](TypeAlgorithmFromCitation.md) | Algorithm's citations |
 | [TypeCitations](TypeCitations.md) | Citations of the Algorithm |
 
@@ -39,6 +41,7 @@ Name: validate_schema
 | [cli_order](cli_order.md) | Order of the CLI arguments |
 | [cli_tag](cli_tag.md) | CLI tag of the object |
 | [default](default.md) | Default value of the parameter |
+| [depth](depth.md) | whether z-dimension i |
 | [description](description.md) | Description of the Algorithm |
 | [display_only](display_only.md) | Display only parameters of a specific Algorithm |
 | [docker_image](docker_image.md) | Description of docker_image for the specific algorithm |
@@ -46,24 +49,32 @@ Name: validate_schema
 | [exec_function](exec_function.md) | Function to execute the Algorithm |
 | [file_count](file_count.md) | Type of Number of files |
 | [folder_name](folder_name.md) | Folder name of the object |
+| [format](format.md) | Format of the inputs and outputs |
 | [hidden_args](hidden_args.md) | Hidden arguments for the Algorithm |
+| [inputs](inputs.md) | Inputs to the algorithm from the last step of the workflow |
 | [interactive](interactive.md) | Whether the object is interactive on UI |
 | [label](label.md) | Label of the object, but also Radio button's label |
+| [license](license.md) | License of the Algorithm |
 | [mode](mode.md) | Mode of the object |
 | [module](module.md) | Module to execute the Algorithm |
 | [multiselect](multiselect.md) | Multiselect value of the dropdown |
-| [name](name.md) | Name of the docker_image, algorithm, parameter, display_only, results |
+| [name](name.md) | Name of the docker_image, algorithm, parameter, display_only |
 | [optional](optional.md) | Optional value of the object |
-| [options](options.md) | Options of the Radio button in parameters, display_only, results |
+| [options](options.md) | Options of the Radio button in parameters, display_only |
 | [org](org.md) | Organization of the docker image |
 | [output_dir_set](output_dir_set.md) | Output directory set |
+| [outputs](outputs.md) | Outputs of the algorithm to the next step in the workflow |
 | [parameters](parameters.md) | Parameters of a specific Algorithm |
+| [path](path.md) | Path of the inputs and outputs |
 | [platform](platform.md) | Platform on which the docker image was built |
-| [results](results.md) | Results of a specific Algorithm |
+| [pyramidal](pyramidal.md) | whether pyramidal images are accepted via tool |
 | [script](script.md) | Script to execute the Algorithm |
 | [section_id](section_id.md) | Section ID of the object |
+| [subtype](subtype.md) | Subtype of the inputs and outputs |
 | [tag](tag.md) | Tag of the docker image |
-| [type](type.md) | Type of the parameter |
+| [tiled](tiled.md) | whether tiled images are accepted via tool |
+| [timepoints](timepoints.md) | whether t-dimension i |
+| [type](type.md) | Type of the inputs, parameters and outputs |
 | [value](value.md) | Value of the hidden argument or RadioButton Option's Value |
 
 
@@ -72,8 +83,9 @@ Name: validate_schema
 | Enumeration | Description |
 | --- | --- |
 | [FileTypeEnum](FileTypeEnum.md) | Type of Number of files |
-| [ModeEnum](ModeEnum.md) | Mode of the parameters, display_only, results |
-| [TypeEnum](TypeEnum.md) | Type of the parameters, display_only, results |
+| [ModeEnum](ModeEnum.md) | Mode of the parameters, display_only |
+| [SubTypeEnum](SubTypeEnum.md) | Subtype of the inputs and outputs, iff type is image |
+| [TypeEnum](TypeEnum.md) | Type of the parameters, display_only |
 
 
 ## Types

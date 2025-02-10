@@ -33,7 +33,7 @@ URI: [xsd:string](http://www.w3.org/2001/XMLSchema#string)
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -43,7 +43,7 @@ URI: [xsd:string](http://www.w3.org/2001/XMLSchema#string)
 | Mapping Type | Mapped Value |
 | ---  | ---  |
 | self | xsd:string |
-| native | https://w3id.org/my-org/validate_schema/:jsonpointer |
+| native | https://w3id.org/my-org/bilayers_schema/:jsonpointer |
 
 
 

@@ -9,7 +9,7 @@ _Citations of the Algorithm_
 
 
 
-URI: [https://w3id.org/my-org/validate_schema/:citations](https://w3id.org/my-org/validate_schema/:citations)
+URI: [https://w3id.org/my-org/bilayers_schema/:citations](https://w3id.org/my-org/bilayers_schema/:citations)
 
 
 
@@ -23,7 +23,7 @@ URI: [https://w3id.org/my-org/validate_schema/:citations](https://w3id.org/my-or
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [Container](Container.md) | Container class which holds all the high_level keywords from config |  no  |
+| [SpecContainer](SpecContainer.md) | SpecContianer class which holds all the high_level keywords from config |  no  |
 
 
 
@@ -52,7 +52,7 @@ URI: [https://w3id.org/my-org/validate_schema/:citations](https://w3id.org/my-or
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -61,8 +61,8 @@ URI: [https://w3id.org/my-org/validate_schema/:citations](https://w3id.org/my-or
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | https://w3id.org/my-org/validate_schema/:citations |
-| native | https://w3id.org/my-org/validate_schema/:citations |
+| self | https://w3id.org/my-org/bilayers_schema/:citations |
+| native | https://w3id.org/my-org/bilayers_schema/:citations |
 
 
 
@@ -73,11 +73,11 @@ URI: [https://w3id.org/my-org/validate_schema/:citations](https://w3id.org/my-or
 ```yaml
 name: citations
 description: Citations of the Algorithm
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 rank: 1000
 alias: citations
 domain_of:
-- Container
+- SpecContainer
 range: TypeCitations
 required: true
 

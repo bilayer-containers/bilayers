@@ -32,7 +32,7 @@ URI: [xsd:double](http://www.w3.org/2001/XMLSchema#double)
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -42,7 +42,7 @@ URI: [xsd:double](http://www.w3.org/2001/XMLSchema#double)
 | Mapping Type | Mapped Value |
 | ---  | ---  |
 | self | xsd:double |
-| native | https://w3id.org/my-org/validate_schema/:double |
+| native | https://w3id.org/my-org/bilayers_schema/:double |
 | close | schema:Float |
 
 

@@ -42,7 +42,9 @@ def insert_into_jagged_array(
         jagged_array.append(None)
 
     # Initialize the sublist if it's not already
-    jagged_array[abs(cli_order)] = jagged_array[abs(cli_order)] or []
+    {# jagged_array[abs(cli_order)] = jagged_array[abs(cli_order)] or [] #}
+    if jagged_array[abs(cli_order)] is None:
+        jagged_array[abs(cli_order)] = []
 
     # Append the cli_tag and value to the appropriate sublist
     result = option_to_append(cli_tag, value)
@@ -150,18 +152,18 @@ def generate_cli_command(
                             raise gr.Error(error_message, duration = None)
                         else:
                             continue
-                # If the parameter is a list (mainly for parameter files and/or inputs image, file, measurement, array, executable), convert it to a string
+                # If the parameter is a list (mainly `inputs` section where type can be either of image, file, measurement, array, executable), convert it to a string
                 elif isinstance(value, list):
-                    folder_name = cli_tags[key].get("folder_name")
+                    folder_name = cli_tags[key]["folder_name"] # Direct access since it's guarranteed to exist
                     print("Folder Name:", folder_name)
                     os.makedirs(folder_name, exist_ok=True)
                     print("Value of dir", value)
                     for file_path in value:
                         shutil.copy(file_path, folder_name)
                     value = folder_name
-                # If the parameter is a TextBox, check if it has a directory-name i.e. it's coming from ouputs
+                # If the parameter is a TextBox, check if it has a directory-name i.e. it's coming for declaring ouput path
                 elif isinstance(value, str) and value!="":
-                    output_dir_set = cli_tags[key].get("output_dir_set")
+                    output_dir_set = cli_tags[key].get("output_dir_set") # May be missing, so .get() prevents crashes by returning None
                     if output_dir_set == True:
                         output_folder_name = value
                         os.makedirs(output_folder_name, exist_ok=True)
@@ -263,22 +265,12 @@ def on_submit(
 {%- endif %}
 {% if parameters is not none -%}
 {% for param_conf in parameters -%}
-{% if param_conf.type == 'files' -%}
-{{param_conf.label | lower | replace(" ", "_")}}_description,
 {{ param_conf.label | lower | replace(" ", "_") }},
-{% else %}
-{{ param_conf.label | lower | replace(" ", "_") }},
-{%- endif %}
 {%- endfor %}
 {%- endif %}
 {% if display_only is not none -%}
 {% for display_only_conf in display_only -%}
-{% if display_only_conf.type == 'files' -%}
-{{display_only_conf.label | lower | replace(" ", "_")}}_description,
 {{ display_only_conf.label | lower | replace(" ", "_") }},
-{% else %}
-{{ display_only_conf.label | lower | replace(" ", "_") }},
-{%- endif %}
 {%- endfor %}
 {%- endif %}
 ):
@@ -321,9 +313,6 @@ def on_submit(
             {% if param_conf.append_value is defined %}
         "append_value": {{ param_conf.append_value }},
             {% endif %}
-        {% endif %}
-        {% if param_conf.type == 'files' %}
-        "folder_name": "{{ param_conf.folder_name }}"
         {% endif %}
         {% if param_conf.type == 'textbox' %}
             {% if param_conf.output_dir_set is defined %}
@@ -402,9 +391,6 @@ def on_submit(
 {{ param_conf.label | lower | replace(" ", "_") }} = gr.Textbox(label="{{ param_conf.label }}", info="{{ param_conf.description }}", value="{{ param_conf.default }}")
 {% elif param_conf.type == 'checkbox' %}
 {{ param_conf.label | lower | replace(" ", "_") }} = gr.Checkbox(label="{{ param_conf.label }}", info="{{ param_conf.description }}", value={{ param_conf.default }})
-{% elif param_conf.type == 'files' %}
-{{ param_conf.label | lower | replace(" ", "_") }}_description = gr.Markdown(value="{{ param_conf.description }}")
-{{ param_conf.label | lower | replace(" ", "_") }} = gr.Files(label="{{ param_conf.label }}", file_count="{{ param_conf.file_count }}")
 {% endif %}
 
 
@@ -425,9 +411,6 @@ def on_submit(
 {{ display_only_conf.label | lower | replace(" ", "_") }} = gr.Textbox(label="{{ display_only_conf.label }}", info="{{ display_only_conf.description }}", value="{{ display_only_conf.default }}", interactive=False)
 {% elif display_only_conf.type == 'checkbox' %}
 {{ display_only_conf.label | lower | replace(" ", "_") }} = gr.Checkbox(label="{{ display_only_conf.label }}", info="{{ display_only_conf.description }}", value={{ display_only_conf.default }}, interactive=False)
-{% elif display_only_conf.type == 'files' %}
-{{ display_only_conf.label | lower | replace(" ", "_") }}_description = gr.Markdown(value="{{ display_only_conf.description }}")
-{{ display_only_conf.label | lower | replace(" ", "_") }} = gr.Files(label="{{ display_only_conf.label }}", file_count="{{ display_only_conf.file_count }}", interactive=False)
 {%- endif %}
 {%- endfor %}
 {%- endif %}
@@ -486,23 +469,13 @@ all_parameters: List[Any] = [
 {# Getting stuff from parameters #}
 {% if parameters is not none -%}
 {% for param_conf in parameters -%}
-{% if param_conf.type == 'files' -%}
-    {{param_conf.label | lower | replace(" ", "_")}}_description,
-    {{ param_conf.label | lower | replace(" ", "_") }},
-{% else %}
-    {{ param_conf.label | lower | replace(" ", "_") }},
-{%- endif %}
+{{ param_conf.label | lower | replace(" ", "_") }},
 {%- endfor %}
 {%- endif %}
 {# Getting stuff from display_only #}
 {% if display_only is not none -%}
 {% for display_only_conf in display_only -%}
-{% if display_only_conf.type == 'files' -%}
-    {{ display_only_conf.label | lower | replace(" ", "_")}}_description,
-    {{ display_only_conf.label | lower | replace(" ", "_") }},
-{% else %}
-    {{ display_only_conf.label | lower | replace(" ", "_") }},
-{%- endif %}
+{{ display_only_conf.label | lower | replace(" ", "_") }},
 {%- endfor %}
 {%- endif %}
 ]

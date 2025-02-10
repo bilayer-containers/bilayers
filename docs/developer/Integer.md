@@ -32,7 +32,7 @@ URI: [xsd:integer](http://www.w3.org/2001/XMLSchema#integer)
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -42,7 +42,7 @@ URI: [xsd:integer](http://www.w3.org/2001/XMLSchema#integer)
 | Mapping Type | Mapped Value |
 | ---  | ---  |
 | self | xsd:integer |
-| native | https://w3id.org/my-org/validate_schema/:integer |
+| native | https://w3id.org/my-org/bilayers_schema/:integer |
 | exact | schema:Integer |
 
 

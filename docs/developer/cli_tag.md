@@ -9,7 +9,7 @@ _CLI tag of the object_
 
 
 
-URI: [https://w3id.org/my-org/validate_schema/:cli_tag](https://w3id.org/my-org/validate_schema/:cli_tag)
+URI: [https://w3id.org/my-org/bilayers_schema/:cli_tag](https://w3id.org/my-org/bilayers_schema/:cli_tag)
 
 
 
@@ -23,11 +23,11 @@ URI: [https://w3id.org/my-org/validate_schema/:cli_tag](https://w3id.org/my-org/
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [TypeOutput](TypeOutput.md) | Outputs of the algorithm to the next step in the workflow |  no  |
 | [TypeParameter](TypeParameter.md) | Parameters of a specific Algorithm |  no  |
+| [TypeOutput](TypeOutput.md) | Outputs of the algorithm to the next step in the workflow |  no  |
+| [TypeInput](TypeInput.md) | Inputs to the algorithm from the last step of the workflow |  no  |
 | [AbstractWorkflowDetails](AbstractWorkflowDetails.md) | Abstract class for details needed to fit config in the workflow |  no  |
 | [HiddenArgs](HiddenArgs.md) | Hidden arguments for the Algorithm |  no  |
-| [TypeInput](TypeInput.md) | Inputs to the algorithm from the last step of the workflow |  no  |
 
 
 
@@ -56,7 +56,7 @@ URI: [https://w3id.org/my-org/validate_schema/:cli_tag](https://w3id.org/my-org/
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -65,8 +65,8 @@ URI: [https://w3id.org/my-org/validate_schema/:cli_tag](https://w3id.org/my-org/
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | https://w3id.org/my-org/validate_schema/:cli_tag |
-| native | https://w3id.org/my-org/validate_schema/:cli_tag |
+| self | https://w3id.org/my-org/bilayers_schema/:cli_tag |
+| native | https://w3id.org/my-org/bilayers_schema/:cli_tag |
 
 
 
@@ -77,7 +77,7 @@ URI: [https://w3id.org/my-org/validate_schema/:cli_tag](https://w3id.org/my-org/
 ```yaml
 name: cli_tag
 description: CLI tag of the object
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 rank: 1000
 alias: cli_tag
 domain_of:

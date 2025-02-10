@@ -32,7 +32,7 @@ URI: [xsd:float](http://www.w3.org/2001/XMLSchema#float)
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -42,7 +42,7 @@ URI: [xsd:float](http://www.w3.org/2001/XMLSchema#float)
 | Mapping Type | Mapped Value |
 | ---  | ---  |
 | self | xsd:float |
-| native | https://w3id.org/my-org/validate_schema/:float |
+| native | https://w3id.org/my-org/bilayers_schema/:float |
 | exact | schema:Float |
 
 

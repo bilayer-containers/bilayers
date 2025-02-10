@@ -9,7 +9,7 @@ _Format of the inputs and outputs_
 
 
 
-URI: [https://w3id.org/my-org/validate_schema/:format](https://w3id.org/my-org/validate_schema/:format)
+URI: [https://w3id.org/my-org/bilayers_schema/:format](https://w3id.org/my-org/bilayers_schema/:format)
 
 
 
@@ -24,8 +24,8 @@ URI: [https://w3id.org/my-org/validate_schema/:format](https://w3id.org/my-org/v
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
 | [TypeOutput](TypeOutput.md) | Outputs of the algorithm to the next step in the workflow |  no  |
-| [TypeInput](TypeInput.md) | Inputs to the algorithm from the last step of the workflow |  no  |
 | [AbstractWorkflowDetails](AbstractWorkflowDetails.md) | Abstract class for details needed to fit config in the workflow |  no  |
+| [TypeInput](TypeInput.md) | Inputs to the algorithm from the last step of the workflow |  no  |
 
 
 
@@ -54,7 +54,7 @@ URI: [https://w3id.org/my-org/validate_schema/:format](https://w3id.org/my-org/v
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -63,8 +63,8 @@ URI: [https://w3id.org/my-org/validate_schema/:format](https://w3id.org/my-org/v
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | https://w3id.org/my-org/validate_schema/:format |
-| native | https://w3id.org/my-org/validate_schema/:format |
+| self | https://w3id.org/my-org/bilayers_schema/:format |
+| native | https://w3id.org/my-org/bilayers_schema/:format |
 
 
 
@@ -75,7 +75,7 @@ URI: [https://w3id.org/my-org/validate_schema/:format](https://w3id.org/my-org/v
 ```yaml
 name: format
 description: Format of the inputs and outputs
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 rank: 1000
 alias: format
 domain_of:

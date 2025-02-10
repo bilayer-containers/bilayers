@@ -1,11 +1,12 @@
 ---
-title: Steps to Run Bilayers Docker Images
+title: Running Bilayers Docker Images
 authors:
   - name: Cimini Lab
     affiliations:
       - Broad Institute of MIT and Harvard
 ---
 
+Bilayers provides ready-to-use Docker images with Gradio or Jupyter Notebook interfaces for bioimage analysis algorithms. This guide explains how to pull and run these images via CLI (Command Line Interface) or Docker Desktop (GUI).
 
 ## 1. Pull the Docker Image (CLI or Docker Desktop)
 
@@ -52,9 +53,9 @@ Replace ```<repo_name>``` with the algorithm name (e.g., cellpose) and ```<tag>`
 ## 2. Run the Docker Container (CLI or Docker Desktop)
 
 :::{attention}
-**Volume Mount:** A volume mount lets a Docker container access and store files on the host machine, so data isn’t lost when the container stops or restarts.
+**Volume Mount:** A volume mount allows a Docker container to access and store files on the host machine. This prevents data loss when the container stops. Running a Jupyter interface requires a volume mount for data persistence.
 
-**No Volume Mount:** Without a volume mount, files inside the container don’t save outside it. Usually, ideal for temporary tasks that don’t need to keep data after stopping the container. However, with Gradio, you can download your output if needed.
+**No Volume Mount:** Without a volume mount, files inside the container don’t save outside it. Usually, ideal for temporary tasks that don’t need to keep data after stopping the container. Running a Gradio interface does not require a volume mount (you can download the output from the UI)
 :::
 
 **Using CLI:**

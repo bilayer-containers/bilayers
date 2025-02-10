@@ -72,7 +72,7 @@ URI: [linkml:Any](https://w3id.org/linkml/Any)
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -82,7 +82,7 @@ URI: [linkml:Any](https://w3id.org/linkml/Any)
 | Mapping Type | Mapped Value |
 | ---  | ---  |
 | self | linkml:Any |
-| native | https://w3id.org/my-org/validate_schema/:Any |
+| native | https://w3id.org/my-org/bilayers_schema/:Any |
 
 
 
@@ -100,7 +100,7 @@ URI: [linkml:Any](https://w3id.org/linkml/Any)
 ```yaml
 name: Any
 description: Any type
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 class_uri: linkml:Any
 
 ```
@@ -112,7 +112,7 @@ class_uri: linkml:Any
 ```yaml
 name: Any
 description: Any type
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 class_uri: linkml:Any
 
 ```

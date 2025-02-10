@@ -9,7 +9,7 @@ _whether pyramidal images are accepted via tool_
 
 
 
-URI: [https://w3id.org/my-org/validate_schema/:pyramidal](https://w3id.org/my-org/validate_schema/:pyramidal)
+URI: [https://w3id.org/my-org/bilayers_schema/:pyramidal](https://w3id.org/my-org/bilayers_schema/:pyramidal)
 
 
 
@@ -24,8 +24,8 @@ URI: [https://w3id.org/my-org/validate_schema/:pyramidal](https://w3id.org/my-or
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
 | [TypeOutput](TypeOutput.md) | Outputs of the algorithm to the next step in the workflow |  no  |
-| [TypeInput](TypeInput.md) | Inputs to the algorithm from the last step of the workflow |  no  |
 | [AbstractWorkflowDetails](AbstractWorkflowDetails.md) | Abstract class for details needed to fit config in the workflow |  no  |
+| [TypeInput](TypeInput.md) | Inputs to the algorithm from the last step of the workflow |  no  |
 
 
 
@@ -52,7 +52,7 @@ URI: [https://w3id.org/my-org/validate_schema/:pyramidal](https://w3id.org/my-or
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -61,8 +61,8 @@ URI: [https://w3id.org/my-org/validate_schema/:pyramidal](https://w3id.org/my-or
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | https://w3id.org/my-org/validate_schema/:pyramidal |
-| native | https://w3id.org/my-org/validate_schema/:pyramidal |
+| self | https://w3id.org/my-org/bilayers_schema/:pyramidal |
+| native | https://w3id.org/my-org/bilayers_schema/:pyramidal |
 
 
 
@@ -73,7 +73,7 @@ URI: [https://w3id.org/my-org/validate_schema/:pyramidal](https://w3id.org/my-or
 ```yaml
 name: pyramidal
 description: whether pyramidal images are accepted via tool
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 rank: 1000
 alias: pyramidal
 domain_of:

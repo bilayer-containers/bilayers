@@ -9,7 +9,7 @@ _Subtype of the inputs and outputs_
 
 
 
-URI: [https://w3id.org/my-org/validate_schema/:subtype](https://w3id.org/my-org/validate_schema/:subtype)
+URI: [https://w3id.org/my-org/bilayers_schema/:subtype](https://w3id.org/my-org/bilayers_schema/:subtype)
 
 
 
@@ -24,8 +24,8 @@ URI: [https://w3id.org/my-org/validate_schema/:subtype](https://w3id.org/my-org/
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
 | [TypeOutput](TypeOutput.md) | Outputs of the algorithm to the next step in the workflow |  no  |
-| [TypeInput](TypeInput.md) | Inputs to the algorithm from the last step of the workflow |  no  |
 | [AbstractWorkflowDetails](AbstractWorkflowDetails.md) | Abstract class for details needed to fit config in the workflow |  no  |
+| [TypeInput](TypeInput.md) | Inputs to the algorithm from the last step of the workflow |  no  |
 
 
 
@@ -54,7 +54,7 @@ URI: [https://w3id.org/my-org/validate_schema/:subtype](https://w3id.org/my-org/
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -63,8 +63,8 @@ URI: [https://w3id.org/my-org/validate_schema/:subtype](https://w3id.org/my-org/
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | https://w3id.org/my-org/validate_schema/:subtype |
-| native | https://w3id.org/my-org/validate_schema/:subtype |
+| self | https://w3id.org/my-org/bilayers_schema/:subtype |
+| native | https://w3id.org/my-org/bilayers_schema/:subtype |
 
 
 
@@ -75,7 +75,7 @@ URI: [https://w3id.org/my-org/validate_schema/:subtype](https://w3id.org/my-org/
 ```yaml
 name: subtype
 description: Subtype of the inputs and outputs
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 rank: 1000
 alias: subtype
 domain_of:

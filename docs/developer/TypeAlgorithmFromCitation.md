@@ -9,7 +9,7 @@ _Algorithm's citations_
 
 
 
-URI: [https://w3id.org/my-org/validate_schema/:TypeAlgorithmFromCitation](https://w3id.org/my-org/validate_schema/:TypeAlgorithmFromCitation)
+URI: [https://w3id.org/my-org/bilayers_schema/:TypeAlgorithmFromCitation](https://w3id.org/my-org/bilayers_schema/:TypeAlgorithmFromCitation)
 
 
 
@@ -78,7 +78,7 @@ URI: [https://w3id.org/my-org/validate_schema/:TypeAlgorithmFromCitation](https:
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -87,8 +87,8 @@ URI: [https://w3id.org/my-org/validate_schema/:TypeAlgorithmFromCitation](https:
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | https://w3id.org/my-org/validate_schema/:TypeAlgorithmFromCitation |
-| native | https://w3id.org/my-org/validate_schema/:TypeAlgorithmFromCitation |
+| self | https://w3id.org/my-org/bilayers_schema/:TypeAlgorithmFromCitation |
+| native | https://w3id.org/my-org/bilayers_schema/:TypeAlgorithmFromCitation |
 
 
 
@@ -106,7 +106,7 @@ URI: [https://w3id.org/my-org/validate_schema/:TypeAlgorithmFromCitation](https:
 ```yaml
 name: TypeAlgorithmFromCitation
 description: Algorithm's citations
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 aliases:
 - Algorithm
 - citations
@@ -125,7 +125,7 @@ slots:
 ```yaml
 name: TypeAlgorithmFromCitation
 description: Algorithm's citations
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 aliases:
 - Algorithm
 - citations
@@ -133,7 +133,7 @@ attributes:
   name:
     name: name
     description: Name of the docker_image, algorithm, parameter, display_only
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: name
     owner: TypeAlgorithmFromCitation
@@ -148,7 +148,7 @@ attributes:
   doi:
     name: doi
     description: DOI of the Algorithm
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: doi
     owner: TypeAlgorithmFromCitation
@@ -158,7 +158,7 @@ attributes:
   license:
     name: license
     description: License of the Algorithm
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: license
     owner: TypeAlgorithmFromCitation
@@ -168,7 +168,7 @@ attributes:
   description:
     name: description
     description: Description of the Algorithm
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: description
     owner: TypeAlgorithmFromCitation

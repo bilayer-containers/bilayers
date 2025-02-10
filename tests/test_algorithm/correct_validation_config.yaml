@@ -31,6 +31,51 @@ exec_function:
       append_value: True
       cli_order: 4
 
+inputs: 
+  # Files Parameter Test Cases
+  # 1. files correct version
+  - name: files_optional_true_correct
+    type: file
+    label: "files_optional_true_correct"
+    description: "Files correct version. with optional flag True"
+    file_count: "single"
+    default: "single"
+    cli_tag: "--files_correct_true"
+    cli_order: 0
+    optional: True
+    section_id: ""
+    folder_name: "/bilayers/input_images"
+    mode: "beginner"
+  # 2. Files version with optional flag False
+  - name: files_optional_false_correct
+    type: file
+    label: "files_optional_false_correct"
+    description: "Files correct version. with optional flag False"
+    file_count: "single"
+    default: "single"
+    cli_tag: "--files_correct_false"
+    optional: False
+    section_id: "input-args"
+    folder_name: "/bilayers/input_images"
+    mode: "beginner"
+
+outputs:
+  - name: output_array 
+    type: array
+    label: "Output Array"
+    description: "these are accepted array for xyz algorithm"
+    cli_tag: "--output_array"
+    cli_order: 1
+    default: "single"
+    optional: True
+    format:
+      - npy
+      - npz
+    folder_name: "/path/to/array"
+    file_count: "single"
+    section_id: "outputs"
+    mode: "beginner"
+
 parameters:
   # Checkbox Parameter Test Cases
   # 1. Checkbox with append_value. append_value's value is False
@@ -64,7 +109,7 @@ parameters:
     cli_tag: "--use_gpu"
     optional: True
     append_value: False
-    folder_name: "/bilayers/input_images"
+    output_dir_set: True
     section_id: "hardware-args"
     mode: "advanced"
   # 4. Checkbox with cli_order
@@ -137,34 +182,6 @@ parameters:
     optional: False
     section_id: "input-args"
     mode: "advanced"
-
-
-  # Files Parameter Test Cases
-  # 1. files correct version
-  - name: files_optional_true_correct
-    type: files
-    label: "files_optional_true_correct"
-    description: "Files correct version. with optional flag True"
-    file_count: "single"
-    default: "single"
-    cli_tag: "--files_correct_true"
-    cli_order: 0
-    optional: True
-    section_id: ""
-    folder_name: "/bilayers/input_images"
-    mode: "beginner"
-  # 2. Files version with optional flag False
-  - name: files_optional_false_correct
-    type: files
-    label: "files_optional_false_correct"
-    description: "Files correct version. with optional flag False"
-    file_count: "single"
-    default: "single"
-    cli_tag: "--files_correct_false"
-    optional: False
-    section_id: "input-args"
-    folder_name: "/bilayers/input_images"
-    mode: "beginner"
 
   # Radio Parameter Test Cases
   # 1. Radio correct version

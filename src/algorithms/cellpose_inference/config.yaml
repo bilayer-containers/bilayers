@@ -217,17 +217,6 @@ parameters:
     mode: "advanced"
  
   # Input Image Arguments
-  # - name: dir
-  #   type: files
-  #   label: "Input Image Directory"
-  #   description: "Path to the directory of input images"
-  #   file_count: "multiple"
-  #   default: "directory"
-  #   cli_tag: "--dir"
-  #   optional: False
-  #   section_id: "input-args"
-  #   folder_name: "/bilayers/input_images"
-  #   mode: "beginner"
   - name: look_one_level_down
     type: checkbox
     label: "Look One Level Down"
@@ -346,17 +335,6 @@ parameters:
     optional: False
     section_id: "model-args"
     mode: "beginner"
-  # - name: add_models
-  #   type: files
-  #   label: "Add Model"
-  #   description: "add custom model to use"
-  #   file_count: "single"
-  #   default: "single"
-  #   cli_tag: "--add_model"
-  #   optional: True
-  #   section_id: "model-args"
-  #   folder_name: "/bilayers/models"
-  #   mode: "advanced"
 
     # Algorithm Arguments
   - name: no_resample

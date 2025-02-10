@@ -9,7 +9,7 @@ _Append value of the hidden argument_
 
 
 
-URI: [https://w3id.org/my-org/validate_schema/:append_value](https://w3id.org/my-org/validate_schema/:append_value)
+URI: [https://w3id.org/my-org/bilayers_schema/:append_value](https://w3id.org/my-org/bilayers_schema/:append_value)
 
 
 
@@ -23,10 +23,10 @@ URI: [https://w3id.org/my-org/validate_schema/:append_value](https://w3id.org/my
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [HiddenArgs](HiddenArgs.md) | Hidden arguments for the Algorithm |  no  |
-| [AbstractUserInterface](AbstractUserInterface.md) | Abstract class for user interface |  no  |
 | [TypeDisplayOnly](TypeDisplayOnly.md) | Display only parameters of a specific Algorithm |  no  |
+| [AbstractUserInterface](AbstractUserInterface.md) | Abstract class for user interface |  no  |
 | [TypeParameter](TypeParameter.md) | Parameters of a specific Algorithm |  no  |
+| [HiddenArgs](HiddenArgs.md) | Hidden arguments for the Algorithm |  no  |
 
 
 
@@ -53,7 +53,7 @@ URI: [https://w3id.org/my-org/validate_schema/:append_value](https://w3id.org/my
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -62,8 +62,8 @@ URI: [https://w3id.org/my-org/validate_schema/:append_value](https://w3id.org/my
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | https://w3id.org/my-org/validate_schema/:append_value |
-| native | https://w3id.org/my-org/validate_schema/:append_value |
+| self | https://w3id.org/my-org/bilayers_schema/:append_value |
+| native | https://w3id.org/my-org/bilayers_schema/:append_value |
 
 
 
@@ -74,7 +74,7 @@ URI: [https://w3id.org/my-org/validate_schema/:append_value](https://w3id.org/my
 ```yaml
 name: append_value
 description: Append value of the hidden argument
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 rank: 1000
 alias: append_value
 domain_of:

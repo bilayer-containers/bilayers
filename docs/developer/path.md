@@ -9,7 +9,7 @@ _Path of the inputs and outputs_
 
 
 
-URI: [https://w3id.org/my-org/validate_schema/:path](https://w3id.org/my-org/validate_schema/:path)
+URI: [https://w3id.org/my-org/bilayers_schema/:path](https://w3id.org/my-org/bilayers_schema/:path)
 
 
 
@@ -41,7 +41,7 @@ URI: [https://w3id.org/my-org/validate_schema/:path](https://w3id.org/my-org/val
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -50,8 +50,8 @@ URI: [https://w3id.org/my-org/validate_schema/:path](https://w3id.org/my-org/val
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | https://w3id.org/my-org/validate_schema/:path |
-| native | https://w3id.org/my-org/validate_schema/:path |
+| self | https://w3id.org/my-org/bilayers_schema/:path |
+| native | https://w3id.org/my-org/bilayers_schema/:path |
 
 
 
@@ -62,7 +62,7 @@ URI: [https://w3id.org/my-org/validate_schema/:path](https://w3id.org/my-org/val
 ```yaml
 name: path
 description: Path of the inputs and outputs
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 rank: 1000
 alias: path
 range: string

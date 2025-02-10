@@ -9,7 +9,7 @@ _Display only parameters of a specific Algorithm_
 
 
 
-URI: [https://w3id.org/my-org/validate_schema/:display_only](https://w3id.org/my-org/validate_schema/:display_only)
+URI: [https://w3id.org/my-org/bilayers_schema/:display_only](https://w3id.org/my-org/bilayers_schema/:display_only)
 
 
 
@@ -23,7 +23,7 @@ URI: [https://w3id.org/my-org/validate_schema/:display_only](https://w3id.org/my
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [Container](Container.md) | Container class which holds all the high_level keywords from config |  no  |
+| [SpecContainer](SpecContainer.md) | SpecContianer class which holds all the high_level keywords from config |  no  |
 
 
 
@@ -52,7 +52,7 @@ URI: [https://w3id.org/my-org/validate_schema/:display_only](https://w3id.org/my
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -61,8 +61,8 @@ URI: [https://w3id.org/my-org/validate_schema/:display_only](https://w3id.org/my
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | https://w3id.org/my-org/validate_schema/:display_only |
-| native | https://w3id.org/my-org/validate_schema/:display_only |
+| self | https://w3id.org/my-org/bilayers_schema/:display_only |
+| native | https://w3id.org/my-org/bilayers_schema/:display_only |
 
 
 
@@ -73,11 +73,11 @@ URI: [https://w3id.org/my-org/validate_schema/:display_only](https://w3id.org/my
 ```yaml
 name: display_only
 description: Display only parameters of a specific Algorithm
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 rank: 1000
 alias: display_only
 domain_of:
-- Container
+- SpecContainer
 range: TypeDisplayOnly
 multivalued: true
 

@@ -9,7 +9,7 @@ _Description of docker_image for the specific algorithm_
 
 
 
-URI: [https://w3id.org/my-org/validate_schema/:DockerImage](https://w3id.org/my-org/validate_schema/:DockerImage)
+URI: [https://w3id.org/my-org/bilayers_schema/:DockerImage](https://w3id.org/my-org/bilayers_schema/:DockerImage)
 
 
 
@@ -54,7 +54,7 @@ URI: [https://w3id.org/my-org/validate_schema/:DockerImage](https://w3id.org/my-
 
 | used by | used in | type | used |
 | ---  | --- | --- | --- |
-| [Container](Container.md) | [docker_image](docker_image.md) | range | [DockerImage](DockerImage.md) |
+| [SpecContainer](SpecContainer.md) | [docker_image](docker_image.md) | range | [DockerImage](DockerImage.md) |
 
 
 
@@ -77,7 +77,7 @@ URI: [https://w3id.org/my-org/validate_schema/:DockerImage](https://w3id.org/my-
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -86,8 +86,8 @@ URI: [https://w3id.org/my-org/validate_schema/:DockerImage](https://w3id.org/my-
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | https://w3id.org/my-org/validate_schema/:DockerImage |
-| native | https://w3id.org/my-org/validate_schema/:DockerImage |
+| self | https://w3id.org/my-org/bilayers_schema/:DockerImage |
+| native | https://w3id.org/my-org/bilayers_schema/:DockerImage |
 
 
 
@@ -105,7 +105,7 @@ URI: [https://w3id.org/my-org/validate_schema/:DockerImage](https://w3id.org/my-
 ```yaml
 name: DockerImage
 description: Description of docker_image for the specific algorithm
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 aliases:
 - docker_image
 slots:
@@ -123,14 +123,14 @@ slots:
 ```yaml
 name: DockerImage
 description: Description of docker_image for the specific algorithm
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 aliases:
 - docker_image
 attributes:
   org:
     name: org
     description: Organization of the docker image
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: org
     owner: DockerImage
@@ -141,7 +141,7 @@ attributes:
   name:
     name: name
     description: Name of the docker_image, algorithm, parameter, display_only
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: name
     owner: DockerImage
@@ -156,7 +156,7 @@ attributes:
   tag:
     name: tag
     description: Tag of the docker image
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: tag
     owner: DockerImage
@@ -167,7 +167,7 @@ attributes:
   platform:
     name: platform
     description: Platform on which the docker image was built
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: platform
     owner: DockerImage

@@ -9,7 +9,7 @@ _Tag of the docker image_
 
 
 
-URI: [https://w3id.org/my-org/validate_schema/:tag](https://w3id.org/my-org/validate_schema/:tag)
+URI: [https://w3id.org/my-org/bilayers_schema/:tag](https://w3id.org/my-org/bilayers_schema/:tag)
 
 
 
@@ -52,7 +52,7 @@ URI: [https://w3id.org/my-org/validate_schema/:tag](https://w3id.org/my-org/vali
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -61,8 +61,8 @@ URI: [https://w3id.org/my-org/validate_schema/:tag](https://w3id.org/my-org/vali
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | https://w3id.org/my-org/validate_schema/:tag |
-| native | https://w3id.org/my-org/validate_schema/:tag |
+| self | https://w3id.org/my-org/bilayers_schema/:tag |
+| native | https://w3id.org/my-org/bilayers_schema/:tag |
 
 
 
@@ -73,7 +73,7 @@ URI: [https://w3id.org/my-org/validate_schema/:tag](https://w3id.org/my-org/vali
 ```yaml
 name: tag
 description: Tag of the docker image
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 rank: 1000
 alias: tag
 domain_of:

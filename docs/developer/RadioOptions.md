@@ -9,7 +9,7 @@ _Options of the Radio button in parameters, display_only_
 
 
 
-URI: [https://w3id.org/my-org/validate_schema/:RadioOptions](https://w3id.org/my-org/validate_schema/:RadioOptions)
+URI: [https://w3id.org/my-org/bilayers_schema/:RadioOptions](https://w3id.org/my-org/bilayers_schema/:RadioOptions)
 
 
 
@@ -82,7 +82,7 @@ URI: [https://w3id.org/my-org/validate_schema/:RadioOptions](https://w3id.org/my
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -91,8 +91,8 @@ URI: [https://w3id.org/my-org/validate_schema/:RadioOptions](https://w3id.org/my
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | https://w3id.org/my-org/validate_schema/:RadioOptions |
-| native | https://w3id.org/my-org/validate_schema/:RadioOptions |
+| self | https://w3id.org/my-org/bilayers_schema/:RadioOptions |
+| native | https://w3id.org/my-org/bilayers_schema/:RadioOptions |
 
 
 
@@ -110,7 +110,7 @@ URI: [https://w3id.org/my-org/validate_schema/:RadioOptions](https://w3id.org/my
 ```yaml
 name: RadioOptions
 description: Options of the Radio button in parameters, display_only
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 slots:
 - label
 - value
@@ -124,12 +124,12 @@ slots:
 ```yaml
 name: RadioOptions
 description: Options of the Radio button in parameters, display_only
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 attributes:
   label:
     name: label
     description: Label of the object, but also Radio button's label
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: label
     owner: RadioOptions
@@ -142,7 +142,7 @@ attributes:
   value:
     name: value
     description: Value of the hidden argument or RadioButton Option's Value
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: value
     owner: RadioOptions

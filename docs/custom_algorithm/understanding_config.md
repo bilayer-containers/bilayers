@@ -204,10 +204,10 @@ A potential use case for hidden_args is ensuring output files are saved to a spe
 
 ## Organizing Parameters from the Algorithm's Command-Line Usage
 
-- inputs: If parameter is about providing any input files eg. image, measurement files, numpy array files, executable files etc.
-- outputs: A way to show what are potential outputs that would spit out post segmenting. Those could be presented under the umbrella of various types of files. eg. image, measurement files, numpy array files, executable files or some other files.
-- parameters: If the parameter and its argument need to be passed in the command line, include them in `parameters`.
-- display_only: If you want to show some information to the user without appending it to the command line, include it in `display_only`.
+- **inputs:** If parameter is about providing any input files eg. image, measurement files, numpy array files, executable files etc.
+- **outputs:** A way to show what are potential outputs that would spit out post segmenting. Those could be presented under the umbrella of various types of files. eg. image, measurement files, numpy array files, executable files or some other files.
+- **parameters:** If the parameter and its argument need to be passed in the command line, include them in `parameters`.
+- **display_only:** If you want to show some information to the user without appending it to the command line, include it in `display_only`.
 
 ## Defining inputs 
 ```{code} yaml
@@ -229,7 +229,11 @@ mode: ""
 - **name**: This should be a simple name, for self-identification purpose. Ideally matching the `cli_tag` (without hyphens). Use underscores instead of spaces. 
   Example: ```name: use_gpu```. 
 
-- **type**: This defines the `type` of the `inputs` and `outputs`. Its an umbrella of type `files`. So, ideally, it's categorized in 5 `types of files`. Those are `image`, `measurement`, `array`, `file`, `executable`. 
+- **type**: This defines the `type` of the `inputs` and `outputs`. Its an umbrella of type `files`. So, ideally, it's categorized in 5 `types of files`. Those are `image`, `measurement`, `array`, `file`, `executable`.
+  
+  The `type` field in `inputs` and `outputs` defines the category of data handled by the algorithm. This selection determines how the data will be structured, processed, and passed to the CLI command. Below is a visual representation of how to choose a `type` and the associated properties:
+
+  ![Types In Inputs and Outputs](../images/custom_algorithm/input_output_type.png)
 
   :::{dropdown} type: image
     ```{code} yaml
@@ -357,6 +361,85 @@ mode: ""
     ```
     :::
 
+  :::{table} Rest of the fields in `inputs`, `outputs`, `parameters` and `display_only`
+  :label: tbl:config-key-fields
+
+  <table>
+  <tr>
+      <th>Field</th>
+      <th>Description</th>
+      <th>Applies To</th>
+  </tr>
+
+  <tr>
+      <td><code>label</code></td>
+      <td>User-facing name displayed in the UI (Gradio, Jupyter).</td>
+      <td>inputs, parameters, display_only, outputs</td>
+  </tr>
+
+  <tr>
+      <td><code>description</code></td>
+      <td>Tooltip/help text explaining the purpose of the field.</td>
+      <td>inputs, parameters, display_only, outputs</td>
+  </tr>
+
+  <tr>
+      <td><code>cli_tag</code></td>
+      <td>Corresponding command-line argument (e.g., <code>--diameter</code>).</td>
+      <td>inputs, parameters, outputs</td>
+  </tr>
+
+  <tr>
+      <td><code>cli_order</code></td>
+      <td>Defines the order of this argument in the CLI command.</td>
+      <td>inputs, parameters, outputs</td>
+  </tr>
+
+  <tr>
+      <td><code>default</code></td>
+      <td>Pre-set value used if the user does not modify it.</td>
+      <td>inputs, parameters, display_only, outputs</td>
+  </tr>
+
+  <tr>
+      <td><code>optional</code></td>
+      <td><code>True</code> or <code>False</code>, indicating if the field is mandatory.</td>
+      <td>inputs, parameters, display_only, outputs</td>
+  </tr>
+
+  <tr>
+      <td><code>format</code></td>
+      <td>Accepted file formats (e.g., PNG, CSV).</td>
+      <td>inputs, outputs</td>
+  </tr>
+
+  <tr>
+      <td><code>folder_name</code></td>
+      <td>Internal container path for storing files.</td>
+      <td>inputs, outputs</td>
+  </tr>
+
+  <tr>
+      <td><code>file_count</code></td>
+      <td><code>"single"</code> or <code>"multiple"</code> specifying allowed file uploads.</td>
+      <td>inputs, outputs</td>
+  </tr>
+
+  <tr>
+      <td><code>section_id</code></td>
+      <td>Groups related UI elements together (e.g., "inputs", "advanced settings").</td>
+      <td>iinputs, parameters, display_only, outputs</td>
+  </tr>
+
+  <tr>
+      <td><code>mode</code></td>
+      <td>Defines UI visibility in "beginner" or "advanced" sections.</td>
+      <td>inputs, parameters, display_only, outputs</td>
+  </tr>
+
+  </table>
+  :::
+
 ## Defining outputs
 ```{code} yaml
 :filename: config.yml
@@ -431,12 +514,6 @@ mode: ""
     </tr>
 
     <tr>
-        <td>files</td>
-        <td>Drag & Drop your files from local system</td>
-        <td>Volume Mount supported (no need to put in files thru UI)</td>
-    </tr>
-
-    <tr>
         <td>radio</td>
         <td>Radio</td>
         <td>RadioButtons</td>
@@ -486,23 +563,6 @@ mode: ""
 
     <tr>
         <td>float</td>
-    </tr>
-
-    <tr>
-        <td>files</td>
-        <td>file_count</td>
-        <td>single | multiple</td>
-        <td>Defines how many files should be accepted:
-        <b>Note:</b>
-            - If file_count: multiple, the default must be "directory".
-            - If file_count: single, the default must be "single".</td>
-    </tr>
-
-    <tr>
-        <td>files</td>
-        <td>folder_name</td>
-        <td>"/bilayers/.."</td>
-        <td>Since the CLI argument only takes a folder name, specify it explicitly. This should also match the volume mount path when running the container.</td>
     </tr>
 
     <tr>
@@ -615,42 +675,6 @@ mode: ""
     ```
     :::
 
-    :::{dropdown} type: files, file_count: single
-    :open:
-    ```{code} yaml
-    -   name: 
-        type: files
-        label: ""
-        description: ""
-        file_count: "single"
-        default: "single"
-        cli_tag: ""
-        cli_order: 0
-        optional: True
-        section_id: ""
-        folder_name: ""
-        mode: ""
-    ```
-    :::
-
-    :::{dropdown} type: files, file_count: multiple
-    :open:
-    ```{code} yaml
-    -   name: 
-        type: files
-        label: ""
-        description: ""
-        file_count: "multiple"
-        default: "directory"
-        cli_tag: ""
-        cli_order: 0
-        optional: True
-        section_id: ""
-        folder_name: ""
-        mode: ""
-    ```
-    :::
-    
     :::{dropdown} type: textbox (standard textbox)
     :open:
     ```{code} yaml

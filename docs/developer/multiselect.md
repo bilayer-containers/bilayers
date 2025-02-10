@@ -9,7 +9,7 @@ _Multiselect value of the dropdown_
 
 
 
-URI: [https://w3id.org/my-org/validate_schema/:multiselect](https://w3id.org/my-org/validate_schema/:multiselect)
+URI: [https://w3id.org/my-org/bilayers_schema/:multiselect](https://w3id.org/my-org/bilayers_schema/:multiselect)
 
 
 
@@ -23,8 +23,8 @@ URI: [https://w3id.org/my-org/validate_schema/:multiselect](https://w3id.org/my-
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [AbstractUserInterface](AbstractUserInterface.md) | Abstract class for user interface |  no  |
 | [TypeDisplayOnly](TypeDisplayOnly.md) | Display only parameters of a specific Algorithm |  no  |
+| [AbstractUserInterface](AbstractUserInterface.md) | Abstract class for user interface |  no  |
 | [TypeParameter](TypeParameter.md) | Parameters of a specific Algorithm |  no  |
 
 
@@ -52,7 +52,7 @@ URI: [https://w3id.org/my-org/validate_schema/:multiselect](https://w3id.org/my-
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -61,8 +61,8 @@ URI: [https://w3id.org/my-org/validate_schema/:multiselect](https://w3id.org/my-
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | https://w3id.org/my-org/validate_schema/:multiselect |
-| native | https://w3id.org/my-org/validate_schema/:multiselect |
+| self | https://w3id.org/my-org/bilayers_schema/:multiselect |
+| native | https://w3id.org/my-org/bilayers_schema/:multiselect |
 
 
 
@@ -73,7 +73,7 @@ URI: [https://w3id.org/my-org/validate_schema/:multiselect](https://w3id.org/my-
 ```yaml
 name: multiselect
 description: Multiselect value of the dropdown
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 rank: 1000
 alias: multiselect
 domain_of:

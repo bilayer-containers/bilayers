@@ -1,10 +1,10 @@
-# validate_schema
+# bilayers_schema
 
 Validate each of the incoming Algorithm's spec file
 
-URI: https://w3id.org/my-org/validate_schema
+URI: https://w3id.org/my-org/bilayers_schema
 
-Name: validate_schema
+Name: bilayers_schema
 
 
 
@@ -19,11 +19,11 @@ Name: validate_schema
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[TypeInput](TypeInput.md) | Inputs to the algorithm from the last step of the workflow |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[TypeOutput](TypeOutput.md) | Outputs of the algorithm to the next step in the workflow |
 | [Any](Any.md) | Any type |
-| [Container](Container.md) | Container class which holds all the high_level keywords from config.yaml file of specific algorithm |
 | [DockerImage](DockerImage.md) | Description of docker_image for the specific algorithm |
 | [ExecFunction](ExecFunction.md) | Function to execute the Algorithm |
 | [HiddenArgs](HiddenArgs.md) | Hidden arguments for the Algorithm |
 | [RadioOptions](RadioOptions.md) | Options of the Radio button in parameters, display_only |
+| [SpecContainer](SpecContainer.md) | SpecContianer class which holds all the high_level keywords from config.yaml file of specific algorithm |
 | [TypeAlgorithmFromCitation](TypeAlgorithmFromCitation.md) | Algorithm's citations |
 | [TypeCitations](TypeCitations.md) | Citations of the Algorithm |
 

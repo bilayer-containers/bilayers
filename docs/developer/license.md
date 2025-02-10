@@ -9,7 +9,7 @@ _License of the Algorithm_
 
 
 
-URI: [https://w3id.org/my-org/validate_schema/:license](https://w3id.org/my-org/validate_schema/:license)
+URI: [https://w3id.org/my-org/bilayers_schema/:license](https://w3id.org/my-org/bilayers_schema/:license)
 
 
 
@@ -50,7 +50,7 @@ URI: [https://w3id.org/my-org/validate_schema/:license](https://w3id.org/my-org/
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -59,8 +59,8 @@ URI: [https://w3id.org/my-org/validate_schema/:license](https://w3id.org/my-org/
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | https://w3id.org/my-org/validate_schema/:license |
-| native | https://w3id.org/my-org/validate_schema/:license |
+| self | https://w3id.org/my-org/bilayers_schema/:license |
+| native | https://w3id.org/my-org/bilayers_schema/:license |
 
 
 
@@ -71,7 +71,7 @@ URI: [https://w3id.org/my-org/validate_schema/:license](https://w3id.org/my-org/
 ```yaml
 name: license
 description: License of the Algorithm
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 rank: 1000
 alias: license
 domain_of:

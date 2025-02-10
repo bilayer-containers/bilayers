@@ -9,7 +9,7 @@ _Main folder name of the algorithm to put the generated files in the folder_
 
 
 
-URI: [https://w3id.org/my-org/validate_schema/:algorithm_folder_name](https://w3id.org/my-org/validate_schema/:algorithm_folder_name)
+URI: [https://w3id.org/my-org/bilayers_schema/:algorithm_folder_name](https://w3id.org/my-org/bilayers_schema/:algorithm_folder_name)
 
 
 
@@ -23,7 +23,7 @@ URI: [https://w3id.org/my-org/validate_schema/:algorithm_folder_name](https://w3
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [Container](Container.md) | Container class which holds all the high_level keywords from config |  no  |
+| [SpecContainer](SpecContainer.md) | SpecContianer class which holds all the high_level keywords from config |  no  |
 
 
 
@@ -50,7 +50,7 @@ URI: [https://w3id.org/my-org/validate_schema/:algorithm_folder_name](https://w3
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -59,8 +59,8 @@ URI: [https://w3id.org/my-org/validate_schema/:algorithm_folder_name](https://w3
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | https://w3id.org/my-org/validate_schema/:algorithm_folder_name |
-| native | https://w3id.org/my-org/validate_schema/:algorithm_folder_name |
+| self | https://w3id.org/my-org/bilayers_schema/:algorithm_folder_name |
+| native | https://w3id.org/my-org/bilayers_schema/:algorithm_folder_name |
 
 
 
@@ -71,11 +71,11 @@ URI: [https://w3id.org/my-org/validate_schema/:algorithm_folder_name](https://w3
 ```yaml
 name: algorithm_folder_name
 description: Main folder name of the algorithm to put the generated files in the folder
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 rank: 1000
 alias: algorithm_folder_name
 domain_of:
-- Container
+- SpecContainer
 range: string
 
 ```

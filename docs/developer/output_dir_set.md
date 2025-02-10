@@ -9,7 +9,7 @@ _Output directory set_
 
 
 
-URI: [https://w3id.org/my-org/validate_schema/:output_dir_set](https://w3id.org/my-org/validate_schema/:output_dir_set)
+URI: [https://w3id.org/my-org/bilayers_schema/:output_dir_set](https://w3id.org/my-org/bilayers_schema/:output_dir_set)
 
 
 
@@ -23,8 +23,8 @@ URI: [https://w3id.org/my-org/validate_schema/:output_dir_set](https://w3id.org/
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [AbstractUserInterface](AbstractUserInterface.md) | Abstract class for user interface |  no  |
 | [TypeDisplayOnly](TypeDisplayOnly.md) | Display only parameters of a specific Algorithm |  no  |
+| [AbstractUserInterface](AbstractUserInterface.md) | Abstract class for user interface |  no  |
 | [TypeParameter](TypeParameter.md) | Parameters of a specific Algorithm |  no  |
 
 
@@ -52,7 +52,7 @@ URI: [https://w3id.org/my-org/validate_schema/:output_dir_set](https://w3id.org/
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -61,8 +61,8 @@ URI: [https://w3id.org/my-org/validate_schema/:output_dir_set](https://w3id.org/
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | https://w3id.org/my-org/validate_schema/:output_dir_set |
-| native | https://w3id.org/my-org/validate_schema/:output_dir_set |
+| self | https://w3id.org/my-org/bilayers_schema/:output_dir_set |
+| native | https://w3id.org/my-org/bilayers_schema/:output_dir_set |
 
 
 
@@ -73,7 +73,7 @@ URI: [https://w3id.org/my-org/validate_schema/:output_dir_set](https://w3id.org/
 ```yaml
 name: output_dir_set
 description: Output directory set
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 rank: 1000
 alias: output_dir_set
 domain_of:

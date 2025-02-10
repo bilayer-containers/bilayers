@@ -43,7 +43,7 @@ URI: [SubTypeEnum](SubTypeEnum.md)
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -56,7 +56,7 @@ URI: [SubTypeEnum](SubTypeEnum.md)
 ```yaml
 name: SubTypeEnum
 description: Subtype of the inputs and outputs, iff type is image
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 rank: 1000
 permissible_values:
   grayscale:

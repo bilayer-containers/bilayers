@@ -56,8 +56,6 @@ class Parameter(TypedDict, total=False):
     mode: str
     options: List[Dict[str, str]] # w.r.t type == radio, dropdown
     output_dir_set: bool # w.r.t type == textbox 
-    folder_name: str # w.r.t type == files
-    file_count: str # w.r.t type == files
     interactive: bool
     append_value: bool # w.r.t type == checkbox
     multiselect: bool # w.r.t type == dropdown

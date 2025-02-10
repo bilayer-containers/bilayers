@@ -9,7 +9,7 @@ _Function to execute the Algorithm_
 
 
 
-URI: [https://w3id.org/my-org/validate_schema/:ExecFunction](https://w3id.org/my-org/validate_schema/:ExecFunction)
+URI: [https://w3id.org/my-org/bilayers_schema/:ExecFunction](https://w3id.org/my-org/bilayers_schema/:ExecFunction)
 
 
 
@@ -64,7 +64,7 @@ URI: [https://w3id.org/my-org/validate_schema/:ExecFunction](https://w3id.org/my
 
 | used by | used in | type | used |
 | ---  | --- | --- | --- |
-| [Container](Container.md) | [exec_function](exec_function.md) | range | [ExecFunction](ExecFunction.md) |
+| [SpecContainer](SpecContainer.md) | [exec_function](exec_function.md) | range | [ExecFunction](ExecFunction.md) |
 
 
 
@@ -89,7 +89,7 @@ URI: [https://w3id.org/my-org/validate_schema/:ExecFunction](https://w3id.org/my
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -98,8 +98,8 @@ URI: [https://w3id.org/my-org/validate_schema/:ExecFunction](https://w3id.org/my
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | https://w3id.org/my-org/validate_schema/:ExecFunction |
-| native | https://w3id.org/my-org/validate_schema/:ExecFunction |
+| self | https://w3id.org/my-org/bilayers_schema/:ExecFunction |
+| native | https://w3id.org/my-org/bilayers_schema/:ExecFunction |
 
 
 
@@ -117,7 +117,7 @@ URI: [https://w3id.org/my-org/validate_schema/:ExecFunction](https://w3id.org/my
 ```yaml
 name: ExecFunction
 description: Function to execute the Algorithm
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 aliases:
 - exec_function
 - generate_cli_command
@@ -138,7 +138,7 @@ slots:
 ```yaml
 name: ExecFunction
 description: Function to execute the Algorithm
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 aliases:
 - exec_function
 - generate_cli_command
@@ -147,7 +147,7 @@ attributes:
   name:
     name: name
     description: Name of the docker_image, algorithm, parameter, display_only
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: name
     owner: ExecFunction
@@ -162,7 +162,7 @@ attributes:
   script:
     name: script
     description: Script to execute the Algorithm
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: script
     owner: ExecFunction
@@ -173,7 +173,7 @@ attributes:
   module:
     name: module
     description: Module to execute the Algorithm
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: module
     owner: ExecFunction
@@ -184,7 +184,7 @@ attributes:
   cli_command:
     name: cli_command
     description: CLI command to execute the Algorithm
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: cli_command
     owner: ExecFunction
@@ -195,7 +195,7 @@ attributes:
   hidden_args:
     name: hidden_args
     description: Hidden arguments for the Algorithm
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: hidden_args
     owner: ExecFunction

@@ -1,7 +1,7 @@
 ---
-id: https://w3id.org/my-org/validate_schema
-name: validate_schema
-title: validate_schema
+id: https://w3id.org/my-org/bilayers_schema
+name: bilayers_schema
+title: bilayers_schema
 description: |-
   Validate each of the incoming Algorithm's spec file
 
@@ -16,8 +16,8 @@ classes:
     description: "Any type"
     class_uri: linkml:Any
 
-  Container:
-    description: "Container class which holds all the high_level keywords from config.yaml file of specific algorithm"
+  SpecContainer:
+    description: "SpecContianer class which holds all the high_level keywords from config.yaml file of specific algorithm"
     slots: 
     - inputs
     - outputs
@@ -113,8 +113,6 @@ classes:
       - mode
       # Conditional w.r.t to type
       - output_dir_set
-      - folder_name
-      - file_count
       - options
       - interactive
       - append_value
@@ -128,15 +126,6 @@ classes:
         postconditions:
           slot_conditions:
             append_value:
-              required: true
-      - description: "Extra flags needed iff type is files"
-        preconditions:
-          slot_conditions:
-            type:
-              equals_string: "files"
-        postconditions:
-          slot_conditions:
-            file_count:
               required: true
       - description: "Extra flags needed iff type is radio"
         preconditions:
@@ -167,16 +156,6 @@ classes:
       - default
       - cli_tag
       - cli_order
-    rules:
-      - description: "Extra flags needed iff type is files"
-        preconditions:
-          slot_conditions:
-            type:
-              equals_string: "files"
-        postconditions:
-          slot_conditions:
-            folder_name:
-              required: true
 
   TypeDisplayOnly:
     aliases: ["display_only"]
@@ -184,16 +163,6 @@ classes:
     is_a: AbstractUserInterface
     slots:
       - default
-    rules:
-      - description: "Extra flags needed iff type is files"
-        preconditions:
-          slot_conditions:
-            type:
-              equals_string: "files"
-        postconditions:
-          slot_conditions:
-            folder_name:
-              required: true
 
 
   ExecFunction:
@@ -364,14 +333,6 @@ slots:
     description: "Output directory set"
     required: false
     range: boolean
-  folder_name:
-    description: "Folder name of the object"
-    range: string
-    required: false
-  file_count:
-    description: "Type of Number of files"
-    range: FileTypeEnum
-    required: false
   options:
     description: "Options of the Radio button in parameters, display_only" 
     range: RadioOptions
@@ -404,6 +365,14 @@ slots:
     description: "Format of the inputs and outputs"
     range: string
     multivalued: true
+  folder_name:
+    description: "Folder name of the object"
+    range: string
+    required: false
+  file_count:
+    description: "Type of Number of files"
+    range: FileTypeEnum
+    required: false
   # slots specific to inputs and outputs, if type is image
   subtype:
     description: "Subtype of the inputs and outputs"
@@ -430,8 +399,6 @@ enums:
       float:
       boolean:
       checkbox:
-      # files: # after adding inputs-outputs, we have removed type=files support. It was only kept for 'results' section. Since, that is also removed, we are completely taking this off!
-               # In case, we wish to readd - just uncomment this line.
       dropdown:
       radio:
       textbox:

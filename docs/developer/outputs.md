@@ -9,7 +9,7 @@ _Outputs of the algorithm to the next step in the workflow_
 
 
 
-URI: [https://w3id.org/my-org/validate_schema/:outputs](https://w3id.org/my-org/validate_schema/:outputs)
+URI: [https://w3id.org/my-org/bilayers_schema/:outputs](https://w3id.org/my-org/bilayers_schema/:outputs)
 
 
 
@@ -23,7 +23,7 @@ URI: [https://w3id.org/my-org/validate_schema/:outputs](https://w3id.org/my-org/
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [Container](Container.md) | Container class which holds all the high_level keywords from config |  no  |
+| [SpecContainer](SpecContainer.md) | SpecContianer class which holds all the high_level keywords from config |  no  |
 
 
 
@@ -54,7 +54,7 @@ URI: [https://w3id.org/my-org/validate_schema/:outputs](https://w3id.org/my-org/
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -63,8 +63,8 @@ URI: [https://w3id.org/my-org/validate_schema/:outputs](https://w3id.org/my-org/
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | https://w3id.org/my-org/validate_schema/:outputs |
-| native | https://w3id.org/my-org/validate_schema/:outputs |
+| self | https://w3id.org/my-org/bilayers_schema/:outputs |
+| native | https://w3id.org/my-org/bilayers_schema/:outputs |
 
 
 
@@ -75,11 +75,11 @@ URI: [https://w3id.org/my-org/validate_schema/:outputs](https://w3id.org/my-org/
 ```yaml
 name: outputs
 description: Outputs of the algorithm to the next step in the workflow
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 rank: 1000
 alias: outputs
 domain_of:
-- Container
+- SpecContainer
 range: TypeOutput
 required: true
 multivalued: true

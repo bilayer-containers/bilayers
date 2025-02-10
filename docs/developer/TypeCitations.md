@@ -9,7 +9,7 @@ _Citations of the Algorithm_
 
 
 
-URI: [https://w3id.org/my-org/validate_schema/:TypeCitations](https://w3id.org/my-org/validate_schema/:TypeCitations)
+URI: [https://w3id.org/my-org/bilayers_schema/:TypeCitations](https://w3id.org/my-org/bilayers_schema/:TypeCitations)
 
 
 
@@ -52,7 +52,7 @@ URI: [https://w3id.org/my-org/validate_schema/:TypeCitations](https://w3id.org/m
 
 | used by | used in | type | used |
 | ---  | --- | --- | --- |
-| [Container](Container.md) | [citations](citations.md) | range | [TypeCitations](TypeCitations.md) |
+| [SpecContainer](SpecContainer.md) | [citations](citations.md) | range | [TypeCitations](TypeCitations.md) |
 
 
 
@@ -75,7 +75,7 @@ URI: [https://w3id.org/my-org/validate_schema/:TypeCitations](https://w3id.org/m
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -84,8 +84,8 @@ URI: [https://w3id.org/my-org/validate_schema/:TypeCitations](https://w3id.org/m
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | https://w3id.org/my-org/validate_schema/:TypeCitations |
-| native | https://w3id.org/my-org/validate_schema/:TypeCitations |
+| self | https://w3id.org/my-org/bilayers_schema/:TypeCitations |
+| native | https://w3id.org/my-org/bilayers_schema/:TypeCitations |
 
 
 
@@ -103,7 +103,7 @@ URI: [https://w3id.org/my-org/validate_schema/:TypeCitations](https://w3id.org/m
 ```yaml
 name: TypeCitations
 description: Citations of the Algorithm
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 aliases:
 - citations
 slots:
@@ -118,14 +118,14 @@ slots:
 ```yaml
 name: TypeCitations
 description: Citations of the Algorithm
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 aliases:
 - citations
 attributes:
   algorithm:
     name: algorithm
     description: Algorithm's citations
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: algorithm
     owner: TypeCitations

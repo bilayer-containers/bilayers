@@ -51,7 +51,7 @@ URI: [TypeEnum](TypeEnum.md)
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -64,7 +64,7 @@ URI: [TypeEnum](TypeEnum.md)
 ```yaml
 name: TypeEnum
 description: Type of the parameters, display_only
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 rank: 1000
 permissible_values:
   integer:

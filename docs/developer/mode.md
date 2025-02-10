@@ -9,7 +9,7 @@ _Mode of the object_
 
 
 
-URI: [https://w3id.org/my-org/validate_schema/:mode](https://w3id.org/my-org/validate_schema/:mode)
+URI: [https://w3id.org/my-org/bilayers_schema/:mode](https://w3id.org/my-org/bilayers_schema/:mode)
 
 
 
@@ -23,12 +23,12 @@ URI: [https://w3id.org/my-org/validate_schema/:mode](https://w3id.org/my-org/val
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [TypeOutput](TypeOutput.md) | Outputs of the algorithm to the next step in the workflow |  no  |
 | [TypeParameter](TypeParameter.md) | Parameters of a specific Algorithm |  no  |
-| [AbstractWorkflowDetails](AbstractWorkflowDetails.md) | Abstract class for details needed to fit config in the workflow |  no  |
 | [TypeDisplayOnly](TypeDisplayOnly.md) | Display only parameters of a specific Algorithm |  no  |
-| [AbstractUserInterface](AbstractUserInterface.md) | Abstract class for user interface |  no  |
+| [TypeOutput](TypeOutput.md) | Outputs of the algorithm to the next step in the workflow |  no  |
 | [TypeInput](TypeInput.md) | Inputs to the algorithm from the last step of the workflow |  no  |
+| [AbstractWorkflowDetails](AbstractWorkflowDetails.md) | Abstract class for details needed to fit config in the workflow |  no  |
+| [AbstractUserInterface](AbstractUserInterface.md) | Abstract class for user interface |  no  |
 
 
 
@@ -57,7 +57,7 @@ URI: [https://w3id.org/my-org/validate_schema/:mode](https://w3id.org/my-org/val
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -66,8 +66,8 @@ URI: [https://w3id.org/my-org/validate_schema/:mode](https://w3id.org/my-org/val
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | https://w3id.org/my-org/validate_schema/:mode |
-| native | https://w3id.org/my-org/validate_schema/:mode |
+| self | https://w3id.org/my-org/bilayers_schema/:mode |
+| native | https://w3id.org/my-org/bilayers_schema/:mode |
 
 
 
@@ -78,7 +78,7 @@ URI: [https://w3id.org/my-org/validate_schema/:mode](https://w3id.org/my-org/val
 ```yaml
 name: mode
 description: Mode of the object
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 rank: 1000
 alias: mode
 domain_of:

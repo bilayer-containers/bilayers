@@ -9,7 +9,7 @@ _whether t-dimension i.e. timepoints are accepted via tool_
 
 
 
-URI: [https://w3id.org/my-org/validate_schema/:timepoints](https://w3id.org/my-org/validate_schema/:timepoints)
+URI: [https://w3id.org/my-org/bilayers_schema/:timepoints](https://w3id.org/my-org/bilayers_schema/:timepoints)
 
 
 
@@ -24,8 +24,8 @@ URI: [https://w3id.org/my-org/validate_schema/:timepoints](https://w3id.org/my-o
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
 | [TypeOutput](TypeOutput.md) | Outputs of the algorithm to the next step in the workflow |  no  |
-| [TypeInput](TypeInput.md) | Inputs to the algorithm from the last step of the workflow |  no  |
 | [AbstractWorkflowDetails](AbstractWorkflowDetails.md) | Abstract class for details needed to fit config in the workflow |  no  |
+| [TypeInput](TypeInput.md) | Inputs to the algorithm from the last step of the workflow |  no  |
 
 
 
@@ -52,7 +52,7 @@ URI: [https://w3id.org/my-org/validate_schema/:timepoints](https://w3id.org/my-o
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -61,8 +61,8 @@ URI: [https://w3id.org/my-org/validate_schema/:timepoints](https://w3id.org/my-o
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | https://w3id.org/my-org/validate_schema/:timepoints |
-| native | https://w3id.org/my-org/validate_schema/:timepoints |
+| self | https://w3id.org/my-org/bilayers_schema/:timepoints |
+| native | https://w3id.org/my-org/bilayers_schema/:timepoints |
 
 
 
@@ -73,7 +73,7 @@ URI: [https://w3id.org/my-org/validate_schema/:timepoints](https://w3id.org/my-o
 ```yaml
 name: timepoints
 description: whether t-dimension i.e. timepoints are accepted via tool
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 rank: 1000
 alias: timepoints
 domain_of:

@@ -9,7 +9,7 @@ _Outputs of the algorithm to the next step in the workflow_
 
 
 
-URI: [https://w3id.org/my-org/validate_schema/:TypeOutput](https://w3id.org/my-org/validate_schema/:TypeOutput)
+URI: [https://w3id.org/my-org/bilayers_schema/:TypeOutput](https://w3id.org/my-org/bilayers_schema/:TypeOutput)
 
 
 
@@ -145,7 +145,7 @@ URI: [https://w3id.org/my-org/validate_schema/:TypeOutput](https://w3id.org/my-o
 
 | used by | used in | type | used |
 | ---  | --- | --- | --- |
-| [Container](Container.md) | [outputs](outputs.md) | range | [TypeOutput](TypeOutput.md) |
+| [SpecContainer](SpecContainer.md) | [outputs](outputs.md) | range | [TypeOutput](TypeOutput.md) |
 
 
 
@@ -168,7 +168,7 @@ URI: [https://w3id.org/my-org/validate_schema/:TypeOutput](https://w3id.org/my-o
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -177,8 +177,8 @@ URI: [https://w3id.org/my-org/validate_schema/:TypeOutput](https://w3id.org/my-o
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | https://w3id.org/my-org/validate_schema/:TypeOutput |
-| native | https://w3id.org/my-org/validate_schema/:TypeOutput |
+| self | https://w3id.org/my-org/bilayers_schema/:TypeOutput |
+| native | https://w3id.org/my-org/bilayers_schema/:TypeOutput |
 
 
 
@@ -196,7 +196,7 @@ URI: [https://w3id.org/my-org/validate_schema/:TypeOutput](https://w3id.org/my-o
 ```yaml
 name: TypeOutput
 description: Outputs of the algorithm to the next step in the workflow
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 aliases:
 - outputs
 is_a: AbstractWorkflowDetails
@@ -234,7 +234,7 @@ rules:
 ```yaml
 name: TypeOutput
 description: Outputs of the algorithm to the next step in the workflow
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 aliases:
 - outputs
 is_a: AbstractWorkflowDetails
@@ -242,7 +242,7 @@ attributes:
   name:
     name: name
     description: Name of the docker_image, algorithm, parameter, display_only
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: name
     owner: TypeOutput
@@ -257,7 +257,7 @@ attributes:
   type:
     name: type
     description: Type of the inputs, parameters and outputs
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: type
     owner: TypeOutput
@@ -269,7 +269,7 @@ attributes:
   label:
     name: label
     description: Label of the object, but also Radio button's label
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: label
     owner: TypeOutput
@@ -282,7 +282,7 @@ attributes:
   description:
     name: description
     description: Description of the Algorithm
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: description
     owner: TypeOutput
@@ -294,7 +294,7 @@ attributes:
   cli_tag:
     name: cli_tag
     description: CLI tag of the object
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: cli_tag
     owner: TypeOutput
@@ -307,7 +307,7 @@ attributes:
   cli_order:
     name: cli_order
     description: Order of the CLI arguments
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: cli_order
     owner: TypeOutput
@@ -320,7 +320,7 @@ attributes:
   default:
     name: default
     description: Default value of the parameter
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: default
     owner: TypeOutput
@@ -333,7 +333,7 @@ attributes:
   optional:
     name: optional
     description: Optional value of the object
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: optional
     owner: TypeOutput
@@ -345,7 +345,7 @@ attributes:
   format:
     name: format
     description: Format of the inputs and outputs
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: format
     owner: TypeOutput
@@ -356,31 +356,29 @@ attributes:
   folder_name:
     name: folder_name
     description: Folder name of the object
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: folder_name
     owner: TypeOutput
     domain_of:
     - AbstractWorkflowDetails
-    - AbstractUserInterface
     range: string
     required: false
   file_count:
     name: file_count
     description: Type of Number of files
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: file_count
     owner: TypeOutput
     domain_of:
     - AbstractWorkflowDetails
-    - AbstractUserInterface
     range: FileTypeEnum
     required: false
   section_id:
     name: section_id
     description: Section ID of the object
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: section_id
     owner: TypeOutput
@@ -392,7 +390,7 @@ attributes:
   mode:
     name: mode
     description: Mode of the object
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: mode
     owner: TypeOutput
@@ -404,7 +402,7 @@ attributes:
   subtype:
     name: subtype
     description: Subtype of the inputs and outputs
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: subtype
     owner: TypeOutput
@@ -415,7 +413,7 @@ attributes:
   depth:
     name: depth
     description: whether z-dimension i.e. depth is accepted via tool
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: depth
     owner: TypeOutput
@@ -425,7 +423,7 @@ attributes:
   timepoints:
     name: timepoints
     description: whether t-dimension i.e. timepoints are accepted via tool
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: timepoints
     owner: TypeOutput
@@ -435,7 +433,7 @@ attributes:
   tiled:
     name: tiled
     description: whether tiled images are accepted via tool
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: tiled
     owner: TypeOutput
@@ -445,7 +443,7 @@ attributes:
   pyramidal:
     name: pyramidal
     description: whether pyramidal images are accepted via tool
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: pyramidal
     owner: TypeOutput

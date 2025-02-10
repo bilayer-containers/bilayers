@@ -9,7 +9,7 @@ _Order of the CLI arguments_
 
 
 
-URI: [https://w3id.org/my-org/validate_schema/:cli_order](https://w3id.org/my-org/validate_schema/:cli_order)
+URI: [https://w3id.org/my-org/bilayers_schema/:cli_order](https://w3id.org/my-org/bilayers_schema/:cli_order)
 
 
 
@@ -23,11 +23,11 @@ URI: [https://w3id.org/my-org/validate_schema/:cli_order](https://w3id.org/my-or
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [TypeOutput](TypeOutput.md) | Outputs of the algorithm to the next step in the workflow |  no  |
 | [TypeParameter](TypeParameter.md) | Parameters of a specific Algorithm |  no  |
+| [TypeOutput](TypeOutput.md) | Outputs of the algorithm to the next step in the workflow |  no  |
+| [TypeInput](TypeInput.md) | Inputs to the algorithm from the last step of the workflow |  no  |
 | [AbstractWorkflowDetails](AbstractWorkflowDetails.md) | Abstract class for details needed to fit config in the workflow |  no  |
 | [HiddenArgs](HiddenArgs.md) | Hidden arguments for the Algorithm |  no  |
-| [TypeInput](TypeInput.md) | Inputs to the algorithm from the last step of the workflow |  no  |
 
 
 
@@ -54,7 +54,7 @@ URI: [https://w3id.org/my-org/validate_schema/:cli_order](https://w3id.org/my-or
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -63,8 +63,8 @@ URI: [https://w3id.org/my-org/validate_schema/:cli_order](https://w3id.org/my-or
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | https://w3id.org/my-org/validate_schema/:cli_order |
-| native | https://w3id.org/my-org/validate_schema/:cli_order |
+| self | https://w3id.org/my-org/bilayers_schema/:cli_order |
+| native | https://w3id.org/my-org/bilayers_schema/:cli_order |
 
 
 
@@ -75,7 +75,7 @@ URI: [https://w3id.org/my-org/validate_schema/:cli_order](https://w3id.org/my-or
 ```yaml
 name: cli_order
 description: Order of the CLI arguments
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 rank: 1000
 alias: cli_order
 domain_of:

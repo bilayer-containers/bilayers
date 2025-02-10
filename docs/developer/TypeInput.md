@@ -9,7 +9,7 @@ _Inputs to the algorithm from the last step of the workflow_
 
 
 
-URI: [https://w3id.org/my-org/validate_schema/:TypeInput](https://w3id.org/my-org/validate_schema/:TypeInput)
+URI: [https://w3id.org/my-org/bilayers_schema/:TypeInput](https://w3id.org/my-org/bilayers_schema/:TypeInput)
 
 
 
@@ -145,7 +145,7 @@ URI: [https://w3id.org/my-org/validate_schema/:TypeInput](https://w3id.org/my-or
 
 | used by | used in | type | used |
 | ---  | --- | --- | --- |
-| [Container](Container.md) | [inputs](inputs.md) | range | [TypeInput](TypeInput.md) |
+| [SpecContainer](SpecContainer.md) | [inputs](inputs.md) | range | [TypeInput](TypeInput.md) |
 
 
 
@@ -168,7 +168,7 @@ URI: [https://w3id.org/my-org/validate_schema/:TypeInput](https://w3id.org/my-or
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -177,8 +177,8 @@ URI: [https://w3id.org/my-org/validate_schema/:TypeInput](https://w3id.org/my-or
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | https://w3id.org/my-org/validate_schema/:TypeInput |
-| native | https://w3id.org/my-org/validate_schema/:TypeInput |
+| self | https://w3id.org/my-org/bilayers_schema/:TypeInput |
+| native | https://w3id.org/my-org/bilayers_schema/:TypeInput |
 
 
 
@@ -196,7 +196,7 @@ URI: [https://w3id.org/my-org/validate_schema/:TypeInput](https://w3id.org/my-or
 ```yaml
 name: TypeInput
 description: Inputs to the algorithm from the last step of the workflow
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 aliases:
 - inputs
 is_a: AbstractWorkflowDetails
@@ -234,7 +234,7 @@ rules:
 ```yaml
 name: TypeInput
 description: Inputs to the algorithm from the last step of the workflow
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 aliases:
 - inputs
 is_a: AbstractWorkflowDetails
@@ -242,7 +242,7 @@ attributes:
   name:
     name: name
     description: Name of the docker_image, algorithm, parameter, display_only
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: name
     owner: TypeInput
@@ -257,7 +257,7 @@ attributes:
   type:
     name: type
     description: Type of the inputs, parameters and outputs
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: type
     owner: TypeInput
@@ -269,7 +269,7 @@ attributes:
   label:
     name: label
     description: Label of the object, but also Radio button's label
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: label
     owner: TypeInput
@@ -282,7 +282,7 @@ attributes:
   description:
     name: description
     description: Description of the Algorithm
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: description
     owner: TypeInput
@@ -294,7 +294,7 @@ attributes:
   cli_tag:
     name: cli_tag
     description: CLI tag of the object
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: cli_tag
     owner: TypeInput
@@ -307,7 +307,7 @@ attributes:
   cli_order:
     name: cli_order
     description: Order of the CLI arguments
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: cli_order
     owner: TypeInput
@@ -320,7 +320,7 @@ attributes:
   default:
     name: default
     description: Default value of the parameter
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: default
     owner: TypeInput
@@ -333,7 +333,7 @@ attributes:
   optional:
     name: optional
     description: Optional value of the object
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: optional
     owner: TypeInput
@@ -345,7 +345,7 @@ attributes:
   format:
     name: format
     description: Format of the inputs and outputs
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: format
     owner: TypeInput
@@ -356,31 +356,29 @@ attributes:
   folder_name:
     name: folder_name
     description: Folder name of the object
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: folder_name
     owner: TypeInput
     domain_of:
     - AbstractWorkflowDetails
-    - AbstractUserInterface
     range: string
     required: false
   file_count:
     name: file_count
     description: Type of Number of files
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: file_count
     owner: TypeInput
     domain_of:
     - AbstractWorkflowDetails
-    - AbstractUserInterface
     range: FileTypeEnum
     required: false
   section_id:
     name: section_id
     description: Section ID of the object
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: section_id
     owner: TypeInput
@@ -392,7 +390,7 @@ attributes:
   mode:
     name: mode
     description: Mode of the object
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: mode
     owner: TypeInput
@@ -404,7 +402,7 @@ attributes:
   subtype:
     name: subtype
     description: Subtype of the inputs and outputs
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: subtype
     owner: TypeInput
@@ -415,7 +413,7 @@ attributes:
   depth:
     name: depth
     description: whether z-dimension i.e. depth is accepted via tool
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: depth
     owner: TypeInput
@@ -425,7 +423,7 @@ attributes:
   timepoints:
     name: timepoints
     description: whether t-dimension i.e. timepoints are accepted via tool
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: timepoints
     owner: TypeInput
@@ -435,7 +433,7 @@ attributes:
   tiled:
     name: tiled
     description: whether tiled images are accepted via tool
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: tiled
     owner: TypeInput
@@ -445,7 +443,7 @@ attributes:
   pyramidal:
     name: pyramidal
     description: whether pyramidal images are accepted via tool
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: pyramidal
     owner: TypeInput

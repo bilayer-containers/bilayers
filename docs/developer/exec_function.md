@@ -9,7 +9,7 @@ _Function to execute the Algorithm_
 
 
 
-URI: [https://w3id.org/my-org/validate_schema/:exec_function](https://w3id.org/my-org/validate_schema/:exec_function)
+URI: [https://w3id.org/my-org/bilayers_schema/:exec_function](https://w3id.org/my-org/bilayers_schema/:exec_function)
 
 
 
@@ -23,7 +23,7 @@ URI: [https://w3id.org/my-org/validate_schema/:exec_function](https://w3id.org/m
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [Container](Container.md) | Container class which holds all the high_level keywords from config |  no  |
+| [SpecContainer](SpecContainer.md) | SpecContianer class which holds all the high_level keywords from config |  no  |
 
 
 
@@ -52,7 +52,7 @@ URI: [https://w3id.org/my-org/validate_schema/:exec_function](https://w3id.org/m
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -61,8 +61,8 @@ URI: [https://w3id.org/my-org/validate_schema/:exec_function](https://w3id.org/m
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | https://w3id.org/my-org/validate_schema/:exec_function |
-| native | https://w3id.org/my-org/validate_schema/:exec_function |
+| self | https://w3id.org/my-org/bilayers_schema/:exec_function |
+| native | https://w3id.org/my-org/bilayers_schema/:exec_function |
 
 
 
@@ -73,11 +73,11 @@ URI: [https://w3id.org/my-org/validate_schema/:exec_function](https://w3id.org/m
 ```yaml
 name: exec_function
 description: Function to execute the Algorithm
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 rank: 1000
 alias: exec_function
 domain_of:
-- Container
+- SpecContainer
 range: ExecFunction
 required: true
 

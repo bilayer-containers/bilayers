@@ -14,72 +14,63 @@ exec_function = {{exec_function}}
 beginner_widgets = []
 advanced_widgets = []
 
-param_vars = []
+param_vars = {}
 
 # Appending args in cli_command
-cli_command = []
-cli_command.append(exec_function['cli_command'])
+cli_command_base = exec_function.get('cli_command', "")
 
 radio_options = {
 
-    {% if parameters is not none -%}
-    {% for param_conf in parameters if param_conf.type == 'radio' -%}
-        "{{ param_conf.label | lower | replace(' ', '_') }}": {
-            {% for option in param_conf.options %}
-            "{{ option.label }}": "{{ option.value }}"{% if not loop.last -%}, {%- endif %}
+    {% if parameters -%}
+    {% for key, param_conf in parameters.items() if param_conf.get('type') in ['radio', 'dropdown'] -%}
+        "{{ key | lower | replace(' ', '_') }}": {
+            {% for option in param_conf.get('options', []) -%}
+            "{{ option.get('label', '') }}": "{{ option.get('value', '') }}"{% if not loop.last %}, {% endif %}
             {%- endfor %}
         },
-    {% endfor -%}
-    {% for param_conf in parameters if param_conf.type == 'dropdown' -%}
-        "{{ param_conf.label | lower | replace(' ', '_') }}": {
-            {% for option in param_conf.options %}
-            "{{ option.label }}": "{{ option.value }}"{% if not loop.last -%}, {%- endif %}
+    {%- endfor %}
+    {%- endif %}
+    {% if display_only -%}
+    {% for key, display_only_conf in display_only.items() if display_only_conf.get('type') in ['radio', 'dropdown'] -%}
+        "{{ key | lower | replace(' ', '_') }}": {
+            {% for option in display_only_conf.get('options', []) %}
+            "{{ option.get('label', '') }}": "{{ option.get('value', '') }}"{% if not loop.last %}, {% endif %}
             {%- endfor %}
         },
-    {% endfor -%}
-    {% endif -%}
-    {% if display_only is not none -%}
-    {% for display_only_conf in display_only if display_only_conf.type == 'radio' -%}
-        "{{ display_only_conf.label | lower | replace(' ', '_') }}": {
-            {% for option in display_only_conf.options %}
-            "{{ option.label }}": "{{ option.value }}"{% if not loop.last -%}, {%- endif %}
-            {%- endfor %}
-        },
-    {% endfor -%}
-    {% for display_only_conf in display_only if display_only_conf.type == 'dropdown' -%}
-        "{{ display_only_conf.label | lower | replace(' ', '_') }}": {
-            {% for option in display_only_conf.options %}
-            "{{ option.label }}": "{{ option.value }}"{% if not loop.last -%}, {%- endif %}
-            {%- endfor %}
-        },
-    {% endfor -%}
-    {% endif -%}
+    {%- endfor %}
+    {%- endif %}
     }
 
 {# Parsing inputs section #}
-{% if inputs is not none -%}
-{% for input_conf in inputs -%}
+{% if inputs -%}
+{% for key, input_conf in inputs.items() -%}
 
-{% if input_conf.type in ['image', 'measurement', 'array', 'file', 'executable'] and input_conf.file_count == "multiple" %}
-{{ input_conf.label | lower | replace(" ", "_") }} = widgets.FileUpload(multiple=True)
-{% elif input_conf.type in ['image', 'measurement', 'array', 'file', 'executable'] and input_conf.file_count == "single" %}
-{{ input_conf.label | lower | replace(" ", "_") }} = widgets.FileUpload(multiple=False)
+{% set input_label = key | lower | replace(" ", "_") %}
+
+{% if input_conf.get('type') in ['image', 'measurement', 'array', 'file', 'executable'] %}
+{{ input_label }} = widgets.FileUpload(multiple = {{ 'True' if input_conf.get('file_count') == "multiple" else 'False' }})
 {%- endif %}
 
 # Add a description label
-{{ "desc_" + input_conf.label | lower | replace(" ", "_") }}  = widgets.HTML(value = "<b>{{ input_conf['label'] }} </b> :  {{ input_conf.get('description', '') }}")
+{{ "desc_" + input_label }}  = widgets.HTML(value = "<b>{{ input_conf.get('label', '') }} </b> :  {{ input_conf.get('description', '') }}")
 
 # Add widget and description to accordion
-tab = Tab(children=[HBox([widgets.Label("{{ input_conf['label'] }}"), {{ input_conf.label | lower | replace(" ", "_") }}]), {{ "desc_" + input_conf.label | lower | replace(" ", "_") }}])
-tab.set_title(0, "{{ input_conf['label'] }}")
+tab = Tab(children=[HBox([widgets.Label("{{ input_conf.get('label', '') }}"), {{ input_label }}]), {{ "desc_" + input_label }}])
+tab.set_title(0, "{{ input_conf.get('label', '') }}")
 tab.set_title(1, "Description")
 
 # Append the corresponding cli_tag, widget to param_vars
-{% if input_conf.type in ['image', 'measurement', 'array', 'file', 'executable'] %}
-param_vars.append(("{{ input_conf['cli_tag'] }}", {{ input_conf.label | lower | replace(" ", "_") }}, {{ input_conf.get('cli_order', 0) }}, "{{ input_conf.get('folder_name', '') }}"))
+{% if input_conf.get('type') in ['image', 'measurement', 'array', 'file', 'executable'] %}
+param_vars["{{ input_label }}"] = {
+    "cli_tag": "{{ input_conf.get('cli_tag') }}",
+    "widget": {{ input_label }},
+    "cli_order": {{ input_conf.get('cli_order', 0) }},
+    "folder_name": "{{ input_conf.get('folder_name', '') }}"
+}
+{# param_vars.append(("{{ input_conf.get('cli_tag') }}", {{ input_label }}, {{ input_conf.get('cli_order', 0) }}, "{{ input_conf.get('folder_name', '') }}")) #}
 {%- endif %}
 
-{% if input_conf.mode == 'beginner' -%}
+{% if input_conf.get('mode') == 'beginner' -%}
 beginner_widgets.append(tab)
 {% else %}
 advanced_widgets.append(tab)
@@ -89,38 +80,54 @@ advanced_widgets.append(tab)
 {%- endif %}
 
 {# Parsing parameters section #}
-{% if parameters is not none -%}
-{% for param_conf in parameters -%}
-{% if param_conf.type == 'radio' %}
-{{ param_conf.label | lower | replace(" ", "_") }} = widgets.RadioButtons(options=[{% for option in param_conf.options %}("{{ option.label }}", "{{ option.value }}"){% if not loop.last %}, {% endif %}{% endfor %}], value="{{ param_conf.default }}")
-{% elif param_conf.type == 'dropdown' %}
-{{ param_conf.label | lower | replace(" ", "_") }} = widgets.Dropdown(options=[{% for option in param_conf.options %}("{{ option.label }}", "{{ option.value }}"){% if not loop.last %}, {% endif %}{% endfor %}], value="{{ param_conf.default }}", multiselect = {{ param_conf.multiselect }})
-{% elif param_conf.type == 'integer' %}
-{{ param_conf.label | lower | replace(" ", "_") }} = widgets.IntText(value={{ param_conf.default }})
-{% elif param_conf.type == 'float' %}
-{{ param_conf.label | lower | replace(" ", "_") }} = widgets.FloatText(value={{ param_conf.default }})
-{% elif param_conf.type == 'textbox' %}
-{{ param_conf.label | lower | replace(" ", "_") }} = widgets.Textarea(value="{{ param_conf.default if param_conf.default is not none else '' }}")
-{% elif param_conf.type == 'checkbox' %}
-{{ param_conf.label | lower | replace(" ", "_") }} = widgets.Checkbox(value={{ param_conf.default }})
+{% if parameters -%}
+{% for key, param_conf in parameters.items() -%}
+
+{% set param_label = key | lower | replace(" ", "_") %}
+
+{% if param_conf.get('type') == 'radio' %}
+{{ param_label }} = widgets.RadioButtons(options=[{% for option in param_conf.get('options', []) %}("{{ option.label }}", "{{ option.value }}"){% if not loop.last %}, {% endif %}{% endfor %}], value="{{ param_conf.get('default', '') }}")
+{% elif param_conf.get('type') == 'dropdown' %}
+{{ param_label }} = widgets.Dropdown(options=[{% for option in param_conf.get('options', []) %}("{{ option.label }}", "{{ option.value }}"){% if not loop.last %}, {% endif %}{% endfor %}], value="{{ param_conf.get('default', '') }}", multiselect = {{ param_conf.get('multiselect', False) }})
+{% elif param_conf.get('type') in ['integer', 'float'] %}
+{% if param_conf.get('type') == 'integer' %}
+{{ param_label }} = widgets.IntText(value={{ param_conf.get('default', 0) }})
+{% else %} 
+{{ param_label }} = widgets.FloatText(value={{param_conf.get('default', 0.0)}})
+{% endif %}
+{% elif param_conf.get('type') == 'textbox' %}
+{{ param_label }} = widgets.Textarea(value="{{ param_conf.get('default', '') }}")
+{% elif param_conf.get('type') == 'checkbox' %}
+{{ param_label }} = widgets.Checkbox(value={{ param_conf.get('default', False) }})
 {%- endif %}
 
 # Add a description label
-{{ "desc_" + param_conf.label | lower | replace(" ", "_") }}  = widgets.HTML(value = "<b>{{ param_conf['label'] }} </b> :  {{ param_conf.get('description', '') }}")
+{{ "desc_" + param_label }}  = widgets.HTML(value = "<b>{{ param_conf.get('label', '') }} </b> :  {{ param_conf.get('description', '') }}")
 
 # Add widget and description to accordion
-tab = Tab(children=[HBox([widgets.Label("{{ param_conf['label'] }}"), {{ param_conf.label | lower | replace(" ", "_") }}]), {{ "desc_" + param_conf.label | lower | replace(" ", "_") }}])
-tab.set_title(0, "{{ param_conf['label'] }}")
+tab = Tab(children=[HBox([widgets.Label("{{ param_conf.get('label', '') }}"), {{ param_label }}]), {{ "desc_" + param_label }}])
+tab.set_title(0, "{{ param_conf.get('label', '') }}")
 tab.set_title(1, "Description")
 
 # Append the corresponding cli_tag, widget to param_vars
-{% if param_conf.type == 'checkbox' %}
-param_vars.append(("{{ param_conf['cli_tag'] }}", {{ param_conf.label | lower | replace(" ", "_") }}, {{ param_conf.get('cli_order', 0) }}, {{ param_conf.get('append_value', False) }} ))
+{% if param_conf.get('type') == 'checkbox' %}
+{# param_vars.append(("{{ param_conf.get('cli_tag') }}", {{ param_label }}, {{ param_conf.get('cli_order', 0) }}, {{ param_conf.get('append_value', False) }} )) #}
+param_vars["{{ param_label }}"] = {
+    "cli_tag": "{{ param_conf.get('cli_tag') }}",
+    "widget": {{ param_label }},
+    "cli_order": {{ param_conf.get('cli_order', 0) }},
+    "append_value": {{ param_conf.get('append_value', False) }}
+}
 {% else %}
-param_vars.append(("{{ param_conf['cli_tag'] }}", {{ param_conf.label | lower | replace(" ", "_") }}, {{ param_conf.get('cli_order', 0) }} ))
+param_vars["{{ param_label }}"] = {
+    "cli_tag": "{{ param_conf.get('cli_tag') }}",
+    "widget": {{ param_label }},
+    "cli_order": {{ param_conf.get('cli_order', 0) }}
+}
+{# param_vars.append(("{{ param_conf.get('cli_tag') }}", {{ param_label }}, {{ param_conf.get('cli_order', 0) }} )) #}
 {% endif %}
 
-{% if param_conf.mode == 'beginner' -%}
+{% if param_conf.get('mode') == 'beginner' -%}
 beginner_widgets.append(tab)
 {% else %}
 advanced_widgets.append(tab)
@@ -129,32 +136,37 @@ advanced_widgets.append(tab)
 {%- endif %}
 
 {# Parsing display_only section #}
-{% if display_only is not none -%}
-{% for display_only_conf in display_only -%}
-{% if display_only_conf.type == 'radio' %}
-{{ display_only_conf.label | lower | replace(" ", "_") }} = widgets.RadioButtons(options=[{% for option in display_only_conf.options %}("{{ option.label }}", "{{ option.value }}"){% if not loop.last %}, {% endif %}{% endfor %}], value="{{ display_only_conf.default }}", disabled=True)
-{% elif display_only_conf.type == 'dropdown' %}
-{{ display_only_conf.label | lower | replace(" ", "_") }} = widgets.Dropdown(options=[{% for option in display_only_conf.options %}("{{ option.label }}", "{{ option.value }}"){% if not loop.last %}, {% endif %}{% endfor %}], value="{{ display_only_conf.default }}", multiselect="{{ display_only_conf.multiselect }}", disabled=True)
-{% elif display_only_conf.type == 'integer' %}
-{{ display_only_conf.label | lower | replace(" ", "_") }} = widgets.IntText(value={{ display_only_conf.default }}, disabled=True)
-{% elif display_only_conf.type == 'float' %}
-{{ display_only_conf.label | lower | replace(" ", "_") }} = widgets.FloatText(value={{ display_only_conf.default }}, disabled=True)
-{% elif display_only_conf.type == 'textbox' %}
-{{ display_only_conf.label | lower | replace(" ", "_") }} = widgets.Textarea(value="{{ display_only_conf.default if display_only_conf.default is not none else '' }}", disabled=True)
-{% elif display_only_conf.type == 'checkbox' %}
-{{ display_only_conf.label | lower | replace(" ", "_") }} = widgets.Checkbox(value={{ display_only_conf.default }}, disabled=True)
+{% if display_only -%}
+{% for key, display_only_conf in display_only.items() -%}
+
+{% set display_only_label = key | lower | replace(" ", "_") %}
+
+{% if display_only_conf.get('type') == 'radio' %}
+{{ display_only_label }} = widgets.RadioButtons(options=[{% for option in display_only_conf.get('options', []) %}("{{ option.label }}", "{{ option.value }}"){% if not loop.last %}, {% endif %}{% endfor %}], value="{{ display_only_conf.get('default', '') }}", disabled=True)
+{% elif display_only_conf.get('type') == 'dropdown' %}
+{{ display_only_label }} = widgets.Dropdown(options=[{% for option in display_only_conf.get('options', []) %}("{{ option.label }}", "{{ option.value }}"){% if not loop.last %}, {% endif %}{% endfor %}], value="{{ display_only_conf.get('default', '') }}", multiselect="{{ display_only_conf.get('multiselect', False) }}", disabled=True)
+{% elif display_only_conf.get('type') in ['integer', 'float'] %}
+{% if display_only_conf.get('type') == 'integer' %}
+{{ display_only_label }} = widgets.IntText(value={{ display_only_conf.get('default', 0) }}, disabled=True)
+{% else %}
+{{ display_only_label }} = widgets.FloatText(value={{ display_only_conf.get('default', 0.0) }}, disabled=True)
+{% endif %}
+{% elif display_only_conf.get('type') == 'textbox' %}
+{{ display_only_label }} = widgets.Textarea(value="{{ display_only_conf.get('default', '') }}", disabled=True)
+{% elif display_only_conf.get('type') == 'checkbox' %}
+{{ display_only_label }} = widgets.Checkbox(value={{ display_only_conf.get('default', False) }}, disabled=True)
 {%- endif %}
 
 
 # Add a description label
-{{ "desc_" + display_only_conf.label | lower | replace(" ", "_") }}  = widgets.HTML(value = "<b>{{ display_only_conf['label'] }} </b> :  {{ display_only_conf.get('description', '') }}")
+{{ "desc_" + display_only_label }}  = widgets.HTML(value = "<b>{{ display_only_conf.get('label', '') }} </b> :  {{ display_only_conf.get('description', '') }}")
 
 # Add widget and description to accordion
-tab = Tab(children=[HBox([widgets.Label("{{ display_only_conf['label'] }}"), {{ display_only_conf.label | lower | replace(" ", "_") }}]), {{ "desc_" + display_only_conf.label | lower | replace(" ", "_") }}])
-tab.set_title(0, "{{ display_only_conf['label'] }}")
+tab = Tab(children=[HBox([widgets.Label("{{ display_only_conf.get('label', '') }}"), {{ display_only_label }}]), {{ "desc_" + display_only_label }}])
+tab.set_title(0, "{{ display_only_conf.get('label', '') }}")
 tab.set_title(1, "Description")
 
-{% if display_only_conf.mode == 'beginner' -%}
+{% if display_only_conf.get('mode') == 'beginner' -%}
 beginner_widgets.append(tab)
 {% else %}
 advanced_widgets.append(tab)
@@ -226,19 +238,20 @@ def construct_cli_command() -> str:
     Returns:
         str: The constructed CLI command string.
     """
-    cli_command: list[str] = ["{{ exec_function.cli_command }}"]
+    {# cli_command: str = "{{ exec_function.get('cli_command', '') }}" #}
+    cli_command_parts = [ cli_command_base]
 
     # Initialize jagged arrays
     jagged_positive_array: list[list[str] | None] = []
     jagged_negative_array: list[list[str] | None] = []
 
     {% autoescape false %}
-    hidden_args = {{ exec_function.get("hidden_args", []) }}
+    hidden_args = {{ exec_function.get("hidden_args", {}) }}
     print("Hidden Args:", hidden_args)
     {% endautoescape %}
 
     if hidden_args:
-        for hidden_arg in hidden_args:
+        for hidden_arg in hidden_args.values(): # Iterating over dictionary values, not keys
             cli_tag = hidden_arg.get('cli_tag', '')
             cli_order = hidden_arg.get('cli_order', 0)
             value = hidden_arg.get('value', '')
@@ -276,21 +289,21 @@ def construct_cli_command() -> str:
                 else:
                     insert_into_jagged_array(jagged_positive_array, cli_order, cli_tag, value)
 
-    for param_var in param_vars:
-        cli_tag: str = param_var[0]
-        widget: Union[widgets.Widget, widgets.FileUpload, widgets.Checkbox] = param_var[1]
-        cli_order: int = param_var[2]
+    for key, param_info in param_vars.items():
+        cli_tag: str = param_info["cli_tag"]
+        widget: Union[widgets.Widget, widgets.FileUpload, widgets.Checkbox] = param_info["widget"]
+        cli_order: int = param_info["cli_order"]
 
-        if len(param_var) == 4:  
-            if isinstance(widget, widgets.FileUpload): # This is a 'Files' type
-                folder_name: str = param_var[3]
+        if "folder_name" in param_info or "append_value" in param_info: # Special case for 'File' type and checkbox
+            if isinstance(widget, widgets.FileUpload): # This is a 'File' type
+                folder_name: str = param_info["folder_name"]
                 value = folder_name
                 if cli_order < 0:
                     insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)
                 else:
                     insert_into_jagged_array(jagged_positive_array, cli_order, cli_tag, value)
             elif isinstance(widget, widgets.Checkbox):  # This is a 'Checkbox' type
-                append_value: bool = param_var[3]
+                append_value: bool = param_info.get("append_value", False)
                 value = widget.value
                 if append_value: # If value needs to appended along with cli_tag - Special case for Checkbox
                     if cli_order < 0:
@@ -338,18 +351,18 @@ def construct_cli_command() -> str:
     # Append Positive ordered elements
     for index in range(1, len(jagged_positive_array)):
         if jagged_positive_array[index]:
-            cli_command.extend(jagged_positive_array[index])
+            cli_command_parts.extend(jagged_positive_array[index])
 
     # Append elements with cli_order == 0
     if jagged_positive_array and jagged_positive_array[0]:
-        cli_command.extend(jagged_positive_array[0])
+        cli_command_parts.extend(jagged_positive_array[0])
 
     # Append Negative ordered elements in reverse order
     for index in range(len(jagged_negative_array) - 1, 0, -1):
         if jagged_negative_array[index]:
-            cli_command.extend(jagged_negative_array[index])
+            cli_command_parts.extend(jagged_negative_array[index])
 
-    return " ".join(cli_command)
+    return " ".join(cli_command_parts)
 
 def update_command(change: Any) -> None:
     """
@@ -362,11 +375,11 @@ def update_command(change: Any) -> None:
 
 cli_command: widgets.Textarea = widgets.Textarea(value=construct_cli_command(), description="CLI Command")
 
-for param_var in param_vars:
-    widget = param_var[1]
-    widget.observe(update_command, names='value')
+for key, param_info in param_vars.items():
+    widget = param_info["widget"]
+    if hasattr(widget, 'observe'):
+        widget.observe(update_command, names='value')
 
-display(acc, cli_command)
-
-if __name__ == "main":
-    print("Hello World")
+if __name__ == "__main__":
+    from IPython.display import display
+    display(acc, cli_command)

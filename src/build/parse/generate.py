@@ -10,10 +10,10 @@ from parse import Config, InputOutput, Parameter, ExecFunction, Citations # type
 
 def generate_gradio_app(
         template_path: str, 
-        inputs: list[InputOutput], 
-        outputs: list[InputOutput], 
-        parameters: list[Parameter], 
-        display_only: list[Parameter] | None, 
+        inputs: Dict[str,InputOutput], 
+        outputs: Dict[str,InputOutput], 
+        parameters: Dict[str,Parameter], 
+        display_only: Optional[Dict[str,Parameter]], 
         exec_function: ExecFunction, 
         citations: Citations) -> str:
     """
@@ -21,10 +21,10 @@ def generate_gradio_app(
 
     Args:
         template_path (str): Path to the Gradio template file.
-        inputs (list[InputOutput]): list of input configurations.
-        outputs (list[InputOutput]): list of output configurations.
-        parameters (list[Parameter]): list of parameter configurations.
-        display_only list[Parameter] | None: list of display-only parameters, or None.
+        inputs (Dict[str, InputOutput]): Dictionary of input configurations.
+        outputs (Dict[str, InputOutput]): Dictionary of output configurations.
+        parameters (Dict[str, Parameter]): Dictionary of parameter configurations.
+        display_only (Optional[Dict[str, Parameter]]): Dictionary of display-only parameters, or None.
         exec_function (ExecFunction): Execution function details.
         citations (Citations): Citations information.
 
@@ -47,17 +47,24 @@ def generate_gradio_app(
 
     template = env.get_template(os.path.basename(template_path))
 
-    gradio_app_code: str = template.render(inputs=inputs, outputs=outputs, parameters=parameters, display_only=display_only or [], exec_function=exec_function, citations=citations)
+    gradio_app_code: str = template.render(
+        inputs=inputs,
+        outputs=outputs,
+        parameters=parameters,
+        display_only=display_only,
+        exec_function=exec_function,
+        citations=citations
+    )
 
     return gradio_app_code
 
 
 def generate_jupyter_notebook(
         template_path: str, 
-        inputs: list[InputOutput],
-        outputs: list[InputOutput], 
-        parameters: list[Parameter], 
-        display_only: list[Parameter] | None, 
+        inputs: Dict[str,InputOutput],
+        outputs: Dict[str,InputOutput], 
+        parameters: Dict[str,Parameter], 
+        display_only: Optional[Dict[str,Parameter]], 
         exec_function: ExecFunction, 
         citations: Citations) -> nbf.NotebookNode:
     """
@@ -65,10 +72,10 @@ def generate_jupyter_notebook(
 
     Args:
         template_path (str): Path to the Jupyter Notebook template file.
-        inputs (list[InputOutput]): list of input configurations.
-        outputs (list[InputOutput]): list of output configurations.
-        parameters (list[Parameter]): list of parameter configurations.
-        display_only list[Parameter] | None: list of display-only parameters, or None.
+        inputs (Dict[str, InputOutput]): Dictionary of input configurations.
+        outputs (Dict[str, InputOutput]): Dictionary of output configurations.
+        parameters (Dict[str, Parameter]): Dictionary of parameter configurations.
+        display_only (Optional[Dict[str, Parameter]]): Dictionary of display-only parameters, or None.
         exec_function (ExecFunction): Execution function details.
         citations (Citations): Citations information.
 
@@ -94,7 +101,12 @@ def generate_jupyter_notebook(
 
     template = env.get_template(os.path.basename(template_path))
     notebook_content: str = template.render(
-        inputs=inputs, outputs=outputs, parameters=parameters, display_only=display_only or [], exec_function=exec_function)
+        inputs=inputs, 
+        outputs=outputs, 
+        parameters=parameters, 
+        display_only=display_only, 
+        exec_function=exec_function
+    )
 
     DEFAULT_CITATIONS: dict[str, list[dict[str, str]]] = {
         "Bilayers": [
@@ -120,7 +132,7 @@ def generate_jupyter_notebook(
     nb.cells.append(create_markdown_cell("## Set Variables and Run the cell"))
 
     citation_cell: str = ""
-    for citation in citations['algorithm']:
+    for citation in citations.get('algorithm', {}).values():
         citation_cell += f"- {citation.get('name', 'Unknown Name')} under {citation.get('license', 'Unknown')} License : {citation.get('doi', 'No Description Available')} --> {citation.get('description', 'No Description Available')}\n"
     for citation in DEFAULT_CITATIONS['Jupyter']:
         citation_cell += f"- {citation.get('name', 'Unknown Name')} under {citation.get('license', 'Unknown')} License : {citation.get('doi', 'No Description Available')} --> {citation.get('description', 'No Description Available')}\n"

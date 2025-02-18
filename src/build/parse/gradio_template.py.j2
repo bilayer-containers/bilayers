@@ -64,38 +64,24 @@ def generate_cli_command(
     Returns:
         tuple[str, str | None, str | None]: CLI command, folder_name, and output_folder_name.
     """
-    cli_command = ["{{ exec_function.cli_command }}"]
+    cli_command = ["{{ exec_function.get("cli_command", "") }}"]
 
     # Radio options mapping
     radio_options = {
-    {% if parameters is not none -%}
-    {% for param_conf in parameters if param_conf.type == 'radio' -%}
-        "{{ param_conf.label | lower | replace(' ', '_') }}": {
-            {% for option in param_conf.options -%}
-            "{{ option.label }}": "{{ option.value }}"{% if not loop.last %}, {% endif %}
-            {%- endfor %}
-        },
-    {%- endfor %}
-    {% for param_conf in parameters if param_conf.type == 'dropdown' -%}
-        "{{ param_conf.label | lower | replace(' ', '_') }}": {
-            {% for option in param_conf.options -%}
-            "{{ option.label }}": "{{ option.value }}"{% if not loop.last %}, {% endif %}
+    {% if parameters %}
+    {% for key, param_conf in parameters.items() if param_conf.get('type') in ['radio', 'dropdown'] -%}
+        "{{ key | lower | replace(' ', '_') }}": {
+            {% for option in param_conf.get('options', []) -%}
+            "{{ option.get('label', '') }}": "{{ option.get('value', '') }}"{% if not loop.last %}, {% endif %}
             {%- endfor %}
         },
     {%- endfor %}
     {%- endif %}
-    {% if display_only is not none -%}
-    {% for display_only_conf in display_only if display_only_conf.type == 'radio' -%}
-        "{{ display_only_conf.label | lower | replace(' ', '_') }}": {
-            {% for option in display_only_conf.options -%}
-            "{{ option.label }}": "{{ option.value }}"{% if not loop.last %}, {% endif %}
-            {%- endfor %}
-        },
-    {%- endfor %}
-    {% for display_only_conf in display_only if display_only_conf.type == 'dropdown' -%}
-        "{{ display_only_conf.label | lower | replace(' ', '_') }}": {
-            {% for option in display_only_conf.options -%}
-            "{{ option.label }}": "{{ option.value }}"{% if not loop.last %}, {% endif %}
+    {% if display_only %}
+    {% for key, display_only_conf in display_only.items() if display_only_conf.get('type') in ['radio', 'dropdown'] -%}
+        "{{ key | lower | replace(' ', '_') }}": {
+            {% for option in display_only_conf.get('options', []) -%}
+            "{{ option.get('label', '') }}": "{{ option.get('value', '') }}"{% if not loop.last %}, {% endif %}
             {%- endfor %}
         },
     {%- endfor %}
@@ -145,7 +131,7 @@ def generate_cli_command(
             else:
                 # Handle Radio type mappings dynamically
                 if key in radio_options and value in radio_options[key]:
-                    value = radio_options[key][value]
+                    value = radio_options[key].get(value, value)
                     if value == "None":
                         if optional is False:
                             error_message = f"{label} needs to have some value. It's Mandatory!"
@@ -191,13 +177,13 @@ def generate_cli_command(
 
     # Add hidden arguments to the command
     {% autoescape false %}
-    hidden_args = {{ exec_function.get("hidden_args", []) or []}}
+    hidden_args = {{ exec_function.get("hidden_args", {}) }}
     print("Hidden Args:", hidden_args)
     {% endautoescape %}
 
     # If hidden_args exists
     if hidden_args:
-        for arg in hidden_args:
+        for arg in hidden_args.values():  # Iterate over dictionary values, not keys
             cli_tag = arg.get("cli_tag", '')
             value = arg.get("value", '')
             append_value = arg.get("append_value", False)
@@ -253,71 +239,67 @@ def generate_cli_command(
 
 # Dynamically define on_submit with the exact parameter arguments
 def on_submit(
-{% if inputs is not none -%}
-{% for input_conf in inputs -%}
-{% if input_conf.type in ['image', 'measurement', 'array', 'file', 'executable'] %}
-{{input_conf.label | lower | replace(" ", "_")}}_description,
-{{ input_conf.label | lower | replace(" ", "_") }},
+{% if inputs -%}
+{% for key, input_conf in inputs.items() -%}
+{% if input_conf.get('type') in ['image', 'measurement', 'array', 'file', 'executable'] %}
+{{ key | lower | replace(" ", "_") }}_description,
+{{ key | lower | replace(" ", "_") }},
 {% else %}
-{{ input_conf.label | lower | replace(" ", "_") }},
+{{ key | lower | replace(" ", "_") }},
 {%- endif %}
 {%- endfor %}
 {%- endif %}
-{% if parameters is not none -%}
-{% for param_conf in parameters -%}
-{{ param_conf.label | lower | replace(" ", "_") }},
+{% if parameters -%}
+{% for key, param_conf in parameters.items() -%}
+{{ key | lower | replace(" ", "_") }},
 {%- endfor %}
 {%- endif %}
-{% if display_only is not none -%}
-{% for display_only_conf in display_only -%}
-{{ display_only_conf.label | lower | replace(" ", "_") }},
+{% if display_only -%}
+{% for key, display_only_conf in display_only.items() -%}
+{{ key | lower | replace(" ", "_") }},
 {%- endfor %}
 {%- endif %}
 ):
 
     kwargs = {
-    {% if inputs is not none %}
-    {% for input_conf in inputs %}
-        "{{ input_conf.label | lower | replace(' ', '_') }}": {{ input_conf.label | lower | replace(' ', '_') }},
+    {% if inputs %}
+    {% for key, input_conf in inputs.items() %}
+        "{{ key | lower | replace(' ', '_') }}": {{ key | lower | replace(' ', '_') }},
     {% endfor %}
     {% endif %}
-    {% if parameters is not none %}
-    {% for param_conf in parameters %}
-        "{{ param_conf.label | lower | replace(' ', '_') }}": {{ param_conf.label | lower | replace(' ', '_') }},
+    {% if parameters %}
+    {% for key, param_conf in parameters.items() %}
+        "{{ key | lower | replace(' ', '_') }}": {{ key | lower | replace(' ', '_') }},
     {% endfor %}
     {% endif %}
     }
 
     # Mapping of parameter tags to CLI tags
     cli_tags = {
-    {% for input_conf in inputs %}
-    "{{ input_conf.label | lower | replace(' ', '_') }}": {
-        "cli_tag": "{{ input_conf.cli_tag }}",
-        "default": "{{ input_conf.default }}",
-        "cli_order": {{ input_conf.cli_order | default(0) }},
-        "optional": {{ input_conf.optional }},
-        "label": "{{ input_conf.label }}",
-        {% if input_conf.type in ['image', 'measurement', 'file', 'array', 'executable'] %}
-        "folder_name": "{{ input_conf.folder_name }}"
+    {% for key, input_conf in inputs.items() %}
+    "{{ key | lower | replace(' ', '_') }}": {
+        "cli_tag": "{{ input_conf.get('cli_tag', '') }}",
+        "default": "{{ input_conf.get('default', '') }}",
+        "cli_order": {{ input_conf.get('cli_order', 0) }},
+        "optional": {{ input_conf.get('optional', False) }},
+        "label": "{{ input_conf.get('label', '') }}",
+        {% if input_conf.get('type') in ['image', 'measurement', 'file', 'array', 'executable'] %}
+        "folder_name": "{{ input_conf.get('folder_name', '') }}"
         {% endif %}
     },
     {% endfor %}
-    {% for param_conf in parameters %}
-    "{{ param_conf.label | lower | replace(' ', '_') }}": {
-        "cli_tag": "{{ param_conf.cli_tag }}",
-        "default": "{{ param_conf.default }}",
-        "cli_order": {{ param_conf.cli_order | default(0) }},
-        "optional": {{ param_conf.optional }},
-        "label": "{{ param_conf.label }}",
-        {% if param_conf.type == 'checkbox' %}
-            {% if param_conf.append_value is defined %}
-        "append_value": {{ param_conf.append_value }},
-            {% endif %}
+    {% for key, param_conf in parameters.items() %}
+    "{{ key | lower | replace(' ', '_') }}": {
+        "cli_tag": "{{ param_conf.get('cli_tag', '') }}",
+        "default": "{{ param_conf.get('default', '') }}",
+        "cli_order": {{ param_conf.get('cli_order', 0) }},
+        "optional": {{ param_conf.get('optional', False) }},
+        "label": "{{ param_conf.get('label', '') }}",
+        {% if param_conf.get('type') == 'checkbox' and param_conf.get('append_value') is defined %}
+        "append_value": {{ param_conf.get('append_value', False) }},
         {% endif %}
-        {% if param_conf.type == 'textbox' %}
-            {% if param_conf.output_dir_set is defined %}
-        "output_dir_set": {{ param_conf.output_dir_set }}
-            {% endif %}
+        {% if param_conf.get('type') == 'textbox' and param_conf.get('output_dir_set') is defined %}
+        "output_dir_set": {{ param_conf.get('output_dir_set', False) }},
         {% endif %}
     }{% if not loop.last %},{% endif %}
     {% endfor %}
@@ -350,69 +332,55 @@ def on_submit(
         error_message += f"Command failed with error: {e.stderr.decode()}\n\n"
         raise gr.Error(error_message, duration = None)
         
-{% if inputs is not none -%}
-{% for input_conf in inputs %}
+{% if inputs is not none and inputs | length > 0 -%}
+{% for key, input_conf in inputs.items() %}
 
-{% if input_conf.type == 'image' %}
-{{ input_conf.label | lower | replace(" ", "_") }}_description = gr.Markdown(value="{{ input_conf.description }}")
-{{ input_conf.label | lower | replace(" ", "_") }} = gr.Files(label="{{ input_conf.label }}", file_count="{{ input_conf.file_count }}")
-{% elif input_conf.type == 'measurement' %}
-{{ input_conf.label | lower | replace(" ", "_") }}_description = gr.Markdown(value="{{ input_conf.description }}")
-{{ input_conf.label | lower | replace(" ", "_") }} = gr.Files(label="{{ input_conf.label }}", file_count="{{ input_conf.file_count }}")
-{% elif input_conf.type == 'array' %}
-{{ input_conf.label | lower | replace(" ", "_") }}_description = gr.Markdown(value="{{ input_conf.description }}")
-{{ input_conf.label | lower | replace(" ", "_") }} = gr.Files(label="{{ input_conf.label }}", file_count="{{ input_conf.file_count }}")
-{% elif input_conf.type == 'file' %}
-{{ input_conf.label | lower | replace(" ", "_") }}_description = gr.Markdown(value="{{ input_conf.description }}")
-{{ input_conf.label | lower | replace(" ", "_") }} = gr.Files(label="{{ input_conf.label }}", file_count="{{ input_conf.file_count }}")
-{% elif input_conf.type == 'executable' %}
-{{ input_conf.label | lower | replace(" ", "_") }}_description = gr.Markdown(value="{{ input_conf.description }}")
-{{ input_conf.label | lower | replace(" ", "_") }} = gr.Files(label="{{ input_conf.label }}", file_count="{{ input_conf.file_count }}")
+{% if input_conf.get('type') in ['image', 'measurement', 'array', 'file', 'executable'] %}
+{{ key | lower | replace(" ", "_") }}_description = gr.Markdown(value="{{ input_conf.get('description', '') }}")
+{{ key | lower | replace(" ", "_") }} = gr.Files(label="{{ input_conf.get('label', '') }}", file_count="{{ input_conf.get('file_count', 'single') }}")
 {% endif %}
 
 
 {% endfor %}
 {%- endif %}
 
-{% if parameters is not none -%}
-{% for param_conf in parameters %}
+{% if parameters is not none and parameters | length > 0 -%}
+{% for key, param_conf in parameters.items() %}
 
-{% if param_conf.type == 'radio' -%}
-{{ param_conf.label | lower | replace(" ", "_") }} = gr.Radio(label="{{ param_conf.label }}", info="{{ param_conf.description }}",  choices=[{% for option in param_conf.options %}"{{ option.label }}"{% if not loop.last %}, {% endif %}{% endfor %}], value="{{ param_conf.default }}")
-{% elif param_conf.type == 'dropdown' %}
-{{ param_conf.label | lower | replace(" ", "_") }} = gr.Dropdown(label="{{ param_conf.label }}", info="{{ param_conf.description }}",  choices=[{% for option in param_conf.options %}("{{ option.label }}", "{{ option.value }}"){% if not loop.last %}, {% endif %}{% endfor %}], value="{{ param_conf.default }}", multiselect = {{ param_conf.multiselect }})
-{% elif param_conf.type == 'integer' %}
-{{ param_conf.label | lower | replace(" ", "_") }} = gr.Number(label="{{ param_conf.label }}", info="{{ param_conf.description }}", value={{ param_conf.default }})
-{% elif param_conf.type == 'float' %}
-{{ param_conf.label | lower | replace(" ", "_") }} = gr.Number(label="{{ param_conf.label }}", info="{{ param_conf.description }}", value={{ param_conf.default }})
-{% elif param_conf.type == 'textbox' and param_conf.output_dir_set == False %}
-{{ param_conf.label | lower | replace(" ", "_") }} = gr.Textbox(label="{{ param_conf.label }}", info="{{ param_conf.description }}", value="{{ param_conf.default }}", interactive=False)
-{% elif param_conf.type == 'textbox' %}
-{{ param_conf.label | lower | replace(" ", "_") }} = gr.Textbox(label="{{ param_conf.label }}", info="{{ param_conf.description }}", value="{{ param_conf.default }}")
-{% elif param_conf.type == 'checkbox' %}
-{{ param_conf.label | lower | replace(" ", "_") }} = gr.Checkbox(label="{{ param_conf.label }}", info="{{ param_conf.description }}", value={{ param_conf.default }})
+{% set param_label = key | lower | replace(" ", "_") %}
+
+{% if param_conf.get('type') == 'radio' %}
+{{ param_label }} = gr.Radio(label="{{ param_conf.get('label', '') }}", info="{{ param_conf.get('description', '') }}", choices=[{% for option in param_conf.get('options', []) %}"{{ option.label }}"{% if not loop.last %}, {% endif %}{% endfor %}], value="{{ param_conf.get('default', '') }}")
+{% elif param_conf.get('type') == 'dropdown' %}
+{{ param_label }} = gr.Dropdown(label="{{ param_conf.get('label', '') }}", info="{{ param_conf.get('description', '') }}", choices=[{% for option in param_conf.get('options', []) %}("{{ option.label }}", "{{ option.value }}"){% if not loop.last %}, {% endif %}{% endfor %}], value="{{ param_conf.get('default', '') }}", multiselect={{ param_conf.get('multiselect', False) }})
+{% elif param_conf.get('type') in ['integer', 'float'] %}
+{{ param_label }} = gr.Number(label="{{ param_conf.get('label', '') }}", info="{{ param_conf.get('description', '') }}", value={{ param_conf.get('default', 0) }} if "{{param_conf.get('type') }}" == "integer" else {{ param_conf.get('default', 0.0)}})
+{% elif param_conf.get('type') == 'textbox' %}
+{{ param_label }} = gr.Textbox(label="{{ param_conf.get('label', '') }}", info="{{ param_conf.get('description', '') }}", value="{{ param_conf.get('default', '') }}", interactive={{ not param_conf.get('output_dir_set', False) }})
+{% elif param_conf.get('type') == 'checkbox' %}
+{{ param_label }} = gr.Checkbox(label="{{ param_conf.get('label', '') }}", info="{{ param_conf.get('description', '') }}", value={{ param_conf.get('default', False) }})
 {% endif %}
 
-
-{% endfor %}  
+{% endfor %}
 {%- endif %}
 
-{% if display_only is not none -%}
-{% for display_only_conf in display_only -%}
-{% if display_only_conf.type == 'radio' -%}
-{{ display_only_conf.label | lower | replace(" ", "_") }} = gr.Radio(label="{{ display_only_conf.label }}", info="{{ display_only_conf.description }}",  choices=[{% for option in display_only_conf.options %}"{{ option.label }}"{% if not loop.last %}, {% endif %}{% endfor %}], value="{{ display_only_conf.default }}", interactive=False)
-{% elif display_only_conf.type == 'dropdown' %}
-{{ display_only_conf.label | lower | replace(" ", "_") }} = gr.Dropdown(label="{{ display_only_conf.label }}", info="{{ display_only_conf.description }}",  choices=[{% for option in display_only_conf.options %}("{{ option.label }}", "{{option.value}}"){% if not loop.last %}, {% endif %}{% endfor %}], value="{{ display_only_conf.default }}", interactive=False, multiselect = {{ display_only_conf.multiselect }})
-{% elif display_only_conf.type == 'integer' %}
-{{ display_only_conf.label | lower | replace(" ", "_") }} = gr.Number(label="{{ display_only_conf.label }}", info="{{ display_only_conf.description }}", value={{ display_only_conf.default }}, interactive=False)
-{% elif display_only_conf.type == 'float' %}
-{{ display_only_conf.label | lower | replace(" ", "_") }} = gr.Number(label="{{ display_only_conf.label }}", info="{{ display_only_conf.description }}", value={{ display_only_conf.default }}, interactive=False)
-{% elif display_only_conf.type == 'textbox' %}
-{{ display_only_conf.label | lower | replace(" ", "_") }} = gr.Textbox(label="{{ display_only_conf.label }}", info="{{ display_only_conf.description }}", value="{{ display_only_conf.default }}", interactive=False)
-{% elif display_only_conf.type == 'checkbox' %}
-{{ display_only_conf.label | lower | replace(" ", "_") }} = gr.Checkbox(label="{{ display_only_conf.label }}", info="{{ display_only_conf.description }}", value={{ display_only_conf.default }}, interactive=False)
-{%- endif %}
-{%- endfor %}
+{% if display_only is not none and display_only | length > 0 -%}
+{% for key, display_only_conf in display_only.items() %}
+{% set display_label = key | lower | replace(" ", "_") %}
+    
+{% if display_only_conf.get('type') == 'radio' %}
+{{ display_label }} = gr.Radio(label="{{ display_only_conf.get('label', '') }}", info="{{ display_only_conf.get('description', '') }}", choices=[{% for option in display_only_conf.get('options', []) %}"{{ option.label }}"{% if not loop.last %}, {% endif %}{% endfor %}], value="{{ display_only_conf.get('default', '') }}", interactive=False)    
+{% elif display_only_conf.get('type') == 'dropdown' %}
+{{ display_label }} = gr.Dropdown(label="{{ display_only_conf.get('label', '') }}", info="{{ display_only_conf.get('description', '') }}", choices=[{% for option in display_only_conf.get('options', []) %}("{{ option.label }}", "{{ option.value }}"){% if not loop.last %}, {% endif %}{% endfor %}], value="{{ display_only_conf.get('default', '') }}", interactive=False, multiselect={{ display_only_conf.get('multiselect', False) }})
+{% elif display_only_conf.get('type') in ['integer', 'float'] %}
+{{ display_label }} = gr.Number(label="{{ display_only_conf.get('label', '') }}", info="{{ display_only_conf.get('description', '') }}", value={{ display_only_conf.get('default', 0) }} if "{{ display_only_conf.get('type') }}" == "integer" else {{ display_only_conf.get('default', 0.0) }}, interactive=False)
+{% elif display_only_conf.get('type') == 'textbox' %}
+{{ display_label }} = gr.Textbox(label="{{ display_only_conf.get('label', '') }}", info="{{ display_only_conf.get('description', '') }}", value="{{ display_only_conf.get('default', '') }}", interactive=False)
+{% elif display_only_conf.get('type') == 'checkbox' %}
+{{ display_label }} = gr.Checkbox(label="{{ display_only_conf.get('label', '') }}", info="{{ display_only_conf.get('description', '') }}", value={{ display_only_conf.get('default', False) }}, interactive=False)
+{% endif %}
+
+{% endfor %}
 {%- endif %}
 
 
@@ -424,36 +392,36 @@ def on_submit(
             "doi" : "10.48550/arXiv.190602569",
             "license" : "Apache License 2.0",
             "description" : "A simple web interface for deploying machine learning models"
-        },
+        }
     ],
     "Bilayers": [
         {
             "name" : "Bilayers",
+            "doi": "N/A",
             "license" : "BSD 3-Clause",
             "description" : "A Container Specification and CI/CD  built for whole-community support"
-        },
+        }
     ],
 } %}
 
 description_text = "Please cite the following while using Bilayers X Gradio Interface!\n\n"
 
-{% for citation in citations.algorithm %}
-description_text += f"{{ citation.name }} under {{ citation.license }} License: {{ citation.doi }} -- {{ citation.description }}\n\n"
+{# Loop over citations in the algorithm dictionary #}
+{% for citation in citations.algorithm.values() %}
+description_text += f"{{ citation.get('name', 'Unknown') }} under {{ citation.get('license', 'Unknown') }} License: {{ citation.get('doi', 'N/A') }} -- {{ citation.get('description', 'No Description Available') }}\n\n"
 {% endfor %}
 
-{% for citation_type, citation_list in DEFAULT_CITATIONS.items() -%}
-{% for citation in citation_list -%}
-{% if citation_type == "Gradio" -%}
-description_text += f"{{ citation.name }} under {{ citation.license }} License : {{ citation.doi }} -- {{ citation.description }}\n\n"
-{% elif citation_type == "Bilayers" %}
-description_text += f"{{ citation.name }} under {{ citation.license }} License : {{ citation.description }}\n\n"
-{%- endif %}
-{%- endfor %}
+{# Loop over default citations (Gradio, Bilayers, etc.) #}
+{% for citation_list in DEFAULT_CITATIONS.values() -%}
+{% for citation in citation_list %}
+description_text += f"{{ citation.get('name', 'Unknown') }} under {{ citation.get('license', 'Unknown') }} License: {{ citation.get('doi', 'N/A') }} -- {{ citation.get('description', 'No Description Available') }}\n\n"
+{% endfor %}
 {%- endfor %}
 
 
 
 
+<<<<<<< HEAD
 all_parameters: list[Any] = [
 {# Getting stuff from inputs #}
 {% if inputs is not none -%}
@@ -463,20 +431,34 @@ all_parameters: list[Any] = [
     {{ input_conf.label | lower | replace(" ", "_") }},
 {% else %}
     {{ input_conf.label | lower | replace(" ", "_") }},
+=======
+all_parameters: List[Any] = [
+
+{# Getting inputs #}
+{% if inputs -%}
+    {% for key, input_conf in inputs.items() -%}
+        {% if input_conf.get('type') in ['image', 'measurement', 'array', 'file', 'executable'] -%}
+            {{ key | lower | replace(" ", "_") }}_description,
+            {{ key | lower | replace(" ", "_") }},
+        {% else %}
+            {{ key | lower | replace(" ", "_") }},
+        {%- endif %}
+    {%- endfor %}
+>>>>>>> 3f378a9 (Lists to Dictionary)
 {%- endif %}
-{%- endfor %}
+
+{# Getting parameters #}
+{% if parameters -%}
+    {% for key, param_conf in parameters.items() -%}
+        {{ key | lower | replace(" ", "_") }},
+    {%- endfor %}
 {%- endif %}
-{# Getting stuff from parameters #}
-{% if parameters is not none -%}
-{% for param_conf in parameters -%}
-{{ param_conf.label | lower | replace(" ", "_") }},
-{%- endfor %}
-{%- endif %}
-{# Getting stuff from display_only #}
-{% if display_only is not none -%}
-{% for display_only_conf in display_only -%}
-{{ display_only_conf.label | lower | replace(" ", "_") }},
-{%- endfor %}
+
+{# Getting display_only #}
+{% if display_only -%}
+    {% for key, display_only_conf in display_only.items() -%}
+        {{ key | lower | replace(" ", "_") }},
+    {%- endfor %}
 {%- endif %}
 ]
 

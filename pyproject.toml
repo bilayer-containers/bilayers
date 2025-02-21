@@ -48,3 +48,13 @@ bilayers = { path = ".", editable = true }
 
 [tool.pixi.environments]
 dev = ["dev", "docs"]
+
+[tool.ruff]
+# 80 columns are a thing of the past
+line-length = 160
+
+[tool.ruff.lint]
+# extend linting rules (may overlap with formatting fules)
+extend-select = [
+    #"E501", # line too long
+]

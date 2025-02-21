@@ -173,6 +173,10 @@ def test_generate(session: nox.Session) -> None:
     session.cd('../../..')
 
 lint_locations = "src", "tests", "noxfile.py"
+# to check but do nothing:
+# nox -rs lint
+# to auto-fix:
+# nox -rs lint -- --fix
 @nox.session
 def lint(session) -> None:
     args = session.posargs or lint_locations

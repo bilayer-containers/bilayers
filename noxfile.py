@@ -171,3 +171,17 @@ def test_generate(session: nox.Session) -> None:
     config_path = session.posargs[0]
     session.run('python', 'generate.py', config_path)
     session.cd('../../..')
+
+lint_locations = "src", "tests", "noxfile.py"
+@nox.session
+def lint(session) -> None:
+    args = session.posargs or lint_locations
+    session.install('ruff')
+    session.run('ruff', 'check', *args)
+
+format_locations = lint_locations
+@nox.session
+def format(session) -> None:
+    args = session.posargs or format_locations
+    session.install('ruff')
+    session.run('ruff', 'format', *args)

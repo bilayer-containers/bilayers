@@ -1,16 +1,14 @@
 import os
 import sys
+
 # Importing parse function from parse.py
 from parse import main as parse_config
 from jinja2 import Environment, FileSystemLoader, select_autoescape
-import nbformat as nbf 
+import nbformat as nbf
 
 
 def generate_gradio_app(template_path, parameters, display_only, results, exec_function, citations):
-    env = Environment(
-        loader=FileSystemLoader(searchpath=os.path.dirname(template_path)),
-        autoescape=select_autoescape(['j2'])
-    )
+    env = Environment(loader=FileSystemLoader(searchpath=os.path.dirname(template_path)), autoescape=select_autoescape(["j2"]))
 
     def lower(text):
         return text.lower()
@@ -18,8 +16,8 @@ def generate_gradio_app(template_path, parameters, display_only, results, exec_f
     def replace(text, old, new):
         return text.replace(old, new)
 
-    env.filters['lower'] = lower
-    env.filters['replace'] = replace
+    env.filters["lower"] = lower
+    env.filters["replace"] = replace
 
     template = env.get_template(os.path.basename(template_path))
 
@@ -29,10 +27,7 @@ def generate_gradio_app(template_path, parameters, display_only, results, exec_f
 
 
 def generate_jupyter_notebook(template_path, parameters, display_only, results, exec_function, citations):
-    env = Environment(
-        loader=FileSystemLoader(searchpath=os.path.dirname(template_path)),
-        autoescape=select_autoescape(['j2'])
-    )
+    env = Environment(loader=FileSystemLoader(searchpath=os.path.dirname(template_path)), autoescape=select_autoescape(["j2"]))
 
     def lower(text):
         return text.lower()
@@ -52,18 +47,14 @@ def generate_jupyter_notebook(template_path, parameters, display_only, results, 
 
     DEFAULT_CITATIONS = {
         "Bilayers": [
-            {
-                "name" : "Bilayers",
-                "license" : "BSD 3-Clause",
-                "description" : "A Container Specification and CI/CD  built for whole-community support"
-            },
+            {"name": "Bilayers", "license": "BSD 3-Clause", "description": "A Container Specification and CI/CD  built for whole-community support"},
         ],
         "Jupyter": [
             {
-                "name" : "Jupyter",
-                "doi" : "10.1109/MCSE.2007.53",
-                "license" : "BSD 3-Clause",
-                "description" : "Interactive, code-driven documents for data analysis and visualization"
+                "name": "Jupyter",
+                "doi": "10.1109/MCSE.2007.53",
+                "license": "BSD 3-Clause",
+                "description": "Interactive, code-driven documents for data analysis and visualization",
             },
         ],
     }
@@ -74,13 +65,13 @@ def generate_jupyter_notebook(template_path, parameters, display_only, results, 
     nb.cells.append(create_markdown_cell("## Set Variables and Run the cell"))
 
     citation_cell = ""
-    for citation in citations['algorithm']:
+    for citation in citations["algorithm"]:
         citation_cell += f"- {citation['name']} under {citation['license']} License : {citation['doi']} --> {citation['description']}\n"
 
-    for citation in DEFAULT_CITATIONS['Jupyter']:
+    for citation in DEFAULT_CITATIONS["Jupyter"]:
         citation_cell += f"- {citation['name']} under {citation['license']} License : {citation['doi']} --> {citation['description']}\n"
 
-    for citation in DEFAULT_CITATIONS['Bilayers']:
+    for citation in DEFAULT_CITATIONS["Bilayers"]:
         citation_cell += f"- {citation['name']} : {citation['license']} --> {citation['description']}\n"
 
     # Add a markdown cell with the formatted citations
@@ -97,12 +88,13 @@ def generate_jupyter_notebook(template_path, parameters, display_only, results, 
     # jupyter_shell_command_template_path
     jupyter_shell_command_template_path = "jupyter_shell_command_template.py.j2"
     shell_command_template = env.get_template(os.path.basename(jupyter_shell_command_template_path))
-    run_command_cell = shell_command_template.render(cli_command=exec_function['cli_command'])
+    run_command_cell = shell_command_template.render(cli_command=exec_function["cli_command"])
 
     # Append the try-except cell to the notebook
     nb.cells.append(create_code_cell(run_command_cell))
 
     return nb
+
 
 def main():
     print("Parsing config...")
@@ -130,10 +122,10 @@ def main():
     gradio_app_code = generate_gradio_app(gradio_template_path, parameters, display_only, results, exec_function, citations)
 
     # Join folders and file name
-    gradio_app_path = os.path.join(folderA, folderB, 'app.py')
+    gradio_app_path = os.path.join(folderA, folderB, "app.py")
 
     # Generating Gradio app file dynamically
-    with open(gradio_app_path, 'w') as f:
+    with open(gradio_app_path, "w") as f:
         f.write(gradio_app_code)
     print("app.py generated successfully!!")
 
@@ -154,7 +146,7 @@ def main():
     jupyter_app_code = generate_jupyter_notebook(jupyter_template_path, parameters, display_only, results, exec_function, citations)
 
     # Join folders and file name
-    jupyter_notebook_path = os.path.join(folderA, folderB, 'generated_notebook.ipynb')
+    jupyter_notebook_path = os.path.join(folderA, folderB, "generated_notebook.ipynb")
 
     with open(jupyter_notebook_path, "w") as f:
         nbf.write(jupyter_app_code, f)

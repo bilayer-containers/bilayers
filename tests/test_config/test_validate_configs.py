@@ -1,10 +1,12 @@
 import pytest
 import subprocess
 
+
 @pytest.fixture
 def schema_path():
     """Fixture for the path to the validation schema."""
     return "tests/test_config/validate_schema.yaml"
+
 
 @pytest.mark.parametrize(
     "config_path, expected_error",
@@ -35,7 +37,7 @@ def schema_path():
         ),
     ],
 )
-def test_specific_validation_errors(schema_path, config_path, expected_error): 
+def test_specific_validation_errors(schema_path, config_path, expected_error):
     """
     Test that the validation throws the exact expected error for multiple configurations.
     Test cases would bark at LinkML Validation level if any extra flags are passed.

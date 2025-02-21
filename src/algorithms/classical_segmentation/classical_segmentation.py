@@ -60,43 +60,19 @@ def example_function(image_list, threshold_method, min_size, max_size, save_dir)
     # Return the list of file names
     return output_filelist
 
+
 def parse_arguments():
     """
     Parse the command-line arguments using argparse.
     """
-    parser = argparse.ArgumentParser(
-        description="Threshold images and filter objects by size."
-    )
+    parser = argparse.ArgumentParser(description="Threshold images and filter objects by size.")
 
-    parser.add_argument(
-        "--folder",
-        required=True,
-        help="Path to the folder containing input images."
-    )
-    parser.add_argument(
-        "--threshold_method",
-        choices=["otsu", "li"],
-        required=True,
-        help="Thresholding method to use ('otsu' or 'li')."
-    )
-    parser.add_argument(
-        "--min_size",
-        type=float,
-        required=True,
-        help="Minimum size of objects to retain."
-    )
-    parser.add_argument(
-        "--max_size",
-        type=float,
-        required=True,
-        help="Maximum size of objects to retain."
-    )
+    parser.add_argument("--folder", required=True, help="Path to the folder containing input images.")
+    parser.add_argument("--threshold_method", choices=["otsu", "li"], required=True, help="Thresholding method to use ('otsu' or 'li').")
+    parser.add_argument("--min_size", type=float, required=True, help="Minimum size of objects to retain.")
+    parser.add_argument("--max_size", type=float, required=True, help="Maximum size of objects to retain.")
 
-    parser.add_argument(
-        "--save_dir",
-        required=True,
-        help="Path to the folder to save output images."
-    )
+    parser.add_argument("--save_dir", required=True, help="Path to the folder to save output images.")
 
     return parser.parse_args()
 
@@ -106,13 +82,11 @@ def get_image_files_from_folder(folder_path):
     Get a list of image files from the specified folder.
     """
     # List of supported image file extensions
-    image_extensions = ['.png', '.jpg', '.jpeg', '.tiff', '.bmp', '.tif']
+    image_extensions = [".png", ".jpg", ".jpeg", ".tiff", ".bmp", ".tif"]
 
     # Get all files in the folder and filter by image extensions and also dont include the files with _output in the name
     image_files = [
-        os.path.join(folder_path, file)
-        for file in os.listdir(folder_path)
-        if os.path.splitext(file)[1].lower() in image_extensions and "_output" not in file
+        os.path.join(folder_path, file) for file in os.listdir(folder_path) if os.path.splitext(file)[1].lower() in image_extensions and "_output" not in file
     ]
 
     return image_files
@@ -131,11 +105,7 @@ def main():
 
     # Call the example function
     output_filelist = example_function(
-        image_list=image_list,
-        threshold_method=args.threshold_method,
-        min_size=args.min_size,
-        max_size=args.max_size,
-        save_dir=args.save_dir
+        image_list=image_list, threshold_method=args.threshold_method, min_size=args.min_size, max_size=args.max_size, save_dir=args.save_dir
     )
 
     # Print the output file paths for the user to access

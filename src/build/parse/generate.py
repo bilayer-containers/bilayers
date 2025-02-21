@@ -92,7 +92,7 @@ def generate_jupyter_notebook(template_path, parameters, display_only, results, 
     hidden_cell.metadata.jupyter = {"source_hidden": True}
     nb.cells.append(hidden_cell)
 
-    nb.cells.append(create_code_cell(f"print({{cli_command.value}})"))
+    nb.cells.append(create_code_cell("print({cli_command.value})"))
 
     # jupyter_shell_command_template_path
     jupyter_shell_command_template_path = "jupyter_shell_command_template.py.j2"

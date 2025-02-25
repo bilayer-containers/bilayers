@@ -1,0 +1,82 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+*.pyo
+*.pyd
+*.swp
+*.swo
+*.DS_Store
+
+# Distribution / packaging
+*.tar.gz  # Ignore any tarballs generated for PyPI packaging
+*.zip  # Ignore any zip files from packaging
+dist/
+build/
+site-packages/
+*.egg-info/
+*.whl
+
+# Virtual environments
+.venv/
+.env/
+pixi.lock
+.pixi/
+pip-wheel-metadata/
+
+# Logs & database files
+logs/
+debug.log
+*.log
+
+# Editor & system files
+.vscode/
+.idea/
+Thumbs.db
+*.iml
+*.sublime-project
+*.sublime-workspace
+
+# PyTest & Coverage Reports
+.coverage
+htmlcov/
+*.cover
+*.py,cover
+nosetests.xml
+coverage.xml
+pytest_cache/
+
+# Linting & Static Analysis
+.mypy_cache/
+.pyrightcache/
+ruff_cache/
+.ruff_cache/
+flake8.log
+pylint.log
+
+# Docker & CI/CD
+Dockerfile
+docker-compose.yml
+.envrc
+*.env
+*.dockerenv
+
+# Documentation Builds
+docs/_build/
+*.rst~
+*.bak
+*.swp
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# PyPI Build Artifacts
+MANIFEST
+*.manifest
+*.spec
+
+# Pyre Type Checker Cache
+.pyre/
+.pyre_configuration
+.pyre_configuration.local

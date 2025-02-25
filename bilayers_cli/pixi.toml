@@ -1,0 +1,21 @@
+[project]
+authors = [
+    "Rajavi Shah <shahraja@broadinstitute.org>", 
+    "Nodar Gogoberidze <gnodar01@gmail.com>",
+    "Beth Cimini <bcimini@broadinstitute.org>"
+]
+channels = ["conda-forge"]
+name = "bilayers_cli"
+platforms = ["osx-arm64", "linux-64", "win-64"]
+version = "0.1.0"
+
+[tasks]
+
+[dependencies]
+pytest = ">=8.3.4,<9"
+pyyaml = ">=6.0.2,<7"
+ruff = ">=0.9.7,<0.10"
+pre-commit = ">=4.1.0,<5"
+mypy = ">=1.15.0,<2"
+pyright = ">=1.1.394,<2"
+types-pyyaml = ">=6.0.12.20241230,<7"

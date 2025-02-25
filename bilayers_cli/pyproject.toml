@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bilayers_cli"
+version = "0.1.0"
+description = "Bilayers CLI is a tool designed to parse Bilayers specification files and generate executable CLI commands, ensuring consistency and ease of use in running bioimage analysis tools"
+authors = [
+    {name = "Rajavi Shah", email = "shahraja@broadinstitute.org"},
+    {name = "Nodar Gogoberidze", email = "gnodar01@gmail.com"},
+    {name = "Beth Cimini", email = "bcimini@broadinstitute.org"}
+]
+maintainers = [
+    {name = "Rajavi Shah", email = "shahraja@broadinstitute.org"},
+    {name = "Nodar Gogoberidze", email = "gnodar01@gmail.com"},
+    {name = "Beth Cimini", email = "bcimini@broadinstitute.org"}
+]
+readme = "README.md"
+license = "BSD-3-Clause"
+requires-python = ">=3.9"
+
+dependencies = [
+    "pyyaml"
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "ruff", "pyright"]
+
+[project.scripts]
+bilayers_cli = "bilayers_cli.cli:cli"
+
+[tool.setuptools]
+packages = ["bilayers_cli"]
+
+[tool.pixi.dependencies]
+pytest = "*"
+pyyaml = "*"
+
+[tool.ruff]
+line-length = 100  # Enforce a max line length of 100
+
+[tool.ruff.lint]
+select = ["E", "F", "W"]  # Apply error, warnings, and Pyflakes checks
+ignore = ["E501"]  # Ignore long-line warnings

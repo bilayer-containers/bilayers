@@ -5,7 +5,7 @@ import skimage.io
 import skimage.filters
 import skimage.measure
 import numpy
-from typing import List, Any, TypedDict
+from typing import Any, TypedDict
 from numpy.typing import NDArray
 
 class ParsedArgs(TypedDict):
@@ -16,26 +16,26 @@ class ParsedArgs(TypedDict):
     save_dir: str
 
 def example_function(
-        image_list: List[str], 
+        image_list: list[str], 
         threshold_method: str,
         min_size: float,
         max_size: float, 
         save_dir: str
-    ) -> List[str]:
+    ) -> list[str]:
     """
     Example function that will threshold, label, and then filter objects
     based on size. This function also saves the arrays and returns the
     file save paths, which can be downloaded by the user.
 
     Args:
-        image_list (List[str]): List of image file paths to process.
+        image_list (list[str]): list of image file paths to process.
         threshold_method (str): Thresholding method to use ('otsu' or 'li').
         min_size (float): Minimum size of objects to retain.
         max_size (float): Maximum size of objects to retain.
         save_dir (str): Path to the folder to save output images.
 
     Returns:
-        List[str]: List of file paths of the saved output images.
+        list[str]: list of file paths of the saved output images.
     """
     # If no images are provided, return an empty list
     if not image_list:
@@ -43,7 +43,7 @@ def example_function(
         return []
 
     # Store output filenames to be returned
-    output_filelist: List[str] = []
+    output_filelist: list[str] = []
 
     for image_path in image_list:
         # Load the image
@@ -135,7 +135,7 @@ def parse_arguments() -> ParsedArgs:
     return parser.parse_args() # type: ignore
 
 
-def get_image_files_from_folder(folder_path: str) -> List[str]:
+def get_image_files_from_folder(folder_path: str) -> list[str]:
     """
     Get a list of image files from the specified folder.
 
@@ -143,13 +143,13 @@ def get_image_files_from_folder(folder_path: str) -> List[str]:
         folder_path (str): Path to the folder containing images.
 
     Returns:
-        List[str]: List of image file paths.
+        list[str]: list of image file paths.
     """
-    # List of supported image file extensions
-    image_extensions: List[str] = ['.png', '.jpg', '.jpeg', '.tiff', '.bmp', '.tif']
+    # list of supported image file extensions
+    image_extensions: list[str] = ['.png', '.jpg', '.jpeg', '.tiff', '.bmp', '.tif']
 
     # Get all files in the folder and filter by image extensions and also dont include the files with _output in the name
-    image_files: List[str] = [
+    image_files: list[str] = [
         os.path.join(folder_path, file)
         for file in os.listdir(folder_path)
         if os.path.splitext(file)[1].lower() in image_extensions and "_output" not in file
@@ -166,14 +166,14 @@ def main() -> None:
     args: ParsedArgs = parse_arguments()
 
     # Get list of image files from the folder
-    image_list: List[str] = get_image_files_from_folder(args["folder"])
+    image_list: list[str] = get_image_files_from_folder(args["folder"])
 
     if not image_list:
         print("No images found in the specified folder.")
         return
 
     # Call the example function
-    output_filelist: List[str] = example_function(
+    output_filelist: list[str] = example_function(
         image_list=image_list,
         threshold_method=args["threshold_method"],
         min_size=args["min_size"],

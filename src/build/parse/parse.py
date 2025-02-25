@@ -1,6 +1,6 @@
 import yaml
 import sys
-from typing import TypedDict, Dict, Any, Tuple
+from typing import TypedDict, Any, Tuple
 
 class CitationEntry(TypedDict):
     name: str
@@ -54,7 +54,7 @@ class Parameter(TypedDict, total=False):
     optional: bool
     section_id: str
     mode: str
-    options: list[Dict[str, str]] # w.r.t type == radio, dropdown
+    options: list[dict[str, str]] # w.r.t type == radio, dropdown
     output_dir_set: bool # w.r.t type == textbox 
     interactive: bool
     append_value: bool # w.r.t type == checkbox

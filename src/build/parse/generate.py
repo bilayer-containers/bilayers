@@ -1,6 +1,5 @@
 import os
 import sys
-from typing import Dict
 # Importing parse function from parse.py
 from parse import main as parse_config # type: ignore
 from jinja2 import Environment, FileSystemLoader, select_autoescape
@@ -97,7 +96,7 @@ def generate_jupyter_notebook(
     notebook_content: str = template.render(
         inputs=inputs, outputs=outputs, parameters=parameters, display_only=display_only or [], exec_function=exec_function)
 
-    DEFAULT_CITATIONS: Dict[str, list[Dict[str, str]]] = {
+    DEFAULT_CITATIONS: dict[str, list[dict[str, str]]] = {
         "Bilayers": [
             {
                 "name" : "Bilayers",

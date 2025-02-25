@@ -48,7 +48,8 @@ def example_function(
     for image_path in image_list:
         # Load the image
         print("Processing Image: ", image_path)
-        image: NDArray[Any] = skimage.io.imread(image_path)
+        # return_num=False ensures only an array is returned, hence type ignore is used
+        image: NDArray[Any] = skimage.io.imread(image_path) # type: ignore
 
         # Threshold the image
         if threshold_method.casefold() == "otsu":

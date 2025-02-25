@@ -1,6 +1,6 @@
 import yaml
 import sys
-from typing import TypedDict, List, Dict, Any, Tuple
+from typing import TypedDict, Dict, Any, Tuple
 
 class CitationEntry(TypedDict):
     name: str
@@ -9,7 +9,7 @@ class CitationEntry(TypedDict):
     description: str
 
 class Citations(TypedDict):
-    algorithm: List[CitationEntry]
+    algorithm: list[CitationEntry]
 
 class HiddenArgs(TypedDict, total=False):
     cli_tag: str
@@ -22,19 +22,19 @@ class ExecFunction(TypedDict):
     script: str
     module: str
     cli_command: str
-    hidden_args: List[HiddenArgs] | None
+    hidden_args: list[HiddenArgs] | None
 
 class InputOutput(TypedDict, total=False):
     name: str
     type: str
     label: str
-    subtype: List[str] # w.r.t type == image
+    subtype: list[str] # w.r.t type == image
     description: str
     cli_tag: str | None
     cli_order: int | None
     default: str
     optional: bool
-    format: List[str]
+    format: list[str]
     folder_name: str
     file_count: str
     section_id: str
@@ -54,7 +54,7 @@ class Parameter(TypedDict, total=False):
     optional: bool
     section_id: str
     mode: str
-    options: List[Dict[str, str]] # w.r.t type == radio, dropdown
+    options: list[Dict[str, str]] # w.r.t type == radio, dropdown
     output_dir_set: bool # w.r.t type == textbox 
     interactive: bool
     append_value: bool # w.r.t type == checkbox
@@ -64,10 +64,10 @@ class Config(TypedDict):
     citations: Citations
     algorithm_folder_name: str
     exec_function: ExecFunction
-    inputs: List[InputOutput]
-    outputs: List[InputOutput]
-    parameters: List[Parameter]
-    display_only: List[Parameter] | None
+    inputs: list[InputOutput]
+    outputs: list[InputOutput]
+    parameters: list[Parameter]
+    display_only: list[Parameter] | None
 
 def parse_config(config_path: str | None = None) -> Config:
     """
@@ -86,10 +86,10 @@ def parse_config(config_path: str | None = None) -> Config:
     return config
 
 def main(config_path: str | None = None) -> Tuple[
-    List[InputOutput], 
-    List[InputOutput], 
-    List[Parameter], 
-    List[Parameter] | None, 
+    list[InputOutput], 
+    list[InputOutput], 
+    list[Parameter], 
+    list[Parameter] | None, 
     ExecFunction, 
     str, 
     Citations
@@ -107,13 +107,13 @@ def main(config_path: str | None = None) -> Tuple[
 
     config: Config = parse_config(config_path)
 
-    inputs: List[InputOutput] = config.get('inputs', [])
+    inputs: list[InputOutput] = config.get('inputs', [])
 
-    outputs: List[InputOutput] = config.get('outputs', [])
+    outputs: list[InputOutput] = config.get('outputs', [])
 
-    parameters: List[Parameter] = config.get('parameters', [])
+    parameters: list[Parameter] = config.get('parameters', [])
 
-    display_only: List[Parameter] | None = config.get('display_only', []) or []
+    display_only: list[Parameter] | None = config.get('display_only', []) or []
 
     exec_function: ExecFunction = config.get('exec_function', ExecFunction(name="", script="", module="", cli_command="", hidden_args=[]))
 

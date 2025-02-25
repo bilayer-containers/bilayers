@@ -1,6 +1,5 @@
 import pytest
 import subprocess
-from typing import List
 
 @pytest.fixture
 def schema_path() -> str:
@@ -43,7 +42,7 @@ def schema_path() -> str:
 def test_specific_validation_errors(
     schema_path: str, 
     config_path: str, 
-    expected_error: List[str]
+    expected_error: list[str]
     ) -> None: 
     """
     Test that the validation throws the exact expected error for multiple configurations.
@@ -52,7 +51,7 @@ def test_specific_validation_errors(
     Args:
         schema_path (str): The file path to the validation schema.
         config_path (str): The path to the configuration file to be validated.
-        expected_error (List[str]): The expected validation error messages.
+        expected_error (list[str]): The expected validation error messages.
     """
     # for config_path, expected_errors in config_files:
     result: subprocess.CompletedProcess[str] = subprocess.run(
@@ -63,5 +62,5 @@ def test_specific_validation_errors(
     )
 
     # Process the results
-    actual_output: List[str] = result.stdout.strip().split("\n")
+    actual_output: list[str] = result.stdout.strip().split("\n")
     assert expected_error == actual_output, f"Expected: {expected_error}, Got: {actual_output}"

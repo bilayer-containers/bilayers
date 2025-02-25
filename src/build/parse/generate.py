@@ -1,6 +1,6 @@
 import os
 import sys
-from typing import List, Dict
+from typing import Dict
 # Importing parse function from parse.py
 from parse import main as parse_config # type: ignore
 from jinja2 import Environment, FileSystemLoader, select_autoescape
@@ -11,10 +11,10 @@ from parse import Config, InputOutput, Parameter, ExecFunction, Citations # type
 
 def generate_gradio_app(
         template_path: str, 
-        inputs: List[InputOutput], 
-        outputs: List[InputOutput], 
-        parameters: List[Parameter], 
-        display_only: List[Parameter] | None, 
+        inputs: list[InputOutput], 
+        outputs: list[InputOutput], 
+        parameters: list[Parameter], 
+        display_only: list[Parameter] | None, 
         exec_function: ExecFunction, 
         citations: Citations) -> str:
     """
@@ -22,10 +22,10 @@ def generate_gradio_app(
 
     Args:
         template_path (str): Path to the Gradio template file.
-        inputs (List[InputOutput]): List of input configurations.
-        outputs (List[InputOutput]): List of output configurations.
-        parameters (List[Parameter]): List of parameter configurations.
-        display_only List[Parameter] | None: List of display-only parameters, or None.
+        inputs (list[InputOutput]): list of input configurations.
+        outputs (list[InputOutput]): list of output configurations.
+        parameters (list[Parameter]): list of parameter configurations.
+        display_only list[Parameter] | None: list of display-only parameters, or None.
         exec_function (ExecFunction): Execution function details.
         citations (Citations): Citations information.
 
@@ -55,10 +55,10 @@ def generate_gradio_app(
 
 def generate_jupyter_notebook(
         template_path: str, 
-        inputs: List[InputOutput],
-        outputs: List[InputOutput], 
-        parameters: List[Parameter], 
-        display_only: List[Parameter] | None, 
+        inputs: list[InputOutput],
+        outputs: list[InputOutput], 
+        parameters: list[Parameter], 
+        display_only: list[Parameter] | None, 
         exec_function: ExecFunction, 
         citations: Citations) -> nbf.NotebookNode:
     """
@@ -66,10 +66,10 @@ def generate_jupyter_notebook(
 
     Args:
         template_path (str): Path to the Jupyter Notebook template file.
-        inputs (List[InputOutput]): List of input configurations.
-        outputs (List[InputOutput]): List of output configurations.
-        parameters (List[Parameter]): List of parameter configurations.
-        display_only List[Parameter] | None: List of display-only parameters, or None.
+        inputs (list[InputOutput]): list of input configurations.
+        outputs (list[InputOutput]): list of output configurations.
+        parameters (list[Parameter]): list of parameter configurations.
+        display_only list[Parameter] | None: list of display-only parameters, or None.
         exec_function (ExecFunction): Execution function details.
         citations (Citations): Citations information.
 
@@ -97,7 +97,7 @@ def generate_jupyter_notebook(
     notebook_content: str = template.render(
         inputs=inputs, outputs=outputs, parameters=parameters, display_only=display_only or [], exec_function=exec_function)
 
-    DEFAULT_CITATIONS: Dict[str, List[Dict[str, str]]] = {
+    DEFAULT_CITATIONS: Dict[str, list[Dict[str, str]]] = {
         "Bilayers": [
             {
                 "name" : "Bilayers",

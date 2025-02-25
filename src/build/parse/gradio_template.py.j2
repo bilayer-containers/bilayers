@@ -2,7 +2,7 @@ import os
 import gradio as gr
 import subprocess
 import shutil
-from typing import Any, Tuple
+from typing import Any
 
 def option_to_append(cli_tag: str, value: Any) -> str:
     """
@@ -53,7 +53,7 @@ def insert_into_jagged_array(
 def generate_cli_command(
     cli_tags: dict[str, dict[str, Any]], 
     **kwargs: Any
-    ) -> Tuple[str, str | None, str | None]:
+    ) -> tuple[str, str | None, str | None]:
     """
     Generates the CLI command dynamically based on user inputs.
 
@@ -62,7 +62,7 @@ def generate_cli_command(
         **kwargs (Any): User-provided parameter values.
 
     Returns:
-        Tuple[str, str | None, str | None]: CLI command, folder_name, and output_folder_name.
+        tuple[str, str | None, str | None]: CLI command, folder_name, and output_folder_name.
     """
     cli_command = ["{{ exec_function.cli_command }}"]
 

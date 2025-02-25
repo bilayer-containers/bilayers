@@ -1,6 +1,6 @@
 import yaml
 import sys
-from typing import TypedDict, Any, Tuple
+from typing import TypedDict, Any
 
 class CitationEntry(TypedDict):
     name: str
@@ -85,7 +85,7 @@ def parse_config(config_path: str | None = None) -> Config:
         config = yaml.safe_load(file)
     return config
 
-def main(config_path: str | None = None) -> Tuple[
+def main(config_path: str | None = None) -> tuple[
     list[InputOutput], 
     list[InputOutput], 
     list[Parameter], 
@@ -101,7 +101,7 @@ def main(config_path: str | None = None) -> Tuple[
         config_path (str | None): Path to the configuration file.
 
     Returns:
-        Tuple containing parsed configuration data.
+        tuple containing parsed configuration data.
     """
     config_path = sys.argv[1] if len(sys.argv) > 1 else None
 

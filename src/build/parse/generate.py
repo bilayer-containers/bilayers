@@ -1,6 +1,6 @@
 import os
 import sys
-from typing import List, Optional, Dict
+from typing import List, Dict
 # Importing parse function from parse.py
 from parse import main as parse_config # type: ignore
 from jinja2 import Environment, FileSystemLoader, select_autoescape
@@ -14,7 +14,7 @@ def generate_gradio_app(
         inputs: List[InputOutput], 
         outputs: List[InputOutput], 
         parameters: List[Parameter], 
-        display_only: Optional[List[Parameter]], 
+        display_only: List[Parameter] | None, 
         exec_function: ExecFunction, 
         citations: Citations) -> str:
     """
@@ -25,7 +25,7 @@ def generate_gradio_app(
         inputs (List[InputOutput]): List of input configurations.
         outputs (List[InputOutput]): List of output configurations.
         parameters (List[Parameter]): List of parameter configurations.
-        display_only (Optional[List[Parameter]]): List of display-only parameters, or None.
+        display_only List[Parameter] | None: List of display-only parameters, or None.
         exec_function (ExecFunction): Execution function details.
         citations (Citations): Citations information.
 
@@ -58,7 +58,7 @@ def generate_jupyter_notebook(
         inputs: List[InputOutput],
         outputs: List[InputOutput], 
         parameters: List[Parameter], 
-        display_only: Optional[List[Parameter]], 
+        display_only: List[Parameter] | None, 
         exec_function: ExecFunction, 
         citations: Citations) -> nbf.NotebookNode:
     """
@@ -69,7 +69,7 @@ def generate_jupyter_notebook(
         inputs (List[InputOutput]): List of input configurations.
         outputs (List[InputOutput]): List of output configurations.
         parameters (List[Parameter]): List of parameter configurations.
-        display_only (Optional[List[Parameter]]): List of display-only parameters, or None.
+        display_only List[Parameter] | None: List of display-only parameters, or None.
         exec_function (ExecFunction): Execution function details.
         citations (Citations): Citations information.
 
@@ -155,7 +155,7 @@ def main() -> None:
     print("Parsing config...")
 
     if len(sys.argv) > 1:
-        config_path: Optional[str] = sys.argv[1]
+        config_path: str | None = sys.argv[1]
     else:
         config_path = None
 

@@ -1,6 +1,6 @@
 import yaml
 import sys
-from typing import TypedDict, List, Optional, Dict, Any, Tuple
+from typing import TypedDict, List, Dict, Any, Tuple
 
 class CitationEntry(TypedDict):
     name: str
@@ -22,7 +22,7 @@ class ExecFunction(TypedDict):
     script: str
     module: str
     cli_command: str
-    hidden_args: Optional[List[HiddenArgs]]
+    hidden_args: List[HiddenArgs] | None
 
 class InputOutput(TypedDict, total=False):
     name: str
@@ -30,8 +30,8 @@ class InputOutput(TypedDict, total=False):
     label: str
     subtype: List[str] # w.r.t type == image
     description: str
-    cli_tag: Optional[str]
-    cli_order: Optional[int]
+    cli_tag: str | None
+    cli_order: int | None
     default: str
     optional: bool
     format: List[str]
@@ -50,7 +50,7 @@ class Parameter(TypedDict, total=False):
     label: str
     description: str
     default: Any
-    cli_tag: Optional[str]
+    cli_tag: str | None
     optional: bool
     section_id: str
     mode: str
@@ -67,14 +67,14 @@ class Config(TypedDict):
     inputs: List[InputOutput]
     outputs: List[InputOutput]
     parameters: List[Parameter]
-    display_only: Optional[List[Parameter]]
+    display_only: List[Parameter] | None
 
-def parse_config(config_path: Optional[str] = None) -> Config:
+def parse_config(config_path: str | None = None) -> Config:
     """
     Parses a YAML configuration file.
 
     Args:
-        config_path (Optional[str]): Path to the config file. Defaults to None.
+        config_path (str | None): Path to the config file. Defaults to None.
 
     Returns:
         Config: A structured dictionary containing parsed YAML data.
@@ -85,11 +85,11 @@ def parse_config(config_path: Optional[str] = None) -> Config:
         config = yaml.safe_load(file)
     return config
 
-def main(config_path: Optional[str] = None) -> Tuple[
+def main(config_path: str | None = None) -> Tuple[
     List[InputOutput], 
     List[InputOutput], 
     List[Parameter], 
-    Optional[List[Parameter]], 
+    List[Parameter] | None, 
     ExecFunction, 
     str, 
     Citations
@@ -98,7 +98,7 @@ def main(config_path: Optional[str] = None) -> Tuple[
     Loads the configuration and extracts necessary information.
 
     Args:
-        config_path (Optional[str]): Path to the configuration file.
+        config_path (str | None): Path to the configuration file.
 
     Returns:
         Tuple containing parsed configuration data.
@@ -113,7 +113,7 @@ def main(config_path: Optional[str] = None) -> Tuple[
 
     parameters: List[Parameter] = config.get('parameters', [])
 
-    display_only: Optional[List[Parameter]] = config.get('display_only', []) or []
+    display_only: List[Parameter] | None = config.get('display_only', []) or []
 
     exec_function: ExecFunction = config.get('exec_function', ExecFunction(name="", script="", module="", cli_command="", hidden_args=[]))
 

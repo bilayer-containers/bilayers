@@ -1,7 +1,6 @@
 import nox
 import os
 import yaml
-from typing import Optional
 
 @nox.session
 def run_parse(session: nox.Session) -> None:
@@ -39,13 +38,13 @@ def build_algorithm(session: nox.Session) -> None:
         session (nox.Session): The Nox session object    
     """
 
-    def _fallback(platform: Optional[str], image_name: str, algorithm: str) -> None:
+    def _fallback(platform: str | None, image_name: str, algorithm: str) -> None:
         """
         Handles fallback if pulling a Docker image fails by attempting to build locally.
 
         Args:
             session (nox.Session): The Nox session object.
-            platform (Optional[str]): The target platform (e.g., "linux/arm64").
+            platform (str | None): The target platform (e.g., "linux/arm64").
             image_name (str): The name of the Docker image.
             algorithm (str): The name of the algorithm.
         """
@@ -79,10 +78,10 @@ def build_algorithm(session: nox.Session) -> None:
         with open(config_file_path, 'r') as file:
             config = yaml.safe_load(file)
 
-        org: Optional[str] = config.get('docker_image', {}).get('org')
-        name: Optional[str] = config.get('docker_image', {}).get('name')
-        tag: Optional[str] = config.get('docker_image', {}).get('tag')
-        platform: Optional[str] = config.get('docker_image', {}).get('platform')
+        org: str | None = config.get('docker_image', {}).get('org')
+        name: str | None = config.get('docker_image', {}).get('name')
+        tag: str | None = config.get('docker_image', {}).get('tag')
+        platform: str | None = config.get('docker_image', {}).get('platform')
 
         if not org or not name or not tag:
             _fallback(platform, image_name, algorithm)

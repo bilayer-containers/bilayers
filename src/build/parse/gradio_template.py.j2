@@ -2,7 +2,7 @@ import os
 import gradio as gr
 import subprocess
 import shutil
-from typing import List, Optional, Dict, Any, Tuple
+from typing import List, Dict, Any, Tuple
 
 def option_to_append(cli_tag: str, value: Any) -> str:
     """
@@ -23,7 +23,7 @@ def option_to_append(cli_tag: str, value: Any) -> str:
         return f"{cli_tag} {value}"  # Append cli_tag and value
 
 def insert_into_jagged_array(
-    jagged_array: List[Optional[List[str]]], 
+    jagged_array: List[List[str] | None], 
     cli_order: int, 
     cli_tag: str, 
     value: Any
@@ -32,7 +32,7 @@ def insert_into_jagged_array(
     Inserts CLI arguments into a structured array to maintain ordering.
 
     Args:
-        jagged_array (List[Optional[List[str]]]): The structured array for CLI options.
+        jagged_array (List[List[str] | None]): The structured array for CLI options.
         cli_order (int): The order in which arguments should appear.
         cli_tag (str): The CLI tag.
         value (Any): The value to append.
@@ -53,7 +53,7 @@ def insert_into_jagged_array(
 def generate_cli_command(
     cli_tags: Dict[str, Dict[str, Any]], 
     **kwargs: Any
-    ) -> Tuple[str, Optional[str], Optional[str]]:
+    ) -> Tuple[str, str | None, str | None]:
     """
     Generates the CLI command dynamically based on user inputs.
 
@@ -62,7 +62,7 @@ def generate_cli_command(
         **kwargs (Any): User-provided parameter values.
 
     Returns:
-        Tuple[str, Optional[str], Optional[str]]: CLI command, folder_name, and output_folder_name.
+        Tuple[str, str | None, str | None]: CLI command, folder_name, and output_folder_name.
     """
     cli_command = ["{{ exec_function.cli_command }}"]
 

@@ -1,6 +1,6 @@
 import yaml
 import sys
-from typing import TypedDict, Any, Tuple
+from typing import TypedDict, Any
 
 class CitationEntry(TypedDict):
     name: str
@@ -103,7 +103,7 @@ def parse_config(config_path: str | None = None) -> Config:
 
     return config
 
-def main(config_path: str | None = None) -> Tuple[
+def main(config_path: str | None = None) -> tuple[
     dict[str,InputOutput], 
     dict[str,InputOutput], 
     dict[str,Parameter], 

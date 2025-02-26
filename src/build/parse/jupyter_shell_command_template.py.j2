@@ -2,7 +2,6 @@ import subprocess
 from IPython.display import display, HTML
 import traceback
 import urllib.parse
-from typing import Optional
 
 try:
     res = subprocess.run(cli_command.value, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)

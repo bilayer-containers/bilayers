@@ -1,6 +1,6 @@
 import yaml
 import sys
-from typing import TypedDict, Optional, Any, Tuple, List
+from typing import TypedDict, Any, Tuple, List
 
 class CitationEntry(TypedDict):
     name: str
@@ -22,7 +22,7 @@ class ExecFunction(TypedDict):
     script: str
     module: str
     cli_command: str
-    hidden_args: Optional[dict[str, HiddenArgs]]
+    hidden_args: dict[str, HiddenArgs] | None
 
 class InputOutput(TypedDict, total=False):
     name: str
@@ -39,10 +39,10 @@ class InputOutput(TypedDict, total=False):
     file_count: str
     section_id: str
     mode: str
-    depth: Optional[bool] # w.r.t type == image
-    timepoints: Optional[bool] # w.r.t type == image
-    tiled: Optional[bool] # w.r.t type == image
-    pyramidal: Optional[bool] # w.r.t type == image
+    depth: bool | None # w.r.t type == image
+    timepoints: bool | None # w.r.t type == image
+    tiled: bool | None # w.r.t type == image
+    pyramidal: bool | None # w.r.t type == image
 
 class Parameter(TypedDict, total=False):
     name: str
@@ -50,16 +50,16 @@ class Parameter(TypedDict, total=False):
     label: str
     description: str
     default: Any
-    cli_tag: Optional[str]
-    cli_order: Optional[int]
+    cli_tag: str | None
+    cli_order: int | None
     optional: bool
     section_id: str
     mode: str
-    options: Optional[List[dict[str, str]]] # w.r.t type == radio, dropdown
-    output_dir_set: Optional[bool] # w.r.t type == textbox 
-    interactive: Optional[bool]
-    append_value: Optional[bool] # w.r.t type == checkbox
-    multiselect: Optional[bool] # w.r.t type == dropdown
+    options: List[dict[str, str]] | None # w.r.t type == radio, dropdown
+    output_dir_set: bool | None # w.r.t type == textbox 
+    interactive: bool | None
+    append_value: bool | None # w.r.t type == checkbox
+    multiselect: bool | None # w.r.t type == dropdown
 
 class Config(TypedDict):
     citations: Citations
@@ -68,7 +68,7 @@ class Config(TypedDict):
     inputs: dict[str, InputOutput]
     outputs: dict[str, InputOutput]
     parameters: dict[str, Parameter]
-    display_only: Optional[dict[str, Parameter]]
+    display_only: dict[str, Parameter] | None
 
 def parse_config(config_path: str | None = None) -> Config:
     """
@@ -103,11 +103,11 @@ def parse_config(config_path: str | None = None) -> Config:
 
     return config
 
-def main(config_path: Optional[str] = None) -> Tuple[
+def main(config_path: str | None = None) -> Tuple[
     dict[str,InputOutput], 
     dict[str,InputOutput], 
     dict[str,Parameter], 
-    Optional[dict[str,Parameter]], 
+    dict[str,Parameter] | None, 
     ExecFunction, 
     str, 
     Citations
@@ -131,7 +131,7 @@ def main(config_path: Optional[str] = None) -> Tuple[
 
     parameters: dict[str,Parameter] = config.get('parameters', {})
 
-    display_only: Optional[dict[str,Parameter]] = config.get('display_only', {})
+    display_only: dict[str,Parameter] | None = config.get('display_only', {})
 
     exec_function: ExecFunction = config.get('exec_function', {})
     exec_function.setdefault("name", "")

@@ -10,10 +10,10 @@ from parse import Config, InputOutput, Parameter, ExecFunction, Citations # type
 
 def generate_gradio_app(
         template_path: str, 
-        inputs: Dict[str,InputOutput], 
-        outputs: Dict[str,InputOutput], 
-        parameters: Dict[str,Parameter], 
-        display_only: Optional[Dict[str,Parameter]], 
+        inputs: dict[str,InputOutput], 
+        outputs: dict[str,InputOutput], 
+        parameters: dict[str,Parameter], 
+        display_only: Optional[dict[str,Parameter]], 
         exec_function: ExecFunction, 
         citations: Citations) -> str:
     """
@@ -21,10 +21,10 @@ def generate_gradio_app(
 
     Args:
         template_path (str): Path to the Gradio template file.
-        inputs (Dict[str, InputOutput]): Dictionary of input configurations.
-        outputs (Dict[str, InputOutput]): Dictionary of output configurations.
-        parameters (Dict[str, Parameter]): Dictionary of parameter configurations.
-        display_only (Optional[Dict[str, Parameter]]): Dictionary of display-only parameters, or None.
+        inputs (dict[str, InputOutput]): dictionary of input configurations.
+        outputs (dict[str, InputOutput]): dictionary of output configurations.
+        parameters (dict[str, Parameter]): dictionary of parameter configurations.
+        display_only (Optional[dict[str, Parameter]]): dictionary of display-only parameters, or None.
         exec_function (ExecFunction): Execution function details.
         citations (Citations): Citations information.
 
@@ -61,10 +61,10 @@ def generate_gradio_app(
 
 def generate_jupyter_notebook(
         template_path: str, 
-        inputs: Dict[str,InputOutput],
-        outputs: Dict[str,InputOutput], 
-        parameters: Dict[str,Parameter], 
-        display_only: Optional[Dict[str,Parameter]], 
+        inputs: dict[str,InputOutput],
+        outputs: dict[str,InputOutput], 
+        parameters: dict[str,Parameter], 
+        display_only: Optional[dict[str,Parameter]], 
         exec_function: ExecFunction, 
         citations: Citations) -> nbf.NotebookNode:
     """
@@ -72,10 +72,10 @@ def generate_jupyter_notebook(
 
     Args:
         template_path (str): Path to the Jupyter Notebook template file.
-        inputs (Dict[str, InputOutput]): Dictionary of input configurations.
-        outputs (Dict[str, InputOutput]): Dictionary of output configurations.
-        parameters (Dict[str, Parameter]): Dictionary of parameter configurations.
-        display_only (Optional[Dict[str, Parameter]]): Dictionary of display-only parameters, or None.
+        inputs (dict[str, InputOutput]): dictionary of input configurations.
+        outputs (dict[str, InputOutput]): dictionary of output configurations.
+        parameters (dict[str, Parameter]): dictionary of parameter configurations.
+        display_only (Optional[dict[str, Parameter]]): dictionary of display-only parameters, or None.
         exec_function (ExecFunction): Execution function details.
         citations (Citations): Citations information.
 

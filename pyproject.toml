@@ -55,7 +55,14 @@ line-length = 160
 
 [tool.ruff.lint]
 # extend linting rules (may overlap with formatting fules)
-select = ["W"]
+select = ["W", "F", "C", "E"]
 extend-select = [
-    #"E501", # line too long
+    "W291",
+    "W292",
+    "W293",
+    "F401",
+    "F823",
+    "F841",
+    "C901",
+    "E501"
 ]

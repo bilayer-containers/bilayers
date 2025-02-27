@@ -1,0 +1,163 @@
+####################################
+# Auto-Generated CellProfiler Plugin
+# Generated from Bilayers Spec File
+####################################
+
+#################################
+#
+# Imports from Python Standard Libraries
+#
+##################################
+
+
+#################################
+#
+# Imports from CellProfiler
+#
+##################################
+
+from cellprofiler_core.setting import Binary, Choice, Directory, Filename, Float, Integer
+from cellprofiler_core.setting.text import Filename, ImageName
+from cellprofiler_core.module.image_segmentation import ImageSegmentation
+from cellprofiler_core.object import Object
+from cellprofiler_core.pipeline import Pipeline
+from cellprofiler_core.image import Image
+
+LOGGER = logging.getLogger(__name__)
+
+__doc__ = f"""\
+{{ algorithm_folder_name }}
+===========
+
+**{{ algorithm_folder_name }}** is an auto-generated CellProfiler module based on Bilayers specification.
+
+{%- for citation in citations.algorithm %}
+This module uses **{{ citation.name }}** i.e. {{ citation.description }}.
+
+To cite this module, use:
+- **DOI**: {{ citation.doi }}
+- **License**: {{ citation.license }}
+{%- endfor %}
+
+============ ============ ===============
+Supports 2D? Supports 3D? Respects masks?
+============ ============ ===============
+
+============ ============ ===============
+"""
+
+class {{ tool.name }}({{ exec_function.category }}):
+    category = "{{ exec_function.module }}"
+
+    module_name = "{{ algorithm_folder_name }}"
+
+    variable_revision_number = 1
+
+    def create_settings(self):
+        super({{ algorithm_folder_name }}, self).create_settings()
+
+        
+        {% set type_mapping = {
+
+            "image": "Filename",
+            "measurement": "Filename",
+            "array": "Filename",
+            "executable": "Filename",
+            "file": "Filename",
+
+            "radio": "Choice",
+            "dropdown": "Choice",
+            "checkbox": "Binary",
+            "integer": "Integer",
+            "float": "Float",
+            "textbox": "ImageName",
+        } %}
+        {% set default_type = "Text" %} #Fallback type
+
+        {% for input_conf in inputs %}
+        self.{{ input_conf.name }} = {{ type_mapping[input_conf.type] }}(
+            text="{{ input_conf.label }}",
+            {% if input_conf.default is not none %}
+            value="{{ input_conf.default }}",
+            {% endif %}
+            doc="{{ input_conf.description }}"
+        )
+        {% endfor %}
+
+        {% for parameter in parameters %}
+        self.{{ parameter.name }} = {{ type_mapping[parameter.type] }}(
+            text="{{ parameter.label }}",
+            {% if parameter.type in ["radio", "dropdown"] %}
+            choices=[{% for option in parameter.options %}"{{ options}}"{% if not loop.last %}, {% endif %}{% endfor %},]
+            {% endif %}
+            {% if parameter.default is not none %}
+            value="{{ parameter.default }}",
+            {% endif %}
+            doc="{{ parameter.description }}"
+        )
+        {% endfor %}
+
+        {# self.input_image = cellprofiler_core.setting.subscriber.ImageSubscriber(
+            "Input Image", doc="Select the input image."
+        )
+
+        self.output_image = cellprofiler_core.setting.subscriber.ImageProvider(
+            "Output Image", doc="Name the output image."
+        )
+
+        {% for setting in settings %}
+        self.{{ setting.name }} = cellprofiler_core.setting.{{ setting.type }}(
+            "{{ setting.label }}", value={{ setting.default }},
+            doc="{{ setting.doc }}"
+        )
+        {% endfor %} #}
+
+        
+    def settings(self):
+        
+        return [
+        {% for input_conf in inputs %}
+        self.{{ input_conf.name }},
+        {% endfor %}
+        {% for param in parameters %}
+        self.{{ param.name }},
+        {% endfor %}
+        ]
+    
+    def settings(self):
+        return [self.input_image, self.output_image {% for setting in settings %}, self.{{ setting.name }}{% endfor %}]
+
+    def run(self, workspace):
+        input_image = workspace.image_set.get_image(self.input_image.value)
+        pixels = input_image.pixel_data
+
+        # Process image
+        {% for step in processing_steps %}
+        pixels = {{ step }}
+        {% endfor %}
+
+        output_image = cellprofiler_core.image.Image(pixels)
+        workspace.image_set.add(self.output_image.value, output_image)
+
+    {# def visible_settings(self):
+        vis_settings = [
+            {% for input_conf in inputs %}
+            self.{{ input_conf.name }},
+            {% endfor %}
+            {% for param in parameters %}
+            self.{{ param.name }},
+            {% endfor %}
+            {% for display_conf in display_only %}
+            self.{{ display_conf.name }},
+            {% endfor %}
+        ]
+        return vis_settings #}
+
+    def run(self, workspace):
+        pass
+
+    def display(self, workspace, figure):
+        pass
+    
+    def upgrade_settings(self, setting_values, variable_revision_number, module_name):
+        return setting_values, variable_revision_number

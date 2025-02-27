@@ -2,6 +2,10 @@ import yaml
 import sys
 from typing import TypedDict, Any
 
+class Tool(TypedDict):
+    name: str
+    category: str
+    notes: str
 
 class CitationEntry(TypedDict):
     name: str
@@ -69,6 +73,7 @@ class Parameter(TypedDict, total=False):
 
 
 class Config(TypedDict):
+    tool: dict[str, Tool]
     citations: Citations
     algorithm_folder_name: str
     exec_function: ExecFunction
@@ -116,7 +121,7 @@ def parse_config(config_path: str | None = None) -> Config:
 
 def main(
     config_path: str | None = None,
-) -> tuple[dict[str, InputOutput], dict[str, InputOutput], dict[str, Parameter], dict[str, Parameter] | None, ExecFunction, str, Citations]:
+) -> tuple[dict[str, Tool], dict[str, InputOutput], dict[str, InputOutput], dict[str, Parameter], dict[str, Parameter] | None, ExecFunction, str, Citations]:
     """
     Loads the configuration and extracts necessary information.
 
@@ -129,6 +134,8 @@ def main(
     config_path = sys.argv[1] if len(sys.argv) > 1 else None
 
     config: Config = parse_config(config_path)
+
+    tool: dict[str, Tool] = config.get("tool", {})
 
     inputs: dict[str, InputOutput] = config.get("inputs", {})
 
@@ -149,11 +156,11 @@ def main(
 
     citations: Citations = config.get("citations", {"algorithm": {}})
 
-    return inputs, outputs, parameters, display_only, exec_function, algorithm_folder_name, citations
+    return tool, inputs, outputs, parameters, display_only, exec_function, algorithm_folder_name, citations
 
 
 if __name__ == "__main__":
-    inputs, outputs, parameters, display_only, exec_function, algorithm_folder_name, citations = main()
+    tool, inputs, outputs, parameters, display_only, exec_function, algorithm_folder_name, citations = main()
     print(f"Inputs: {inputs}")
     print(f"Outputs: {outputs}")
     print(f"Parameters: {parameters}")

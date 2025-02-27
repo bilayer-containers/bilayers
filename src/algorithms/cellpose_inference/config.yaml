@@ -1,3 +1,8 @@
+tool:
+  name: RunCellpose
+  category: "ImageSegmentation"
+  notes:
+
 citations:
   algorithm:
     - name: "Cellpose"

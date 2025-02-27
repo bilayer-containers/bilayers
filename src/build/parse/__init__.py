@@ -1,3 +1,3 @@
-__all__ = ['parse', 'generate']
+__all__ = ["parse", "generate"]
 
 from . import parse

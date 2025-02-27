@@ -3,4 +3,4 @@
 # Append more test cases in the same file (if needed)
 
 # Also, if testing individual interfaces, make the folder structure for each interface in the tests folder.
-# For example, tests/test_gradio/test_generate_cli_command.py | tests/test_jupyter/test_construct_cli_command.py 
+# For example, tests/test_gradio/test_generate_cli_command.py | tests/test_jupyter/test_construct_cli_command.py

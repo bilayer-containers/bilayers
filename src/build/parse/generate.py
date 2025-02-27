@@ -3,18 +3,18 @@ import sys
 # Importing parse function from parse.py
 from parse import main as parse_config # type: ignore
 from jinja2 import Environment, FileSystemLoader, select_autoescape
-import nbformat as nbf 
+import nbformat as nbf
 
 # Import TypedDict definitions from parse.py
 from parse import Config, InputOutput, Parameter, ExecFunction, Citations # type: ignore
 
 def generate_gradio_app(
-        template_path: str, 
-        inputs: dict[str,InputOutput], 
-        outputs: dict[str,InputOutput], 
-        parameters: dict[str,Parameter], 
-        display_only: dict[str,Parameter] | None, 
-        exec_function: ExecFunction, 
+        template_path: str,
+        inputs: dict[str,InputOutput],
+        outputs: dict[str,InputOutput],
+        parameters: dict[str,Parameter],
+        display_only: dict[str,Parameter] | None,
+        exec_function: ExecFunction,
         citations: Citations) -> str:
     """
     Generates a Gradio application dynamically using Jinja2 templates.
@@ -60,12 +60,12 @@ def generate_gradio_app(
 
 
 def generate_jupyter_notebook(
-        template_path: str, 
+        template_path: str,
         inputs: dict[str,InputOutput],
-        outputs: dict[str,InputOutput], 
-        parameters: dict[str,Parameter], 
-        display_only: dict[str,Parameter] | None, 
-        exec_function: ExecFunction, 
+        outputs: dict[str,InputOutput],
+        parameters: dict[str,Parameter],
+        display_only: dict[str,Parameter] | None,
+        exec_function: ExecFunction,
         citations: Citations) -> nbf.NotebookNode:
     """
     Generates a Jupyter Notebook dynamically using Jinja2 templates.
@@ -101,10 +101,10 @@ def generate_jupyter_notebook(
 
     template = env.get_template(os.path.basename(template_path))
     notebook_content: str = template.render(
-        inputs=inputs, 
-        outputs=outputs, 
-        parameters=parameters, 
-        display_only=display_only, 
+        inputs=inputs,
+        outputs=outputs,
+        parameters=parameters,
+        display_only=display_only,
         exec_function=exec_function
     )
 

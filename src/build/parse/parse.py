@@ -56,7 +56,7 @@ class Parameter(TypedDict, total=False):
     section_id: str
     mode: str
     options: list[dict[str, str]] | None # w.r.t type == radio, dropdown
-    output_dir_set: bool | None # w.r.t type == textbox 
+    output_dir_set: bool | None # w.r.t type == textbox
     interactive: bool | None
     append_value: bool | None # w.r.t type == checkbox
     multiselect: bool | None # w.r.t type == dropdown
@@ -104,12 +104,12 @@ def parse_config(config_path: str | None = None) -> Config:
     return config
 
 def main(config_path: str | None = None) -> tuple[
-    dict[str,InputOutput], 
-    dict[str,InputOutput], 
-    dict[str,Parameter], 
-    dict[str,Parameter] | None, 
-    ExecFunction, 
-    str, 
+    dict[str,InputOutput],
+    dict[str,InputOutput],
+    dict[str,Parameter],
+    dict[str,Parameter] | None,
+    ExecFunction,
+    str,
     Citations
 ]:
     """

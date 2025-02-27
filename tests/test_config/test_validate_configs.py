@@ -40,10 +40,10 @@ def schema_path() -> str:
     ],
 )
 def test_specific_validation_errors(
-    schema_path: str, 
-    config_path: str, 
+    schema_path: str,
+    config_path: str,
     expected_error: list[str]
-    ) -> None: 
+    ) -> None:
     """
     Test that the validation throws the exact expected error for multiple configurations.
     Test cases would bark at LinkML Validation level if any extra flags are passed.

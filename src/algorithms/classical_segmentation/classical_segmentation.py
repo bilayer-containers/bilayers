@@ -16,10 +16,10 @@ class ParsedArgs(TypedDict):
     save_dir: str
 
 def example_function(
-        image_list: list[str], 
+        image_list: list[str],
         threshold_method: str,
         min_size: float,
-        max_size: float, 
+        max_size: float,
         save_dir: str
     ) -> list[str]:
     """

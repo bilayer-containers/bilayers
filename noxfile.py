@@ -35,7 +35,7 @@ def build_algorithm(session: nox.Session) -> None:
     """
     Build the Algorithm docker Image
     Args:
-        session (nox.Session): The Nox session object    
+        session (nox.Session): The Nox session object
     """
 
     def _fallback(platform: str | None, image_name: str, algorithm: str) -> None:

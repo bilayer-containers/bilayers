@@ -104,7 +104,10 @@ def build_algorithm(session: nox.Session) -> None:
         # Attempt to pull the image from DockerHub
         try:
             print(f"Trying to pull the Docker image: {docker_image_name}")
-            session.run("docker", "pull", "--platform", platform, docker_image_name)
+            # Pyright reports an error since `platform` can be None, while `session.run()` expects `str | PathLike[str]`
+            # However, we have a fallback function, that takes care of this scenario
+            # Since this is a safe and expected, I have suppress the warning
+            session.run("docker", "pull", "--platform", platform, docker_image_name) # pyright: ignore
             print(f"Successfully pulled Docker image from DockerHub: {docker_image_name}")
             # Save the Docker image name in a file
             with open("/tmp/docker_image_name.txt", "w") as file:

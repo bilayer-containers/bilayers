@@ -9,6 +9,15 @@
 #
 ##################################
 
+import numpy
+import os
+import skimage
+import importlib.metadata
+import subprocess
+import uuid
+import shutil
+import logging
+import sys
 
 #################################
 #
@@ -26,12 +35,12 @@ from cellprofiler_core.image import Image
 LOGGER = logging.getLogger(__name__)
 
 __doc__ = f"""\
-{{ algorithm_folder_name }}
+{{ exec_function.get('script') }}
 ===========
 
-**{{ algorithm_folder_name }}** is an auto-generated CellProfiler module based on Bilayers specification.
+**{{ exec_function.get('script') }}** is an auto-generated CellProfiler module based on Bilayers specification.
 
-{%- for citation in citations.algorithm %}
+{%- for citation in citations.algorithm.values() %}
 This module uses **{{ citation.name }}** i.e. {{ citation.description }}.
 
 To cite this module, use:
@@ -46,25 +55,31 @@ Supports 2D? Supports 3D? Respects masks?
 ============ ============ ===============
 """
 
-class {{ tool.name }}({{ exec_function.category }}):
-    category = "{{ exec_function.module }}"
+class {{ exec_function.get('script') }}({{ exec_function.get('module') }}):
+    category = "{{ tool.category }}"
 
-    module_name = "{{ algorithm_folder_name }}"
+    module_name = "{{ exec_function.get('script') }}"
 
     variable_revision_number = 1
 
-    def create_settings(self):
-        super({{ algorithm_folder_name }}, self).create_settings()
+    doi = {
+        {%- for citation in citations.algorithm.values() %}
+        "This module uses {{ citation.name }} i.e. {{ citation.description }}"
+        "To cite this module, use:"
+        "- **DOI**: {{ citation.doi }}"
+        "- **License**: {{ citation.license }}"
+        {%- endfor %}
+    }
 
+    def create_settings(self):
+        super({{ exec_function.get('script') }}, self).create_settings()
         
         {% set type_mapping = {
-
             "image": "Filename",
             "measurement": "Filename",
             "array": "Filename",
             "executable": "Filename",
             "file": "Filename",
-
             "radio": "Choice",
             "dropdown": "Choice",
             "checkbox": "Binary",
@@ -72,31 +87,65 @@ class {{ tool.name }}({{ exec_function.category }}):
             "float": "Float",
             "textbox": "ImageName",
         } %}
-        {% set default_type = "Text" %} #Fallback type
+        {% set default_type = "Text" %} {# Fallback type #}
 
-        {% for input_conf in inputs %}
-        self.{{ input_conf.name }} = {{ type_mapping[input_conf.type] }}(
-            text="{{ input_conf.label }}",
-            {% if input_conf.default is not none %}
-            value="{{ input_conf.default }}",
+        self.docker_or_python = Choice(
+            text="{{ exec_function.get('script') }} in docker or local python environment",
+            choices=["Docker", "Python"],
+            value="Docker",
+            doc="""\
+If Docker is selected, ensure that Docker Desktop is open and running on your
+computer. On first run of the X plugin, the Docker container will be
+downloaded, which may be slow . However, this slow downloading process will only have to happen
+once.
+
+If Python is selected, the Python environment in which CellProfiler is installed will be used.
+""",
+        )
+
+        self.docker_image = Choice(
+            text="Select your external docker image",
+            {# choices=["{{ docker_image.get('org') }}/{{ docker_image.get('name') }}:{{ docker_image.get('tag') }}"], #}
+            {# value="{{ docker_image.get('org') }}/{{ docker_image.get('name') }}:{{ docker_image.get('tag') }}", #}
+            choices="gibberish",
+            value="gibberish",
+            doc="""\
+Select which Docker image to use for running your plugin.
+"""
+        )
+        
+        {% for key, input_conf in inputs.items() %}
+        self.{{ input_conf.get('name') }} = {{ type_mapping[input_conf.get('type')] }}(
+            text="{{ input_conf.get('label') }}",
+            {% if input_conf.get('default') is not none %}
+            value="{{ input_conf.get('default') }}",
             {% endif %}
-            doc="{{ input_conf.description }}"
+            doc="{{ input_conf.get('description') }}"
+
         )
         {% endfor %}
 
-        {% for parameter in parameters %}
-        self.{{ parameter.name }} = {{ type_mapping[parameter.type] }}(
-            text="{{ parameter.label }}",
-            {% if parameter.type in ["radio", "dropdown"] %}
-            choices=[{% for option in parameter.options %}"{{ options}}"{% if not loop.last %}, {% endif %}{% endfor %},]
+        {% for key, parameter in parameters.items() %}
+        self.{{ parameter.get('name') }} = {{ type_mapping[parameter.get('type')] }}(
+            text="{{ parameter.get('label') }}",
+            {% if parameter.get('type') in ["radio", "dropdown"] %}
+            choices=[
+                {% for option in parameter.get('options') %}
+                    "{{ option.value }}"{% if not loop.last %}, {% endif %}
+                {% endfor %}
+            ],
             {% endif %}
-            {% if parameter.default is not none %}
-            value="{{ parameter.default }}",
+            {% if parameter.get('default') is not none %}
+            value="{{ parameter.get('default') }}",
             {% endif %}
-            doc="{{ parameter.description }}"
+            {% if parameter.get('type') in ["integer", "float"] %}
+            minval=float('-inf'),
+            maxval=float('inf'),
+            {% endif %}
+            doc="{{ parameter.get('description') }}"
         )
         {% endfor %}
-
+{# Commmmenet --------- Ignoreee -------------- #}
         {# self.input_image = cellprofiler_core.setting.subscriber.ImageSubscriber(
             "Input Image", doc="Select the input image."
         )
@@ -112,49 +161,112 @@ class {{ tool.name }}({{ exec_function.category }}):
         )
         {% endfor %} #}
 
+{# Commmmenet --------- Ignoreee -------------- #}
         
     def settings(self):
-        
+
         return [
-        {% for input_conf in inputs %}
-        self.{{ input_conf.name }},
+        self.x_name,
+        self.docker_or_python,
+        self.docker_image,
+        {% for key, input_conf in inputs.items() %}
+        self.{{ input_conf.get('name') }},
         {% endfor %}
-        {% for param in parameters %}
-        self.{{ param.name }},
+        {% for key, param in parameters.items() %}
+        self.{{ param.get('name') }},
         {% endfor %}
-        ]
-    
-    def settings(self):
-        return [self.input_image, self.output_image {% for setting in settings %}, self.{{ setting.name }}{% endfor %}]
+        self.y_name,
+        ]    
 
     def run(self, workspace):
-        input_image = workspace.image_set.get_image(self.input_image.value)
-        pixels = input_image.pixel_data
+        # 1. Retrive Input and Output Names + Load Input Image
+        x_name = self.x_name.value
+        y_name = self.y_name.value
 
-        # Process image
-        {% for step in processing_steps %}
-        pixels = {{ step }}
-        {% endfor %}
+        images = workspace.image_set
+        x = images.get_image(x_name)
+        x_data = x.pixel_data
+        dimensions = x.dimensions
 
-        output_image = cellprofiler_core.image.Image(pixels)
-        workspace.image_set.add(self.output_image.value, output_image)
+        # 2. Preprocessing Stuff
 
-    {# def visible_settings(self):
+        # 3. Choose Execution Method
+        if self.docker_or_python.value == "Python":
+            # Run algorithm in Python
+            try:
+                y_data = somefunction(
+                    x_data,
+                    {% for param in parameters.values() %}
+                    self.{{ param.get('name') }}.value,
+                    {% endfor %}
+                )
+            except Exception as e:
+                print(f"Error in Python execution: {e}")
+        
+        elif self.docker_or_python.value == "Docker":
+            # Docker binary path (Windows vs Unix)
+            docker_path = "docker" if sys.platform.lower().startswith("win") else "/usr/local/bin/docker"
+            
+            # Create a unique folder for this run
+            unique_name = str(uuid.uuid4())
+            temp_dir = os.path.join(get_default_output_directory(), ".cellprofiler_temp", unique_name)
+            temp_img_dir = os.path.join(temp_dir, "img")
+            
+            os.makedirs(temp_dir, exist_ok=True)
+            os.makedirs(temp_img_dir, exist_ok=True)
+            
+            temp_img_path = os.path.join(temp_img_dir, unique_name+".tiff")
+
+            # Save the input image in docker mounted path
+            skimage.io.imsave(temp_img_path, x_data)
+
+            # Construct Docker command
+            cmd = [docker_path, "run", "--rm", "-v", f"{temp_dir}:/data", self.docker_image.value]
+            {% for key, input_conf in inputs.items() %}
+            cmd += ["{{ input_conf.get('cli_tag') }}", str(self.{{ input_conf.get('name') }}.value)]
+            {% endfor %}
+            {% for key, param in parameters.items() %}
+            cmd += ["{{ param.get('cli_tag') }}", str(self.{{ param.get('name') }}.value)]
+            {% endfor %}
+
+            # Test -if this is working
+            {# print("Docker command:", " ".join(cmd)) #}
+
+            try:
+                subprocess.run(cmd, text=True)
+                # Load the segmentation output
+                y_data = numpy.load(os.path.join(temp_img_dir, "segmentation.npy"), allow_pickle=True).item()
+            finally:
+                # Clean up temporary directory
+                try:
+                    shutil.rmtree(temp_dir)
+                except:
+                    LOGGER.error("Unable to delete temporary directory. Files may be in use.")
+
+        
+        # 4. Store and Display Results
+        # Store segmented objects
+        y = Objects()
+        y.segmented = y_data
+        y.parent_image = x.parent_image
+        workspace.object_set.add_objects(y, y_name)
+
+        # Save measurements
+        self.add_measurements(workspace)
+
+        # Display results in UI
+        if self.show_window:
+            workspace.display_data.x_data = x.pixel_data if x.volumetric else x_data
+            workspace.display_data.y_data = y_data
+            workspace.display_data.dimensions = dimensions
+
+    def visible_settings(self):
         vis_settings = [
-            {% for input_conf in inputs %}
-            self.{{ input_conf.name }},
-            {% endfor %}
-            {% for param in parameters %}
-            self.{{ param.name }},
-            {% endfor %}
-            {% for display_conf in display_only %}
-            self.{{ display_conf.name }},
-            {% endfor %}
+            
         ]
-        return vis_settings #}
+        return vis_settings
 
-    def run(self, workspace):
-        pass
+    
 
     def display(self, workspace, figure):
         pass

@@ -194,7 +194,7 @@ def generate_cellprofiler_plugin(
 
     template = env.get_template(os.path.basename(template_path))
 
-    cellprofiler_code: str = template.render(inputs=inputs, outputs=outputs, parameters=parameters, display_only=display_only or [], algorithm_folder_name=algorithm_folder_name, exec_function=exec_function, citations=citations)
+    cellprofiler_code: str = template.render(tool=tool, inputs=inputs, outputs=outputs, parameters=parameters, display_only=display_only or [], algorithm_folder_name=algorithm_folder_name, exec_function=exec_function, citations=citations)
 
     return cellprofiler_code
 
@@ -237,18 +237,18 @@ def main() -> None:
     # Logic for generating Jupyter Notebook
     ################################################
 
-    # Template path for the Jupyter Notebook
-    jupyter_template_path: str = "jupyter_template.py.j2"
+    # # Template path for the Jupyter Notebook
+    # jupyter_template_path: str = "jupyter_template.py.j2"
 
-    # Generating Jupyter Notebook file dynamically
-    jupyter_app_code: nbf.NotebookNode = generate_jupyter_notebook(jupyter_template_path, inputs, outputs, parameters, display_only, exec_function, citations)
+    # # Generating Jupyter Notebook file dynamically
+    # jupyter_app_code: nbf.NotebookNode = generate_jupyter_notebook(jupyter_template_path, inputs, outputs, parameters, display_only, exec_function, citations)
 
-    # Join folders and file name
-    jupyter_notebook_path: str = os.path.join(folderA, folderB, "generated_notebook.ipynb")
+    # # Join folders and file name
+    # jupyter_notebook_path: str = os.path.join(folderA, folderB, "generated_notebook.ipynb")
 
-    with open(jupyter_notebook_path, "w") as f:
-        nbf.write(jupyter_app_code, f)
-    print("Jupyter notebook saved at generated_notebook.ipynb")
+    # with open(jupyter_notebook_path, "w") as f:
+    #     nbf.write(jupyter_app_code, f)
+    # print("Jupyter notebook saved at generated_notebook.ipynb")
 
     ################################################
     # Logic for generating CellProfiler Plugin

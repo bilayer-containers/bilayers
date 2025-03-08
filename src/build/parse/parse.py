@@ -17,6 +17,11 @@ class CitationEntry(TypedDict):
 class Citations(TypedDict):
     algorithm: dict[str, CitationEntry]
 
+class DockerImage(TypedDict):
+    org: str
+    name: str
+    tag: str
+    platform: str
 
 class HiddenArgs(TypedDict, total=False):
     cli_tag: str
@@ -75,6 +80,7 @@ class Parameter(TypedDict, total=False):
 class Config(TypedDict):
     tool: dict[str, Tool]
     citations: Citations
+    docker_image: DockerImage
     algorithm_folder_name: str
     exec_function: ExecFunction
     inputs: dict[str, InputOutput]
@@ -115,6 +121,13 @@ def parse_config(config_path: str | None = None) -> Config:
         config["exec_function"]["hidden_args"] = {arg["cli_tag"]: arg for arg in hidden_args}
     else:
         config["exec_function"]["hidden_args"] = {}
+    
+    # Convert docker_image to dictionary
+    docker_image = config.get("docker_image", {})
+    if isinstance(docker_image, dict):
+        config["docker_image"] = docker_image
+    else:
+        config["docker_image"] = {}
 
     return config
 

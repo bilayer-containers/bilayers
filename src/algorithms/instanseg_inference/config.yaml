@@ -1,58 +1,97 @@
+citations:
+  algorithm: 
+    - name: "InstanSeg in Brightfield Images"
+      doi: 10.48550/arXiv.2408.15954
+      license: "Apache-2.0"
+      description: "InstanSeg for Nucleus Segmentation in Brightfield Images"
+    - name: "InstanSeg in Fluorescence Images"
+      doi: 10.1101/2024.09.04.611150
+      license: "Apache-2.0"
+      description: "InstanSeg for Nucleus/Cell Segmentation in Fluorescence Images"
+
+docker_image:
+  org: bilayer
+  name: instanseg
+  tag: "1.0.2"
+  platform: "linux/amd64"
+
+algorithm_folder_name: "instanseg_inference"
+
+exec_function: 
+  name: "generate_cli_command"
+  script: "instanseg_inference"
+  module: "algorithms.instanseg_inference"
+  cli_command: "python /instanseg/instanseg/scripts/inference.py"
+  hidden_args:
+
 inputs:
   - name: input_images
     type: image
+    label: Drag and drop all images to be analyzed
     subtype: 
       - grayscale
       - color
       - binary
       - labeled
     description: "Input images to be analyzed"
+    cli_tag: "--image_path"
+    cli_order: 0
+    default: "directory"
     optional: False
-    path: "input_images"
     format: 
       - tiff
       - ometiff
       - png
       - jpg
       - jpeg
-    collection: True
-    z: True
-    t: True
+    folder_name: "input_images"
+    file_count: multiple
+    section_id: "inputs"
+    mode: "beginner"
+    depth: True
+    timepoints: True
     tiled: True
     pyramidal: True
 
 outputs: 
   - name: output_images
     type: image
+    label: "Output Images"
     subtype: 
       - grayscale
       - color
       - binary
       - labeled
     description: "Output images"
+    cli_tag: "None"
+    cli_order: 0
+    default: "directory"
     optional: False
-    path: "/bilayers/input_images"
     format: 
       - tiff
       - ometiff
-    collection: True
-    z: True
-    t: True
+    folder_name: "/bilayers/input_images"
+    file_count: multiple
+    section_id: "outputs"
+    mode: "beginner"
+    depth: True
+    timepoints: True
     tiled: True
     pyramidal: True
     
 parameters:
-  - name: image_path
-    type: files
-    label: "Drag and drop all images to be analyzed"
-    description: "Upload all images to be analyzed"
-    file_count: multiple
-    default: "directory"
-    cli_tag: "--image_path"
-    optional: False
-    section_id: "input-args"
-    folder_name: "input_images"
-    mode: "beginner"
+  # Since, this was moved to inputs section, it is commented out (can get rid of it in future)
+  # - name: image_path
+  #   type: files
+  #   label: "Drag and drop all images to be analyzed"
+  #   description: "Upload all images to be analyzed"
+  #   file_count: multiple
+  #   default: "directory"
+  #   cli_tag: "--image_path"
+  #   optional: False
+  #   section_id: "input-args"
+  #   folder_name: "input_images"
+  #   mode: "beginner"
   - name: model_folder
     type: radio
     label: "Model Folder"
@@ -161,40 +200,3 @@ display_only:
     optional: True
     section_id: "display_only-args"
     mode: "beginner"
-
-results:
-  - name: output_dir
-    type: files
-    label: "Download Output"
-    description: "Download the output files"
-    file_count: multiple
-    cli_tag: "None"
-    optional: True
-    section_id: "output-args"
-    mode: "beginner"
-    
-exec_function: 
-  name: "generate_cli_command"
-  script: "instanseg_inference"
-  module: "algorithms.instanseg_inference"
-  cli_command: "python /instanseg/InstanSeg/scripts/inference.py"
-  hidden_args:
-
-docker_image:
-  org: bilayer
-  name: instanseg
-  tag: "1.0.2"
-  platform: "linux/amd64"
-
-algorithm_folder_name: "instanseg_inference"
-
-citations:
-  algorithm: 
-    - name: "InstanSeg in Brightfield Images"
-      doi: 10.48550/arXiv.2408.15954
-      license: "Apache-2.0"
-      description: "InstanSeg for Nucleus Segmentation in Brightfield Images"
-    - name: "InstanSeg in Fluorescence Images"
-      doi: 10.1101/2024.09.04.611150
-      license: "Apache-2.0"
-      description: "InstanSeg for Nucleus/Cell Segmentation in Fluorescence Images"

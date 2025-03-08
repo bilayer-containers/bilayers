@@ -3,7 +3,7 @@
 
 
 
-_Mode of the parameters, display_only, results_
+_Mode of the parameters, display_only_
 
 
 
@@ -41,7 +41,7 @@ URI: [ModeEnum](ModeEnum.md)
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -53,8 +53,8 @@ URI: [ModeEnum](ModeEnum.md)
 <details>
 ```yaml
 name: ModeEnum
-description: Mode of the parameters, display_only, results
-from_schema: https://w3id.org/my-org/validate_schema
+description: Mode of the parameters, display_only
+from_schema: https://w3id.org/my-org/bilayers_schema
 rank: 1000
 permissible_values:
   beginner:

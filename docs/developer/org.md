@@ -9,7 +9,7 @@ _Organization of the docker image_
 
 
 
-URI: [https://w3id.org/my-org/validate_schema/:org](https://w3id.org/my-org/validate_schema/:org)
+URI: [https://w3id.org/my-org/bilayers_schema/:org](https://w3id.org/my-org/bilayers_schema/:org)
 
 
 
@@ -52,7 +52,7 @@ URI: [https://w3id.org/my-org/validate_schema/:org](https://w3id.org/my-org/vali
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -61,8 +61,8 @@ URI: [https://w3id.org/my-org/validate_schema/:org](https://w3id.org/my-org/vali
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | https://w3id.org/my-org/validate_schema/:org |
-| native | https://w3id.org/my-org/validate_schema/:org |
+| self | https://w3id.org/my-org/bilayers_schema/:org |
+| native | https://w3id.org/my-org/bilayers_schema/:org |
 
 
 
@@ -73,7 +73,7 @@ URI: [https://w3id.org/my-org/validate_schema/:org](https://w3id.org/my-org/vali
 ```yaml
 name: org
 description: Organization of the docker image
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 rank: 1000
 alias: org
 domain_of:

@@ -3,13 +3,13 @@
 # Slot: name
 
 
-_Name of the docker_image, algorithm, parameter, display_only, results_
+_Name of the docker_image, algorithm, parameter, display_only_
 
 
 
 
 
-URI: [https://w3id.org/my-org/validate_schema/:name](https://w3id.org/my-org/validate_schema/:name)
+URI: [https://w3id.org/my-org/bilayers_schema/:name](https://w3id.org/my-org/bilayers_schema/:name)
 
 
 
@@ -23,13 +23,15 @@ URI: [https://w3id.org/my-org/validate_schema/:name](https://w3id.org/my-org/val
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [TypeParameter](TypeParameter.md) | Parameters of a specific Algorithm |  no  |
-| [AbstractUserInterface](AbstractUserInterface.md) | Abstract class for user interface |  no  |
-| [DockerImage](DockerImage.md) | Description of docker_image for the specific algorithm |  no  |
-| [ExecFunction](ExecFunction.md) | Function to execute the Algorithm |  no  |
-| [TypeResults](TypeResults.md) | Results of a specific Algorithm |  no  |
-| [TypeDisplayOnly](TypeDisplayOnly.md) | Display only parameters of a specific Algorithm |  no  |
 | [TypeAlgorithmFromCitation](TypeAlgorithmFromCitation.md) | Algorithm's citations |  no  |
+| [ExecFunction](ExecFunction.md) | Function to execute the Algorithm |  no  |
+| [TypeParameter](TypeParameter.md) | Parameters of a specific Algorithm |  no  |
+| [TypeDisplayOnly](TypeDisplayOnly.md) | Display only parameters of a specific Algorithm |  no  |
+| [TypeInput](TypeInput.md) | Inputs to the algorithm from the last step of the workflow |  no  |
+| [TypeOutput](TypeOutput.md) | Outputs of the algorithm to the next step in the workflow |  no  |
+| [DockerImage](DockerImage.md) | Description of docker_image for the specific algorithm |  no  |
+| [AbstractWorkflowDetails](AbstractWorkflowDetails.md) | Abstract class for details needed to fit config in the workflow |  no  |
+| [AbstractUserInterface](AbstractUserInterface.md) | Abstract class for user interface |  no  |
 
 
 
@@ -58,7 +60,7 @@ URI: [https://w3id.org/my-org/validate_schema/:name](https://w3id.org/my-org/val
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -67,8 +69,8 @@ URI: [https://w3id.org/my-org/validate_schema/:name](https://w3id.org/my-org/val
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | https://w3id.org/my-org/validate_schema/:name |
-| native | https://w3id.org/my-org/validate_schema/:name |
+| self | https://w3id.org/my-org/bilayers_schema/:name |
+| native | https://w3id.org/my-org/bilayers_schema/:name |
 
 
 
@@ -78,11 +80,12 @@ URI: [https://w3id.org/my-org/validate_schema/:name](https://w3id.org/my-org/val
 <details>
 ```yaml
 name: name
-description: Name of the docker_image, algorithm, parameter, display_only, results
-from_schema: https://w3id.org/my-org/validate_schema
+description: Name of the docker_image, algorithm, parameter, display_only
+from_schema: https://w3id.org/my-org/bilayers_schema
 rank: 1000
 alias: name
 domain_of:
+- AbstractWorkflowDetails
 - AbstractUserInterface
 - ExecFunction
 - DockerImage

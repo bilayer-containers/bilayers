@@ -9,7 +9,7 @@ _CLI command to execute the Algorithm_
 
 
 
-URI: [https://w3id.org/my-org/validate_schema/:cli_command](https://w3id.org/my-org/validate_schema/:cli_command)
+URI: [https://w3id.org/my-org/bilayers_schema/:cli_command](https://w3id.org/my-org/bilayers_schema/:cli_command)
 
 
 
@@ -52,7 +52,7 @@ URI: [https://w3id.org/my-org/validate_schema/:cli_command](https://w3id.org/my-
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -61,8 +61,8 @@ URI: [https://w3id.org/my-org/validate_schema/:cli_command](https://w3id.org/my-
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | https://w3id.org/my-org/validate_schema/:cli_command |
-| native | https://w3id.org/my-org/validate_schema/:cli_command |
+| self | https://w3id.org/my-org/bilayers_schema/:cli_command |
+| native | https://w3id.org/my-org/bilayers_schema/:cli_command |
 
 
 
@@ -73,7 +73,7 @@ URI: [https://w3id.org/my-org/validate_schema/:cli_command](https://w3id.org/my-
 ```yaml
 name: cli_command
 description: CLI command to execute the Algorithm
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 rank: 1000
 alias: cli_command
 domain_of:

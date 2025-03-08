@@ -42,12 +42,17 @@ URI: [linkml:Any](https://w3id.org/linkml/Any)
 
 | used by | used in | type | used |
 | ---  | --- | --- | --- |
+| [AbstractWorkflowDetails](AbstractWorkflowDetails.md) | [label](label.md) | range | [Any](Any.md) |
+| [AbstractWorkflowDetails](AbstractWorkflowDetails.md) | [default](default.md) | range | [Any](Any.md) |
+| [TypeInput](TypeInput.md) | [label](label.md) | range | [Any](Any.md) |
+| [TypeInput](TypeInput.md) | [default](default.md) | range | [Any](Any.md) |
+| [TypeOutput](TypeOutput.md) | [label](label.md) | range | [Any](Any.md) |
+| [TypeOutput](TypeOutput.md) | [default](default.md) | range | [Any](Any.md) |
 | [AbstractUserInterface](AbstractUserInterface.md) | [label](label.md) | range | [Any](Any.md) |
 | [TypeParameter](TypeParameter.md) | [default](default.md) | range | [Any](Any.md) |
 | [TypeParameter](TypeParameter.md) | [label](label.md) | range | [Any](Any.md) |
 | [TypeDisplayOnly](TypeDisplayOnly.md) | [default](default.md) | range | [Any](Any.md) |
 | [TypeDisplayOnly](TypeDisplayOnly.md) | [label](label.md) | range | [Any](Any.md) |
-| [TypeResults](TypeResults.md) | [label](label.md) | range | [Any](Any.md) |
 | [RadioOptions](RadioOptions.md) | [label](label.md) | range | [Any](Any.md) |
 | [RadioOptions](RadioOptions.md) | [value](value.md) | range | [Any](Any.md) |
 
@@ -67,7 +72,7 @@ URI: [linkml:Any](https://w3id.org/linkml/Any)
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -77,7 +82,7 @@ URI: [linkml:Any](https://w3id.org/linkml/Any)
 | Mapping Type | Mapped Value |
 | ---  | ---  |
 | self | linkml:Any |
-| native | https://w3id.org/my-org/validate_schema/:Any |
+| native | https://w3id.org/my-org/bilayers_schema/:Any |
 
 
 
@@ -95,7 +100,7 @@ URI: [linkml:Any](https://w3id.org/linkml/Any)
 ```yaml
 name: Any
 description: Any type
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 class_uri: linkml:Any
 
 ```
@@ -107,7 +112,7 @@ class_uri: linkml:Any
 ```yaml
 name: Any
 description: Any type
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 class_uri: linkml:Any
 
 ```

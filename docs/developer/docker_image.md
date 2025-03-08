@@ -9,7 +9,7 @@ _Description of docker_image for the specific algorithm_
 
 
 
-URI: [https://w3id.org/my-org/validate_schema/:docker_image](https://w3id.org/my-org/validate_schema/:docker_image)
+URI: [https://w3id.org/my-org/bilayers_schema/:docker_image](https://w3id.org/my-org/bilayers_schema/:docker_image)
 
 
 
@@ -23,7 +23,7 @@ URI: [https://w3id.org/my-org/validate_schema/:docker_image](https://w3id.org/my
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [Container](Container.md) | Container class which holds all the high_level keywords from config |  no  |
+| [SpecContainer](SpecContainer.md) | SpecContianer class which holds all the high_level keywords from config |  no  |
 
 
 
@@ -50,7 +50,7 @@ URI: [https://w3id.org/my-org/validate_schema/:docker_image](https://w3id.org/my
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -59,8 +59,8 @@ URI: [https://w3id.org/my-org/validate_schema/:docker_image](https://w3id.org/my
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | https://w3id.org/my-org/validate_schema/:docker_image |
-| native | https://w3id.org/my-org/validate_schema/:docker_image |
+| self | https://w3id.org/my-org/bilayers_schema/:docker_image |
+| native | https://w3id.org/my-org/bilayers_schema/:docker_image |
 
 
 
@@ -71,11 +71,11 @@ URI: [https://w3id.org/my-org/validate_schema/:docker_image](https://w3id.org/my
 ```yaml
 name: docker_image
 description: Description of docker_image for the specific algorithm
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 rank: 1000
 alias: docker_image
 domain_of:
-- Container
+- SpecContainer
 range: DockerImage
 
 ```

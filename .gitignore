@@ -32,6 +32,8 @@ test.ipynb
 # pixi environments
 .pixi
 *.egg-info
+# ruff cache
+.ruff_cache
 # Documentation
 
 

@@ -9,7 +9,7 @@ _Type of Number of files_
 
 
 
-URI: [https://w3id.org/my-org/validate_schema/:file_count](https://w3id.org/my-org/validate_schema/:file_count)
+URI: [https://w3id.org/my-org/bilayers_schema/:file_count](https://w3id.org/my-org/bilayers_schema/:file_count)
 
 
 
@@ -23,10 +23,9 @@ URI: [https://w3id.org/my-org/validate_schema/:file_count](https://w3id.org/my-o
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [TypeDisplayOnly](TypeDisplayOnly.md) | Display only parameters of a specific Algorithm |  no  |
-| [TypeResults](TypeResults.md) | Results of a specific Algorithm |  no  |
-| [TypeParameter](TypeParameter.md) | Parameters of a specific Algorithm |  no  |
-| [AbstractUserInterface](AbstractUserInterface.md) | Abstract class for user interface |  no  |
+| [TypeOutput](TypeOutput.md) | Outputs of the algorithm to the next step in the workflow |  no  |
+| [AbstractWorkflowDetails](AbstractWorkflowDetails.md) | Abstract class for details needed to fit config in the workflow |  no  |
+| [TypeInput](TypeInput.md) | Inputs to the algorithm from the last step of the workflow |  no  |
 
 
 
@@ -53,7 +52,7 @@ URI: [https://w3id.org/my-org/validate_schema/:file_count](https://w3id.org/my-o
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -62,8 +61,8 @@ URI: [https://w3id.org/my-org/validate_schema/:file_count](https://w3id.org/my-o
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | https://w3id.org/my-org/validate_schema/:file_count |
-| native | https://w3id.org/my-org/validate_schema/:file_count |
+| self | https://w3id.org/my-org/bilayers_schema/:file_count |
+| native | https://w3id.org/my-org/bilayers_schema/:file_count |
 
 
 
@@ -74,11 +73,11 @@ URI: [https://w3id.org/my-org/validate_schema/:file_count](https://w3id.org/my-o
 ```yaml
 name: file_count
 description: Type of Number of files
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 rank: 1000
 alias: file_count
 domain_of:
-- AbstractUserInterface
+- AbstractWorkflowDetails
 range: FileTypeEnum
 required: false
 

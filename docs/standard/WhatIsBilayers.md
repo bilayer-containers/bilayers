@@ -6,7 +6,7 @@ authors:
       - Broad Institute of MIT and Harvard
 ---
 
-Bilayers is an open-source specification designed to characterize software containers in terms of expected inputs, expected outputs, and tunable parameters. Its primary aim is to make bioimage analysis deep-learning algorithms more accessible by automatically generating intuitive, no-terminal-required user interfaces. Bilayers ensures that software containers can be deployed consistently across different environments, from small prototypes to large-scale workflows, without the risk of version mismatch.
+Bilayers is an **open-source specification** designed to characterize software containers in terms of expected inputs, outputs, and tunable parameters. Its primary aim is to make bioimage analysis deep-learning algorithms more accessible by automatically generating intuitive, no-terminal-required user interfaces. Bilayers ensures that software containers can be deployed consistently across different environments, from small prototypes to large-scale workflows, without the risk of version mismatch.
 
 Bilayers currently supports interfaces like Gradio and Jupyter Notebook and plans to expand to others, such as CellProfiler plugins. Each algorithm-interface pair is containerized and published as a Docker image on DockerHub, allowing users to run the tool effortlessly by spinning up a Docker container. You can start using it right away — No Coding or Complicated Installations needed!
 

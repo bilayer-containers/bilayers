@@ -33,7 +33,7 @@ URI: [xsd:boolean](http://www.w3.org/2001/XMLSchema#boolean)
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -43,7 +43,7 @@ URI: [xsd:boolean](http://www.w3.org/2001/XMLSchema#boolean)
 | Mapping Type | Mapped Value |
 | ---  | ---  |
 | self | xsd:boolean |
-| native | https://w3id.org/my-org/validate_schema/:boolean |
+| native | https://w3id.org/my-org/bilayers_schema/:boolean |
 | exact | schema:Boolean |
 
 

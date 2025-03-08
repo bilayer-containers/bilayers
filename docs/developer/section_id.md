@@ -9,7 +9,7 @@ _Section ID of the object_
 
 
 
-URI: [https://w3id.org/my-org/validate_schema/:section_id](https://w3id.org/my-org/validate_schema/:section_id)
+URI: [https://w3id.org/my-org/bilayers_schema/:section_id](https://w3id.org/my-org/bilayers_schema/:section_id)
 
 
 
@@ -23,9 +23,11 @@ URI: [https://w3id.org/my-org/validate_schema/:section_id](https://w3id.org/my-o
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [TypeDisplayOnly](TypeDisplayOnly.md) | Display only parameters of a specific Algorithm |  no  |
-| [TypeResults](TypeResults.md) | Results of a specific Algorithm |  no  |
 | [TypeParameter](TypeParameter.md) | Parameters of a specific Algorithm |  no  |
+| [TypeDisplayOnly](TypeDisplayOnly.md) | Display only parameters of a specific Algorithm |  no  |
+| [TypeOutput](TypeOutput.md) | Outputs of the algorithm to the next step in the workflow |  no  |
+| [TypeInput](TypeInput.md) | Inputs to the algorithm from the last step of the workflow |  no  |
+| [AbstractWorkflowDetails](AbstractWorkflowDetails.md) | Abstract class for details needed to fit config in the workflow |  no  |
 | [AbstractUserInterface](AbstractUserInterface.md) | Abstract class for user interface |  no  |
 
 
@@ -55,7 +57,7 @@ URI: [https://w3id.org/my-org/validate_schema/:section_id](https://w3id.org/my-o
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -64,8 +66,8 @@ URI: [https://w3id.org/my-org/validate_schema/:section_id](https://w3id.org/my-o
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | https://w3id.org/my-org/validate_schema/:section_id |
-| native | https://w3id.org/my-org/validate_schema/:section_id |
+| self | https://w3id.org/my-org/bilayers_schema/:section_id |
+| native | https://w3id.org/my-org/bilayers_schema/:section_id |
 
 
 
@@ -76,10 +78,11 @@ URI: [https://w3id.org/my-org/validate_schema/:section_id](https://w3id.org/my-o
 ```yaml
 name: section_id
 description: Section ID of the object
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 rank: 1000
 alias: section_id
 domain_of:
+- AbstractWorkflowDetails
 - AbstractUserInterface
 range: string
 required: true

@@ -37,7 +37,7 @@ URI: [shex:iri](http://www.w3.org/ns/shex#iri)
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -47,7 +47,7 @@ URI: [shex:iri](http://www.w3.org/ns/shex#iri)
 | Mapping Type | Mapped Value |
 | ---  | ---  |
 | self | shex:iri |
-| native | https://w3id.org/my-org/validate_schema/:objectidentifier |
+| native | https://w3id.org/my-org/bilayers_schema/:objectidentifier |
 
 
 

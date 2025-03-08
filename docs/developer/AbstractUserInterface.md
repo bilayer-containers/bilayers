@@ -11,7 +11,7 @@ _Abstract class for user interface_
 * __NOTE__: this is an abstract class and should not be instantiated directly
 
 
-URI: [https://w3id.org/my-org/validate_schema/:AbstractUserInterface](https://w3id.org/my-org/validate_schema/:AbstractUserInterface)
+URI: [https://w3id.org/my-org/bilayers_schema/:AbstractUserInterface](https://w3id.org/my-org/bilayers_schema/:AbstractUserInterface)
 
 
 
@@ -26,23 +26,10 @@ URI: [https://w3id.org/my-org/validate_schema/:AbstractUserInterface](https://w3
         click TypeParameter href "../TypeParameter"
       AbstractUserInterface <|-- TypeDisplayOnly
         click TypeDisplayOnly href "../TypeDisplayOnly"
-      AbstractUserInterface <|-- TypeResults
-        click TypeResults href "../TypeResults"
       
       AbstractUserInterface : append_value
         
       AbstractUserInterface : description
-        
-      AbstractUserInterface : file_count
-        
-          
-    
-    
-    AbstractUserInterface --> "0..1" FileTypeEnum : file_count
-    click FileTypeEnum href "../FileTypeEnum"
-
-        
-      AbstractUserInterface : folder_name
         
       AbstractUserInterface : interactive
         
@@ -103,7 +90,6 @@ URI: [https://w3id.org/my-org/validate_schema/:AbstractUserInterface](https://w3
 * **AbstractUserInterface**
     * [TypeParameter](TypeParameter.md)
     * [TypeDisplayOnly](TypeDisplayOnly.md)
-    * [TypeResults](TypeResults.md)
 
 
 
@@ -111,17 +97,15 @@ URI: [https://w3id.org/my-org/validate_schema/:AbstractUserInterface](https://w3
 
 | Name | Cardinality and Range | Description | Inheritance |
 | ---  | --- | --- | --- |
-| [name](name.md) | 1 <br/> [String](String.md) | Name of the docker_image, algorithm, parameter, display_only, results | direct |
-| [type](type.md) | 1 <br/> [TypeEnum](TypeEnum.md) | Type of the parameter | direct |
+| [name](name.md) | 1 <br/> [String](String.md) | Name of the docker_image, algorithm, parameter, display_only | direct |
+| [type](type.md) | 1 <br/> [TypeEnum](TypeEnum.md) | Type of the inputs, parameters and outputs | direct |
 | [label](label.md) | 1 <br/> [Any](Any.md) | Label of the object, but also Radio button's label | direct |
 | [description](description.md) | 0..1 <br/> [String](String.md) | Description of the Algorithm | direct |
 | [optional](optional.md) | 1 <br/> [Boolean](Boolean.md) | Optional value of the object | direct |
 | [section_id](section_id.md) | 1 <br/> [String](String.md) | Section ID of the object | direct |
 | [mode](mode.md) | 1 <br/> [ModeEnum](ModeEnum.md) | Mode of the object | direct |
 | [output_dir_set](output_dir_set.md) | 0..1 <br/> [Boolean](Boolean.md) | Output directory set | direct |
-| [folder_name](folder_name.md) | 0..1 <br/> [String](String.md) | Folder name of the object | direct |
-| [file_count](file_count.md) | 0..1 <br/> [FileTypeEnum](FileTypeEnum.md) | Type of Number of files | direct |
-| [options](options.md) | * <br/> [RadioOptions](RadioOptions.md) | Options of the Radio button in parameters, display_only, results | direct |
+| [options](options.md) | * <br/> [RadioOptions](RadioOptions.md) | Options of the Radio button in parameters, display_only | direct |
 | [interactive](interactive.md) | 0..1 <br/> [Boolean](Boolean.md) | Whether the object is interactive on UI | direct |
 | [append_value](append_value.md) | 0..1 <br/> [Boolean](Boolean.md) | Append value of the hidden argument | direct |
 | [multiselect](multiselect.md) | 0..1 <br/> [Boolean](Boolean.md) | Multiselect value of the dropdown | direct |
@@ -137,7 +121,6 @@ URI: [https://w3id.org/my-org/validate_schema/:AbstractUserInterface](https://w3
 
 * parameters
 * display_only
-* results
 
 
 
@@ -152,7 +135,7 @@ URI: [https://w3id.org/my-org/validate_schema/:AbstractUserInterface](https://w3
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -161,8 +144,8 @@ URI: [https://w3id.org/my-org/validate_schema/:AbstractUserInterface](https://w3
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | https://w3id.org/my-org/validate_schema/:AbstractUserInterface |
-| native | https://w3id.org/my-org/validate_schema/:AbstractUserInterface |
+| self | https://w3id.org/my-org/bilayers_schema/:AbstractUserInterface |
+| native | https://w3id.org/my-org/bilayers_schema/:AbstractUserInterface |
 
 
 
@@ -180,11 +163,10 @@ URI: [https://w3id.org/my-org/validate_schema/:AbstractUserInterface](https://w3
 ```yaml
 name: AbstractUserInterface
 description: Abstract class for user interface
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 aliases:
 - parameters
 - display_only
-- results
 abstract: true
 slots:
 - name
@@ -195,8 +177,6 @@ slots:
 - section_id
 - mode
 - output_dir_set
-- folder_name
-- file_count
 - options
 - interactive
 - append_value
@@ -213,17 +193,6 @@ rules:
         name: append_value
         required: true
   description: Extra flags needed iff type is checkbox
-- preconditions:
-    slot_conditions:
-      type:
-        name: type
-        equals_string: files
-  postconditions:
-    slot_conditions:
-      file_count:
-        name: file_count
-        required: true
-  description: Extra flags needed iff type is files
 - preconditions:
     slot_conditions:
       type:
@@ -259,21 +228,21 @@ rules:
 ```yaml
 name: AbstractUserInterface
 description: Abstract class for user interface
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 aliases:
 - parameters
 - display_only
-- results
 abstract: true
 attributes:
   name:
     name: name
-    description: Name of the docker_image, algorithm, parameter, display_only, results
-    from_schema: https://w3id.org/my-org/validate_schema
+    description: Name of the docker_image, algorithm, parameter, display_only
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: name
     owner: AbstractUserInterface
     domain_of:
+    - AbstractWorkflowDetails
     - AbstractUserInterface
     - ExecFunction
     - DockerImage
@@ -282,23 +251,25 @@ attributes:
     required: true
   type:
     name: type
-    description: Type of the parameter
-    from_schema: https://w3id.org/my-org/validate_schema
+    description: Type of the inputs, parameters and outputs
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: type
     owner: AbstractUserInterface
     domain_of:
+    - AbstractWorkflowDetails
     - AbstractUserInterface
     range: TypeEnum
     required: true
   label:
     name: label
     description: Label of the object, but also Radio button's label
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: label
     owner: AbstractUserInterface
     domain_of:
+    - AbstractWorkflowDetails
     - AbstractUserInterface
     - RadioOptions
     range: Any
@@ -306,51 +277,55 @@ attributes:
   description:
     name: description
     description: Description of the Algorithm
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: description
     owner: AbstractUserInterface
     domain_of:
+    - AbstractWorkflowDetails
     - AbstractUserInterface
     - TypeAlgorithmFromCitation
     range: string
   optional:
     name: optional
     description: Optional value of the object
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: optional
     owner: AbstractUserInterface
     domain_of:
+    - AbstractWorkflowDetails
     - AbstractUserInterface
     range: boolean
     required: true
   section_id:
     name: section_id
     description: Section ID of the object
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: section_id
     owner: AbstractUserInterface
     domain_of:
+    - AbstractWorkflowDetails
     - AbstractUserInterface
     range: string
     required: true
   mode:
     name: mode
     description: Mode of the object
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: mode
     owner: AbstractUserInterface
     domain_of:
+    - AbstractWorkflowDetails
     - AbstractUserInterface
     range: ModeEnum
     required: true
   output_dir_set:
     name: output_dir_set
     description: Output directory set
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: output_dir_set
     owner: AbstractUserInterface
@@ -358,32 +333,10 @@ attributes:
     - AbstractUserInterface
     range: boolean
     required: false
-  folder_name:
-    name: folder_name
-    description: Folder name of the object
-    from_schema: https://w3id.org/my-org/validate_schema
-    rank: 1000
-    alias: folder_name
-    owner: AbstractUserInterface
-    domain_of:
-    - AbstractUserInterface
-    range: string
-    required: false
-  file_count:
-    name: file_count
-    description: Type of Number of files
-    from_schema: https://w3id.org/my-org/validate_schema
-    rank: 1000
-    alias: file_count
-    owner: AbstractUserInterface
-    domain_of:
-    - AbstractUserInterface
-    range: FileTypeEnum
-    required: false
   options:
     name: options
-    description: Options of the Radio button in parameters, display_only, results
-    from_schema: https://w3id.org/my-org/validate_schema
+    description: Options of the Radio button in parameters, display_only
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: options
     owner: AbstractUserInterface
@@ -395,7 +348,7 @@ attributes:
   interactive:
     name: interactive
     description: Whether the object is interactive on UI
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: interactive
     owner: AbstractUserInterface
@@ -406,7 +359,7 @@ attributes:
   append_value:
     name: append_value
     description: Append value of the hidden argument
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: append_value
     owner: AbstractUserInterface
@@ -418,7 +371,7 @@ attributes:
   multiselect:
     name: multiselect
     description: Multiselect value of the dropdown
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: multiselect
     owner: AbstractUserInterface
@@ -438,17 +391,6 @@ rules:
         name: append_value
         required: true
   description: Extra flags needed iff type is checkbox
-- preconditions:
-    slot_conditions:
-      type:
-        name: type
-        equals_string: files
-  postconditions:
-    slot_conditions:
-      file_count:
-        name: file_count
-        required: true
-  description: Extra flags needed iff type is files
 - preconditions:
     slot_conditions:
       type:

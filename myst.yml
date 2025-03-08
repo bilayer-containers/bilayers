@@ -33,8 +33,8 @@ project:
           title: Choosing the Right Base Docker Image
         - file: docs/custom_algorithm/steps_to_create.md
           title: Steps to create a custom algorithm's interface
-    # - file: docs/developer/developer.md
-    #   title: Developer
+    - file: docs/developer/index.md
+      title: Developer
 
   exports:
     - format: md
@@ -42,7 +42,7 @@ project:
 site:
   template: book-theme
   options:
-    # favicon: favicon.ico
+    favicon: docs/images/standard/Bilayers_Logo.png
     logo: docs/images/standard/Bilayers_Logo.png
     logo_text: Bilayers
     hide_toc: false

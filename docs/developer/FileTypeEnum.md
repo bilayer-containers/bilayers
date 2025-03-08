@@ -41,7 +41,7 @@ URI: [FileTypeEnum](FileTypeEnum.md)
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -54,7 +54,7 @@ URI: [FileTypeEnum](FileTypeEnum.md)
 ```yaml
 name: FileTypeEnum
 description: Type of Number of files
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 rank: 1000
 permissible_values:
   single:

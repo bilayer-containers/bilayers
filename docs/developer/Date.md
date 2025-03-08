@@ -33,7 +33,7 @@ URI: [xsd:date](http://www.w3.org/2001/XMLSchema#date)
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -43,7 +43,7 @@ URI: [xsd:date](http://www.w3.org/2001/XMLSchema#date)
 | Mapping Type | Mapped Value |
 | ---  | ---  |
 | self | xsd:date |
-| native | https://w3id.org/my-org/validate_schema/:date |
+| native | https://w3id.org/my-org/bilayers_schema/:date |
 | exact | schema:Date |
 
 

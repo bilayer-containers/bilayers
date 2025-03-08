@@ -1,0 +1,330 @@
+citations:
+ algorithm:
+   - name: ""
+     doi: ""
+     license: ""
+     description: ""
+
+docker-image:
+  org: ""
+  name: ""
+  tag: ""
+  platform: "" # eg. linux/amd64, linux/arm64, linux/arm/v7 etc.
+
+algorithm_folder_name:
+
+exec_function:
+  name: "generate_cli_command"
+  script:
+  module:
+  cli_command:
+  hidden_args:
+
+inputs: 
+  - name: input_images
+    type: image
+    label: "Input Images"
+    subtype: # ONLY IFF TYPE==IMAGE. Can list all those relevant subtypes out of these 4, supported by the tool
+      - grayscale
+      - color
+      - binary
+      - labeled
+    description: "these are accepted input_images for xyz algorithm"
+    cli_tag: "--input_images" # tag to be used in CLI
+    cli_order: Integer # default is 0. Could be positive, negative or zero. If negative, then it will be appended at the end of the command. BUT IT IS OPTIONAL TO PROVIDE THIS FLAG.
+    default: ("single" | "directory") # if it is a single file or a folder
+    optional: (True | False) # if input is optional
+    format: # can include all those relevant formats supported by the tool
+      - tif
+      - png
+      - jpg
+      - jpeg
+      - tiff
+      - ometiff
+    folder_name: "/path/to/input_images" # folder_path
+    file_count: ("single" | "multiple") # if it accepts single file or multiple files. If multiple, then it will be a folder
+    section_id: "inputs" # section_id to group the inputs together
+    mode: ("beginner" | "advanced")
+    # Extra flags ONLY IFF TYPE==IMAGE
+    depth: (True | False) # ONLY IF TYPE IS IMAGE. If tool accepts images, with z-dimension i.e. depth, then set it to True
+    timepoints: (True | False) # ONLY IF TYPE IS IMAGE. If tool accepts images, with t-dimension i.e. timepoints, then set it to True
+    tiled: (True | False) # ONLY IF TYPE IS IMAGE. If tool accepts images, with tiled format, then set it to True
+    pyramidal: (True | False) # ONLY IF TYPE IS IMAGE. If tool accepts images, with pyramidal format, then set it to True
+  - name: input_measurement # a meaningful name for measurement file(/s) which can be self-explanatory for user 
+    type: measurement
+    label: "Input Measurement" # label would be shown in the UI (only for inputs it matters)
+    description: "these are accepted measurement_related_info for xyz algorithm"
+    cli_tag: "--input_measurement" # tag to be used in CLI
+    cli_order: Integer # default is 0. Could be positive, negative or zero. If negative, then it will be appended at the end of the command. BUT IT IS OPTIONAL TO PROVIDE THIS FLAG.
+    default: ("single" | "directory")
+    optional: (True | False) # True, if input is optional; False, if input is mandatory
+    format: # either or all of those depending on the tool, and if default is directory, or file_count is multiple
+      - csv # any csv format files included here eg. csv, tsv etc.
+      - parquet # any binary format files included here
+      - feather
+    folder_name: "/path/to/measurement/files" # folder_path or file_path if single file
+    file_count: ("single" | "multiple") # if it accepts single file or multiple files. If multiple, then it will be a folder
+    section_id: "inputs"
+    mode: ("beginner" | "advanced") # mode just for clean UI, to show objects in segregated sections
+  - name: input_array # a meaningful name for array(/s) which can be self-explanatory for user
+    type: array
+    label: "Input Array" # label would be shown in the UI
+    description: "these are accepted array for xyz algorithm"
+    cli_tag: "--input_array" # tag to be used in CLI
+    cli_order: Integer # default is 0. Could be positive, negative or zero. If negative, then it will be appended at the end of the command. BUT IT IS OPTIONAL TO PROVIDE THIS FLAG.
+    default: ("single" | "directory") # if it is a single file or a folder
+    optional: (True | False) # True, if input is optional; False, if input is mandatory
+    format: # either or all of those, depending on default is directory, or file_count is multiple
+      - npy
+      - npz
+    folder_name: "/path/to/array" # folder_path or file_path if single file
+    file_count: ("single" | "multiple") # if it accepts single file or multiple files. If multiple, then it will be a folder
+    section_id: "inputs"
+    mode: ("beginner" | "advanced") # mode just for clean UI, to show objects in segregated sections
+  - name: input_file
+    type: file
+    label: "Input File" # label would be shown in the UI
+    description: "these are accepted input_files for xyz algorithm"
+    cli_tag: "--input_file" # tag to be used in CLI
+    cli_order: Integer # default is 0. Could be positive, negative or zero. If negative, then it will be appended at the end of the command. BUT IT IS OPTIONAL TO PROVIDE THIS FLAG.
+    default: ("single" | "directory") # if it is a single file or a folder
+    optional: (True | False)
+    format: # can include all those relevant formats supported by the tool
+      - log
+      - unix
+      - notebook
+    folder_name: "/path/to/input_files" # folder_path or file_path if single file
+    file_count: ("single" | "multiple") # if it accepts single file or multiple files. If multiple, then it will be a folder
+    section_id: "inputs"
+    mode: ("beginner" | "advanced") # mode just for clean UI, to show objects in segregated sections
+  - name: input_executable
+    type: executable
+    label: "Input Executable" # label would be shown in the UI
+    description: "these are accepted input_executables for xyz algorithm"
+    cli_tag: "--input_executable" # tag to be used in CLI
+    cli_order: Integer # default is 0. Could be positive, negative or zero. If negative, then it will be appended at the end of the command. BUT IT IS OPTIONAL TO PROVIDE THIS FLAG.
+    default: ("single" | "directory") # if it is a single file or a folder
+    optional: (True | False)
+    format: # can include all those relevant formats supported by the tool
+      - ipynb
+      - sh
+      - bash
+      - csh
+      - zsh
+      - ksh
+      - py
+      - pyw
+      - js
+      - cmd
+      - bat
+    folder_name: "/path/to/executable" # folder_path or file_path if single file
+    file_count: ("single" | "multiple") # if it accepts single file or multiple files. If multiple, then it will be a folder
+    section_id: "inputs"
+    mode: ("beginner" | "advanced") # mode just for clean UI, to show objects in segregated sections
+    
+outputs:
+  - name: output_images
+    type: image
+    subtype: # ONLY IFF TYPE==IMAGE. Can list all those relevant subtypes out of these 4, supported by the tool
+      - grayscale
+      - color
+      - binary
+      - labeled
+    label: "Output Images"
+    description: "these are potential output_images for xyz algorithm"
+    cli_tag: "--output_images" # tag to be used in CLI
+    cli_order: Integer # default is 0. Could be positive, negative or zero. If negative, then it will be appended at the end of the command. BUT IT IS OPTIONAL TO PROVIDE THIS FLAG.
+    default: ("single" | "directory")
+    optional: (True | False)
+    format: # can include all those relevant formats supported by the tool
+      - tif
+      - png
+      - jpg
+      - jpeg
+      - tiff
+      - ometiff
+    folder_name: "/path/to/output_images" # folder_path
+    file_count: ("single" | "multiple") # if it accepts single file or multiple files. If multiple, then it will be a folder
+    section_id: "outputs"
+    mode: ("beginner" | "advanced")
+    # Extra flags ONLY IFF TYPE==IMAGE
+    depth: (True | False) # ONLY IF TYPE IS IMAGE. If tool spits out images, with z-dimension i.e. depth, then set it to True
+    timepoints: (True | False) # ONLY IF TYPE IS IMAGE. If tool spits out images, with t-dimension i.e. timepoints, then set it to True
+    tiled: (True | False) # ONLY IF TYPE IS IMAGE. If tool spits out images, with tiled format, then set it to True
+    pyramidal: (True | False) # ONLY IF TYPE IS IMAGE. If tool spits out images, with pyramidal format, then set it to True
+  - name: output_measurement # a meaningful name for measurement file(/s) which can be self-explanatory for user
+    type: measurement
+    label: "Output Measurement" # label would be shown in the UI (for outputs it doesnt matter much). Yet, its mandatory to include label for uniformity
+    description: "this is measurement_related_info after segmentating"
+    cli_tag: "--output_measurement" # "None" - component would be not shown on UI. "" {empty string} - component would be shown on UI, but only value would be apppended to exec_command. "--output_measurement" - component would be shown on UI, and value would be appended to exec_command with tag
+    cli_order: Integer # default is 0. Could be positive, negative or zero. If negative, then it will be appended at the end of the command. BUT IT IS OPTIONAL TO PROVIDE THIS FLAG.
+    default: ("single" | "directory")
+    optional: (True | False)
+    format: # either or all of those depending on the tool, and if default is directory, or file_count is multiple
+      - csv # any csv format files included here eg. csv, tsv etc.
+      - parquet # any binary format files included here
+      - feather
+    folder_name: "/path/to/measurement/files" # folder_path or file_path if single file
+    file_count: ("single" | "multiple") # if it accepts single file or multiple files. If multiple, then it will be a folder
+    section_id: "outputs"
+    mode: ("beginner" | "advanced") # mode just for clean UI, to show objects in segregated sections. ONLY MATTERS IF THE COMPONENT IS DISPLAYED ON UI.
+  - name: output_array # a meaningful name for array(/s) which can be self-explanatory for user
+    type: array
+    label: "Output Array" # label would be shown in the UI
+    description: "these are accepted array for xyz algorithm"
+    cli_tag: "--output_array" # "None" - component would be not shown on UI. "" {empty string} - component would be shown on UI, but only value would be apppended to exec_command. "--output_measurement" - component would be shown on UI, and value would be appended to exec_command with tag
+    cli_order: Integer # default is 0. Could be positive, negative or zero. If negative, then it will be appended at the end of the command. BUT IT IS OPTIONAL TO PROVIDE THIS FLAG.
+    default: ("single" | "directory")
+    optional: (True | False)
+    format: # either or all of those, depending on default is directory, or file_count is multiple
+      - npy
+      - npz
+    folder_name: "/path/to/array" # folder_path or file_path if single file
+    file_count: ("single" | "multiple") # if it accepts single file or multiple files. If multiple, then it will be a folder
+    section_id: "outputs"
+    mode: ("beginner" | "advanced") # mode just for clean UI, to show objects in segregated sections. ONLY MATTERS IF THE COMPONENT IS DISPLAYED ON UI.
+  - name: output_file
+    type: file
+    label: "Output File" # label would be shown in the UI
+    description: "these are accepted output_files for xyz algorithm"
+    cli_tag: "--output_file" # "None" - component would be not shown on UI. "" {empty string} - component would be shown on UI, but only value would be apppended to exec_command. "--output_measurement" - component would be shown on UI, and value would be appended to exec_command with tag
+    cli_order: Integer # default is 0. Could be positive, negative or zero. If negative, then it will be appended at the end of the command. BUT IT IS OPTIONAL TO PROVIDE THIS FLAG.
+    default: ("single" | "directory")
+    optional: (True | False)
+    format: # can include all those relevant formats supported by the tool
+      - log
+      - unix
+    folder_name: "/path/to/output_files" # folder_path or file_path if single file
+    file_count: ("single" | "multiple") # if it accepts single file or multiple files. If multiple, then it will be a folder
+    section_id: "outputs"
+    mode: ("beginner" | "advanced") # mode just for clean UI, to show objects in segregated sections. ONLY MATTERS IF THE COMPONENT IS DISPLAYED ON UI.
+  - name: output_executable
+    type: executable
+    label: "Output Executable" # label would be shown in the UI
+    description: "these are potential output_executables for xyz algorithm"
+    cli_tag: "--output_executable" # "None" - component would be not shown on UI. "" {empty string} - component would be shown on UI, but only value would be apppended to exec_command. "--output_measurement" - component would be shown on UI, and value would be appended to exec_command with tag
+    cli_order: Integer # default is 0. Could be positive, negative or zero. If negative, then it will be appended at the end of the command. BUT IT IS OPTIONAL TO PROVIDE THIS FLAG.
+    default: ("single" | "directory")
+    optional: (True | False)
+    format: # can include all those relevant formats supported by the tool
+      - ipynb
+      - sh
+      - bash
+      - csh
+      - zsh
+      - ksh
+      - py
+      - pyw
+      - js
+      - cmd
+      - bat
+    folder_name: "/path/to/executable" # folder_path or file_path if single file
+    file_count: ("single" | "multiple") # if it accepts single file or multiple files. If multiple, then it will be a folder
+    section_id: "outputs"
+    mode: ("beginner" | "advanced") # mode just for clean UI, to show objects in segregated sections. ONLY MATTERS IF THE COMPONENT IS DISPLAYED ON UI.
+
+parameters:
+  # Each type of parameter is defined in a separate block. With all the necessary flags. 
+  # Below is the list of mandatory flags for any type of parameters.
+  - name: 
+    type: ("checkbox" | "integer" | "float" | "radio" | "dropdown") # supported types of parameter
+    label: "" # label would be shown in the UI
+    description: ""
+    default: 
+    cli_tag: "" # "None" - whole cli_tag, value pair will be ignored. "" {empty string} - only value will be appended to exec_command. "--cli_tag" - whole cli_tag, value pair will be appended to exec_command. NOTE: THIS IS FOR PARAMETERS AND INPUTS ONLY. FOR OUTPUTS, ITS LITTLE DIFFERENT.
+    cli_order: 0 # default is 0. Could be positive, negative or zero. If negative, then it will be appended at the end of the command.
+    optional: (True | False)
+    section_id: "" # categorizing the parameters for cleaner specification file. Not much of use anywhere beyond this file, as of now.
+    mode: ("beginner" | "advanced")
+  # Example of type: checkbox
+  - name: use_gpu
+    type: checkbox
+    label: "use GPU"
+    description: "whether to use GPU or not"
+    default: "otsu"
+    cli_tag: "--threshold_method"
+    cli_order: 0
+    optional: False
+    append_value: False # SPECIAL FLAG FOR CHECKBOX
+    section_id: "input-args"
+    mode: "beginner"
+  # Example of type: integer
+  - name: min_diameter
+    type: integer
+    label: "Object Minimum Diameter Size"
+    description: "Minimum diameter of objects in pixels"
+    default: 5
+    cli_tag: "--min_size"
+    cli_order: 0
+    optional: True
+    section_id: "input-args"
+    mode: "beginner"
+  # Example of type: float
+  - name: pixel_size
+    type: float
+    label: "Pixel Size"
+    description: "Pixel size of the input image in microns"
+    default: 0.5
+    cli_tag: "--pixel_size"
+    cli_order: 0
+    optional: True
+    section_id: "input-args"
+    mode: "beginner"
+  # Example of type: radio
+  - name: model_folder
+    type: radio
+    label: "Model Folder"
+    description: "Upload the model folder"
+    options: # SPECIAL FLAG FOR RADIO
+      - label: "Brightfield Nuclei"
+        value: "brightfield_nuclei"
+      - label: "Fluorescence Nuclei and Cells"
+        value: "fluorescence_nuclei_and_cells"
+    default: "brightfield_nuclei"
+    cli_tag: "--model_folder"
+    cli_order: 0
+    optional: False
+    section_id: "input-args"
+    mode: "beginner"
+  # Example of type: dropdown
+  - name: device
+    type: dropdown
+    label: "Device"
+    description: "Select the device to run the model"
+    options: # SPECIAL FLAG FOR DROPDOWN
+      - label: "CPU"
+        value: "cpu"
+      - label: "GPU"
+        value: "cuda"
+    default: "cpu"
+    multiselect: False # as of now, only multiselect=false is supported. SPECIAL FLAG FOR DROPDOWN
+    cli_tag: "--device"
+    cli_order: 0
+    optional: False
+    section_id: "input-args"
+    mode: "beginner"
+  # Example of type: textbox. THIS IS EXAMPLE OF STANDARD TEXTBOX. FOR SPECIFYING FOLDER PATH SEE THE NEXT EXAMPLE.
+  - name: image_filter
+    type: textbox
+    label: "Image Filter"
+    description: "Filtering the files on the name basis"
+    default: ""
+    cli_tag: "--image_filter"
+    cli_order: 0
+    optional: True
+    section_id: "input-args"
+    mode: "beginner"
+  # Example of type: textbox. (which helps specify output folder path). NOTE SOME SPECIAL FLAGS ARE INCLUDED HERE.
+  - name: save_dir
+    type: textbox
+    label: "Save Directory"
+    description: "directory to save output files"
+    output_dir_set: True # SPECIAL FLAG TO SPECIFY THAT THIS TEXTBOX IS FOR OUTPUT DIRECTORY
+    default: "/bilayers/input_images"
+    cli_tag: "--save_dir"
+    cli_order: 0
+    optional: True
+    section_id: "output-args"
+    mode: "advanced"
+  
+display_only:

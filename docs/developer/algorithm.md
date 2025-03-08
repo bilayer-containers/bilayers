@@ -9,7 +9,7 @@ _Algorithm's citations_
 
 
 
-URI: [https://w3id.org/my-org/validate_schema/:algorithm](https://w3id.org/my-org/validate_schema/:algorithm)
+URI: [https://w3id.org/my-org/bilayers_schema/:algorithm](https://w3id.org/my-org/bilayers_schema/:algorithm)
 
 
 
@@ -54,7 +54,7 @@ URI: [https://w3id.org/my-org/validate_schema/:algorithm](https://w3id.org/my-or
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -63,8 +63,8 @@ URI: [https://w3id.org/my-org/validate_schema/:algorithm](https://w3id.org/my-or
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | https://w3id.org/my-org/validate_schema/:algorithm |
-| native | https://w3id.org/my-org/validate_schema/:algorithm |
+| self | https://w3id.org/my-org/bilayers_schema/:algorithm |
+| native | https://w3id.org/my-org/bilayers_schema/:algorithm |
 
 
 
@@ -75,7 +75,7 @@ URI: [https://w3id.org/my-org/validate_schema/:algorithm](https://w3id.org/my-or
 ```yaml
 name: algorithm
 description: Algorithm's citations
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 rank: 1000
 alias: algorithm
 domain_of:

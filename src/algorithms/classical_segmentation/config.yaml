@@ -1,58 +1,92 @@
+citations:
+  algorithm: 
+    - name: "Classical Segmentation"
+      doi: doi_number
+      license: license_details
+      description: "Segments images using classical thresholding methods : Otsu and Li"
+
+docker_image:
+  org: bilayer
+  name: classical_segmentation
+  tag: "1.0.0"
+  platform: "linux/arm64"
+
+algorithm_folder_name: "classical_segmentation"
+
+exec_function: 
+  name: "generate_cli_command"
+  script: "classical_segmentation"
+  module: "algorithms.classical_segmentation"
+  cli_command: "python -m classical_segmentation"
+  hidden_args:
+
 inputs:
   - name: input_images
     type: image
+    label: "Drag and drop all images to be analyzed"
     subtype: 
       - grayscale
       - color
       - binary
       - labeled
-    description: "Input images to be analyzed"
+    description: "Upload all images to be analyzed"
+    cli_tag: "--folder"
+    cli_order: 0
+    default: "directory"
     optional: False
-    path: "/bilayers/input_images"
     format: 
       - tiff
       - ometiff
       - png
       - jpg
       - jpeg
-    collection: True
-    z: True
-    t: True
+    folder_name: "/bilayers/input_images"
+    file_count: multiple
+    section_id: "inputs"
+    mode: "beginner"
+    depth: True
+    timepoints: True
     tiled: True
     pyramidal: True
 
 outputs:
   - name: segmented_images
     type: image
+    label: "Segmented Images"
     subtype: 
       - grayscale
       - color
       - binary
       - labeled
     description: "Segmented images"
+    cli_tag: "None"
+    cli_order: 0
+    default: "directory"
     optional: False 
-    path: "/bilayers/input_images" # discuss
     format: 
       - tiff
       - ometiff
-    collection: True
-    z: True
-    t: True
+    folder_name: "/bilayers/input_images" # discuss
+    file_count: multiple
+    section_id: "outputs"
+    mode: "beginner"
+    depth: True
+    timepoints: True
     tiled: True
     pyramidal: True
     
 parameters:
-  - name: input_ images
-    type: files
-    label: "Drag and drop all images to be analyzed"
-    description: "Upload all images to be analyzed"
-    file_count: multiple
-    default: "directory"
-    cli_tag: "--folder"
-    optional: False
-    section_id: "input-args"
-    folder_name: "/bilayers/input_images"
-    mode: "beginner"
+  # - name: input_images
+  #   type: files
+  #   label: "Drag and drop all images to be analyzed"
+  #   description: "Upload all images to be analyzed"
+  #   file_count: multiple
+  #   default: "directory"
+  #   cli_tag: "--folder"
+  #   optional: False
+  #   section_id: "input-args"
+  #   folder_name: "/bilayers/input_images"
+  #   mode: "beginner"
   - name: threshold_method
     type: radio
     label: "Select a Threshold Method"
@@ -97,36 +131,3 @@ parameters:
     mode: "advanced"
 
 display_only:
-
-results:
-  - name: output_dir
-    type: files
-    label: "Download Output"
-    description: "Download the output files"
-    file_count: multiple
-    cli_tag: "None"
-    optional: True
-    section_id: "output-args"
-    mode: "beginner"
-    
-exec_function: 
-  name: "generate_cli_command"
-  script: "classical_segmentation"
-  module: "algorithms.classical_segmentation"
-  cli_command: "python -m classical_segmentation"
-  hidden_args:
-
-docker_image:
-  org: bilayer
-  name: classical_segmentation
-  tag: "1.0.0"
-  platform: "linux/arm64"
-
-algorithm_folder_name: "classical_segmentation"
-
-citations:
-  algorithm: 
-    - name: "Classical Segmentation"
-      doi: doi_number
-      license: license_details
-      description: "Segments images using classical thresholding methods : Otsu and Li"

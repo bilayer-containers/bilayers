@@ -32,7 +32,7 @@ URI: [xsd:decimal](http://www.w3.org/2001/XMLSchema#decimal)
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -42,7 +42,7 @@ URI: [xsd:decimal](http://www.w3.org/2001/XMLSchema#decimal)
 | Mapping Type | Mapped Value |
 | ---  | ---  |
 | self | xsd:decimal |
-| native | https://w3id.org/my-org/validate_schema/:decimal |
+| native | https://w3id.org/my-org/bilayers_schema/:decimal |
 | broad | schema:Number |
 
 

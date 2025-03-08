@@ -58,6 +58,24 @@ URI: [https://w3id.org/my-org/validate_schema/:Container](https://w3id.org/my-or
     click ExecFunction href "../ExecFunction"
 
         
+      Container : inputs
+        
+          
+    
+    
+    Container --> "1..*" TypeInput : inputs
+    click TypeInput href "../TypeInput"
+
+        
+      Container : outputs
+        
+          
+    
+    
+    Container --> "1..*" TypeOutput : outputs
+    click TypeOutput href "../TypeOutput"
+
+        
       Container : parameters
         
           
@@ -65,15 +83,6 @@ URI: [https://w3id.org/my-org/validate_schema/:Container](https://w3id.org/my-or
     
     Container --> "1..*" TypeParameter : parameters
     click TypeParameter href "../TypeParameter"
-
-        
-      Container : results
-        
-          
-    
-    
-    Container --> "1..*" TypeResults : results
-    click TypeResults href "../TypeResults"
 
         
       
@@ -89,9 +98,10 @@ URI: [https://w3id.org/my-org/validate_schema/:Container](https://w3id.org/my-or
 
 | Name | Cardinality and Range | Description | Inheritance |
 | ---  | --- | --- | --- |
+| [inputs](inputs.md) | 1..* <br/> [TypeInput](TypeInput.md) | Inputs to the algorithm from the last step of the workflow | direct |
+| [outputs](outputs.md) | 1..* <br/> [TypeOutput](TypeOutput.md) | Outputs of the algorithm to the next step in the workflow | direct |
 | [parameters](parameters.md) | 1..* <br/> [TypeParameter](TypeParameter.md) | Parameters of a specific Algorithm | direct |
 | [display_only](display_only.md) | * <br/> [TypeDisplayOnly](TypeDisplayOnly.md) | Display only parameters of a specific Algorithm | direct |
-| [results](results.md) | 1..* <br/> [TypeResults](TypeResults.md) | Results of a specific Algorithm | direct |
 | [exec_function](exec_function.md) | 1 <br/> [ExecFunction](ExecFunction.md) | Function to execute the Algorithm | direct |
 | [docker_image](docker_image.md) | 0..1 <br/> [DockerImage](DockerImage.md) | Description of docker_image for the specific algorithm | direct |
 | [algorithm_folder_name](algorithm_folder_name.md) | 0..1 <br/> [String](String.md) | Main folder name of the algorithm to put the generated files in the folder | direct |
@@ -147,9 +157,10 @@ description: Container class which holds all the high_level keywords from config
   file of specific algorithm
 from_schema: https://w3id.org/my-org/validate_schema
 slots:
+- inputs
+- outputs
 - parameters
 - display_only
-- results
 - exec_function
 - docker_image
 - algorithm_folder_name
@@ -167,6 +178,30 @@ description: Container class which holds all the high_level keywords from config
   file of specific algorithm
 from_schema: https://w3id.org/my-org/validate_schema
 attributes:
+  inputs:
+    name: inputs
+    description: Inputs to the algorithm from the last step of the workflow
+    from_schema: https://w3id.org/my-org/validate_schema
+    rank: 1000
+    alias: inputs
+    owner: Container
+    domain_of:
+    - Container
+    range: TypeInput
+    required: true
+    multivalued: true
+  outputs:
+    name: outputs
+    description: Outputs of the algorithm to the next step in the workflow
+    from_schema: https://w3id.org/my-org/validate_schema
+    rank: 1000
+    alias: outputs
+    owner: Container
+    domain_of:
+    - Container
+    range: TypeOutput
+    required: true
+    multivalued: true
   parameters:
     name: parameters
     description: Parameters of a specific Algorithm
@@ -189,18 +224,6 @@ attributes:
     domain_of:
     - Container
     range: TypeDisplayOnly
-    multivalued: true
-  results:
-    name: results
-    description: Results of a specific Algorithm
-    from_schema: https://w3id.org/my-org/validate_schema
-    rank: 1000
-    alias: results
-    owner: Container
-    domain_of:
-    - Container
-    range: TypeResults
-    required: true
     multivalued: true
   exec_function:
     name: exec_function

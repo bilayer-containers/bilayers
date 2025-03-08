@@ -9,7 +9,7 @@ _Platform on which the docker image was built_
 
 
 
-URI: [https://w3id.org/my-org/validate_schema/:platform](https://w3id.org/my-org/validate_schema/:platform)
+URI: [https://w3id.org/my-org/bilayers_schema/:platform](https://w3id.org/my-org/bilayers_schema/:platform)
 
 
 
@@ -52,7 +52,7 @@ URI: [https://w3id.org/my-org/validate_schema/:platform](https://w3id.org/my-org
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -61,8 +61,8 @@ URI: [https://w3id.org/my-org/validate_schema/:platform](https://w3id.org/my-org
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | https://w3id.org/my-org/validate_schema/:platform |
-| native | https://w3id.org/my-org/validate_schema/:platform |
+| self | https://w3id.org/my-org/bilayers_schema/:platform |
+| native | https://w3id.org/my-org/bilayers_schema/:platform |
 
 
 
@@ -73,7 +73,7 @@ URI: [https://w3id.org/my-org/validate_schema/:platform](https://w3id.org/my-org
 ```yaml
 name: platform
 description: Platform on which the docker image was built
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 rank: 1000
 alias: platform
 domain_of:

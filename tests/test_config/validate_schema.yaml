@@ -1,7 +1,7 @@
 ---
-id: https://w3id.org/my-org/validate_schema
-name: validate_schema
-title: validate_schema
+id: https://w3id.org/my-org/bilayers_schema
+name: bilayers_schema
+title: bilayers_schema
 description: |-
   Validate each of the incoming Algorithm's spec file
 
@@ -16,14 +16,13 @@ classes:
     description: "Any type"
     class_uri: linkml:Any
 
-  Container:
-    description: "Container class which holds all the high_level keywords from config.yaml file of specific algorithm"
+  SpecContainer:
+    description: "SpecContianer class which holds all the high_level keywords from config.yaml file of specific algorithm"
     slots: 
     - inputs
     - outputs
     - parameters
     - display_only
-    - results
     - exec_function
     - docker_image
     - algorithm_folder_name
@@ -36,15 +35,21 @@ classes:
     slots:
       - name
       - type
+      - label
       - description
+      - cli_tag
+      - cli_order
+      - default
       - optional
-      - path
       - format
-      - collection
+      - folder_name
+      - file_count
+      - section_id
+      - mode
       # Conditional w.r.t to type (if type == image, then include below flags)
       - subtype
-      - z
-      - t
+      - depth
+      - timepoints
       - tiled
       - pyramidal
 
@@ -62,9 +67,9 @@ classes:
           slot_conditions:
             subtype:
               required: true
-            z:
+            depth:
               required: true
-            t:
+            timepoints:
               required: true
             tiled:
               required: true
@@ -85,9 +90,9 @@ classes:
           slot_conditions:
             subtype:
               required: true
-            z:
+            depth:
               required: true
-            t:
+            timepoints:
               required: true
             tiled:
               required: true
@@ -95,7 +100,7 @@ classes:
               required: true
 
   AbstractUserInterface:
-    aliases: ["parameters", "display_only", "results"]  
+    aliases: ["parameters", "display_only"]  
     description: "Abstract class for user interface"
     abstract: true
     slots:
@@ -108,8 +113,6 @@ classes:
       - mode
       # Conditional w.r.t to type
       - output_dir_set
-      - folder_name
-      - file_count
       - options
       - interactive
       - append_value
@@ -123,15 +126,6 @@ classes:
         postconditions:
           slot_conditions:
             append_value:
-              required: true
-      - description: "Extra flags needed iff type is files"
-        preconditions:
-          slot_conditions:
-            type:
-              equals_string: "files"
-        postconditions:
-          slot_conditions:
-            file_count:
               required: true
       - description: "Extra flags needed iff type is radio"
         preconditions:
@@ -162,16 +156,6 @@ classes:
       - default
       - cli_tag
       - cli_order
-    rules:
-      - description: "Extra flags needed iff type is files"
-        preconditions:
-          slot_conditions:
-            type:
-              equals_string: "files"
-        postconditions:
-          slot_conditions:
-            folder_name:
-              required: true
 
   TypeDisplayOnly:
     aliases: ["display_only"]
@@ -179,23 +163,7 @@ classes:
     is_a: AbstractUserInterface
     slots:
       - default
-    rules:
-      - description: "Extra flags needed iff type is files"
-        preconditions:
-          slot_conditions:
-            type:
-              equals_string: "files"
-        postconditions:
-          slot_conditions:
-            folder_name:
-              required: true
 
-  TypeResults:
-    aliases: ["results"]
-    description: "Results of a specific Algorithm"
-    is_a: AbstractUserInterface
-    slots:
-      - cli_tag
 
   ExecFunction:
     aliases: ["exec_function", "generate_cli_command", "construct_cli_command"]
@@ -248,7 +216,7 @@ classes:
         required: false
 
   RadioOptions:
-    description: "Options of the Radio button in parameters, display_only, results"
+    description: "Options of the Radio button in parameters, display_only"
     slots:
       - label
       - value
@@ -273,11 +241,6 @@ slots:
     description: "Display only parameters of a specific Algorithm"
     range: TypeDisplayOnly
     multivalued: true
-  results:
-    description: "Results of a specific Algorithm"
-    range: TypeResults
-    multivalued: true
-    required: true
   exec_function:
     description: "Function to execute the Algorithm"
     range: ExecFunction
@@ -306,7 +269,7 @@ slots:
     required: true
     range: string
   name:
-    description: "Name of the docker_image, algorithm, parameter, display_only, results"
+    description: "Name of the docker_image, algorithm, parameter, display_only"
     required: true
     range: string
   tag:
@@ -370,16 +333,8 @@ slots:
     description: "Output directory set"
     required: false
     range: boolean
-  folder_name:
-    description: "Folder name of the object"
-    range: string
-    required: false
-  file_count:
-    description: "Type of Number of files"
-    range: FileTypeEnum
-    required: false
   options:
-    description: "Options of the Radio button in parameters, display_only, results" 
+    description: "Options of the Radio button in parameters, display_only" 
     range: RadioOptions
     multivalued: true
     required: false
@@ -410,19 +365,24 @@ slots:
     description: "Format of the inputs and outputs"
     range: string
     multivalued: true
-  collection:
-    description: "Collection of the inputs and outputs"
-    range: boolean
+  folder_name:
+    description: "Folder name of the object"
+    range: string
+    required: false
+  file_count:
+    description: "Type of Number of files"
+    range: FileTypeEnum
+    required: false
   # slots specific to inputs and outputs, if type is image
   subtype:
     description: "Subtype of the inputs and outputs"
     range: SubTypeEnum
     multivalued: true
-  z:
-    description: "whether z-dimension is accepted via tool"
+  depth:
+    description: "whether z-dimension i.e. depth is accepted via tool"
     range: boolean
-  t: 
-    description: "whether t-dimension is accepted via tool"
+  timepoints: 
+    description: "whether t-dimension i.e. timepoints are accepted via tool"
     range: boolean
   tiled:
     description: "whether tiled images are accepted via tool"
@@ -433,13 +393,12 @@ slots:
 
 enums:
   TypeEnum:
-    description: "Type of the parameters, display_only, results"
+    description: "Type of the parameters, display_only"
     permissible_values:
       integer:
       float:
       boolean:
       checkbox:
-      files:
       dropdown:
       radio:
       textbox:
@@ -450,7 +409,7 @@ enums:
       file:
       executable:
   ModeEnum:
-    description: "Mode of the parameters, display_only, results"
+    description: "Mode of the parameters, display_only"
     permissible_values:
       beginner:
       advanced:

@@ -9,7 +9,7 @@ _Algorithm's citations_
 
 
 
-URI: [https://w3id.org/my-org/validate_schema/:TypeAlgorithmFromCitation](https://w3id.org/my-org/validate_schema/:TypeAlgorithmFromCitation)
+URI: [https://w3id.org/my-org/bilayers_schema/:TypeAlgorithmFromCitation](https://w3id.org/my-org/bilayers_schema/:TypeAlgorithmFromCitation)
 
 
 
@@ -23,6 +23,8 @@ URI: [https://w3id.org/my-org/validate_schema/:TypeAlgorithmFromCitation](https:
       TypeAlgorithmFromCitation : description
         
       TypeAlgorithmFromCitation : doi
+        
+      TypeAlgorithmFromCitation : license
         
       TypeAlgorithmFromCitation : name
         
@@ -39,8 +41,9 @@ URI: [https://w3id.org/my-org/validate_schema/:TypeAlgorithmFromCitation](https:
 
 | Name | Cardinality and Range | Description | Inheritance |
 | ---  | --- | --- | --- |
-| [name](name.md) | 1 <br/> [String](String.md) | Name of the docker_image, algorithm, parameter, display_only, results | direct |
+| [name](name.md) | 1 <br/> [String](String.md) | Name of the docker_image, algorithm, parameter, display_only | direct |
 | [doi](doi.md) | 0..1 <br/> [String](String.md) | DOI of the Algorithm | direct |
+| [license](license.md) | 0..1 <br/> [String](String.md) | License of the Algorithm | direct |
 | [description](description.md) | 0..1 <br/> [String](String.md) | Description of the Algorithm | direct |
 
 
@@ -75,7 +78,7 @@ URI: [https://w3id.org/my-org/validate_schema/:TypeAlgorithmFromCitation](https:
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -84,8 +87,8 @@ URI: [https://w3id.org/my-org/validate_schema/:TypeAlgorithmFromCitation](https:
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | https://w3id.org/my-org/validate_schema/:TypeAlgorithmFromCitation |
-| native | https://w3id.org/my-org/validate_schema/:TypeAlgorithmFromCitation |
+| self | https://w3id.org/my-org/bilayers_schema/:TypeAlgorithmFromCitation |
+| native | https://w3id.org/my-org/bilayers_schema/:TypeAlgorithmFromCitation |
 
 
 
@@ -103,13 +106,14 @@ URI: [https://w3id.org/my-org/validate_schema/:TypeAlgorithmFromCitation](https:
 ```yaml
 name: TypeAlgorithmFromCitation
 description: Algorithm's citations
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 aliases:
 - Algorithm
 - citations
 slots:
 - name
 - doi
+- license
 - description
 
 ```
@@ -121,19 +125,20 @@ slots:
 ```yaml
 name: TypeAlgorithmFromCitation
 description: Algorithm's citations
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 aliases:
 - Algorithm
 - citations
 attributes:
   name:
     name: name
-    description: Name of the docker_image, algorithm, parameter, display_only, results
-    from_schema: https://w3id.org/my-org/validate_schema
+    description: Name of the docker_image, algorithm, parameter, display_only
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: name
     owner: TypeAlgorithmFromCitation
     domain_of:
+    - AbstractWorkflowDetails
     - AbstractUserInterface
     - ExecFunction
     - DockerImage
@@ -143,9 +148,19 @@ attributes:
   doi:
     name: doi
     description: DOI of the Algorithm
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: doi
+    owner: TypeAlgorithmFromCitation
+    domain_of:
+    - TypeAlgorithmFromCitation
+    range: string
+  license:
+    name: license
+    description: License of the Algorithm
+    from_schema: https://w3id.org/my-org/bilayers_schema
+    rank: 1000
+    alias: license
     owner: TypeAlgorithmFromCitation
     domain_of:
     - TypeAlgorithmFromCitation
@@ -153,11 +168,12 @@ attributes:
   description:
     name: description
     description: Description of the Algorithm
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
     alias: description
     owner: TypeAlgorithmFromCitation
     domain_of:
+    - AbstractWorkflowDetails
     - AbstractUserInterface
     - TypeAlgorithmFromCitation
     range: string

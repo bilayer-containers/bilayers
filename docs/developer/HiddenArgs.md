@@ -9,7 +9,7 @@ _Hidden arguments for the Algorithm_
 
 
 
-URI: [https://w3id.org/my-org/validate_schema/:HiddenArgs](https://w3id.org/my-org/validate_schema/:HiddenArgs)
+URI: [https://w3id.org/my-org/bilayers_schema/:HiddenArgs](https://w3id.org/my-org/bilayers_schema/:HiddenArgs)
 
 
 
@@ -72,7 +72,7 @@ URI: [https://w3id.org/my-org/validate_schema/:HiddenArgs](https://w3id.org/my-o
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -81,8 +81,8 @@ URI: [https://w3id.org/my-org/validate_schema/:HiddenArgs](https://w3id.org/my-o
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | https://w3id.org/my-org/validate_schema/:HiddenArgs |
-| native | https://w3id.org/my-org/validate_schema/:HiddenArgs |
+| self | https://w3id.org/my-org/bilayers_schema/:HiddenArgs |
+| native | https://w3id.org/my-org/bilayers_schema/:HiddenArgs |
 
 
 
@@ -100,20 +100,20 @@ URI: [https://w3id.org/my-org/validate_schema/:HiddenArgs](https://w3id.org/my-o
 ```yaml
 name: HiddenArgs
 description: Hidden arguments for the Algorithm
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 attributes:
   cli_tag:
     name: cli_tag
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     domain_of:
+    - AbstractWorkflowDetails
     - TypeParameter
-    - TypeResults
     - HiddenArgs
     range: string
     required: true
   value:
     name: value
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     domain_of:
     - HiddenArgs
     - RadioOptions
@@ -121,7 +121,7 @@ attributes:
     required: true
   append_value:
     name: append_value
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     domain_of:
     - AbstractUserInterface
     - HiddenArgs
@@ -129,8 +129,9 @@ attributes:
     required: false
   cli_order:
     name: cli_order
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     domain_of:
+    - AbstractWorkflowDetails
     - TypeParameter
     - HiddenArgs
     range: integer
@@ -145,22 +146,22 @@ attributes:
 ```yaml
 name: HiddenArgs
 description: Hidden arguments for the Algorithm
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 attributes:
   cli_tag:
     name: cli_tag
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     alias: cli_tag
     owner: HiddenArgs
     domain_of:
+    - AbstractWorkflowDetails
     - TypeParameter
-    - TypeResults
     - HiddenArgs
     range: string
     required: true
   value:
     name: value
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     alias: value
     owner: HiddenArgs
     domain_of:
@@ -170,7 +171,7 @@ attributes:
     required: true
   append_value:
     name: append_value
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     alias: append_value
     owner: HiddenArgs
     domain_of:
@@ -180,10 +181,11 @@ attributes:
     required: false
   cli_order:
     name: cli_order
-    from_schema: https://w3id.org/my-org/validate_schema
+    from_schema: https://w3id.org/my-org/bilayers_schema
     alias: cli_order
     owner: HiddenArgs
     domain_of:
+    - AbstractWorkflowDetails
     - TypeParameter
     - HiddenArgs
     range: integer

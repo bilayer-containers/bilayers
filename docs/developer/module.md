@@ -9,7 +9,7 @@ _Module to execute the Algorithm_
 
 
 
-URI: [https://w3id.org/my-org/validate_schema/:module](https://w3id.org/my-org/validate_schema/:module)
+URI: [https://w3id.org/my-org/bilayers_schema/:module](https://w3id.org/my-org/bilayers_schema/:module)
 
 
 
@@ -52,7 +52,7 @@ URI: [https://w3id.org/my-org/validate_schema/:module](https://w3id.org/my-org/v
 ### Schema Source
 
 
-* from schema: https://w3id.org/my-org/validate_schema
+* from schema: https://w3id.org/my-org/bilayers_schema
 
 
 
@@ -61,8 +61,8 @@ URI: [https://w3id.org/my-org/validate_schema/:module](https://w3id.org/my-org/v
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | https://w3id.org/my-org/validate_schema/:module |
-| native | https://w3id.org/my-org/validate_schema/:module |
+| self | https://w3id.org/my-org/bilayers_schema/:module |
+| native | https://w3id.org/my-org/bilayers_schema/:module |
 
 
 
@@ -73,7 +73,7 @@ URI: [https://w3id.org/my-org/validate_schema/:module](https://w3id.org/my-org/v
 ```yaml
 name: module
 description: Module to execute the Algorithm
-from_schema: https://w3id.org/my-org/validate_schema
+from_schema: https://w3id.org/my-org/bilayers_schema
 rank: 1000
 alias: module
 domain_of:

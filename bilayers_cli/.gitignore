@@ -21,7 +21,6 @@ site-packages/
 # Virtual environments
 .venv/
 .env/
-pixi.lock
 .pixi/
 pip-wheel-metadata/
 

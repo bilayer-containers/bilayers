@@ -16,8 +16,8 @@ maintainers = [
     {name = "Nodar Gogoberidze", email = "gnodar01@gmail.com"},
     {name = "Beth Cimini", email = "bcimini@broadinstitute.org"}
 ]
-readme = "README.md"
-license = "BSD-3-Clause"
+readme = { file = "README.md", content-type = "text/markdown" }
+license = { file = "LICENSE" }
 requires-python = ">=3.9"
 
 dependencies = [
@@ -33,9 +33,24 @@ bilayers_cli = "bilayers_cli.cli:cli"
 [tool.setuptools]
 packages = ["bilayers_cli"]
 
+[tool.pixi.project]
+channels = ["conda-forge"]
+platforms = ["osx-64", "osx-arm64", "linux-64", "win-64"]
+
+[tool.pixi.tasks]
+
 [tool.pixi.dependencies]
-pytest = "*"
-pyyaml = "*"
+python = ">=3.9"
+pytest = ">=8.3.4,<9"
+pyyaml = ">=6.0.2,<7"
+ruff = ">=0.9.7,<0.10"
+pre-commit = ">=4.1.0,<5"
+mypy = ">=1.15.0,<2"
+pyright = ">=1.1.394,<2"
+types-pyyaml = ">=6.0.12.20241230,<7"
+
+[tool.pixi.pypi-dependencies]
+bilayers_cli = { path = ".", editable = true }
 
 [tool.ruff]
 line-length = 100  # Enforce a max line length of 100

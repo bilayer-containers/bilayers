@@ -49,3 +49,6 @@ docs/_build/           # Ignore _build within the docs directory if that's your 
 
 # Additional MyST outputs
 *.nbconvert/           # Ignore any nbconvert artifacts if notebooks are used
+
+stardist-env/
+stardist_pixi/

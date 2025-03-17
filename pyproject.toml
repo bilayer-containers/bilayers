@@ -41,7 +41,7 @@ platforms = ["win-64", "linux-64", "osx-64", "osx-arm64"]
 [tool.pixi.tasks]
 
 [tool.pixi.dependencies]
-python = ">=3.9"
+python = "3.9.*"
 
 [tool.pixi.pypi-dependencies]
 bilayers = { path = ".", editable = true }

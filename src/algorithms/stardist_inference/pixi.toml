@@ -1,0 +1,14 @@
+[project]
+authors = ["Rajavi Shah <shahraja@broadinstitute.org>"]
+channels = ["conda-forge"]
+name = "stardist_inference"
+platforms = ["osx-arm64"]
+version = "0.1.0"
+
+[tasks]
+
+[dependencies]
+python = "3.9.*"
+numpy = ">=1.26.4,<2"
+tensorflow = ">=2.18.0,<3"
+stardist = ">=0.9.1,<0.10"

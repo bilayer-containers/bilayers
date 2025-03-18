@@ -48,8 +48,7 @@ def example_function(
     for image_path in image_list:
         # Load the image
         print("Processing Image: ", image_path)
-        # return_num=False ensures only an array is returned, hence type ignore is used
-        image: NDArray[Any] = skimage.io.imread(image_path) # type: ignore
+        image: NDArray[Any] = skimage.io.imread(image_path)
 
         # Threshold the image
         if threshold_method.casefold() == "otsu":
@@ -60,7 +59,8 @@ def example_function(
             raise NotImplementedError(f"Threshold method '{threshold_method}' is not implemented.")
 
         # Label the image
-        labeled_image: NDArray[Any] = skimage.measure.label(th_image)
+        # return_num=False ensures only an array is returned, hence type ignore is used
+        labeled_image: NDArray[Any] = skimage.measure.label(th_image) # type: ignore
 
         areas: NDArray[Any] = scipy.ndimage.sum(
             numpy.ones(labeled_image.shape),

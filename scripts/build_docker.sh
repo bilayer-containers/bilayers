@@ -4,8 +4,10 @@
 set -e
 
 # List of algorithms and interfaces
-ALGORITHM_NAMES=("classical_segmentation" "cellpose_inference" "instanseg_inference")
-INTERFACE_NAMES=("gradio" "jupyter")
+# ALGORITHM_NAMES=("classical_segmentation" "cellpose_inference" "instanseg_inference")
+ALGORITHM_NAMES=("cellpose_inference")
+# INTERFACE_NAMES=("gradio" "jupyter")
+INTERFACE_NAMES=("gradio")
 
 # Build the Docker images for each algorithm and interface
 for ALGORITHM_NAME in "${ALGORITHM_NAMES[@]}";

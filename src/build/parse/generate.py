@@ -7,7 +7,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 import nbformat as nbf
 
 # Import TypedDict definitions from parse.py
-from parse import Tool, InputOutput, Parameter, ExecFunction, Citations  # type: ignore
+from parse import Tool, InputOutput, Parameter, ExecFunction, Citations, DockerImage  # type: ignore
 
 
 def generate_gradio_app(
@@ -162,7 +162,9 @@ def generate_cellprofiler_plugin(
         display_only: dict[str, Parameter] | None,
         algorithm_folder_name: str,
         exec_function: ExecFunction,
-        citations: Citations):
+        citations: Citations,
+        docker_image: DockerImage
+    ):
     """ 
     Generates a CellProfiler Plugin dynamically using Jinja2 templates.
 
@@ -194,7 +196,7 @@ def generate_cellprofiler_plugin(
 
     template = env.get_template(os.path.basename(template_path))
 
-    cellprofiler_code: str = template.render(tool=tool, inputs=inputs, outputs=outputs, parameters=parameters, display_only=display_only or [], algorithm_folder_name=algorithm_folder_name, exec_function=exec_function, citations=citations)
+    cellprofiler_code: str = template.render(tool=tool, inputs=inputs, outputs=outputs, parameters=parameters, display_only=display_only or [], algorithm_folder_name=algorithm_folder_name, exec_function=exec_function, citations=citations, docker_image=docker_image)
 
     return cellprofiler_code
 
@@ -207,7 +209,7 @@ def main() -> None:
     else:
         config_path = None
 
-    tool, inputs, outputs, parameters, display_only, exec_function, algorithm_folder_name, citations = parse_config(config_path)
+    tool, inputs, outputs, parameters, display_only, exec_function, algorithm_folder_name, citations, docker_image = parse_config(config_path)
 
     folderA: str = "generated_folders"
     folderB: str = algorithm_folder_name
@@ -266,7 +268,8 @@ def main() -> None:
         display_only,
         algorithm_folder_name,
         exec_function,
-        citations
+        citations,
+        docker_image
     )
 
     # Join folders and file name    

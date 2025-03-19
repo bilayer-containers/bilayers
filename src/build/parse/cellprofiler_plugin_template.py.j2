@@ -1,0 +1,374 @@
+####################################
+# Auto-Generated CellProfiler Plugin
+# Generated from Bilayers Spec File
+####################################
+
+{# ======================================= #}
+{#  Jinja2 Template for a CellProfiler Plugin  #}
+{# ======================================= #}
+
+{% set import_list = [
+    "os",
+    "sys",
+    "uuid",
+    "shutil",
+    "logging",
+    "subprocess",
+    "numpy",
+    "skimage",
+] %}
+
+#################################
+#
+# Imports from Python Standard Libraries
+#
+##################################
+
+{% for item in import_list %}
+import {{ item }}
+{% endfor %}
+
+#################################
+#
+# Imports from CellProfiler
+#
+##################################
+
+from cellprofiler_core.module.image_segmentation import ImageSegmentation
+from cellprofiler_core.preferences import get_default_output_directory
+from cellprofiler_core.object import Objects
+from cellprofiler_core.setting import (
+    Binary,
+    Integer,
+    Float,
+    Text,
+    Choice,
+    Filename,
+    Directory
+)
+from cellprofiler_core.setting.subscriber import ImageSubscriber
+from cellprofiler_core.setting.text import ImageName
+from cellprofiler_core.image import Image
+
+LOGGER = logging.getLogger(__name__)
+
+__doc__ = f"""\
+{{ exec_function.get('script') }}
+===========
+
+**{{ exec_function.get('script') }}** is an auto-generated CellProfiler module based on Bilayers specification.
+
+{% if citations.algorithm %}
+To cite or reference the underlying algorithms, please see:
+{% for c in citations.algorithm.values() -%}
+- Name: {{ c.name }}
+  - DOI: {{ c.doi }}
+  - License: {{ c.license }}
+  - Description: {{ c.description }}
+{% endfor %}
+{% endif %}
+
+============ ============ ===============
+Supports 2D? Supports 3D? Respects masks?
+============ ============ ===============
+Yes/No       Yes/No      Yes/No
+============ ============ ===============
+
+Additional Notes:
+----------------
+{{ tool.notes if tool else "No additional notes provided." }}
+
+"""
+
+class {{ exec_function.get('script') }}({{ exec_function.get('module') }}):
+    category = "{{ tool.category }}"
+
+    module_name = "{{ exec_function.get('script') }}"
+
+    variable_revision_number = 1
+
+    doi = {
+        {%- for citation in citations.algorithm.values() %}
+        "This module uses {{ citation.name }} i.e. {{ citation.description }}"
+        "To cite this module, use:"
+        "- DOI: {{ citation.doi }}"
+        "- License: {{ citation.license }}"
+        {%- endfor %}
+    }
+
+    def create_settings(self):
+        super({{ exec_function.get('script') }}, self).create_settings()
+        
+        {% set type_mapping = {
+            "image": "ImageSubscriber",
+            "measurement": "Filename",
+            "array": "Filename",
+            "executable": "Filename",
+            "file": "Directory",
+            "radio": "Choice",
+            "dropdown": "Choice",
+            "checkbox": "Binary",
+            "integer": "Integer",
+            "float": "Float",
+            "textbox": "ImageName",
+        } %}
+        {% set default_type = "Text" %} {# Fallback type #}
+
+        # Docker Image Selection
+        self.docker_image = Choice(
+            text="Select your external docker image",
+            choices=["{{ docker_image.get('org') }}/{{ docker_image.get('name') }}:{{ docker_image.get('tag') }}"],
+            value="{{ docker_image.get('org') }}/{{ docker_image.get('name') }}:{{ docker_image.get('tag') }}",
+            doc="""\
+Select which Docker image to use for running your plugin.
+Make sure Docker Desktop is running.
+"""
+        )
+        
+        {% for key, input_conf in inputs.items() %}
+        self.{{ input_conf.get('name') }} = {{ type_mapping[input_conf.get('type')] }}(
+            text="{{ input_conf.get('label') }}",
+            {% if input_conf.get('default') is not none %}
+            value="{{ input_conf.get('default') }}",
+            {% endif %}
+            doc="{{ input_conf.get('description') }}"
+
+        )
+        {% endfor %}
+
+        {% for key, parameter in parameters.items() %}
+        self.{{ parameter.get('name') }} = {{ type_mapping[parameter.get('type')] }}(
+            text="{{ parameter.get('label') }}",
+            {% if parameter.get('type') in ["radio", "dropdown"] %}
+            choices=[
+                {% for option in parameter.get('options') %}
+                    "{{ option.value }}"{% if not loop.last %}, {% endif %}
+                {% endfor %}
+            ],
+            {% endif %}
+            {% if parameter.get('default') is not none %}
+            value="{{ parameter.get('default') }}",
+            {% endif %}
+            {% if parameter.get('type') in ["integer", "float"] %}
+            minval=float('-inf'),
+            maxval=float('inf'),
+            {% endif %}
+            doc="{{ parameter.get('description') }}"
+        )
+        {% endfor %}
+        
+    def settings(self):
+
+        return [
+        self.x_name,
+        self.docker_image,
+        {% for key, input_conf in inputs.items() %}
+        self.{{ input_conf.get('name') }},
+        {% endfor %}
+        {% for key, param in parameters.items() %}
+        self.{{ param.get('name') }},
+        {% endfor %}
+        self.y_name,
+        ]    
+
+    def run(self, workspace):
+        # 1. Retrive Input and Output Names + Load Input Image
+        x_name = self.x_name.value
+        y_name = self.y_name.value
+
+        images = workspace.image_set
+        x = images.get_image(x_name)
+        x_data = x.pixel_data
+        dimensions = x.dimensions
+
+        # 2. Preprocessing Stuff
+
+        # 3. Run the Docker Container
+        docker_path = "docker" if sys.platform.lower().startswith("win") else "/usr/local/bin/docker"
+            
+        # Create a unique folder for this run
+        unique_name = str(uuid.uuid4())
+        temp_dir = os.path.join(get_default_output_directory(), ".cellprofiler_temp", unique_name)
+        temp_img_dir = os.path.join(temp_dir, "img")
+        
+        os.makedirs(temp_dir, exist_ok=True)
+        os.makedirs(temp_img_dir, exist_ok=True)
+            
+        temp_img_path = os.path.join(temp_img_dir, unique_name+".tiff")
+
+        # Save the input image in docker mounted path
+        skimage.io.imsave(temp_img_path, x_data)
+
+        # Construct Docker command
+        cmd = [docker_path, "run", "--rm", "-v", f"{temp_dir}:/data", self.docker_image.value]
+        {% for key, input_conf in inputs.items() %}
+        cmd += ["{{ input_conf.get('cli_tag') }}", str(self.{{ input_conf.get('name') }}.value)]
+        {% endfor %}
+        {% for key, param in parameters.items() %}
+        cmd += ["{{ param.get('cli_tag') }}", str(self.{{ param.get('name') }}.value)]
+        {% endfor %}
+
+        LOGGER.info(f"Running Docker command: {' '.join(cmd)}")
+
+        # Test -if this is working
+        print("Docker command:", " ".join(cmd))
+
+        try:
+            result = subprocess.run(cmd, capture_output=True, text=True)
+            if result.returncode != 0:
+                LOGGER.error(f"Docker error: {result.stderr}")
+                # fallback to blank segmentation
+                y_data = numpy.zeros_like(x_data)
+            else:
+                # Suppose the Docker container saves output in `output_seg.npy`:
+                output_seg_path = os.path.join(temp_img_dir, "output_seg.npy")
+                if os.path.exists(output_seg_path):
+                    y_data = numpy.load(output_seg_path)
+                else:
+                    LOGGER.warning("No output_seg.npy found; using blank seg.")
+                    y_data = numpy.zeros_like(x_data)
+
+        finally:
+            # Cleanup
+            try:
+                shutil.rmtree(temp_dir)
+            except OSError as ex:
+                LOGGER.warning(f"Unable to delete {temp_dir}: {ex}")
+
+        
+        # 4. Convert to CP Objects
+        # Store segmented objects
+        output_objs = Objects()
+        output_objs.segmented = y_data
+        output_objs.parent_image = x.parent_image
+        workspace.object_set.add_objects(output_objs, y_name)
+
+        # Save measurements
+        self.add_measurements(workspace)
+
+        # Display results in UI
+        if self.show_window:
+            workspace.display_data.x_data = x.pixel_data if x.volumetric else x_data
+            workspace.display_data.y_data = y_data
+            workspace.display_data.dimensions = dimensions
+
+    def visible_settings(self):
+        vis_settings = [
+            
+        ]
+        return vis_settings
+
+    
+    {% set have_prob = parameters.get('save_probabilities') %}
+    {% set have_flows = parameters.get('save_flows') %}
+    {% set have_distance = parameters.get('save_distance') %}
+    {% set have_outlines = parameters.get('save_outlines') %}
+
+    def display(self, workspace, figure):
+        """
+        Generic display function to show input, segmentation, and optional images.
+        """
+
+        # 1) Decide how many rows & columns we need based on optional images
+        # You can dynamically compute, or just pick a typical layout style
+        num_extra = 0
+        {% if have_prob %}
+        num_extra += 1
+        {% endif %}
+        {% if have_flows %}
+        num_extra += 1
+        {% endif %}
+        {% if have_distance %}
+        num_extra += 1
+        {% endif %}
+        {% if have_outlines %}
+        num_extra += 1
+        {% endif %}
+
+        # Let's just say we put everything in columns for a single row:
+        # 1 col for input, 1 col for segmentation, plus columns for each optional.
+        cols = 2 + num_extra
+        layout = (1, cols)
+
+        figure.set_subplots(dimensions=workspace.display_data.dimensions, subplots=layout)
+
+        # We'll track the column index with a local variable
+        col = 0
+
+        # 2) Show the input image
+        figure.subplot_imshow(
+            image=workspace.display_data.x_data,
+            colormap="gray",
+            title="Input Image",
+            x=col,
+            y=0
+        )
+        col += 1
+
+        # 3) Show the segmentation labels
+        figure.subplot_imshow_labels(
+            image=workspace.display_data.y_data,
+            sharexy=figure.subplot(0, 0),
+            title=self.y_name.value,
+            x=col,
+            y=0
+        )
+        col += 1
+
+        # 4) Conditionally show the probability map
+        {% if have_prob %}
+        if self.save_probabilities.value and hasattr(workspace.display_data, "probabilities"):
+            figure.subplot_imshow(
+                image=workspace.display_data.probabilities,
+                colormap="gray",
+                sharexy=figure.subplot(0, 0),
+                title=self.probabilities_name.value,
+                x=col,
+                y=0
+            )
+        col += 1
+        {% endif %}
+
+        # 5) Conditionally show flows
+        {% if have_flows %}
+        if hasattr(workspace.display_data, "flows"):
+            figure.subplot_imshow(
+                image=workspace.display_data.flows,
+                sharexy=figure.subplot(0, 0),
+                title="Predicted Flows",
+                x=col,
+                y=0
+            )
+        col += 1
+        {% endif %}
+
+        # 6) Conditionally show distance
+        {% if have_distance %}
+        if hasattr(workspace.display_data, "distance"):
+            figure.subplot_imshow(
+                image=workspace.display_data.distance,
+                colormap="magma",
+                sharexy=figure.subplot(0, 0),
+                title="Distance Map",
+                x=col,
+                y=0
+            )
+        col += 1
+        {% endif %}
+
+        # 7) Conditionally show outlines
+        {% if have_outlines %}
+        if hasattr(workspace.display_data, "outlines"):
+            figure.subplot_imshow(
+                image=workspace.display_data.outlines,
+                sharexy=figure.subplot(0, 0),
+                title="Outlines",
+                x=col,
+                y=0
+            )
+        col += 1
+        {% endif %}
+
+    
+    def upgrade_settings(self, setting_values, variable_revision_number, module_name):
+        return setting_values, variable_revision_number

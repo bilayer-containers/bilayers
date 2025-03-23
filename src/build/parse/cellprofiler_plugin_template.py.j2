@@ -121,8 +121,8 @@ Make sure Docker Desktop is running.
         {% for key, input_conf in inputs.items() %}
         self.{{ input_conf.get('name') }} = {{ type_mapping[input_conf.get('type')] }}(
             text="{{ input_conf.get('label') }}",
-            {% if input_conf.get('default') is not none %}
-            value="{{ input_conf.get('default') }}",
+            {% if input_conf.get('folder_name') is not none %}
+            value="{{ input_conf.get('folder_name') }}",
             {% endif %}
             doc="{{ input_conf.get('description') }}"
 
@@ -183,9 +183,11 @@ Make sure Docker Desktop is running.
         unique_name = str(uuid.uuid4())
         temp_dir = os.path.join(get_default_output_directory(), ".cellprofiler_temp", unique_name)
         temp_img_dir = os.path.join(temp_dir, "img")
+        output_folder_host = os.path.join(temp_dir, "output_images")
         
         os.makedirs(temp_dir, exist_ok=True)
         os.makedirs(temp_img_dir, exist_ok=True)
+        os.makedirs(output_folder_host, exist_ok=True)
             
         temp_img_path = os.path.join(temp_img_dir, unique_name+".tiff")
 
@@ -193,7 +195,7 @@ Make sure Docker Desktop is running.
         skimage.io.imsave(temp_img_path, x_data)
 
         # Construct Docker command
-        cmd = [docker_path, "run", "--rm", "-v", f"{temp_dir}:/data", self.docker_image.value]
+        cmd = [docker_path, "run", "--rm", "-v", f"{temp_dir}:/data", self.docker_image.value, "{{ exec_function.get('cli_command') }}"]
         {% for key, input_conf in inputs.items() %}
         cmd += ["{{ input_conf.get('cli_tag') }}", str(self.{{ input_conf.get('name') }}.value)]
         {% endfor %}
@@ -289,7 +291,7 @@ Make sure Docker Desktop is running.
         # Let's just say we put everything in columns for a single row:
         # 1 col for input, 1 col for segmentation, plus columns for each optional.
         cols = 2 + num_extra
-        layout = (1, cols)
+        layout = (2, cols)
 
         figure.set_subplots(dimensions=workspace.display_data.dimensions, subplots=layout)
 

@@ -13,7 +13,7 @@ citations:
 docker_image:
   org: rajavishah
   name: stardist
-  tag: "4.0.0"
+  tag: "5.0.0"
   platform: "linux/arm64/v8"
 
 algorithm_folder_name: "stardist_inference"

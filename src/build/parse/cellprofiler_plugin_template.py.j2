@@ -195,20 +195,30 @@ Make sure Docker Desktop is running.
         skimage.io.imsave(temp_img_path, x_data)
 
         # Construct Docker command
-        cmd = [docker_path, "run", "--rm", "-v", f"{temp_dir}:/data", self.docker_image.value, "{{ exec_function.get('cli_command') }}"]
+        cmd = [docker_path, "run", "--rm", "-v", f"{temp_dir}:/data", self.docker_image.value]
+        {% set cli_tokens = exec_function.get('cli_command').split(' ') %}
+        {% for token in cli_tokens %}
+        cmd += ["{{ token }}"]
+        {% endfor %}
         {% for key, input_conf in inputs.items() %}
         cmd += ["{{ input_conf.get('cli_tag') }}", str(self.{{ input_conf.get('name') }}.value)]
         {% endfor %}
         {% for key, param in parameters.items() %}
-            {% if param.get('type') in ["checkbox"] %}
+            {# {% if param.get('type') in ["checkbox"] %}
+        {% set checkbox_value = self|attribute(param.get('name'))|attribute("value") %}
                 {% if param.get('append_value', True) %}
-        cmd += ["{{ param.get('cli_tag') }}"]
+        {# If type is checkbox and append_value is True, then append cli_tag and value to Docker Command #}
+        cmd += ["{{ param.get('cli_tag') }}", str(checkbox_value)]
                 {% else %}
-                    {# Do not append anything #}
+        {# Else - append_value is False, and checkbox is checked - then append only cli_tag #}
+                    {% if checkbox_value %}
+        cmd += ["{{ param.get('cli_tag') }}"]
+                    {% endif %}
                 {% endif %}
-            {% else %}
+            {% else %} #}
+        {# For all the rest of the types except checkbox #}
         cmd += ["{{ param.get('cli_tag') }}", str(self.{{ param.get('name') }}.value)]
-            {% endif %}
+            {# {% endif %} #}
         {% endfor %}
 
         LOGGER.info(f"Running Docker command: {' '.join(cmd)}")
@@ -233,7 +243,7 @@ Make sure Docker Desktop is running.
 
                 if self.save_probability.value:
                 # Suppose your Docker inference script saves probabilities as output_probabilities.npy
-                prob_file_path = os.path.join(temp_img_dir, "output_probabilities.npy")
+                    prob_file_path = os.path.join(temp_img_dir, "output_probabilities.npy")
                 if os.path.exists(prob_file_path):
                     prob_data = numpy.load(prob_file_path)
                     # Assign probabilities to the workspace display data for later display

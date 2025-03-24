@@ -11,7 +11,7 @@ from csbdeep.utils import normalize
 def stardist_inference(model_type, model_name, model_path, input_folder, output_folder, prob_thresh, nms_thresh, n_tiles_x, n_tiles_y, save_probs, use_gpu):
     """Run StarDist model for object detection and save results."""
     
-    # Optionally check for GPU availability if use_gpu is True
+    # Check for GPU availability if use_gpu is True
     if use_gpu:
         gpus = tf.config.list_physical_devices('GPU')
         if gpus:
@@ -23,9 +23,9 @@ def stardist_inference(model_type, model_name, model_path, input_folder, output_
                 except Exception as e:
                     print("Error setting memory growth on GPU:", e)
         else:
-            print("GPU flag enabled, but no GPU found. Running on CPU.")
+            print("GPU flag enabled, but no GPU found. Running on CPU...")
     else:
-        print("Running on CPU.")
+        print("Running on CPU...")
 
     # Check if the output folder exists
     os.makedirs(output_folder, exist_ok=True)

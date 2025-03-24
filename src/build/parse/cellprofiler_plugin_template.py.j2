@@ -208,8 +208,6 @@ Make sure Docker Desktop is running.
         {% if param.get('type') == "checkbox" %}
         {# {% set checkbox_value = self|attr(param.get('name'))|attr('value') %} #}
             {% if param.get('append_value') %}
-                print("What is the value of self.{{ param.get('name') }}.value...", self.{{ param.get('name') }}.value)
-                print("HIih ---  debugg here")
         cmd += ["{{ param.get('cli_tag') }}", str(self.{{ param.get('name') }}.value)]
                 {# {% endif %} #}
             {% else %}

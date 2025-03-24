@@ -204,10 +204,22 @@ Make sure Docker Desktop is running.
         cmd += ["{{ input_conf.get('cli_tag') }}", str(self.{{ input_conf.get('name') }}.value)]
         {% endfor %}
         {% for key, param in parameters.items() %}
-            
+        # If type is checkbox and append value is True - append both cli_tag and value
+        {% if param.get('type') == "checkbox" %}
+        {# {% set checkbox_value = self|attr(param.get('name'))|attr('value') %} #}
+            {% if param.get('append_value') %}
+                print("What is the value of self.{{ param.get('name') }}.value...", self.{{ param.get('name') }}.value)
+                print("HIih ---  debugg here")
+        cmd += ["{{ param.get('cli_tag') }}", str(self.{{ param.get('name') }}.value)]
+                {# {% endif %} #}
+            {% else %}
+                # If type is checkbox and append_value is True and value is also True - append only cli_tag        
+        cmd += ["{{ param.get('cli_tag') }}"]
+            {% endif %}
+        {% else %}
         {# For all the rest of the types except checkbox #}
         cmd += ["{{ param.get('cli_tag') }}", str(self.{{ param.get('name') }}.value)]
-            {# {% endif %} #}
+        {% endif %}
         {% endfor %}
 
         LOGGER.info(f"Running Docker command: {' '.join(cmd)}")
@@ -285,10 +297,6 @@ Make sure Docker Desktop is running.
         return vis_settings
 
     
-    {% set have_prob = parameters.get('save_probabilities') %}
-    {% set have_flows = parameters.get('save_flows') %}
-    {% set have_distance = parameters.get('save_distance') %}
-    {% set have_outlines = parameters.get('save_outlines') %}
 
     def display(self, workspace, figure):
         """
@@ -298,18 +306,21 @@ Make sure Docker Desktop is running.
         # 1) Decide how many rows & columns we need based on optional images
         # You can dynamically compute, or just pick a typical layout style
         num_extra = 0
-        {% if have_prob %}
+        {% for key, param in parameters.items() %}
+        {% if param.get('name') == "save_probability" -%}
         num_extra += 1
-        {% endif %}
-        {% if have_flows %}
+        {%- endif %}
+        {% if param.get('name') == "save_flows" -%}
         num_extra += 1
-        {% endif %}
-        {% if have_distance %}
+        {%- endif %}
+        {% if param.get('name') == "save_distance" -%}
         num_extra += 1
-        {% endif %}
-        {% if have_outlines %}
+        {%- endif %}
+        {% if param.get('name') == "save_outlines" -%}
         num_extra += 1
-        {% endif %}
+        {%- endif %}
+        {% endfor %}
+        
 
         # Let's just say we put everything in columns for a single row:
         # 1 col for input, 1 col for segmentation, plus columns for each optional.
@@ -359,7 +370,7 @@ Make sure Docker Desktop is running.
 
         # 5) Conditionally show flows
         {# {% if have_flows %} #}
-        if save_flows.value:
+        if self.save_flows.value:
             figure.subplot_imshow(
                 image=workspace.display_data.flows,
                 sharexy=figure.subplot(0, 0),
@@ -372,7 +383,7 @@ Make sure Docker Desktop is running.
 
         # 6) Conditionally show distance
         {# {% if have_distance %} #}
-        if save_distance.value:
+        if self.save_distance.value:
             figure.subplot_imshow(
                 image=workspace.display_data.distance,
                 colormap="magma",
@@ -386,7 +397,7 @@ Make sure Docker Desktop is running.
 
         # 7) Conditionally show outlines
         {# {% if have_outlines %} #}
-        if save_outlines.value:
+        if self.save_outlines.value:
             figure.subplot_imshow(
                 image=workspace.display_data.outlines,
                 sharexy=figure.subplot(0, 0),

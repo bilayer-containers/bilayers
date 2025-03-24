@@ -204,18 +204,7 @@ Make sure Docker Desktop is running.
         cmd += ["{{ input_conf.get('cli_tag') }}", str(self.{{ input_conf.get('name') }}.value)]
         {% endfor %}
         {% for key, param in parameters.items() %}
-            {# {% if param.get('type') in ["checkbox"] %}
-        {% set checkbox_value = self|attribute(param.get('name'))|attribute("value") %}
-                {% if param.get('append_value', True) %}
-        {# If type is checkbox and append_value is True, then append cli_tag and value to Docker Command #}
-        cmd += ["{{ param.get('cli_tag') }}", str(checkbox_value)]
-                {% else %}
-        {# Else - append_value is False, and checkbox is checked - then append only cli_tag #}
-                    {% if checkbox_value %}
-        cmd += ["{{ param.get('cli_tag') }}"]
-                    {% endif %}
-                {% endif %}
-            {% else %} #}
+            
         {# For all the rest of the types except checkbox #}
         cmd += ["{{ param.get('cli_tag') }}", str(self.{{ param.get('name') }}.value)]
             {# {% endif %} #}
@@ -223,8 +212,6 @@ Make sure Docker Desktop is running.
 
         LOGGER.info(f"Running Docker command: {' '.join(cmd)}")
 
-        # Test -if this is working
-        print("Docker command:", " ".join(cmd))
 
         try:
             result = subprocess.run(cmd, capture_output=True, text=True)
@@ -233,23 +220,30 @@ Make sure Docker Desktop is running.
                 # fallback to blank segmentation
                 y_data = numpy.zeros_like(x_data)
             else:
-                # Suppose the Docker container saves output in `output_seg.npy`:
-                output_seg_path = os.path.join(temp_img_dir, "output_seg.npy")
+                # Suppose the Docker container saves output in as unique_name_segmented.tif in the specified path
+                # --------------- Modify the below block to match your Docker output -------------------------
+                output_seg_path = os.path.join(output_folder_host, unique_name+"_segmented.tif")
+                # --------------- Modify the above block to match your Docker output ------------------------
                 if os.path.exists(output_seg_path):
-                    y_data = numpy.load(output_seg_path)
+                    # --------------- Modify this to match your Docker output -------------------------
+                    # Incase Docker output is npy array -- modify below line to load npy instead of tif for eg. y_data = numpy.load(output_seg_path)
+                    y_data = skimage.io.imread(output_seg_path)
+                    # --------------- Modify the above line to match your Docker output ------------------------
                 else:
-                    LOGGER.warning("No output_seg.npy found; using blank seg.")
+                    LOGGER.warning("No unique_name_segmented.tif found; using blank seg.")
                     y_data = numpy.zeros_like(x_data)
 
                 if self.save_probability.value:
-                # Suppose your Docker inference script saves probabilities as output_probabilities.npy
-                    prob_file_path = os.path.join(temp_img_dir, "output_probabilities.npy")
-                if os.path.exists(prob_file_path):
-                    prob_data = numpy.load(prob_file_path)
-                    # Assign probabilities to the workspace display data for later display
-                    workspace.display_data.probabilities = prob_data
-                else:
-                    LOGGER.warning("No output probabilities file found; probabilities will not be displayed.")
+                    # Suppose Docker inference script saves probabilities as unique_name_probabilities.npy
+                    # --------------- Otherwise modify this to match your Docker output -------------------------
+                    prob_file_path = os.path.join(output_folder_host, unique_name+"_probabilities.npy")
+                    # --------------- Modify the above block to match your Docker output ------------------------
+                    if os.path.exists(prob_file_path):
+                        prob_data = numpy.load(prob_file_path)
+                        # Assign probabilities to the workspace display data for later display
+                        workspace.display_data.probabilities = prob_data
+                    else:
+                        LOGGER.warning("No output probabilities file found; probabilities will not be displayed.")
 
 
         finally:
@@ -348,18 +342,18 @@ Make sure Docker Desktop is running.
         col += 1
 
         # 4) Conditionally show the probability map
-        {% if have_prob %}
+        {# {% if have_prob %} #}
         if self.save_probabilities.value and hasattr(workspace.display_data, "probabilities"):
             figure.subplot_imshow(
                 image=workspace.display_data.probabilities,
                 colormap="gray",
                 sharexy=figure.subplot(0, 0),
-                title=self.probabilities_name.value,
+                title="Probability Map",
                 x=col,
                 y=0
             )
         col += 1
-        {% endif %}
+        {# {% endif %} #}
 
         # 5) Conditionally show flows
         {% if have_flows %}

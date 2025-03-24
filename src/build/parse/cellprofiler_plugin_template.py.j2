@@ -93,11 +93,11 @@ class {{ exec_function.get('script') }}({{ exec_function.get('module') }}):
         super({{ exec_function.get('script') }}, self).create_settings()
         
         {% set type_mapping = {
-            "image": "ImageSubscriber",
+            "image": "ImageName",
             "measurement": "Filename",
             "array": "Filename",
             "executable": "Filename",
-            "file": "Directory",
+            "file": "ImageName",
             "radio": "Choice",
             "dropdown": "Choice",
             "checkbox": "Binary",
@@ -182,7 +182,7 @@ Make sure Docker Desktop is running.
         # Create a unique folder for this run
         unique_name = str(uuid.uuid4())
         temp_dir = os.path.join(get_default_output_directory(), ".cellprofiler_temp", unique_name)
-        temp_img_dir = os.path.join(temp_dir, "img")
+        temp_img_dir = os.path.join(temp_dir, "input_images")
         output_folder_host = os.path.join(temp_dir, "output_images")
         
         os.makedirs(temp_dir, exist_ok=True)
@@ -326,7 +326,8 @@ Make sure Docker Desktop is running.
             image=workspace.display_data.x_data,
             colormap="gray",
             title="Input Image",
-            x=col,
+            # Hardcode the position of the input image to (0, 0) - You may change according to your preference
+            x=0,
             y=0
         )
         col += 1
@@ -336,64 +337,65 @@ Make sure Docker Desktop is running.
             image=workspace.display_data.y_data,
             sharexy=figure.subplot(0, 0),
             title=self.y_name.value,
-            x=col,
+            # Hardcode the position of the segmentation image to (0, 1) - You may change according to your preference
+            x=1,
             y=0
         )
         col += 1
 
         # 4) Conditionally show the probability map
         {# {% if have_prob %} #}
-        if self.save_probabilities.value and hasattr(workspace.display_data, "probabilities"):
+        if self.save_probability.value:
             figure.subplot_imshow(
                 image=workspace.display_data.probabilities,
                 colormap="gray",
                 sharexy=figure.subplot(0, 0),
                 title="Probability Map",
-                x=col,
-                y=0
+                x=0,
+                y=col
             )
         col += 1
         {# {% endif %} #}
 
         # 5) Conditionally show flows
-        {% if have_flows %}
-        if hasattr(workspace.display_data, "flows"):
+        {# {% if have_flows %} #}
+        if save_flows.value:
             figure.subplot_imshow(
                 image=workspace.display_data.flows,
                 sharexy=figure.subplot(0, 0),
                 title="Predicted Flows",
-                x=col,
-                y=0
+                x=0,
+                y=col
             )
         col += 1
-        {% endif %}
+        {# {% endif %} #}
 
         # 6) Conditionally show distance
-        {% if have_distance %}
-        if hasattr(workspace.display_data, "distance"):
+        {# {% if have_distance %} #}
+        if save_distance.value:
             figure.subplot_imshow(
                 image=workspace.display_data.distance,
                 colormap="magma",
                 sharexy=figure.subplot(0, 0),
                 title="Distance Map",
-                x=col,
-                y=0
+                x=0,
+                y=col
             )
         col += 1
-        {% endif %}
+        {# {% endif %} #}
 
         # 7) Conditionally show outlines
-        {% if have_outlines %}
-        if hasattr(workspace.display_data, "outlines"):
+        {# {% if have_outlines %} #}
+        if save_outlines.value:
             figure.subplot_imshow(
                 image=workspace.display_data.outlines,
                 sharexy=figure.subplot(0, 0),
                 title="Outlines",
-                x=col,
-                y=0
+                x=0,
+                y=col
             )
         col += 1
-        {% endif %}
+        {# {% endif %} #}
 
     
     def upgrade_settings(self, setting_values, variable_revision_number, module_name):

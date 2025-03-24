@@ -3,6 +3,7 @@ import os
 import skimage.io
 from skimage.transform import resize
 import numpy as np
+import tensorflow as tf
 import imageio
 from stardist.models import StarDist2D, StarDist3D
 from csbdeep.utils import normalize
@@ -10,6 +11,22 @@ from csbdeep.utils import normalize
 def stardist_inference(model_type, model_name, model_path, input_folder, output_folder, prob_thresh, nms_thresh, n_tiles_x, n_tiles_y, save_probs, use_gpu):
     """Run StarDist model for object detection and save results."""
     
+    # Optionally check for GPU availability if use_gpu is True
+    if use_gpu:
+        gpus = tf.config.list_physical_devices('GPU')
+        if gpus:
+            print("GPU(s) available:", gpus)
+            # Optionally, set memory growth on each GPU
+            for gpu in gpus:
+                try:
+                    tf.config.experimental.set_memory_growth(gpu, True)
+                except Exception as e:
+                    print("Error setting memory growth on GPU:", e)
+        else:
+            print("GPU flag enabled, but no GPU found. Running on CPU.")
+    else:
+        print("Running on CPU.")
+
     # Check if the output folder exists
     os.makedirs(output_folder, exist_ok=True)
     
@@ -101,6 +118,9 @@ def stardist_inference(model_type, model_name, model_path, input_folder, output_
 
             print(f"Saving probabilities to {output_prob_path}")
             np.save(output_prob_path, size_corrected)
+            # Also save as an image
+            prob_image_path = os.path.join(output_folder, os.path.splitext(image_file)[0] + "_probabilities.tif")
+            imageio.imwrite(prob_image_path, (size_corrected)) 
 
        
 if __name__ == "__main__":
@@ -109,7 +129,7 @@ if __name__ == "__main__":
     parser.add_argument("--model_name", type=str, default=None, help="Pre-trained model name (if using a default model).")
     parser.add_argument("--model_path", type=str, default=None, help="Path to custom-trained model directory.")
     parser.add_argument("--input_folder", type=str, required=True, help="Path to input image.")
-    parser.add_argument("--output_folder", type=str, default="output.tif", help="Output file name.")
+    parser.add_argument("--output_folder", type=str, default="output_images", help="Output file name.")
     parser.add_argument("--prob_thresh", type=float, default=0.5, help="Probability threshold for detection.")
     parser.add_argument("--nms_thresh", type=float, default=0.4, help="Non-Maximum Suppression (NMS) threshold.")
     parser.add_argument("--n_tiles_x", type=int, default=1, help="Specify the number of tiles to break the image down into along the x-axis (horizontal).")

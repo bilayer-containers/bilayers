@@ -200,7 +200,15 @@ Make sure Docker Desktop is running.
         cmd += ["{{ input_conf.get('cli_tag') }}", str(self.{{ input_conf.get('name') }}.value)]
         {% endfor %}
         {% for key, param in parameters.items() %}
+            {% if param.get('type') in ["checkbox"] %}
+                {% if param.get('append_value', True) %}
+        cmd += ["{{ param.get('cli_tag') }}"]
+                {% else %}
+                    {# Do not append anything #}
+                {% endif %}
+            {% else %}
         cmd += ["{{ param.get('cli_tag') }}", str(self.{{ param.get('name') }}.value)]
+            {% endif %}
         {% endfor %}
 
         LOGGER.info(f"Running Docker command: {' '.join(cmd)}")
@@ -223,6 +231,17 @@ Make sure Docker Desktop is running.
                     LOGGER.warning("No output_seg.npy found; using blank seg.")
                     y_data = numpy.zeros_like(x_data)
 
+                if self.save_probability.value:
+                # Suppose your Docker inference script saves probabilities as output_probabilities.npy
+                prob_file_path = os.path.join(temp_img_dir, "output_probabilities.npy")
+                if os.path.exists(prob_file_path):
+                    prob_data = numpy.load(prob_file_path)
+                    # Assign probabilities to the workspace display data for later display
+                    workspace.display_data.probabilities = prob_data
+                else:
+                    LOGGER.warning("No output probabilities file found; probabilities will not be displayed.")
+
+
         finally:
             # Cleanup
             try:
@@ -241,7 +260,7 @@ Make sure Docker Desktop is running.
         # Save measurements
         self.add_measurements(workspace)
 
-        # Display results in UI
+        # Display results on UI
         if self.show_window:
             workspace.display_data.x_data = x.pixel_data if x.volumetric else x_data
             workspace.display_data.y_data = y_data

@@ -8,10 +8,8 @@ import imageio
 from stardist.models import StarDist2D, StarDist3D
 from csbdeep.utils import normalize
 
-def stardist_inference(model_type, model_name, model_path, input_folder, output_folder, prob_thresh, nms_thresh, n_tiles_x, n_tiles_y, save_probs, use_gpu):
-    """Run StarDist model for object detection and save results."""
-    
-    # Check for GPU availability if use_gpu is True
+def initialize_gpu(use_gpu):
+    """Initialize GPU if available and set memory growth."""
     if use_gpu:
         gpus = tf.config.list_physical_devices('GPU')
         if gpus:
@@ -27,14 +25,32 @@ def stardist_inference(model_type, model_name, model_path, input_folder, output_
     else:
         print("Running on CPU...")
 
+def stardist_inference(
+        model_type,
+        model_name,
+        model_path,
+        input_folder,
+        output_folder,
+        prob_thresh,
+        nms_thresh,
+        n_tiles_x,
+        n_tiles_y,
+        save_probs,
+        use_gpu
+    ):
+    """Run StarDist model for object detection and save results."""
+    
+    # Check for GPU availability if use_gpu is True
+    initialize_gpu(use_gpu)
+
     # Check if the output folder exists
     os.makedirs(output_folder, exist_ok=True)
-    
+
     # Get list of all image files in the input folder
     image_extensions = (".tif", ".tiff", ".png", ".jpg", ".jpeg", ".bmp")
     image_files = [
         f for f in os.listdir(input_folder)
-        if f.lower().endswith(image_extensions) and 
+        if f.lower().endswith(image_extensions) and
         "_segmented" not in f and "_probabilities" not in f # Exclude already segmented images
     ]
 
@@ -91,7 +107,7 @@ def stardist_inference(model_type, model_name, model_path, input_folder, output_
 
             # Defining Output Filenames
             output_image_path = os.path.join(output_folder, os.path.splitext(image_file)[0] + "_segmented.tif")
-            
+
             # Save segmentation result
             print(f"Saving result to {output_folder}")
             imageio.imwrite(output_image_path, data[0])
@@ -104,7 +120,7 @@ def stardist_inference(model_type, model_name, model_path, input_folder, output_
                 prob_thresh=prob_thresh,
                 nms_thresh=nms_thresh,
             )
-            
+
             # Save segmentation result
             output_image_path = os.path.join(output_folder, os.path.splitext(image_file)[0] + "_segmented.tif")
             output_prob_path = os.path.join(output_folder, os.path.splitext(image_file)[0] + "_probabilities.npy")
@@ -120,9 +136,9 @@ def stardist_inference(model_type, model_name, model_path, input_folder, output_
             np.save(output_prob_path, size_corrected)
             # Also save as an image
             prob_image_path = os.path.join(output_folder, os.path.splitext(image_file)[0] + "_probabilities.tif")
-            imageio.imwrite(prob_image_path, (size_corrected)) 
+            imageio.imwrite(prob_image_path, (size_corrected))
 
-       
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Minimal StarDist CLI for segmentation.")
     parser.add_argument("--model_type", choices=["2D", "3D"], required=True, help="Choose StarDist model type.")

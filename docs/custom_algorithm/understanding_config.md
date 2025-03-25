@@ -29,7 +29,9 @@ Once defined, the config.yaml is processed to generate an executable CLI command
 :filename: config.yaml
 tool:
   name:
-  category
+  category:
+  notes:
+  
 citations:
   algorithm:
     - name: ""

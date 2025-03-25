@@ -1,3 +1,8 @@
+tool:
+  name: "classical_segmentation"
+  category: "Object Processing"
+  notes:
+
 citations:
   algorithm: 
     - name: "Classical Segmentation"
@@ -16,7 +21,7 @@ algorithm_folder_name: "classical_segmentation"
 exec_function: 
   name: "generate_cli_command"
   script: "classical_segmentation"
-  module: "algorithms.classical_segmentation"
+  module: ""
   cli_command: "python -m classical_segmentation"
   hidden_args:
 

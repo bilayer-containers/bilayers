@@ -19,6 +19,7 @@ classes:
   SpecContainer:
     description: "SpecContianer class which holds all the high_level keywords from config.yaml file of specific algorithm"
     slots: 
+    - tool
     - inputs
     - outputs
     - parameters
@@ -52,6 +53,14 @@ classes:
       - timepoints
       - tiled
       - pyramidal
+
+  TypeTool:
+    aliases: ["tool"]
+    description: "Algorithm Name"
+    slots:
+      - name
+      - category
+      - notes
 
   TypeInput:
     aliases: ["inputs"]
@@ -222,6 +231,10 @@ classes:
       - value
 
 slots:
+  tool:
+    description: "Algorithm Name"
+    range: TypeTool
+    required: true
   inputs:
     description: "Inputs to the algorithm from the last step of the workflow"
     range: TypeInput
@@ -246,11 +259,11 @@ slots:
     range: ExecFunction
     required: true
   script:
-    description: "Script to execute the Algorithm"
+    description: "Specifies the class name of the cellprofiler plugin that implements the algorithm functionality"
     range: string
     required: true
   module:
-    description: "Module to execute the Algorithm"
+    description: "Specifies the base CellProfiler module that plugin extends"
     range: string
     required: true
   cli_command:
@@ -390,6 +403,13 @@ slots:
   pyramidal:
     description: "whether pyramidal images are accepted via tool"
     range: boolean
+  # slots specific to tool
+  category:
+    description: "Indicates cellprofiler category under which the plugin will be listed"
+    range: string
+  notes:
+    description: "For any supplementary metadata not accommodated by the designated slots"
+    range: string
 
 enums:
   TypeEnum:

@@ -73,7 +73,7 @@ outputs:
     subtype: 
       - labeled
     description: "Segmented images"
-    cli_tag: "None"
+    cli_tag: "--output_folder"
     cli_order: 0
     default: "directory"
     optional: False 
@@ -88,6 +88,41 @@ outputs:
     timepoints: True
     tiled: True
     pyramidal: True
+  - name: probability_images
+    type: image
+    label: "Probability Images"
+    subtype: 
+      - labeled
+    description: "Probability images"
+    cli_tag: "--save_probabilities"
+    cli_order: 0
+    default: "directory"
+    optional: False 
+    format: 
+      - tiff
+      - ometiff
+    folder_name: "/bilayers/output_images"
+    file_count: multiple
+    section_id: "outputs"
+    mode: "advanced"
+    depth: True
+    timepoints: True
+    tiled: True
+    pyramidal: True
+  - name: probability_array
+    type: array
+    label: "Probability Array"
+    description: "Probability Array"
+    cli_tag: "--save_probabilities"
+    cli_order: 0
+    default: "directory"
+    optional: False 
+    format: 
+      - npy
+    folder_name: "/bilayers/output_images"
+    file_count: multiple
+    section_id: "outputs"
+    mode: "advanced"
     
 parameters:
   - name: model_type

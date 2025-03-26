@@ -27,6 +27,11 @@ Once defined, the config.yaml is processed to generate an executable CLI command
 
 ```{code} yaml
 :filename: config.yaml
+tool:
+  name:
+  category:
+  notes:
+  
 citations:
   algorithm:
     - name: ""

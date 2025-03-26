@@ -1,3 +1,8 @@
+tool:
+  name: "testing_inference"
+  category: "Object Processing"
+  notes:
+
 citations:
   algorithm: 
     - name: "Testing"
@@ -15,8 +20,8 @@ algorithm_folder_name: "testing_inference"
 
 exec_function: 
   name: "generate_cli_command"
-  script: "cellpose_inference"
-  module: "algorithms.cellpose_inference"
+  script: "RunTesting"
+  module: "ImageSegmentation"
   cli_command: "python -m cellpose --verbose"
   hidden_args: 
     # dummy example

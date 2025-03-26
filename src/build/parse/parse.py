@@ -2,6 +2,10 @@ import yaml
 import sys
 from typing import TypedDict, Any
 
+class Tool(TypedDict):
+    name: str
+    category: str
+    notes: str
 
 class CitationEntry(TypedDict):
     name: str
@@ -27,6 +31,13 @@ class ExecFunction(TypedDict):
     module: str
     cli_command: str
     hidden_args: dict[str, HiddenArgs] | None
+
+
+class DockerImage(TypedDict):
+    org: str
+    name: str
+    tag: str
+    platform: str
 
 
 class InputOutput(TypedDict, total=False):
@@ -69,6 +80,7 @@ class Parameter(TypedDict, total=False):
 
 
 class Config(TypedDict):
+    tool: Tool
     citations: Citations
     algorithm_folder_name: str
     exec_function: ExecFunction
@@ -76,6 +88,7 @@ class Config(TypedDict):
     outputs: dict[str, InputOutput]
     parameters: dict[str, Parameter]
     display_only: dict[str, Parameter] | None
+    docker_image: DockerImage
 
 
 def parse_config(config_path: str | None = None) -> Config:
@@ -116,7 +129,7 @@ def parse_config(config_path: str | None = None) -> Config:
 
 def main(
     config_path: str | None = None,
-) -> tuple[dict[str, InputOutput], dict[str, InputOutput], dict[str, Parameter], dict[str, Parameter] | None, ExecFunction, str, Citations]:
+) -> tuple[Tool, dict[str, InputOutput], dict[str, InputOutput], dict[str, Parameter], dict[str, Parameter] | None, ExecFunction, str, Citations, DockerImage]:
     """
     Loads the configuration and extracts necessary information.
 
@@ -129,6 +142,9 @@ def main(
     config_path = sys.argv[1] if len(sys.argv) > 1 else None
 
     config: Config = parse_config(config_path)
+
+    # Since, we are sure that tool key exists in the config, we can safely use it.
+    tool: Tool = config["tool"]
 
     inputs: dict[str, InputOutput] = config.get("inputs", {})
 
@@ -149,11 +165,15 @@ def main(
 
     citations: Citations = config.get("citations", {"algorithm": {}})
 
-    return inputs, outputs, parameters, display_only, exec_function, algorithm_folder_name, citations
+    # Since, we are sure that docker_image key exists in the config, we can safely use it.
+    docker_image: DockerImage = config["docker_image"]
+
+    return tool, inputs, outputs, parameters, display_only, exec_function, algorithm_folder_name, citations, docker_image
 
 
 if __name__ == "__main__":
-    inputs, outputs, parameters, display_only, exec_function, algorithm_folder_name, citations = main()
+    tool, inputs, outputs, parameters, display_only, exec_function, algorithm_folder_name, citations, docker_image = main()
+    print(f"Tool: {tool}")
     print(f"Inputs: {inputs}")
     print(f"Outputs: {outputs}")
     print(f"Parameters: {parameters}")
@@ -161,3 +181,4 @@ if __name__ == "__main__":
     print(f"Exec Function: {exec_function}")
     print(f"Folder Name: {algorithm_folder_name}")
     print(f"Citations: {citations}")
+    print(f"Docker Image: {docker_image}")

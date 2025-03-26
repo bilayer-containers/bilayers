@@ -1,3 +1,8 @@
+tool:
+  name: "instanseg_inference"
+  category: "Object Processing"
+  notes:
+
 citations:
   algorithm: 
     - name: "InstanSeg in Brightfield Images"
@@ -19,8 +24,8 @@ algorithm_folder_name: "instanseg_inference"
 
 exec_function: 
   name: "generate_cli_command"
-  script: "instanseg_inference"
-  module: "algorithms.instanseg_inference"
+  script: "RunInstanSeg"
+  module: "ImageSegmentation"
   cli_command: "python /instanseg/instanseg/scripts/inference.py"
   hidden_args:
 

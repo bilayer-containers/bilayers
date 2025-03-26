@@ -12,7 +12,7 @@ for ALGORITHM in "${ALGORITHM_NAMES[@]}"; do
     echo "Validating all config files in $CONFIG_DIR"
     for config in "$CONFIG_DIR"/*.yaml; do
         echo "Validating $config..."
-        linkml validate --schema "$SCHEMA_FILE" --target-class Container "$config" || {
+        linkml validate --schema "$SCHEMA_FILE" --target-class SpecContainer "$config" || {
             echo "Validation failed for $config"
             exit 1
         }

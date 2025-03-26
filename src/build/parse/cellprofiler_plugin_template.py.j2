@@ -352,8 +352,9 @@ Make sure Docker Desktop is running.
         )
         col += 1
 
+        {% for key, param in parameters.items() %}
+        {% if param.get('name') == "save_probability" -%}
         # 4) Conditionally show the probability map
-        {# {% if have_prob %} #}
         if self.save_probability.value:
             figure.subplot_imshow(
                 image=workspace.display_data.probabilities,
@@ -364,10 +365,9 @@ Make sure Docker Desktop is running.
                 y=col
             )
         col += 1
-        {# {% endif %} #}
-
+        {%- endif %}
+        {% if param.get('name') == "save_flows" -%}
         # 5) Conditionally show flows
-        {# {% if have_flows %} #}
         if self.save_flows.value:
             figure.subplot_imshow(
                 image=workspace.display_data.flows,
@@ -377,10 +377,9 @@ Make sure Docker Desktop is running.
                 y=col
             )
         col += 1
-        {# {% endif %} #}
-
+        {%- endif %}
+        {% if param.get('name') == "save_distance" -%}
         # 6) Conditionally show distance
-        {# {% if have_distance %} #}
         if self.save_distance.value:
             figure.subplot_imshow(
                 image=workspace.display_data.distance,
@@ -391,10 +390,9 @@ Make sure Docker Desktop is running.
                 y=col
             )
         col += 1
-        {# {% endif %} #}
-
-        # 7) Conditionally show outlines
-        {# {% if have_outlines %} #}
+        {%- endif %}
+        {% if param.get('name') == "save_outlines" -%}
+         # 7) Conditionally show outlines
         if self.save_outlines.value:
             figure.subplot_imshow(
                 image=workspace.display_data.outlines,
@@ -404,7 +402,8 @@ Make sure Docker Desktop is running.
                 y=col
             )
         col += 1
-        {# {% endif %} #}
+        {%- endif %}
+        {% endfor %}
 
     
     def upgrade_settings(self, setting_values, variable_revision_number, module_name):

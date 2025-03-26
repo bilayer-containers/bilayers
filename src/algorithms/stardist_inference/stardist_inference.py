@@ -8,22 +8,6 @@ import imageio
 from stardist.models import StarDist2D, StarDist3D
 from csbdeep.utils import normalize
 
-def initialize_gpu(use_gpu):
-    """Initialize GPU if available and set memory growth."""
-    if use_gpu:
-        gpus = tf.config.list_physical_devices('GPU')
-        if gpus:
-            print("GPU(s) available:", gpus)
-            # Optionally, set memory growth on each GPU
-            for gpu in gpus:
-                try:
-                    tf.config.experimental.set_memory_growth(gpu, True)
-                except Exception as e:
-                    print("Error setting memory growth on GPU:", e)
-        else:
-            print("GPU flag enabled, but no GPU found. Running on CPU...")
-    else:
-        print("Running on CPU...")
 
 def stardist_inference(
         model_type,
@@ -39,9 +23,22 @@ def stardist_inference(
         use_gpu
     ):
     """Run StarDist model for object detection and save results."""
-    
+
     # Check for GPU availability if use_gpu is True
-    initialize_gpu(use_gpu)
+    if use_gpu:
+        gpus = tf.config.list_physical_devices('GPU')
+        if gpus:
+            print("GPU(s) available:", gpus)
+            # Optionally, set memory growth on each GPU
+            for gpu in gpus:
+                try:
+                    tf.config.experimental.set_memory_growth(gpu, True)
+                except Exception as e:
+                    print("Error setting memory growth on GPU:", e)
+        else:
+            print("GPU flag enabled, but no GPU found. Running on CPU...")
+    else:
+        print("Running on CPU...")
 
     # Check if the output folder exists
     os.makedirs(output_folder, exist_ok=True)

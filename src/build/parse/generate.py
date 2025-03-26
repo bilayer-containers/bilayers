@@ -165,10 +165,10 @@ def generate_cellprofiler_plugin(
         citations: Citations,
         docker_image: DockerImage
     ):
-    """ 
+    """
     Generates a CellProfiler Plugin dynamically using Jinja2 templates.
 
-    Args: 
+    Args:
         template_path (str): Path to the CellProfiler Plugin template file.
         inputs (dict[str, InputOutput]): List of input configurations.
         outputs (dict[str, InputOutput]): List of output configurations.
@@ -176,7 +176,7 @@ def generate_cellprofiler_plugin(
         display_only (dict[str, Parameter] | None): List of display-only parameters, or None.
         exec_function (ExecFunction): Execution function details.
         citations (Citations): Citations information.
-    
+
     Returns:
         .py file: The generated CellProfiler Plugin file.
     """
@@ -187,16 +187,26 @@ def generate_cellprofiler_plugin(
 
     def lower(text: str) -> str:
         return text.lower()
-    
+
     def replace(text: str, old: str, new: str) -> str:
         return text.replace(old, new)
-    
+
     env.filters['lower'] = lower
     env.filters['replace'] = replace
 
     template = env.get_template(os.path.basename(template_path))
 
-    cellprofiler_code: str = template.render(tool=tool, inputs=inputs, outputs=outputs, parameters=parameters, display_only=display_only or [], algorithm_folder_name=algorithm_folder_name, exec_function=exec_function, citations=citations, docker_image=docker_image)
+    cellprofiler_code: str = template.render(
+        tool=tool,
+        inputs=inputs,
+        outputs=outputs,
+        parameters=parameters,
+        display_only=display_only or [],
+        algorithm_folder_name=algorithm_folder_name,
+        exec_function=exec_function,
+        citations=citations,
+        docker_image=docker_image
+    )
 
     return cellprofiler_code
 
@@ -272,7 +282,7 @@ def main() -> None:
         docker_image
     )
 
-    # Join folders and file name    
+    # Join folders and file name
     cellprofiler_plugin_path: str = os.path.join(folderA, folderB, 'cellprofiler_plugin.py')
 
     # Generating CellProfiler Plugin file dynamically

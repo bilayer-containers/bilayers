@@ -7,26 +7,20 @@
 {#  Jinja2 Template for a CellProfiler Plugin  #}
 {# ======================================= #}
 
-{% set import_list = [
-    "os",
-    "sys",
-    "uuid",
-    "shutil",
-    "logging",
-    "subprocess",
-    "numpy",
-    "skimage",
-] %}
-
 #################################
 #
 # Imports from Python Standard Libraries
 #
 ##################################
 
-{% for item in import_list %}
-import {{ item }}
-{% endfor %}
+import os
+import sys
+import uuid
+import shutil
+import logging
+import subprocess
+import numpy
+import skimage
 
 #################################
 #
@@ -34,14 +28,23 @@ import {{ item }}
 #
 ##################################
 
-from cellprofiler_core.module.image_segmentation import ImageSegmentation
-from cellprofiler_core.preferences import get_default_output_directory
-from cellprofiler_core.object import Objects
-from cellprofiler_core.setting import Binary
-from cellprofiler_core.setting.subscriber import ImageSubscriber
-from cellprofiler_core.setting.text import ImageName, Integer, Float, Text, Directory, Filename
-from cellprofiler_core.setting.choice import Choice
-from cellprofiler_core.image import Image
+{% set import_dict = {
+    "module.image_segmentation": "ImageSegmentation",
+    "preferences": "get_default_output_directory",
+    "object": "Objects",
+    "setting": "Binary",
+    "setting.subscriber": "ImageSubscriber",
+    "setting.text": ["ImageName", "Integer", "Float", "Text", "Directory", "Filename"],
+    "setting.choice": "Choice",
+} %}
+
+{% for key, value in import_dict.items() %}
+{% if value is iterable and not value is string %}
+from cellprofiler_core.{{ key }} import {{ value|join(", ") }}
+{% else %}
+from  cellprofiler_core.{{ key }} import {{ value }}
+{% endif %}
+{% endfor %}
 
 LOGGER = logging.getLogger(__name__)
 
@@ -298,112 +301,100 @@ Make sure Docker Desktop is running.
 
     def display(self, workspace, figure):
         """
-        Generic display function to show input, segmentation, and optional images.
+        Generic display function:
+        - Iterates over everything in workspace.display_data
+        - Tries to display each item as either an image or a table
         """
-
-        # 1) Decide how many rows & columns we need based on optional images
-        # You can dynamically compute, or just pick a typical layout style
-        num_extra = 0
-        {% for key, param in parameters.items() %}
-        {% if param.get('name') == "save_probability" -%}
-        num_extra += 1
-        {%- endif %}
-        {% if param.get('name') == "save_flows" -%}
-        num_extra += 1
-        {%- endif %}
-        {% if param.get('name') == "save_distance" -%}
-        num_extra += 1
-        {%- endif %}
-        {% if param.get('name') == "save_outlines" -%}
-        num_extra += 1
-        {%- endif %}
-        {% endfor %}
+    
+        # Gather all keys stored in workspace.display_data
+        data_keys = list(workspace.display_data.keys())
+        print("Keys in workspace.display_data:", data_keys)
         
+        num_columns = 3
+        num_rows = (len(workspace.display_data) + num_columns - 1) // num_columns
 
-        # Let's just say we put everything in columns for a single row:
-        # 1 col for input, 1 col for segmentation, plus columns for each optional.
-        cols = 2 + num_extra
-        layout = (2, cols)
+        # Tell CellProfiler how many subplots we need
+        figure.set_subplots(num_rows, num_columns)
 
-        figure.set_subplots(dimensions=workspace.display_data.dimensions, subplots=layout)
+        i = 0
+        # Keep the track of the index i, then compute row and column
+        {# for key, output_conf in outputs.items(): #}
+        for data_key in data_keys:
+            row = i // num_columns
+            col = i % num_columns
 
-        # We'll track the column index with a local variable
-        col = 0
+            data = workspace.display_data[data_key]
 
-        # 2) Show the input image
-        figure.subplot_imshow(
-            image=workspace.display_data.x_data,
-            colormap="gray",
-            title="Input Image",
-            # Hardcode the position of the input image to (0, 0) - You may change according to your preference
-            x=0,
-            y=0
-        )
-        col += 1
+            # Try to guess how to display:
+            if isinstance(data, numpy.ndarray):
+                # If it's a numpy array, check shape / dtype to guess if it's an image
+                if data.ndim == 2:
+                    # 2D array => grayscale image
+                    figure.subplot_imshow(
+                        image=data,
+                        colormap="gray",
+                        title=data_key,
+                        x=row,
+                        y=col
+                    )
+                elif data.ndim == 3 and data.shape[2] in (3, 4):
+                    # Possibly a color image (RGB or RGBA)
+                    figure.subplot_imshow(
+                        image=data,
+                        title=data_key,
+                        x=row,
+                        y=col
+                    )
+                else:
+                    # 1D array or 4D array, or unknown shape => show as table
+                    figure.subplot_table(
+                        data=data,
+                        title=data_key,
+                        x=row,
+                        y=col
+                    )
+            else:
+                # If not a numpy array, e.g. a list, dict, or something else
+                # fallback to table view
+                figure.subplot_table(
+                    data=data,
+                    title=data_key,
+                    x=row,
+                    y=col
+                )
 
-        # 3) Show the segmentation labels
-        figure.subplot_imshow_labels(
-            image=workspace.display_data.y_data,
-            sharexy=figure.subplot(0, 0),
-            title=self.y_name.value,
-            # Hardcode the position of the segmentation image to (0, 1) - You may change according to your preference
-            x=1,
-            y=0
-        )
-        col += 1
+            {# if output_conf.get('type') == "image":
+                figure.subplot_imshow(
+                    image=workspace.display_data.output_conf['name'],
+                    colormap="gray",
+                    sharexy=figure.subplot(0, 0),
+                    title=output_conf.get('label'),
+                    x=row,
+                    y=col
+                )
+            elif output_conf.get('type') == "measurement":
+                figure.subplot_table(
+                    data=workspace.display_data.output_conf['name'],
+                    title=output_conf.get('label'),
+                    x=row,
+                    y=col
+                )
+            elif output_conf.get('type') == "array":
+                figure.subplot_table(
+                    data=workspace.display_data.output_conf['name'],
+                    title=output_conf.get('label'),
+                    x=row,
+                    y=col
+                )
+            elif output_conf.get('type') == "file":
+                figure.subplot_table(
+                    data=workspace.display_data.output_conf['name'],
+                    title=output_conf.get('label'),
+                    x=row,
+                    y=col
+                )
 
-        {% for key, param in parameters.items() %}
-        {% if param.get('name') == "save_probability" -%}
-        # 4) Conditionally show the probability map
-        if self.save_probability.value:
-            figure.subplot_imshow(
-                image=workspace.display_data.probabilities,
-                colormap="gray",
-                sharexy=figure.subplot(0, 0),
-                title="Probability Map",
-                x=0,
-                y=col
-            )
-        col += 1
-        {%- endif %}
-        {% if param.get('name') == "save_flows" -%}
-        # 5) Conditionally show flows
-        if self.save_flows.value:
-            figure.subplot_imshow(
-                image=workspace.display_data.flows,
-                sharexy=figure.subplot(0, 0),
-                title="Predicted Flows",
-                x=0,
-                y=col
-            )
-        col += 1
-        {%- endif %}
-        {% if param.get('name') == "save_distance" -%}
-        # 6) Conditionally show distance
-        if self.save_distance.value:
-            figure.subplot_imshow(
-                image=workspace.display_data.distance,
-                colormap="magma",
-                sharexy=figure.subplot(0, 0),
-                title="Distance Map",
-                x=0,
-                y=col
-            )
-        col += 1
-        {%- endif %}
-        {% if param.get('name') == "save_outlines" -%}
-         # 7) Conditionally show outlines
-        if self.save_outlines.value:
-            figure.subplot_imshow(
-                image=workspace.display_data.outlines,
-                sharexy=figure.subplot(0, 0),
-                title="Outlines",
-                x=0,
-                y=col
-            )
-        col += 1
-        {%- endif %}
-        {% endfor %}
+            i += 1 #}
 
     
     def upgrade_settings(self, setting_values, variable_revision_number, module_name):

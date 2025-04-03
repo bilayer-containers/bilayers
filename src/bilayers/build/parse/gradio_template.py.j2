@@ -132,12 +132,12 @@ def generate_cli_command(
                 # Handle Radio type mappings dynamically
                 if key in radio_options and value in radio_options[key]:
                     value = radio_options[key].get(value, value)
-                    if value == "None":
-                        if optional is False:
-                            error_message = f"{label} needs to have some value. It's Mandatory!"
-                            raise gr.Error(error_message, duration = None)
-                        else:
-                            continue
+                    # Handle the case where the user explicitly selects "ignore" for this parameter.
+                    # We set the value to None so that later, during validation before adding it to the command,
+                    # a missing mandatory value (None) will trigger an error.
+                    if value == "ignore":
+                        # Make value None if "ignore" is selected
+                        value = None
                 # If the parameter is a list (mainly `inputs` section where type can be either of image, file, measurement, array, executable), convert it to a string
                 elif isinstance(value, list):
                     folder_name = cli_tags[key]["folder_name"] # Direct access since it's guarranteed to exist
@@ -161,14 +161,18 @@ def generate_cli_command(
                         if cli_tag != "None":
                             value = default
 
-                # If the value of (textbox) is empty string, set it to None
-                if value == "":
+                # For each parameter/input, we validate the provided value before constructing the CLI command.
+                # If the user input is an empty string or None, we explicitly set it to None.
+                # For mandatory parameter/input (optional is False), this triggers an error,
+                # ensuring that all required values are provided by the user.
+                if value == "" or value == None:
+                    print("Which cli_tag is coming here?", cli_tag)
                     value = None
                     if optional is False:
                         error_message = f"{label} needs to have some value. It's Mandatory!"
                         raise gr.Error(error_message, duration = None)
-                # If the cli_tag is None, don't include it in the command but if cli_tag is "" then just include the value
                 elif value is not None:
+                # If the cli_tag is None, don't include it in the command but if cli_tag is "" then just include the value
                     if cli_tag != "None":
                         if cli_order < 0: 
                             insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)
@@ -356,7 +360,7 @@ def on_submit(
 {% elif param_conf.get('type') in ['integer', 'float'] %}
 {{ param_label }} = gr.Number(label="{{ param_conf.get('label', '') }}", info="{{ param_conf.get('description', '') }}", value={{ param_conf.get('default', 0) }} if "{{param_conf.get('type') }}" == "integer" else {{ param_conf.get('default', 0.0)}})
 {% elif param_conf.get('type') == 'textbox' %}
-{{ param_label }} = gr.Textbox(label="{{ param_conf.get('label', '') }}", info="{{ param_conf.get('description', '') }}", value="{{ param_conf.get('default', '') }}", interactive={{ not param_conf.get('output_dir_set', False) }})
+{{ param_label }} = gr.Textbox(label="{{ param_conf.get('label', '') }}", info="{{ param_conf.get('description', '') }}", value="{{ param_conf.get('default', '') }}", interactive={{ param_conf.get('output_dir_set', True) }})
 {% elif param_conf.get('type') == 'checkbox' %}
 {{ param_label }} = gr.Checkbox(label="{{ param_conf.get('label', '') }}", info="{{ param_conf.get('description', '') }}", value={{ param_conf.get('default', False) }})
 {% endif %}

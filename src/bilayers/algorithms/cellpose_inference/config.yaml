@@ -329,10 +329,10 @@ parameters:
       - label: Cyto2
         value: "cyto2" 
       - label: Ignore
-        value: "None"
+        value: "ignore"
     default: "cyto"
     cli_tag: "--pretrained_model"
-    optional: False
+    optional: True
     section_id: "model-args"
     mode: "beginner"
 

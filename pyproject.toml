@@ -28,6 +28,7 @@ dev = [
     "ipywidgets",
     "gradio",
     "pytest",
+    "ruff"
 ]
 
 

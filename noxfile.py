@@ -12,10 +12,10 @@ def run_parse(session: nox.Session) -> None:
         session (nox.Session): The Nox session object.
     """
     session.install("pyyaml")
-    session.cd("src/build/parse")
+    session.cd("src/bilayers/build/parse")
     config_path = session.posargs[0]
     session.run("python", "parse.py", config_path)
-    session.cd("../../..")
+    session.cd("../../../..")
 
 
 @nox.session
@@ -27,10 +27,10 @@ def run_generate(session: nox.Session) -> None:
         session (nox.Session): The Nox session object.
     """
     session.install("pyyaml", "jinja2", "nbformat", "ipython", "ipywidgets")
-    session.cd("src/build/parse")
+    session.cd("src/bilayers/build/parse")
     config_path: str = session.posargs[0]
     session.run("python", "generate.py", config_path)
-    session.cd("../../..")
+    session.cd("../../../..")
 
 
 @nox.session
@@ -51,13 +51,13 @@ def build_algorithm(session: nox.Session) -> None:
             image_name (str): The name of the Docker image.
             algorithm (str): The name of the algorithm.
         """
-        dockerfile_path: str = f"src/algorithms/{algorithm}/Dockerfile"
+        dockerfile_path: str = f"src/bilayers/algorithms/{algorithm}/Dockerfile"
         platform_opt: str = "--platform" if platform else ""
         platform = platform or ""
         # Proceed to build from Dockerfile if pull fails
         if os.path.exists(dockerfile_path):
             print("Pull failed; attempting to build locally from Dockerfile.")
-            session.run("docker", "buildx", "build", platform_opt, platform, "-t", image_name, "-f", dockerfile_path, f"src/algorithms/{algorithm}")
+            session.run("docker", "buildx", "build", platform_opt, platform, "-t", image_name, "-f", dockerfile_path, f"src/bilayers/algorithms/{algorithm}")
             # Save the locally built Docker image name in a file
             with open("/tmp/docker_image_name.txt", "w") as file:
                 file.write(image_name)
@@ -73,7 +73,7 @@ def build_algorithm(session: nox.Session) -> None:
     print("Building Algorithm Nox-File: ", algorithm)
     image_name = f"{algorithm}"
     print("Image Name: ", image_name)
-    config_file_path = f"src/algorithms/{algorithm}/config.yaml"
+    config_file_path = f"src/bilayers/algorithms/{algorithm}/config.yaml"
 
     # Start by checking the config file for DockerHub image details
     if os.path.exists(config_file_path):
@@ -138,7 +138,7 @@ def build_interface(session: nox.Session) -> None:
     image_name = f"{algorithm}_{interface}_image"
     print("Image Name: ", image_name)
 
-    dockerfile_path = f"src/build/dockerfiles/{interface.capitalize()}.Dockerfile"
+    dockerfile_path = f"src/bilayers/build/dockerfiles/{interface.capitalize()}.Dockerfile"
     print("Dockerfile Path: ", dockerfile_path)
 
     # Read the platform from the file
@@ -169,7 +169,7 @@ def build_interface(session: nox.Session) -> None:
             image_name,
             "-f",
             dockerfile_path,
-            "src/build",
+            "src/bilayers/build",
         )
     elif interface == "jupyter":
         session.run(
@@ -188,7 +188,7 @@ def build_interface(session: nox.Session) -> None:
             image_name,
             "-f",
             dockerfile_path,
-            "src/build",
+            "src/bilayers/build",
         )
 
 
@@ -202,19 +202,19 @@ def install_gradio(session: nox.Session) -> None:
 @nox.session
 def test_parse(session: nox.Session) -> None:
     session.install("pyyaml")
-    session.cd("src/build/parse")
+    session.cd("src/bilayers/build/parse")
     config_path = session.posargs[0]
     session.run("python", "parse.py", config_path)
-    session.cd("../../..")
+    session.cd("../../../..")
 
 
 @nox.session
 def test_generate(session: nox.Session) -> None:
     session.install("pyyaml", "jinja2", "nbformat", "ipython", "ipywidgets")
-    session.cd("src/build/parse")
+    session.cd("src/bilayers/build/parse")
     config_path = session.posargs[0]
     session.run("python", "generate.py", config_path)
-    session.cd("../../..")
+    session.cd("../../../..")
 
 
 lint_locations = "src", "tests", "noxfile.py"

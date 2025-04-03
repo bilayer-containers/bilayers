@@ -1,6 +1,6 @@
 from ipywidgets import widgets, VBox, HBox, Tab, Accordion
 from IPython.display import display
-from typing import Any, Union
+from typing import Any, Optional
 
 {% autoescape false %}
 inputs = {{inputs}}
@@ -183,7 +183,7 @@ acc.set_title(0, "Beginner's Section")
 acc.children = acc.children + (VBox(advanced_widgets),)
 acc.set_title(1, "Advanced Section")
 
-def option_to_append(cli_tag: str, value: Any) -> str | None:
+def option_to_append(cli_tag: str, value: Any) -> Optional[str]:
     """
     Formats CLI options for appending to the command.
 
@@ -192,7 +192,7 @@ def option_to_append(cli_tag: str, value: Any) -> str | None:
         value (Any): The value to append.
 
     Returns:
-        str | None: The formatted CLI option or None if ignored.
+        Optional[str]: The formatted CLI option or None if ignored.
     """
     if cli_tag == "None":
         return None # Ignore the cli_tag and value pair
@@ -204,7 +204,7 @@ def option_to_append(cli_tag: str, value: Any) -> str | None:
         return f"{cli_tag} {value}"  # Append cli_tag and value
 
 def insert_into_jagged_array(
-    jagged_array: list[list[str] | None], 
+    jagged_array: list[Optional[list[str]]], 
     cli_order: int, 
     cli_tag: str, 
     value: Any
@@ -213,7 +213,7 @@ def insert_into_jagged_array(
     Inserts CLI arguments into a structured array to maintain ordering.
 
     Args:
-        jagged_array (list[list[str] | None]): The structured array for CLI options.
+        jagged_array (list[Optional[list[str]]]): The structured array for CLI options.
         cli_order (int): The order in which arguments should appear.
         cli_tag (str): The CLI tag.
         value (Any): The value to append.
@@ -242,8 +242,8 @@ def construct_cli_command() -> str:
     cli_command_parts = [ cli_command_base]
 
     # Initialize jagged arrays
-    jagged_positive_array: list[list[str] | None] = []
-    jagged_negative_array: list[list[str] | None] = []
+    jagged_positive_array: list[Optional[list[str]]] = []
+    jagged_negative_array: list[Optional[list[str]]] = []
 
     {% autoescape false %}
     hidden_args = {{ exec_function.get("hidden_args", {}) }}

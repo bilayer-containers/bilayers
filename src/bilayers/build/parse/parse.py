@@ -1,6 +1,6 @@
 import yaml
 import sys
-from typing import TypedDict, Any
+from typing import TypedDict, Any, Optional
 
 
 class CitationEntry(TypedDict):
@@ -26,7 +26,7 @@ class ExecFunction(TypedDict):
     script: str
     module: str
     cli_command: str
-    hidden_args: dict[str, HiddenArgs] | None
+    hidden_args: Optional[dict[str, HiddenArgs]]
 
 
 class InputOutput(TypedDict, total=False):
@@ -35,8 +35,8 @@ class InputOutput(TypedDict, total=False):
     label: str
     subtype: list[str]  # w.r.t type == image
     description: str
-    cli_tag: str | None
-    cli_order: int | None
+    cli_tag: Optional[str]
+    cli_order: Optional[int]
     default: str
     optional: bool
     format: list[str]
@@ -44,10 +44,10 @@ class InputOutput(TypedDict, total=False):
     file_count: str
     section_id: str
     mode: str
-    depth: bool | None  # w.r.t type == image
-    timepoints: bool | None  # w.r.t type == image
-    tiled: bool | None  # w.r.t type == image
-    pyramidal: bool | None  # w.r.t type == image
+    depth: Optional[bool]  # w.r.t type == image
+    timepoints: Optional[bool]  # w.r.t type == image
+    tiled: Optional[bool]  # w.r.t type == image
+    pyramidal: Optional[bool]  # w.r.t type == image
 
 
 class Parameter(TypedDict, total=False):
@@ -56,16 +56,16 @@ class Parameter(TypedDict, total=False):
     label: str
     description: str
     default: Any
-    cli_tag: str | None
-    cli_order: int | None
+    cli_tag: Optional[str]
+    cli_order: Optional[int]
     optional: bool
     section_id: str
     mode: str
-    options: list[dict[str, str]] | None  # w.r.t type == radio, dropdown
-    output_dir_set: bool | None  # w.r.t type == textbox
-    interactive: bool | None
-    append_value: bool | None  # w.r.t type == checkbox
-    multiselect: bool | None  # w.r.t type == dropdown
+    options: Optional[list[dict[str, str]]]  # w.r.t type == radio, dropdown
+    output_dir_set: Optional[bool]  # w.r.t type == textbox
+    interactive: Optional[bool]
+    append_value: Optional[bool]  # w.r.t type == checkbox
+    multiselect: Optional[bool]  # w.r.t type == dropdown
 
 
 class Config(TypedDict):
@@ -75,21 +75,21 @@ class Config(TypedDict):
     inputs: dict[str, InputOutput]
     outputs: dict[str, InputOutput]
     parameters: dict[str, Parameter]
-    display_only: dict[str, Parameter] | None
+    display_only: Optional[dict[str, Parameter]]
 
 
-def parse_config(config_path: str | None = None) -> Config:
+def parse_config(config_path: Optional[str] = None) -> Config:
     """
     Parses a YAML configuration file.
 
     Args:
-        config_path (str | None): Path to the config file. Defaults to None.
+        config_path (Optional[str]): Path to the config file. Defaults to None.
 
     Returns:
         Config: A structured dictionary containing parsed YAML data.
     """
     if config_path is None:
-        config_path = "../../../src/algorithms/classical_segmentation/config.yaml"
+        config_path = "../../../src/bilayers/algorithms/classical_segmentation/config.yaml"
     with open(config_path, "r") as file:
         config = yaml.safe_load(file)
 
@@ -115,13 +115,13 @@ def parse_config(config_path: str | None = None) -> Config:
 
 
 def main(
-    config_path: str | None = None,
-) -> tuple[dict[str, InputOutput], dict[str, InputOutput], dict[str, Parameter], dict[str, Parameter] | None, ExecFunction, str, Citations]:
+    config_path: Optional[str] = None,
+) -> tuple[dict[str, InputOutput], dict[str, InputOutput], dict[str, Parameter], Optional[dict[str, Parameter]], ExecFunction, str, Citations]:
     """
     Loads the configuration and extracts necessary information.
 
     Args:
-        config_path (str | None): Path to the configuration file.
+        config_path (Optional[str]): Path to the configuration file.
 
     Returns:
         tuple containing parsed configuration data.
@@ -136,7 +136,7 @@ def main(
 
     parameters: dict[str, Parameter] = config.get("parameters", {})
 
-    display_only: dict[str, Parameter] | None = config.get("display_only", {})
+    display_only: Optional[dict[str, Parameter]] = config.get("display_only", {})
 
     exec_function: ExecFunction = config.get("exec_function", {})
     exec_function.setdefault("name", "")

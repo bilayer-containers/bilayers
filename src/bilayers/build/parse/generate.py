@@ -1,6 +1,6 @@
 import os
 import sys
-
+from typing import Optional
 
 # Importing parse function from parse.py
 from parse import main as parse_config  # type: ignore
@@ -16,7 +16,7 @@ def generate_gradio_app(
     inputs: dict[str, InputOutput],
     outputs: dict[str, InputOutput],
     parameters: dict[str, Parameter],
-    display_only: dict[str, Parameter] | None,
+    display_only: Optional[dict[str, Parameter]],
     exec_function: ExecFunction,
     citations: Citations,
 ) -> str:
@@ -28,7 +28,7 @@ def generate_gradio_app(
         inputs (dict[str, InputOutput]): dictionary of input configurations.
         outputs (dict[str, InputOutput]): dictionary of output configurations.
         parameters (dict[str, Parameter]): dictionary of parameter configurations.
-        display_only (dict[str, Parameter] | None): dictionary of display-only parameters, or None.
+        display_only (Optional[dict[str, Parameter]]): dictionary of display-only parameters, or None.
         exec_function (ExecFunction): Execution function details.
         citations (Citations): Citations information.
 
@@ -60,7 +60,7 @@ def generate_jupyter_notebook(
     inputs: dict[str, InputOutput],
     outputs: dict[str, InputOutput],
     parameters: dict[str, Parameter],
-    display_only: dict[str, Parameter] | None,
+    display_only: Optional[dict[str, Parameter]],
     exec_function: ExecFunction,
     citations: Citations,
 ) -> nbf.NotebookNode:
@@ -72,7 +72,7 @@ def generate_jupyter_notebook(
         inputs (dict[str, InputOutput]): dictionary of input configurations.
         outputs (dict[str, InputOutput]): dictionary of output configurations.
         parameters (dict[str, Parameter]): dictionary of parameter configurations.
-        display_only (dict[str, Parameter] | None): dictionary of display-only parameters, or None.
+        display_only (Optional[dict[str, Parameter]]): dictionary of display-only parameters, or None.
         exec_function (ExecFunction): Execution function details.
         citations (Citations): Citations information.
 
@@ -160,7 +160,7 @@ def main() -> None:
     print("Parsing config...")
 
     if len(sys.argv) > 1:
-        config_path: str | None = sys.argv[1]
+        config_path: Optional[str] = sys.argv[1]
     else:
         config_path = None
 

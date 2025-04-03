@@ -1,6 +1,7 @@
 import os
 import sys
 
+
 # Importing parse function from parse.py
 from parse import main as parse_config  # type: ignore
 from jinja2 import Environment, FileSystemLoader, select_autoescape

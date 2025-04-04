@@ -1,0 +1,28 @@
+def final_validation() -> None:
+    """
+    Checks that all mandatory parameters have valid (non-empty) values.
+    Raises an Exception if any non-optional parameter is missing.
+    """
+    for key, param_info in param_vars.items():
+        cli_tag: str = param_info["cli_tag"]
+        widget: Union[widgets.Widget, widgets.FileUpload, widgets.Checkbox] = param_info["widget"]
+        optional: bool = param_info["optional"]
+        value = widget.value
+        
+        # For RadioButtons, convert "ignore" to None.
+        if isinstance(widget, widgets.RadioButtons) and value == "ignore":
+            value = None
+        
+        # If the value is missing (None, empty string, or "None") and the parameter is mandatory, raise error.
+        if ((value is None) or (value == "") or (value == "None")) and (optional is False):
+            raise Exception(f"🚫 Error: {cli_tag} is mandatory but has no value!")
+    
+    # If we reach here, all mandatory parameters have values.
+    print("✔️ Final validation passed: All required fields are set.")
+
+# Run final validation in a separate cell.
+try:
+    final_validation()
+except Exception as e:
+    print(e)
+    # Optionally, halt further processing if desired.

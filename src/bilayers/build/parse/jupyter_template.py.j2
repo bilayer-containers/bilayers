@@ -1,6 +1,6 @@
 from ipywidgets import widgets, VBox, HBox, Tab, Accordion
 from IPython.display import display
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
 {% autoescape false %}
 inputs = {{inputs}}
@@ -65,7 +65,8 @@ param_vars["{{ input_label }}"] = {
     "cli_tag": "{{ input_conf.get('cli_tag') }}",
     "widget": {{ input_label }},
     "cli_order": {{ input_conf.get('cli_order', 0) }},
-    "folder_name": "{{ input_conf.get('folder_name', '') }}"
+    "folder_name": "{{ input_conf.get('folder_name', '') }}",
+    "optional": {{ input_conf.get('optional', False) }}
 }
 {# param_vars.append(("{{ input_conf.get('cli_tag') }}", {{ input_label }}, {{ input_conf.get('cli_order', 0) }}, "{{ input_conf.get('folder_name', '') }}")) #}
 {%- endif %}
@@ -116,13 +117,15 @@ param_vars["{{ param_label }}"] = {
     "cli_tag": "{{ param_conf.get('cli_tag') }}",
     "widget": {{ param_label }},
     "cli_order": {{ param_conf.get('cli_order', 0) }},
+    "optional": {{ param_conf.get('optional', False) }},
     "append_value": {{ param_conf.get('append_value', False) }}
 }
 {% else %}
 param_vars["{{ param_label }}"] = {
     "cli_tag": "{{ param_conf.get('cli_tag') }}",
     "widget": {{ param_label }},
-    "cli_order": {{ param_conf.get('cli_order', 0) }}
+    "cli_order": {{ param_conf.get('cli_order', 0) }},
+    "optional": {{ param_conf.get('optional', False) }}
 }
 {# param_vars.append(("{{ param_conf.get('cli_tag') }}", {{ param_label }}, {{ param_conf.get('cli_order', 0) }} )) #}
 {% endif %}
@@ -230,6 +233,26 @@ def insert_into_jagged_array(
     if result is not None: # Only append if the result is not None
         jagged_array[abs(cli_order)].append(result)
 
+def validate_and_highlight(widget: widgets.Widget, value: Any, optional: bool) -> bool:
+    """
+    Validates whether the given widget's value is present for non-optional fields.
+    If the value is missing (None, empty, or the string "None") for a mandatory field,
+    it sets the widget's border to red to visually indicate an error.
+    
+    Args:
+        widget (widgets.Widget): The widget to validate.
+        value (Any): The value of the widget.
+        optional (bool): Whether the field is optional.
+    
+    Returns:
+        bool: True if the value is valid (or the field is optional), False otherwise.
+    """
+    if (value is None or value == "" or value == "None") and not optional:
+        widget.layout.border = '2px solid red'
+        return False
+    else:
+        widget.layout.border = ''
+        return True
 
 def construct_cli_command() -> str:
     """
@@ -293,11 +316,14 @@ def construct_cli_command() -> str:
         cli_tag: str = param_info["cli_tag"]
         widget: Union[widgets.Widget, widgets.FileUpload, widgets.Checkbox] = param_info["widget"]
         cli_order: int = param_info["cli_order"]
+        optional: bool = param_info["optional"]
 
         if "folder_name" in param_info or "append_value" in param_info: # Special case for 'File' type and checkbox
             if isinstance(widget, widgets.FileUpload): # This is a 'File' type
                 folder_name: str = param_info["folder_name"]
                 value = folder_name
+                # Validate and highlight the widget if needed
+                validate_and_highlight(widget, value, optional)
                 if cli_order < 0:
                     insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)
                 else:
@@ -305,6 +331,7 @@ def construct_cli_command() -> str:
             elif isinstance(widget, widgets.Checkbox):  # This is a 'Checkbox' type
                 append_value: bool = param_info.get("append_value", False)
                 value = widget.value
+                # For checkboxes, the value is always either True or False, so the optional check isn’t needed since a value is always present
                 if append_value: # If value needs to appended along with cli_tag - Special case for Checkbox
                     if cli_order < 0:
                         insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)
@@ -328,6 +355,11 @@ def construct_cli_command() -> str:
         else:  # Handling other types then Files and Checkbox
             if isinstance(widget, widgets.RadioButtons):
                 value = widget.value
+                # If the user selected "ignore", convert it to None so that the flag is omitted.
+                if value == "ignore":
+                    value = None
+                # Validate and highlight the widget if needed
+                validate_and_highlight(widget, value, optional)
                 if value != "None":  # Ensure the value is not "None" (None helps in ignoring the whole cli_tag & value pair)
                     if cli_order < 0:
                         insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)
@@ -335,6 +367,8 @@ def construct_cli_command() -> str:
                         insert_into_jagged_array(jagged_positive_array, cli_order, cli_tag, value)
             elif isinstance(widget, widgets.Textarea): 
                 value = widget.value
+                # Validate and highlight the widget if needed
+                validate_and_highlight(widget, value, optional)
                 if value: # None value should be ignored
                     if cli_order < 0:
                         insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)
@@ -342,6 +376,8 @@ def construct_cli_command() -> str:
                         insert_into_jagged_array(jagged_positive_array, cli_order, cli_tag, value)
             else:
                 value = widget.value
+                # Validate and highlight the widget if needed
+                validate_and_highlight(widget, value, optional)
                 if cli_order < 0:
                     insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)
                 else:
@@ -373,7 +409,7 @@ def update_command(change: Any) -> None:
     """
     cli_command.value = construct_cli_command()
 
-cli_command: widgets.Textarea = widgets.Textarea(value=construct_cli_command(), description="CLI Command")
+cli_command: widgets.Textarea = widgets.Textarea(value=construct_cli_command(), description="CLI Command", layout=widgets.Layout(width="90%"))
 
 for key, param_info in param_vars.items():
     widget = param_info["widget"]

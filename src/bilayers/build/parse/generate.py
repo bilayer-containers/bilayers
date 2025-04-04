@@ -136,21 +136,40 @@ def generate_jupyter_notebook(
     # Add a markdown cell with the formatted citations
     nb.cells.append(create_markdown_cell(citation_cell))
 
+    ########################################
+    # Logic for Cell-1 in Jupyter Notebook
+    ########################################
     # Create a hidden code cell for widget creation
     hidden_cell = create_code_cell(notebook_content)
 
     hidden_cell.metadata.jupyter = {"source_hidden": True}
     nb.cells.append(hidden_cell)
+    
+    ########################################
+    # Logic for Cell-2 in Jupyter Notebook
+    ########################################
+    # Load and render the final validation template
+    jupyter_final_validation_template_path = "jupyter_final_validation_template.py.j2"
+    jupyter_final_validation_template = env.get_template(os.path.basename(jupyter_final_validation_template_path))
+    final_validation_code = jupyter_final_validation_template.render()
+    # final validation code cell
+    final_validation_code_cell = create_code_cell(final_validation_code)
+    final_validation_code_cell.metadata.jupyter = {"source_hidden": True}
+    # Append a new code cell with the final validation code to the notebook
+    nb.cells.append(final_validation_code_cell)
 
-    nb.cells.append(create_code_cell("print({cli_command.value})"))
-
+    ########################################
+    # Logic for Cell-3 in Jupyter Notebook
+    ########################################
     # jupyter_shell_command_template_path
     jupyter_shell_command_template_path = "jupyter_shell_command_template.py.j2"
     shell_command_template = env.get_template(os.path.basename(jupyter_shell_command_template_path))
-    run_command_cell: str = shell_command_template.render(cli_command=exec_function.get("cli_command", ""))
-
-    # Append the try-except cell to the notebook
-    nb.cells.append(create_code_cell(run_command_cell))
+    run_command_code: str = shell_command_template.render(cli_command=exec_function.get("cli_command", ""))
+    # run command code cell
+    run_command_code_cell = create_code_cell(run_command_code)
+    run_command_code_cell.metadata.jupyter = {"source_hidden": True}
+    # Append a new code cell with the run command code to the notebook
+    nb.cells.append(run_command_code_cell)
 
     return nb
 

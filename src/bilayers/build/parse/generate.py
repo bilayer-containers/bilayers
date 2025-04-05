@@ -47,9 +47,9 @@ def generate_top_level_text(interface: str, citations: dict[str, Citations], out
 
     newline = "<br>" if output_html else "\n"
 
-    app_descriptions_lines = [f"**This interface provides the following tool(s):**"]
-    citation_text_lines = [f"**This project relies on citations! Please cite ALL of the following if you find this application useful in your research:**"]
-    license_info_lines = [f"**Licenses of the components:**"]
+    app_descriptions_lines = ["**This interface provides the following tool(s):**"]
+    citation_text_lines = ["**This project relies on citations! Please cite ALL of the following if you find this application useful in your research:**"]
+    license_info_lines = ["**Licenses of the components:**"]
     app_names_lines = []
 
     # Iterate through the citations dictionary from the config.
@@ -115,7 +115,7 @@ def generate_gradio_app(
     template = env.get_template(os.path.basename(template_path))
 
     title, full_description = generate_top_level_text('Gradio',citations, output_html=False)
-    
+
     gradio_app_code: str = template.render(
         inputs=inputs, outputs=outputs, parameters=parameters, display_only=display_only, exec_function=exec_function, title=title, description=full_description
     )
@@ -180,7 +180,7 @@ def generate_jupyter_notebook(
 
     hidden_cell.metadata.jupyter = {"source_hidden": True}
     nb.cells.append(hidden_cell)
-    
+
     ########################################
     # Logic for Cell-2 in Jupyter Notebook
     ########################################

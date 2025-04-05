@@ -96,7 +96,7 @@ def parse_config(config_path: Optional[str] = None) -> Config:
     config["display_only"] = {item["name"]: item for item in config.get("display_only", [])} if isinstance(config.get("display_only"), list) else {}
 
     config["citations"] = {item["name"]: item for item in config.get("citations", [])} if isinstance(config.get("citations"), list) else {}
-    
+
     # Convert hidden_args to dictionary
     hidden_args = config["exec_function"].get("hidden_args", [])
     if isinstance(hidden_args, list):

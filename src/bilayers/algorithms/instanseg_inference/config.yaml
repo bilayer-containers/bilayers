@@ -1,13 +1,12 @@
 citations:
-  algorithm: 
-    - name: "InstanSeg in Brightfield Images"
-      doi: 10.48550/arXiv.2408.15954
-      license: "Apache-2.0"
-      description: "InstanSeg for Nucleus Segmentation in Brightfield Images"
-    - name: "InstanSeg in Fluorescence Images"
-      doi: 10.1101/2024.09.04.611150
-      license: "Apache-2.0"
-      description: "InstanSeg for Nucleus/Cell Segmentation in Fluorescence Images"
+  - name: "InstanSeg in Brightfield Images"
+    doi: 10.48550/arXiv.2408.15954
+    license: "Apache-2.0"
+    description: "InstanSeg for Nucleus Segmentation in Brightfield Images"
+  - name: "InstanSeg in Fluorescence Images"
+    doi: 10.1101/2024.09.04.611150
+    license: "Apache-2.0"
+    description: "InstanSeg for Nucleus/Cell Segmentation in Fluorescence Images"
 
 docker_image:
   org: bilayer

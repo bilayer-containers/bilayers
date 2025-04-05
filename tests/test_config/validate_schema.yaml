@@ -188,12 +188,6 @@ classes:
     aliases: ["citations"]
     description: "Citations of the Algorithm"
     slots:
-      - algorithm
-
-  TypeAlgorithmFromCitation:
-    aliases: ["Algorithm", "citations"]
-    description: "Algorithm's citations"
-    slots:
       - name
       - doi
       - license
@@ -287,10 +281,6 @@ slots:
     description: "Citations of the Algorithm"
     range: TypeCitations
     required: true
-  algorithm:
-    description: "Algorithm's citations"
-    required: true
-    range: TypeAlgorithmFromCitation
     multivalued: true
   doi:
     description: "DOI of the Algorithm"

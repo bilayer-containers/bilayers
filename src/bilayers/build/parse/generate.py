@@ -11,6 +11,72 @@ import nbformat as nbf
 from parse import InputOutput, Parameter, ExecFunction, Citations  # type: ignore
 
 
+def generate_top_level_text(interface: str, citations: dict[str, Citations], output_html: bool = True) -> tuple[str, str]:
+    """
+    Generates a title and a full description (including tool, citation, and license information)
+    based on the given interface type and citations.
+
+    Args:
+        interface (str): The interface type (e.g. "Gradio" or "Jupyter").
+        citations (dict[str, Citations]): A dictionary of citations, where the key is a name of the tool/interface.
+
+    Returns:
+        tuple[str, str]: A title string and a full description string.
+    """
+    # Default citations for Interfaces and Bilayers
+    DEFAULT_CITATIONS: dict[str, Citations] = {
+        "Bilayers": {
+                "name": "Bilayers",
+                "doi": "",
+                "license": "BSD 3-Clause",
+                "description": "A Container Specification and CI/CD built for whole-community support"
+        },
+        "Jupyter": {
+                "name": "Jupyter",
+                "doi": "10.1109/MCSE.2007.53",
+                "license": "BSD 3-Clause",
+                "description": "Interactive, code-driven documents for data analysis and visualization"
+        },
+        "Gradio": {
+                "name": "Gradio",
+                "doi": "10.48550/arXiv.190602569",
+                "license": "Apache License 2.0",
+                "description": "A simple web interface for deploying machine learning models"
+        }
+    }
+
+    newline = "<br>" if output_html else "\n"
+
+    app_descriptions_lines = [f"**This interface provides the following tool(s):**"]
+    citation_text_lines = [f"**This project relies on citations! Please cite ALL of the following if you find this application useful in your research:**"]
+    license_info_lines = [f"**Licenses of the components:**"]
+    app_names_lines = []
+
+    # Iterate through the citations dictionary from the config.
+    for name, citation in citations.items():
+        app_descriptions_lines.append(f"{name}: {citation.get('description', '')}")
+        if citation.get("doi"):
+            citation_text_lines.append(f"Cite {name} using {citation.get('doi', 'N/A')}")
+        license_info_lines.append(f"{name} is provided under the {citation.get('license', 'Unknown')} license")
+        app_names_lines.append(name)
+
+    # Add default citations for "Bilayers" and for the given interface.
+    for default_key in ["Bilayers", interface]:
+        citation = DEFAULT_CITATIONS.get(default_key)
+        if citation:
+            if citation.get("doi"):
+                citation_text_lines.append(f"Cite {citation.get('name', default_key)} using {citation.get('doi', 'N/A')}")
+            license_info_lines.append(f"{citation.get('name', default_key)} is provided under the {citation.get('license', 'Unknown')} license")
+
+    title = "+".join(app_names_lines) + f" - Brought to you in {interface} by Bilayers"
+    # Instead of joining with newlines, join with <br> so that the markdown cell shows line breaks.
+    full_description = f"{newline}".join([
+        f"{newline}".join(app_descriptions_lines),
+        f"{newline}".join(citation_text_lines),
+        f"{newline}".join(license_info_lines)
+    ])
+    return title, full_description
+
 def generate_gradio_app(
     template_path: str,
     inputs: dict[str, InputOutput],
@@ -18,7 +84,7 @@ def generate_gradio_app(
     parameters: dict[str, Parameter],
     display_only: Optional[dict[str, Parameter]],
     exec_function: ExecFunction,
-    citations: Citations,
+    citations: dict[str, Citations],
 ) -> str:
     """
     Generates a Gradio application dynamically using Jinja2 templates.
@@ -30,7 +96,7 @@ def generate_gradio_app(
         parameters (dict[str, Parameter]): dictionary of parameter configurations.
         display_only (Optional[dict[str, Parameter]]): dictionary of display-only parameters, or None.
         exec_function (ExecFunction): Execution function details.
-        citations (Citations): Citations information.
+        citations (dict[str, Citations]): Citations information.
 
     Returns:
         str: The rendered Gradio application code.
@@ -48,8 +114,10 @@ def generate_gradio_app(
 
     template = env.get_template(os.path.basename(template_path))
 
+    title, full_description = generate_top_level_text('Gradio',citations, output_html=False)
+    
     gradio_app_code: str = template.render(
-        inputs=inputs, outputs=outputs, parameters=parameters, display_only=display_only, exec_function=exec_function, citations=citations
+        inputs=inputs, outputs=outputs, parameters=parameters, display_only=display_only, exec_function=exec_function, title=title, description=full_description
     )
 
     return gradio_app_code
@@ -62,7 +130,7 @@ def generate_jupyter_notebook(
     parameters: dict[str, Parameter],
     display_only: Optional[dict[str, Parameter]],
     exec_function: ExecFunction,
-    citations: Citations,
+    citations: dict[str, Citations],
 ) -> nbf.NotebookNode:
     """
     Generates a Jupyter Notebook dynamically using Jinja2 templates.
@@ -74,7 +142,7 @@ def generate_jupyter_notebook(
         parameters (dict[str, Parameter]): dictionary of parameter configurations.
         display_only (Optional[dict[str, Parameter]]): dictionary of display-only parameters, or None.
         exec_function (ExecFunction): Execution function details.
-        citations (Citations): Citations information.
+        citations (dict[str, Citations]): Citations information.
 
     Returns:
         nbf.NotebookNode: The generated Jupyter Notebook object.
@@ -96,45 +164,13 @@ def generate_jupyter_notebook(
     template = env.get_template(os.path.basename(template_path))
     notebook_content: str = template.render(inputs=inputs, outputs=outputs, parameters=parameters, display_only=display_only, exec_function=exec_function)
 
-    DEFAULT_CITATIONS: dict[str, list[dict[str, str]]] = {
-        "Bilayers": [
-            {"name": "Bilayers", "license": "BSD 3-Clause", "description": "A Container Specification and CI/CD  built for whole-community support"},
-        ],
-        "Jupyter": [
-            {
-                "name": "Jupyter",
-                "doi": "10.1109/MCSE.2007.53",
-                "license": "BSD 3-Clause",
-                "description": "Interactive, code-driven documents for data analysis and visualization",
-            },
-        ],
-    }
+    title, full_description = generate_top_level_text("Jupyter", citations, output_html=True)
 
     nb: nbf.NotebookNode = nbf.v4.new_notebook()
 
-    # Create a markdown cell for instructions or say citations
-    nb.cells.append(create_markdown_cell("## Set Variables and Run the cell"))
-
-    citation_cell: str = ""
-    for citation in citations.get("algorithm", {}).values():
-        citation_cell += (
-            f"- {citation.get('name', 'Unknown Name')} under {citation.get('license', 'Unknown')} License "
-            f": {citation.get('doi', 'No Description Available')} --> {citation.get('description', 'No Description Available')}\n"
-        )
-    for citation in DEFAULT_CITATIONS["Jupyter"]:
-        citation_cell += (
-            f"- {citation.get('name', 'Unknown Name')} under {citation.get('license', 'Unknown')} License "
-            f": {citation.get('doi', 'No Description Available')} --> {citation.get('description', 'No Description Available')}\n"
-        )
-
-    for citation in DEFAULT_CITATIONS["Bilayers"]:
-        citation_cell += (
-            f"- {citation.get('name', 'Unknown Name')} : {citation.get('license', 'Unknown License')} "
-            f" --> {citation.get('description', 'No Description Available')}\n"
-        )
-
-    # Add a markdown cell with the formatted citations
-    nb.cells.append(create_markdown_cell(citation_cell))
+    # Add header markdown cells
+    nb.cells.append(create_markdown_cell(f"# {title}"))
+    nb.cells.append(create_markdown_cell(full_description))
 
     ########################################
     # Logic for Cell-1 in Jupyter Notebook
@@ -223,7 +259,7 @@ def main() -> None:
 
     with open(jupyter_notebook_path, "w") as f:
         nbf.write(jupyter_app_code, f)
-    print("Jupyter notebook saved at generated_notebook.ipynb")
+    print("Jupyter notebook saved as generated_notebook.ipynb")
 
 
 if __name__ == "__main__":

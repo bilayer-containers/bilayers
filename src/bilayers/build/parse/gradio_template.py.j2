@@ -388,44 +388,6 @@ def on_submit(
 {%- endif %}
 
 
-
-{% set DEFAULT_CITATIONS = {
-    "Gradio": [
-        {
-            "name" : "Gradio",
-            "doi" : "10.48550/arXiv.190602569",
-            "license" : "Apache License 2.0",
-            "description" : "A simple web interface for deploying machine learning models"
-        }
-    ],
-    "Bilayers": [
-        {
-            "name" : "Bilayers",
-            "doi": "N/A",
-            "license" : "BSD 3-Clause",
-            "description" : "A Container Specification and CI/CD  built for whole-community support"
-        }
-    ],
-} %}
-
-description_text = "Please cite the following while using Bilayers X Gradio Interface!\n\n"
-
-{# Loop over citations in the algorithm dictionary #}
-{% for citation in citations.algorithm.values() %}
-description_text += f"{{ citation.get('name', 'Unknown') }} under {{ citation.get('license', 'Unknown') }} License: {{ citation.get('doi', 'N/A') }} -- {{ citation.get('description', 'No Description Available') }}\n\n"
-{% endfor %}
-
-{# Loop over default citations (Gradio, Bilayers, etc.) #}
-{% for citation_list in DEFAULT_CITATIONS.values() -%}
-{% for citation in citation_list %}
-description_text += f"{{ citation.get('name', 'Unknown') }} under {{ citation.get('license', 'Unknown') }} License: {{ citation.get('doi', 'N/A') }} -- {{ citation.get('description', 'No Description Available') }}\n\n"
-{% endfor %}
-{%- endfor %}
-
-
-
-
-
 all_parameters: list[Any] = [
 
 {# Getting inputs #}
@@ -461,8 +423,8 @@ app = gr.Interface(
     fn=on_submit, 
     inputs=all_parameters,
     outputs=download_results_from_here, 
-    title="Gradio App",
-    description=f"<div style='text-align: center'>{description_text}</div>"
+    title="{{ title }}",
+    description="""{{ description }}"""
 )
 
 if __name__ == "__main__":

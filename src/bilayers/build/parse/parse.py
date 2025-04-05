@@ -3,15 +3,11 @@ import sys
 from typing import TypedDict, Any, Optional
 
 
-class CitationEntry(TypedDict):
+class Citations(TypedDict):
     name: str
     doi: str
     license: str
     description: str
-
-
-class Citations(TypedDict):
-    algorithm: dict[str, CitationEntry]
 
 
 class HiddenArgs(TypedDict, total=False):
@@ -69,7 +65,7 @@ class Parameter(TypedDict, total=False):
 
 
 class Config(TypedDict):
-    citations: Citations
+    citations: dict[str, Citations]
     algorithm_folder_name: str
     exec_function: ExecFunction
     inputs: dict[str, InputOutput]
@@ -99,11 +95,8 @@ def parse_config(config_path: Optional[str] = None) -> Config:
     config["parameters"] = {item["name"]: item for item in config.get("parameters", [])} if isinstance(config.get("parameters"), list) else {}
     config["display_only"] = {item["name"]: item for item in config.get("display_only", [])} if isinstance(config.get("display_only"), list) else {}
 
-    # Convert citations to a dictionary using "name" as key
-    config["citations"]["algorithm"] = (
-        {item["name"]: item for item in config["citations"].get("algorithm", [])} if isinstance(config["citations"].get("algorithm"), list) else {}
-    )
-
+    config["citations"] = {item["name"]: item for item in config.get("citations", [])} if isinstance(config.get("citations"), list) else {}
+    
     # Convert hidden_args to dictionary
     hidden_args = config["exec_function"].get("hidden_args", [])
     if isinstance(hidden_args, list):
@@ -116,7 +109,7 @@ def parse_config(config_path: Optional[str] = None) -> Config:
 
 def main(
     config_path: Optional[str] = None,
-) -> tuple[dict[str, InputOutput], dict[str, InputOutput], dict[str, Parameter], Optional[dict[str, Parameter]], ExecFunction, str, Citations]:
+) -> tuple[dict[str, InputOutput], dict[str, InputOutput], dict[str, Parameter], Optional[dict[str, Parameter]], ExecFunction, str, dict[str, Citations]]:
     """
     Loads the configuration and extracts necessary information.
 
@@ -147,7 +140,7 @@ def main(
 
     algorithm_folder_name: str = config.get("algorithm_folder_name", "")
 
-    citations: Citations = config.get("citations", {"algorithm": {}})
+    citations: dict[str, Citations] = config.get("citations", {})
 
     return inputs, outputs, parameters, display_only, exec_function, algorithm_folder_name, citations
 

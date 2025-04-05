@@ -1,9 +1,8 @@
 citations:
-  algorithm:
-    - name: "Cellpose"
-      doi: 10.1038/s41592-020-01018-x
-      license: "BSD 3-Clause"
-      description: "Deep Learning algorithm for cell segmentation in microscopy images"
+  - name: "Cellpose"
+    doi: 10.1038/s41592-020-01018-x
+    license: "BSD 3-Clause"
+    description: "Deep Learning algorithm for cell segmentation in microscopy images"
 
 docker_image:
   org: cellprofiler

@@ -732,7 +732,7 @@ packages:
 - pypi: .
   name: bilayers
   version: 0.1.0
-  sha256: e18ea89f919f42a4b99ce0275eb9fd94c58893bcfc3cc972f3cbe9f6c99f2ee8
+  sha256: 65baa9e33842a07e712546687345f35ebb9594f749a5a23371b4fe2507e5121d
   requires_dist:
   - nox>=2024.4.15,<2025
   - pyyaml>=6.0.1,<7
@@ -746,6 +746,7 @@ packages:
   - ipywidgets ; extra == 'dev'
   - gradio ; extra == 'dev'
   - pytest ; extra == 'dev'
+  - ruff ; extra == 'dev'
   requires_python: '>=3.9'
   editable: true
 - conda: https://conda.anaconda.org/conda-forge/linux-64/bzip2-1.0.8-h4bc722e_7.conda

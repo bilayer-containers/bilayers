@@ -1,9 +1,8 @@
 citations:
-  algorithm: 
-    - name: "Classical Segmentation"
-      doi: doi_number
-      license: license_details
-      description: "Segments images using classical thresholding methods : Otsu and Li"
+  - name: "Classical Segmentation"
+    doi: doi_number
+    license: license_details
+    description: "Segments images using classical thresholding methods : Otsu and Li"
 
 docker_image:
   org: bilayer

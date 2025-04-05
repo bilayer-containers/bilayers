@@ -1,9 +1,8 @@
 citations:
- algorithm:
-   - name: ""
-     doi: ""
-     license: ""
-     description: ""
+  - name: ""
+    doi: ""
+    license: ""
+    description: ""
 
 docker-image:
   org: ""

@@ -1,9 +1,8 @@
 citations:
-  algorithm: 
-    - name: "Testing"
-      doi: xyz
-      license: "sample license"
-      description: "Deep Learning algorithm for cell segmentation in microscopy images"
+  - name: "Testing"
+    doi: xyz
+    license: "sample license"
+    description: "Deep Learning algorithm for cell segmentation in microscopy images"
 
 docker_image:
   org: cellprofiler

@@ -3,7 +3,7 @@ name: Docker-Build Pipeline
 on:
   push:
     branches:
-      - selfhosted_runner
+      - main
   # TODO: disable until caching system is implemented
   # pull_request:
   #   types: [opened, reopened, synchronize, ready_for_review, review_requested]

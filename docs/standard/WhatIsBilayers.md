@@ -24,11 +24,11 @@ Containers are lightweight piece of software that contains all the code, librari
 Docker is a containerization platform that allows you to package code and dependencies into a Docker image that can be run on any machine. It allows your application to be separated from your infrastructure. The image that you created is portable, so you can run it on any machine that has Docker installed.
 
 ## Quick Links
-##### Getting Started with Pre-Built Docker Images
+### Getting Started with Pre-Built Docker Images
 Learn how to quickly start using Bilayers with our pre-built Docker images. [Start Here](../tool-user)
 
-##### Generating Interfaces for Your Custom Algorithm
+### Generating Interfaces for Your Custom Algorithm
 Follow our guide to create a web or Jupyter Notebook interface for your deep-learning algorithm. [Learn More](../custom-algorithm)
 
-##### Contribution & Developer Guidelines
+### Contribution & Developer Guidelines
 Want to contribute to Bilayers? Check out our developer guidelines and learn how to submit your custom interfaces. Read the Guidelines

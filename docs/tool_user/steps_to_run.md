@@ -12,27 +12,27 @@ Bilayers provides ready-to-use Docker images with Gradio or Jupyter Notebook int
 
 **Available Docker Images:**
 - classical_segmentation X Gradio :
-  ```{code}
+  ```{code} bash
   docker pull bilayer/classical_segmentation:1.0.0-gradio 
   ```
 - classical_segmentation X Jupyter_Notebook :
-  ```{code}
+  ```{code} bash
   docker pull bilayer/classical_segmentation:1.0.0-jupyter 
   ```
 - cellpose_inference X Gradio :
-  ```{code}
+  ```{code} bash
   docker pull bilayer/cellpose:1.0.1-gradio
   ```
 - cellpose_inference X Jupyter_Notebook :
-  ```{code}
+  ```{code} bash
   docker pull bilayer/cellpose:1.0.0-jupyter
   ```
 - instanseg_inference X Gradio :
-  ```{code}
+  ```{code} bash
   docker pull bilayer/instanseg:1.0.2_pixi_gradio
   ```
 - instanseg_inference X Jupyter :
-  ```{code}
+  ```{code} bash
   docker pull bilayer/instanseg:1.0.2_pixi_jupyter
   ```
 

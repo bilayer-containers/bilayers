@@ -10,12 +10,12 @@ authors:
 Go to [Bilayers GitHub Repo](https://github.com/bilayer-containers/bilayers/tree/main)
 - Click the Fork button on top-right corner
 - Clone your forked repository to your local system
-```{code} yaml
+```{code} bash
 git clone https://github.com/your-username/bilayers.git
 cd bilayers
 ```
 - Set the original repository as your upstream
-```{code} yaml
+```{code} bash
 git remote add upstream https://github.com/bilayer-containers/bilayers.git
 ```
 
@@ -65,36 +65,36 @@ display_only:
 ## 3. Update CI/CD Configuration
 - To enable automated interface generation and testing, update the following files:
   `scripts/build_docker.sh`: Edit your algorithm name to `line #7`:
-  ```{code}
+  ```{code} bash
   ALGORITHM_NAMES=(“your_algorithm”)
   ```
   `scripts/validate.sh`: Edit your algorithm name to `line #6`:
-  ```{code}
+  ```{code} bash
   ALGORITHM_NAMES=(“your_algorithm”)
   ```
 
 ## 4. Test on your end 
 - Build and test your Docker images locally. 
-  ```{code}
+  ```{code} bash
   ./scripts/build_docker.sh
   ```
 - Push them to your personal DockerHub repository for validation:
-  ```{code}
+  ```{code} bash
   docker build -t your-dockerhub-repo/your-algorithm:tag .
   ```
-  ```{code}
+  ```{code} bash
   docker push your-dockerhub-repo/your-algorithm:tag
   ```
 - Share your work with the community by submitting a pull request to Bilayers
 
 ## 5. Commit your changes
-  ```{code}
+  ```{code} bash
   git add .
   ```
-  ```{code}
+  ```{code} bash
   git commit -m "[Add] new algorithm: algorithm_name"
   ```
-  ```{code}
+  ```{code} bash
   git push origin main
   ```
 

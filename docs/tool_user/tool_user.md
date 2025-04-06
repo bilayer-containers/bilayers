@@ -23,7 +23,7 @@ Bilayers provides pre-configured Docker images for widely used bioimage analysis
     You’ll need a DockerHub account to pull and run images.  
     Sign up for DockerHub if you don’t have an account.  
     Log in via the command line:
-    ```{code}
+    ```{code} bash
     docker login
     ```
     You’ll be prompted to enter your DockerHub username and password.
@@ -31,7 +31,7 @@ Bilayers provides pre-configured Docker images for widely used bioimage analysis
 3. Verify Your Docker Installation (Optional but Recommended)
    
     To confirm Docker is installed correctly, run:
-    ```{code}
+    ```{code} bash
     docker run hello-world
     ```
     If everything is set up properly, you should see a message indicating that Docker is running successfully.

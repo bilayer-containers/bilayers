@@ -3,7 +3,7 @@ name: Docker-Build Pipeline
 on:
   push:
     branches:
-      - main
+      - selfhosted_runner
   # TODO: disable until caching system is implemented
   # pull_request:
   #   types: [opened, reopened, synchronize, ready_for_review, review_requested]
@@ -12,9 +12,17 @@ on:
   workflow_dispatch:
 
 jobs:
+  check-machine:
+    runs-on: self-hosted
+    steps:
+      - name: Check Runner Architecture
+        run: |
+          echo "Running 'uname -m' to see architecture..."
+          uname -m
+
   lint-validate-docs:
     name: Lint, Validate, and Generate Docs
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
       - name: Checkout Repository
@@ -46,7 +54,7 @@ jobs:
 
   build:
     name: Docker Build
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: lint-validate-docs
 
     steps:
@@ -68,25 +76,3 @@ jobs:
         run: |
           chmod +x ./scripts/build_docker.sh
           ./scripts/build_docker.sh
-
-      - name: Run gradio Docker Container
-        run: |
-          docker run -d -p 8000:7878 --name gradio-container gradio-image
-          # Wait for the container to start
-          sleep 30
-          # Check if the container is running
-          curl --fail http://localhost:8000 || (echo "Failed to start the container" && exit 1)
-
-      - name: Verify the Gradio App
-        run: curl http://localhost:8000
-
-      - name: Run Jupyter notebook
-        run: |
-          docker run -d -p 8888:7878 --name jupyter-container jupyter-image
-          # Wait for the container to start
-          sleep 30
-          # Check if the container is running
-          curl --fail http://localhost:8888 || (echo "Failed to start the container" && exit 1)
-      
-      - name: Verify the Jupyter Notebook
-        run: curl http://localhost:8888

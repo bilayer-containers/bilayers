@@ -21,7 +21,7 @@ git remote add upstream https://github.com/bilayer-containers/bilayers.git
 
 ## 2. Add Your Algorithm Folder
 - Open the project in VS Code
-- Navigate to `src/algorithms` and create a new folder for your algorithm
+- Navigate to `src/bilayers/algorithms` and create a new folder for your algorithm
 - **Naming convention:** Use `algorithm_inference` or `algorithm_training` based on the task 
 - Add a `__init__.py` file to your folder
 - Add a `config.yaml` file to your folder 
@@ -31,13 +31,12 @@ Use the provided skeleton as a starting point
 :open:
 ```{code} yaml
 citations:
-  algorithm:
-    - name: ""
-      doi: ""
-      license: ""
-      description: ""
+  - name: ""
+    doi: ""
+    license: ""
+    description: ""
 
-docker-image:
+docker_image:
   org:
   name:
   tag:
@@ -47,8 +46,6 @@ algorithm_folder_name:
 
 exec_function:
   name: "generate_cli_command"
-  script:
-  module:
   cli_command:
   hidden_args:
 

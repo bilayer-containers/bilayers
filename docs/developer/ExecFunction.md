@@ -31,11 +31,7 @@ URI: [https://w3id.org/my-org/bilayers_schema/:ExecFunction](https://w3id.org/my
     click HiddenArgs href "../HiddenArgs"
 
         
-      ExecFunction : module
-        
       ExecFunction : name
-        
-      ExecFunction : script
         
       
 ```
@@ -51,8 +47,6 @@ URI: [https://w3id.org/my-org/bilayers_schema/:ExecFunction](https://w3id.org/my
 | Name | Cardinality and Range | Description | Inheritance |
 | ---  | --- | --- | --- |
 | [name](name.md) | 1 <br/> [String](String.md) | Name of the docker_image, algorithm, parameter, display_only | direct |
-| [script](script.md) | 1 <br/> [String](String.md) | Script to execute the Algorithm | direct |
-| [module](module.md) | 1 <br/> [String](String.md) | Module to execute the Algorithm | direct |
 | [cli_command](cli_command.md) | 1 <br/> [String](String.md) | CLI command to execute the Algorithm | direct |
 | [hidden_args](hidden_args.md) | * <br/> [HiddenArgs](HiddenArgs.md) | Hidden arguments for the Algorithm | direct |
 
@@ -124,8 +118,6 @@ aliases:
 - construct_cli_command
 slots:
 - name
-- script
-- module
 - cli_command
 - hidden_args
 
@@ -156,29 +148,7 @@ attributes:
     - AbstractUserInterface
     - ExecFunction
     - DockerImage
-    - TypeAlgorithmFromCitation
-    range: string
-    required: true
-  script:
-    name: script
-    description: Script to execute the Algorithm
-    from_schema: https://w3id.org/my-org/bilayers_schema
-    rank: 1000
-    alias: script
-    owner: ExecFunction
-    domain_of:
-    - ExecFunction
-    range: string
-    required: true
-  module:
-    name: module
-    description: Module to execute the Algorithm
-    from_schema: https://w3id.org/my-org/bilayers_schema
-    rank: 1000
-    alias: module
-    owner: ExecFunction
-    domain_of:
-    - ExecFunction
+    - TypeCitations
     range: string
     required: true
   cli_command:

@@ -7,7 +7,7 @@ authors:
 ---
 To define an interface for your algorithm, it is essential to understand the structure and key components of the `config.yaml` file (aka spec file).
 
-The config.yaml file specifies how the interface interacts with the algorithm and is located at: `bilayers/src/algorithms/algorithm_name/config.yaml`.   
+The config.yaml file specifies how the interface interacts with the algorithm and is located at: `bilayers/src/bilayers/algorithms/algorithm_name/config.yaml`.   
 Here, `algorithm_name` should accurately represent the task, such as `cellpose_inference` or `cellpose_training`.
 
 Each config.yaml contains key sections  that define how an algorithm integrates with an interface. These sections include: `citations`, `docker_image`, `algorithm_folder_name`, `exec_function`, `inputs`, `outputs`, `parameters`, and `display_only`. The skeleton structure can be copied from an existing example.
@@ -16,7 +16,7 @@ Once defined, the config.yaml is processed to generate an executable CLI command
 
 ## Key Sections of `config.yaml`
 
-- **citations**: References relevant research citation, doi, and/or license associated with the algorithm.
+- **citations**: References relevant research citation, doi, and license associated with the algorithm.
 - **docker_image**: Defines the Docker image used for execution, including the organization, repository name, and tag.
 - **algorithm_folder_name**: Specifies the directory where the generated Gradio and Jupyter Notebook interface files are stored.
 - **exec_function**: Defines the function that converts the config.yaml (i.e. spec file) into a Gradio or Jupyter Notebook interface. It also includes the base command (e.g., python -m cellpose) that serves as the entry point for execution and a special **`hidden_args`** section if applicable.
@@ -28,13 +28,12 @@ Once defined, the config.yaml is processed to generate an executable CLI command
 ```{code} yaml
 :filename: config.yaml
 citations:
-  algorithm:
-    - name: ""
-      doi: ""
-      license: ""
-      description: ""
+  - name: ""
+    doi: ""
+    license: ""
+    description: ""
 
-docker-image:
+docker_image:
   org:
   name:
   tag:
@@ -44,8 +43,6 @@ algorithm_folder_name:
 
 exec_function:
   name: "generate_cli_command"
-  script:
-  module:
   cli_command:
   hidden_args:
     # - cli_tag:
@@ -68,31 +65,37 @@ Before you start working on the `config.yaml` file, we recommend reviewing the c
 The `cli_command` is the starting point for executing the command line, like `python -m cellpose`, which is then followed by appending parameters and their arguments. We will cover more about `cli_command` in the context of the `exec_function`, but for now, it's important to understand its role.
 
 ## Defining citations
-Citations are used to credit the relevant works associated with the algorithm. Include the correct name, doi, license and description of the algorithm. Guidelines on how to find citations can be found here. Note that interface citations are added dynamically, so you don’t need to include them manually.
+Citations are used to credit the relevant works associated with the algorithm. Include the correct name, doi, license and description of the algorithm. Guidelines on how to find citations can be found [here](https://github.com/bilayer-containers/bilayers/issues/32).
+
 ```{code} yaml
 :filename: config.yml
 citations:
-  algorithm:
-    - name: "cite-1"
-      doi: ""
-      license: ""
-      description: ""
-    - name: "cite-2"
-      doi: ""
-      license: ""
-      description: ""
+  - name: "cite-1"
+    doi: ""
+    license: ""
+    description: ""
+  - name: "cite-2"
+    doi: ""
+    license: ""
+    description: ""
 ```
+
+:::{note}
+Interface citations are added dynamically, so you don’t need to include them manually!
+:::
 
 Sample Example:
 ```{code} yaml
 :filename: config.yml
 citations:
-  algorithm:
-    - name: "Cellpose"
-      doi: 10.1038/s41592-020-01018-x
-      license: "BSD 3-Clause"
-      description: "Deep Learning algorithm for cell segmentation in microscopy images"
+  - name: "Cellpose"
+    doi: 10.1038/s41592-020-01018-x
+    license: "BSD 3-Clause"
+    description: "Deep Learning algorithm for cell segmentation in microscopy images"
 ```
+:::{important}
+Each citation’s name field must be unique. If an algorithm requires multiple citations, differentiate them by appending a unique suffix. For example, if instanseg needs two citations, you might use names like `instanseg_brightfield` and `instanseg_fluorescence` to clearly distinguish them.
+:::
 
 ## Defining docker_image
 Each interface’s Docker image is built on top of the base Docker image specific to the algorithm. Therefore, it's highly recommended to choose an algorithm with a pre-built Docker image available on DockerHub.
@@ -112,7 +115,7 @@ To learn more about docker image naming, refer to [What are Docker tags?](https:
 Also, here’s the template to directly paste in your config.yaml file
 ```{code} yaml
 :filename: config.yml
-docker-image:
+docker_image:
   org: 
   name: 
   tag: 
@@ -124,15 +127,13 @@ This specifies the folder where the generated Gradio and Jupyter Notebook interf
 Example: algorithm_folder_name: "cellpose_inference"
 
 ## Defining exec_function
-exec_function is instrumental in converting the yaml file to desired interface. It defines the specific function responsible for this conversion. The `exec_function` consists of the following components: `name`, `script`, `module`, `cli_command`, and `hidden_args`.
+exec_function is instrumental in converting the yaml file to desired interface. It defines the specific function responsible for this conversion. The `exec_function` consists of the following components: `name`, `cli_command`, and `hidden_args`.
 
 Below is the template to attach directly to your configuration file, followed by a breakdown:
 ```{code} yaml
 :filename: config.yml
 exec_function:
   name: "generate_cli_command"
-  script: ""
-  module: "algorithms."
   cli_command: ""
   hidden_args:
     # dummy example
@@ -147,24 +148,15 @@ Below is an example to follow, along with a breakdown of each component:
 :filename: config.yml
 exec_function:
   name: "generate_cli_command"
-  script: "cellpose_inference"
-  module: "algorithms.cellpose_inference"
   cli_command: "python -m cellpose --verbose"
   hidden_args:
-    # dummy example
-    # - cli_tag: "--save_png"
-    #   value: "True"
-    #   append_value: False
-    #   cli_order: 3
+    - cli_tag: "--save_png"
+      value: "True"
+      append_value: False
+      cli_order: 3
 ```
 - name: This is the name of the function that converts the `yaml` file into the interface dynamically. It remains the same for all algorithms, so no changes are needed. 
  name: "generate_cli_command"
-
-- script: The name of the algorithm’s parent folder, which can either be `algorithm_inference` or `algorithm_training`.  
-Example: script: "cellpose_inference"
-
-- module: The module name for the algorithm, followed by the script name, separated by a dot.
-Example: module: "Algorithms.cellpose_inference"
 
 - cli_command: As mentioned earlier, the cli_command refers to the `module execution` in the documentation. This serves as the starting point, and the cli_tag and argument pairs are appended to it. Refer to the documentation for proper configuration.
 
@@ -227,7 +219,11 @@ section_id: ""
 mode: ""
 ```
 - **name**: This should be a simple name, for self-identification purpose. Ideally matching the `cli_tag` (without hyphens). Use underscores instead of spaces. 
-  Example: ```name: use_gpu```. 
+  Example: ```name: use_gpu```.
+
+:::{important}
+The name field must be unique within each section—inputs, outputs, parameters, and display_only. These names are used as dictionary keys to reference the corresponding entries in downstream processes (such as interface generation and parameter lookup). Duplicate names can lead to unexpected behavior or errors.
+:::
 
 - **type**: This defines the `type` of the `inputs` and `outputs`. Its an umbrella of type `files`. So, ideally, it's categorized in 5 `types of files`. Those are `image`, `measurement`, `array`, `file`, `executable`.
   
@@ -236,6 +232,31 @@ mode: ""
   ![Types In Inputs and Outputs](../images/custom_algorithm/input_output_type.png)
 
   :::{dropdown} type: image
+  **Skeleton configuration (fill in the values as needed):**
+    ```{code} yaml
+    - name: 
+      type: image
+      label: 
+      subtype:
+        - 
+      description: 
+      cli_tag: 
+      cli_order: 
+      default: 
+      optional: 
+      format: 
+        - 
+      folder_name: 
+      file_count: 
+      section_id: 
+      mode: 
+      depth: 
+      timepoints: 
+      tiled: 
+      pyramidal: 
+    ```
+    
+    **Input configuration template showing all the accepted values:**
     ```{code} yaml
     - name: input_images
       type: image
@@ -271,6 +292,25 @@ mode: ""
     :::
 
   :::{dropdown} type: measurement
+    **Skeleton configuration (fill in the values as needed):**
+    ```{code} yaml
+    - name:  
+      type: measurement
+      label: 
+      description: 
+      cli_tag: 
+      cli_order: 
+      default: 
+      optional: 
+      format: 
+        - 
+      folder_name: 
+      file_count: 
+      section_id: 
+      mode: 
+    ```
+
+    **Input configuration template showing all the accepted values:**
     ```{code} yaml
     - name: input_measurement # a meaningful name for measurement file(/s) which can be self-explanatory for user 
       type: measurement
@@ -292,6 +332,25 @@ mode: ""
     :::
   
   :::{dropdown} type: array
+    **Skeleton configuration (fill in the values as needed):**
+    ```{code} yaml
+    - name: 
+      type: array
+      label: 
+      description: 
+      cli_tag: 
+      cli_order: 
+      default: 
+      optional: 
+      format: 
+        - 
+      folder_name: 
+      file_count: 
+      section_id: 
+      mode: 
+    ```
+
+     **Input configuration template showing all the accepted values:**
     ```{code} yaml
     - name: input_array # a meaningful name for array(/s) which can be self-explanatory for user
       type: array
@@ -312,6 +371,25 @@ mode: ""
     :::
 
   :::{dropdown} type: file
+    **Skeleton configuration (fill in the values as needed):**
+    ```{code} yaml
+    - name: 
+      type: file
+      label: 
+      description: 
+      cli_tag: 
+      cli_order: 
+      default: 
+      optional: 
+      format: 
+        - 
+      folder_name: 
+      file_count: 
+      section_id: 
+      mode: 
+    ```
+
+     **Input configuration template showing all the accepted values:**
     ```{code} yaml
     - name: input_file
       type: file
@@ -333,6 +411,25 @@ mode: ""
     :::
 
   :::{dropdown} type: executable
+    **Skeleton configuration (fill in the values as needed):**
+    ```{code} yaml
+    - name: 
+      type: executable
+      label: 
+      description: 
+      cli_tag: 
+      cli_order: 
+      default: 
+      optional: 
+      format: 
+        - 
+      folder_name: 
+      file_count: 
+      section_id: 
+      mode: 
+    ```
+
+     **Input configuration template showing all the accepted values:**
     ```{code} yaml
     - name: input_executable
       type: executable
@@ -549,6 +646,7 @@ mode: ""
         <td>append_value</td>
         <td>True | False</td>
         <td>Determines how the CLI command is constructed:
+
             - If append_value: True:
                 - If user input is True: --cli_tag True
                 - If user input is False: --cli_tag False
@@ -579,13 +677,13 @@ mode: ""
         <td>radio</td>
         <td>
 
-            options:
-                - label: GRAY
-                value: 0
-                - label: RED
-                value: 1
-                - label: GREEN
-                value: 2
+        options:
+          - label: GRAY
+            value: 0
+          - label: RED
+            value: 1
+          - label: GREEN
+            value: 2
 
     </td>
         <td>List of labels and values</td>
@@ -598,13 +696,13 @@ mode: ""
         <td>dropdown</td>
         <td>
 
-            options:
-                - label: GRAY
-                  value: 0
-                - label: RED
-                  value: 1
-                - label: GREEN
-                  value: 2
+        options:
+          - label: GRAY
+            value: 0
+          - label: RED
+            value: 1
+          - label: GREEN
+            value: 2
     
     </td>
         <td>List of labels and values</td>

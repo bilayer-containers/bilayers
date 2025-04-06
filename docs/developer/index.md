@@ -24,7 +24,6 @@ Name: bilayers_schema
 | [HiddenArgs](HiddenArgs.md) | Hidden arguments for the Algorithm |
 | [RadioOptions](RadioOptions.md) | Options of the Radio button in parameters, display_only |
 | [SpecContainer](SpecContainer.md) | SpecContianer class which holds all the high_level keywords from config.yaml file of specific algorithm |
-| [TypeAlgorithmFromCitation](TypeAlgorithmFromCitation.md) | Algorithm's citations |
 | [TypeCitations](TypeCitations.md) | Citations of the Algorithm |
 
 
@@ -33,7 +32,6 @@ Name: bilayers_schema
 
 | Slot | Description |
 | --- | --- |
-| [algorithm](algorithm.md) | Algorithm's citations |
 | [algorithm_folder_name](algorithm_folder_name.md) | Main folder name of the algorithm to put the generated files in the folder |
 | [append_value](append_value.md) | Append value of the hidden argument |
 | [citations](citations.md) | Citations of the Algorithm |
@@ -56,7 +54,6 @@ Name: bilayers_schema
 | [label](label.md) | Label of the object, but also Radio button's label |
 | [license](license.md) | License of the Algorithm |
 | [mode](mode.md) | Mode of the object |
-| [module](module.md) | Module to execute the Algorithm |
 | [multiselect](multiselect.md) | Multiselect value of the dropdown |
 | [name](name.md) | Name of the docker_image, algorithm, parameter, display_only |
 | [optional](optional.md) | Optional value of the object |
@@ -68,7 +65,6 @@ Name: bilayers_schema
 | [path](path.md) | Path of the inputs and outputs |
 | [platform](platform.md) | Platform on which the docker image was built |
 | [pyramidal](pyramidal.md) | whether pyramidal images are accepted via tool |
-| [script](script.md) | Script to execute the Algorithm |
 | [section_id](section_id.md) | Section ID of the object |
 | [subtype](subtype.md) | Subtype of the inputs and outputs |
 | [tag](tag.md) | Tag of the docker image |

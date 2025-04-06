@@ -35,6 +35,8 @@ URI: [https://w3id.org/my-org/bilayers_schema/:citations](https://w3id.org/my-or
 
 * Range: [TypeCitations](TypeCitations.md)
 
+* Multivalued: True
+
 * Required: True
 
 
@@ -80,6 +82,7 @@ domain_of:
 - SpecContainer
 range: TypeCitations
 required: true
+multivalued: true
 
 ```
 </details>

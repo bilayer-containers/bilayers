@@ -27,7 +27,7 @@ URI: [https://w3id.org/my-org/bilayers_schema/:SpecContainer](https://w3id.org/m
           
     
     
-    SpecContainer --> "1" TypeCitations : citations
+    SpecContainer --> "1..*" TypeCitations : citations
     click TypeCitations href "../TypeCitations"
 
         
@@ -105,7 +105,7 @@ URI: [https://w3id.org/my-org/bilayers_schema/:SpecContainer](https://w3id.org/m
 | [exec_function](exec_function.md) | 1 <br/> [ExecFunction](ExecFunction.md) | Function to execute the Algorithm | direct |
 | [docker_image](docker_image.md) | 0..1 <br/> [DockerImage](DockerImage.md) | Description of docker_image for the specific algorithm | direct |
 | [algorithm_folder_name](algorithm_folder_name.md) | 0..1 <br/> [String](String.md) | Main folder name of the algorithm to put the generated files in the folder | direct |
-| [citations](citations.md) | 1 <br/> [TypeCitations](TypeCitations.md) | Citations of the Algorithm | direct |
+| [citations](citations.md) | 1..* <br/> [TypeCitations](TypeCitations.md) | Citations of the Algorithm | direct |
 
 
 
@@ -268,6 +268,7 @@ attributes:
     - SpecContainer
     range: TypeCitations
     required: true
+    multivalued: true
 
 ```
 </details>

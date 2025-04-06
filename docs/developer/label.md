@@ -23,13 +23,13 @@ URI: [https://w3id.org/my-org/bilayers_schema/:label](https://w3id.org/my-org/bi
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [TypeParameter](TypeParameter.md) | Parameters of a specific Algorithm |  no  |
-| [TypeDisplayOnly](TypeDisplayOnly.md) | Display only parameters of a specific Algorithm |  no  |
-| [TypeOutput](TypeOutput.md) | Outputs of the algorithm to the next step in the workflow |  no  |
-| [TypeInput](TypeInput.md) | Inputs to the algorithm from the last step of the workflow |  no  |
-| [RadioOptions](RadioOptions.md) | Options of the Radio button in parameters, display_only |  no  |
-| [AbstractWorkflowDetails](AbstractWorkflowDetails.md) | Abstract class for details needed to fit config in the workflow |  no  |
 | [AbstractUserInterface](AbstractUserInterface.md) | Abstract class for user interface |  no  |
+| [RadioOptions](RadioOptions.md) | Options of the Radio button in parameters, display_only |  no  |
+| [TypeInput](TypeInput.md) | Inputs to the algorithm from the last step of the workflow |  no  |
+| [TypeDisplayOnly](TypeDisplayOnly.md) | Display only parameters of a specific Algorithm |  no  |
+| [AbstractWorkflowDetails](AbstractWorkflowDetails.md) | Abstract class for details needed to fit config in the workflow |  no  |
+| [TypeParameter](TypeParameter.md) | Parameters of a specific Algorithm |  no  |
+| [TypeOutput](TypeOutput.md) | Outputs of the algorithm to the next step in the workflow |  no  |
 
 
 

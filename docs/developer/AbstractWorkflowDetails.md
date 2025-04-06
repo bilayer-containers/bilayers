@@ -247,7 +247,7 @@ attributes:
     - AbstractUserInterface
     - ExecFunction
     - DockerImage
-    - TypeAlgorithmFromCitation
+    - TypeCitations
     range: string
     required: true
   type:
@@ -285,7 +285,7 @@ attributes:
     domain_of:
     - AbstractWorkflowDetails
     - AbstractUserInterface
-    - TypeAlgorithmFromCitation
+    - TypeCitations
     range: string
   cli_tag:
     name: cli_tag

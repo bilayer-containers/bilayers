@@ -169,23 +169,23 @@ In command-line systems, there are several common command line patterns used for
 6. someexecutable --unordered_flag_1=unordered_value_1 --unordered_flag_2 unordered_value_2
 7. someexecutable --ordered_flag_1=ordered_value_1 unordered_value_2
 
-#### What are ordered_flag and unordered_flag?
+### What are ordered_flag and unordered_flag?
 In some cases, cli_command requires flags in fixed positions (e.g., always the 1st or last argument). To handle this, we use the cli_order flag. Here's how it works:
 - Specify a positive number (1 to n) in cli_order to fix the position of the cli_flag and argument pair.
 - If cli_order is set to 0 or not specified, it will be treated as an unordered_flag, and all such flags will appear after ordered ones.
 - Negative numbers in cli_order will place the flag in the last position, after all unordered flags.
 
-#### How to specify --flag_1=value_1?
+### How to specify --flag_1=value_1?
 By default, flags and their arguments are appended with a space between them. If you want to use = between the flag and value, simply add an = at the end of cli_tag.
 For example, 
 cli_tag: “--savedir=”
 default: “/bilayers/my_outputs”
 This will generate: someexecutable --savedir=/bilayers/my_outputs
 
-#### hidden_args: Need of hidden_args?
+### hidden_args: Need of hidden_args?
 Sometimes, certain `cli_tag` and argument values should always be included in the `cli_command`, but you don’t want to expose them in the user interface. In these cases, use `hidden_args`.
 
-#### Where can it be used?
+### Where can it be used?
 A potential use case for hidden_args is ensuring output files are saved to a specific folder without allowing the user to modify it. If the algorithm's command-line usage includes a specific cli_tag for this, you can define it as a hidden_arg. Use the following fields to configure hidden_args:
 
   - `cli_tag`: The command-line tag to be used.
@@ -583,7 +583,7 @@ mode: ""
     Below is a list of supported types and how they will appear in Gradio or Jupyter Notebook.
 
     :::{table} supported type in config.yaml
-    :label: tbl:areas-html
+    :label: tbl:config-supported-types
 
     <table>
     <tr>
@@ -625,13 +625,13 @@ mode: ""
     </table>
     :::
 
-    #### Details on the `type` Tag
+    ### Details on the `type` Tag
     `type` is the whole world in itself!
 
     With the different `type` there are certain extra flags that you need to put in depending on the value of the flag `type`.
 
     :::{table} Understanding which extra flags are needed and their purpose
-    :label: tbl:areas-html
+    :label: tbl:extra-flags
 
     <table>
     <tr>

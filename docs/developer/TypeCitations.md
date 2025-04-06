@@ -20,14 +20,13 @@ URI: [https://w3id.org/my-org/bilayers_schema/:TypeCitations](https://w3id.org/m
  classDiagram
     class TypeCitations
     click TypeCitations href "../TypeCitations"
-      TypeCitations : algorithm
+      TypeCitations : description
         
-          
-    
-    
-    TypeCitations --> "1..*" TypeAlgorithmFromCitation : algorithm
-    click TypeAlgorithmFromCitation href "../TypeAlgorithmFromCitation"
-
+      TypeCitations : doi
+        
+      TypeCitations : license
+        
+      TypeCitations : name
         
       
 ```
@@ -42,7 +41,10 @@ URI: [https://w3id.org/my-org/bilayers_schema/:TypeCitations](https://w3id.org/m
 
 | Name | Cardinality and Range | Description | Inheritance |
 | ---  | --- | --- | --- |
-| [algorithm](algorithm.md) | 1..* <br/> [TypeAlgorithmFromCitation](TypeAlgorithmFromCitation.md) | Algorithm's citations | direct |
+| [name](name.md) | 1 <br/> [String](String.md) | Name of the docker_image, algorithm, parameter, display_only | direct |
+| [doi](doi.md) | 0..1 <br/> [String](String.md) | DOI of the Algorithm | direct |
+| [license](license.md) | 0..1 <br/> [String](String.md) | License of the Algorithm | direct |
+| [description](description.md) | 0..1 <br/> [String](String.md) | Description of the Algorithm | direct |
 
 
 
@@ -107,7 +109,10 @@ from_schema: https://w3id.org/my-org/bilayers_schema
 aliases:
 - citations
 slots:
-- algorithm
+- name
+- doi
+- license
+- description
 
 ```
 </details>
@@ -122,18 +127,53 @@ from_schema: https://w3id.org/my-org/bilayers_schema
 aliases:
 - citations
 attributes:
-  algorithm:
-    name: algorithm
-    description: Algorithm's citations
+  name:
+    name: name
+    description: Name of the docker_image, algorithm, parameter, display_only
     from_schema: https://w3id.org/my-org/bilayers_schema
     rank: 1000
-    alias: algorithm
+    alias: name
+    owner: TypeCitations
+    domain_of:
+    - AbstractWorkflowDetails
+    - AbstractUserInterface
+    - ExecFunction
+    - DockerImage
+    - TypeCitations
+    range: string
+    required: true
+  doi:
+    name: doi
+    description: DOI of the Algorithm
+    from_schema: https://w3id.org/my-org/bilayers_schema
+    rank: 1000
+    alias: doi
     owner: TypeCitations
     domain_of:
     - TypeCitations
-    range: TypeAlgorithmFromCitation
-    required: true
-    multivalued: true
+    range: string
+  license:
+    name: license
+    description: License of the Algorithm
+    from_schema: https://w3id.org/my-org/bilayers_schema
+    rank: 1000
+    alias: license
+    owner: TypeCitations
+    domain_of:
+    - TypeCitations
+    range: string
+  description:
+    name: description
+    description: Description of the Algorithm
+    from_schema: https://w3id.org/my-org/bilayers_schema
+    rank: 1000
+    alias: description
+    owner: TypeCitations
+    domain_of:
+    - AbstractWorkflowDetails
+    - AbstractUserInterface
+    - TypeCitations
+    range: string
 
 ```
 </details>

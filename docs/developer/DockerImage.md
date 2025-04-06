@@ -150,7 +150,7 @@ attributes:
     - AbstractUserInterface
     - ExecFunction
     - DockerImage
-    - TypeAlgorithmFromCitation
+    - TypeCitations
     range: string
     required: true
   tag:

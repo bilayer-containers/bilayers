@@ -23,7 +23,7 @@ URI: [https://w3id.org/my-org/bilayers_schema/:license](https://w3id.org/my-org/
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [TypeAlgorithmFromCitation](TypeAlgorithmFromCitation.md) | Algorithm's citations |  no  |
+| [TypeCitations](TypeCitations.md) | Citations of the Algorithm |  no  |
 
 
 
@@ -75,7 +75,7 @@ from_schema: https://w3id.org/my-org/bilayers_schema
 rank: 1000
 alias: license
 domain_of:
-- TypeAlgorithmFromCitation
+- TypeCitations
 range: string
 
 ```

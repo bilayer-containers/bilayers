@@ -8,7 +8,7 @@ from src.bilayers.build.parse.parse import parse_config
 def test_main():
     # Use a real configuration file path from your project.
     config_path = "../../bilayers/algorithms/classical_segmentation/config.yaml"
-    
+
     # Parse the configuration file.
     config = parse_config(config_path)
 

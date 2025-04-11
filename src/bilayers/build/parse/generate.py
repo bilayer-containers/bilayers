@@ -8,7 +8,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 import nbformat as nbf
 
 # Import TypedDict definitions from parse.py
-from parse import InputOutput, Parameter, ExecFunction, Citations  # type: ignore
+from parse import InputOutput, Parameter, ExecFunction, Citations, DockerImage  # type: ignore
 
 
 def generate_top_level_text(interface: str, citations: dict[str, Citations], output_html: bool = True) -> tuple[str, str]:
@@ -209,6 +209,80 @@ def generate_jupyter_notebook(
 
     return nb
 
+def generate_cellprofiler_plugin(
+        template_path: str,
+        inputs: dict[str, InputOutput],
+        outputs: dict[str, InputOutput],
+        parameters: dict[str, Parameter],
+        display_only: Optional[dict[str, Parameter]],
+        algorithm_folder_name: str,
+        exec_function: ExecFunction,
+        citations: dict[str, Citations],
+        docker_image: DockerImage
+    ):
+    """
+    Generates a CellProfiler Plugin dynamically using Jinja2 templates.
+
+    Args:
+        template_path (str): Path to the CellProfiler Plugin template file.
+        inputs (dict[str, InputOutput]): List of input configurations.
+        outputs (dict[str, InputOutput]): List of output configurations.
+        parameters (dict[str, Parameter]): List of parameter configurations.
+        display_only (Optional[dict[str, Parameter]]): List of display-only parameters, or None.
+        exec_function (ExecFunction): Execution function details.
+        citations (dict[str, Citations]): Citations information.
+
+    Returns:
+        .py file: The generated CellProfiler Plugin file.
+    """
+    env = Environment(
+        loader=FileSystemLoader(searchpath=os.path.dirname(template_path)),
+        autoescape=select_autoescape(['j2'])
+    )
+
+    # CATEGORY_MATRIX = {
+    #     (frozenset(["image"]), frozenset(["image"])): "Image Processing",
+    #     (frozenset(["image"]), frozenset(["array"])): "Image Segmentation",
+    #     (frozenset(["object"]), frozenset(["object"])): "Object Processing",
+    #     (frozenset(["object"]), frozenset(["measurement"])): "Measure Object",
+    #     (frozenset(["measurement"]), frozenset(["measurement"])): "Measurement",
+    #     (frozenset(["image", "object"]), frozenset(["measurement"])): "Decoder",
+    #     (frozenset(["image"]), frozenset(["image", "measurement"])): "Image + Measure",
+    # }
+
+    # def determine_category(inputs: dict, outputs: dict, matrix: dict) -> str:
+    #     """Returns the category as defined in the matrix based on the types in inputs and outputs."""
+    #     input_types = {conf.get("type") for conf in inputs.values() if conf.get("type")}
+    #     output_types = {conf.get("type") for conf in outputs.values() if conf.get("type")}
+    #     key = (frozenset(input_types), frozenset(output_types))
+    #     return matrix.get(key, "Other")
+
+    def lower(text: str) -> str:
+        return text.lower()
+
+    def replace(text: str, old: str, new: str) -> str:
+        return text.replace(old, new)
+
+    env.filters['lower'] = lower
+    env.filters['replace'] = replace
+
+    template = env.get_template(os.path.basename(template_path))
+
+    # Precompute the category using our helper function.
+    # computed_category = determine_category(inputs, outputs, CATEGORY_MATRIX)
+
+    cellprofiler_code: str = template.render(
+        inputs=inputs,
+        outputs=outputs,
+        parameters=parameters,
+        display_only=display_only or [],
+        algorithm_folder_name=algorithm_folder_name,
+        exec_function=exec_function,
+        citations=citations,
+        docker_image=docker_image
+    )
+
+    return cellprofiler_code
 
 def main() -> None:
     """Main function to parse config and generate Gradio and Jupyter notebook files."""
@@ -219,7 +293,7 @@ def main() -> None:
     else:
         config_path = None
 
-    inputs, outputs, parameters, display_only, exec_function, algorithm_folder_name, citations = parse_config(config_path)
+    inputs, outputs, parameters, display_only, exec_function, algorithm_folder_name, citations, docker_image = parse_config(config_path)
 
     folderA: str = "generated_folders"
     folderB: str = algorithm_folder_name
@@ -260,6 +334,35 @@ def main() -> None:
     with open(jupyter_notebook_path, "w") as f:
         nbf.write(jupyter_app_code, f)
     print("Jupyter notebook saved as generated_notebook.ipynb")
+
+    ################################################
+    # Logic for generating CellProfiler Plugin
+    ################################################
+
+    # Template path for the CellProfiler Plugin
+    cellprofiler_plugin_template_path: str = "cellprofiler_plugin_template.py.j2"
+
+    # Generating CellProfiler Plugin file dynamically
+    cellprofiler_template_code: str = generate_cellprofiler_plugin(
+        cellprofiler_plugin_template_path,
+        inputs,
+        outputs,
+        parameters,
+        display_only,
+        algorithm_folder_name,
+        exec_function,
+        citations,
+        docker_image
+    )
+
+    # Join folders and file name
+    cellprofiler_plugin_path: str = os.path.join(folderA, folderB, 'cellprofiler_plugin.py')
+
+    # Generating CellProfiler Plugin file dynamically
+    with open(cellprofiler_plugin_path, 'w') as f:
+        f.write(cellprofiler_template_code)
+    print("cellprofiler_plugin.py generated successfully!!")
+
 
 
 if __name__ == "__main__":

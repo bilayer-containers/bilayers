@@ -76,9 +76,9 @@ Additional Notes:
 """
 
 class {{ algorithm_folder_name }}(ImageSegmentation):
-    category = "Object Processing"
+    category = "{{ computed_category }}"
 
-    module_name = "ImageSegmentation"
+    module_name = {{ algorithm_folder_name }}
 
     variable_revision_number = 1
 
@@ -92,7 +92,7 @@ class {{ algorithm_folder_name }}(ImageSegmentation):
     }
 
     def create_settings(self):
-        super({{ exec_function.get('script') }}, self).create_settings()
+        super( {{algorithm_folder_name}}, self).create_settings()
         
         {% set type_mapping = {
             "image": "ImageName",

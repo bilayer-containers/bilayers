@@ -20,12 +20,10 @@ class DockerImage(TypedDict):
     org: str
     name: str
     tag: str
-    platform: str    
+    platform: str
 
 class ExecFunction(TypedDict):
     name: str
-    script: str
-    module: str
     cli_command: str
     hidden_args: Optional[dict[str, HiddenArgs]]
 
@@ -115,7 +113,16 @@ def parse_config(config_path: Optional[str] = None) -> Config:
 
 def main(
     config_path: Optional[str] = None,
-) -> tuple[dict[str, InputOutput], dict[str, InputOutput], dict[str, Parameter], Optional[dict[str, Parameter]], ExecFunction, str, dict[str, Citations], DockerImage]:
+) -> tuple[
+        dict[str, InputOutput],
+        dict[str, InputOutput],
+        dict[str, Parameter],
+        Optional[dict[str, Parameter]],
+        ExecFunction,
+        str,
+        dict[str, Citations],
+        DockerImage
+    ]:
     """
     Loads the configuration and extracts necessary information.
 
@@ -139,8 +146,6 @@ def main(
 
     exec_function: ExecFunction = config.get("exec_function", {})
     exec_function.setdefault("name", "")
-    exec_function.setdefault("script", "")
-    exec_function.setdefault("module", "")
     exec_function.setdefault("cli_command", "")
     exec_function.setdefault("hidden_args", {})
 

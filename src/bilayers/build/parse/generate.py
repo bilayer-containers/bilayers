@@ -240,22 +240,107 @@ def generate_cellprofiler_plugin(
         autoescape=select_autoescape(['j2'])
     )
 
-    # CATEGORY_MATRIX = {
-    #     (frozenset(["image"]), frozenset(["image"])): "Image Processing",
-    #     (frozenset(["image"]), frozenset(["array"])): "Image Segmentation",
-    #     (frozenset(["object"]), frozenset(["object"])): "Object Processing",
-    #     (frozenset(["object"]), frozenset(["measurement"])): "Measure Object",
-    #     (frozenset(["measurement"]), frozenset(["measurement"])): "Measurement",
-    #     (frozenset(["image", "object"]), frozenset(["measurement"])): "Decoder",
-    #     (frozenset(["image"]), frozenset(["image", "measurement"])): "Image + Measure",
-    # }
+    # The sparse matrix is based on things discussed here: https://docs.google.com/spreadsheets/d/1e3JXcwdtaJLQrNQApg0mAXccvQhirWZw1pk11TjpiME/edit?gid=0#gid=0
+    def determine_category_from_matrix(inputs: dict, outputs: dict) -> str:
+        """
+        Determines the CellProfiler module category based on input and output types
+        Normalizes input/output types to 'image', 'object', or 'measurement'
+        Falls back to 'Custom' if no rule is matched
+        """
 
-    # def determine_category(inputs: dict, outputs: dict, matrix: dict) -> str:
-    #     """Returns the category as defined in the matrix based on the types in inputs and outputs."""
-    #     input_types = {conf.get("type") for conf in inputs.values() if conf.get("type")}
-    #     output_types = {conf.get("type") for conf in outputs.values() if conf.get("type")}
-    #     key = (frozenset(input_types), frozenset(output_types))
-    #     return matrix.get(key, "Other")
+        # Normalization map
+        TYPE_MAP = {
+            "image": "image",
+            "measurement": "measurement",
+            "array": "measurement",
+            "file": "measurement",
+            "executable": "measurement",
+        }
+
+        # Match matrix as per CellProfiler logic table
+        CATEGORY_MATRIX = {
+            ("image",): {
+                ("image",): "Image Processing",
+                ("object",): "Image Segmentation",
+                ("measurement",): "Measurer",
+                ("image", "object"): "Image Segmentation",
+                ("image", "measurement"): "Image Processing",
+                ("object", "measurement"): "Image Segmentation",
+                ("image", "object", "measurement"): "Image Segmentation",
+            },
+            ("object",): {
+                ("image",): "Object Processing",
+                ("object",): "Object Processing",
+                ("measurement",): "Measurer",
+                ("image", "object"): "Object Processing",
+                ("image", "measurement"): "Object Processing",
+                ("object", "measurement"): "Object Processing",
+                ("image", "object", "measurement"): "Object Processing",
+            },
+            ("measurement",): {
+                ("image",): "Decoder",
+                ("object",): "Decoder",
+                ("measurement",): "Measurer",
+                ("image", "object"): "Decoder",
+                ("image", "measurement"): "Decoder",
+                ("object", "measurement"): "Decoder",
+                ("image", "object", "measurement"): "Decoder",
+            },
+            ("image", "object"): {
+                ("image",): "Object Processing",
+                ("object",): "Object Processing",
+                ("measurement",): "Measurer",
+                ("image", "object"): "Object Processing",
+                ("image", "measurement"): "Object Processing",
+                ("object", "measurement"): "Object Processing",
+                ("image", "object", "measurement"): "Object Processing",
+            },
+            ("image", "measurement"): {
+                ("image",): "Image Processing",
+                ("object",): "Image Segmentation",
+                ("measurement",): "Measurer",
+                ("image", "object"): "Image Segmentation",
+                ("image", "measurement"): "Image Processing",
+                ("object", "measurement"): "Image Segmentation",
+                ("image", "object", "measurement"): "Image Segmentation",
+            },
+            ("object", "measurement"): {
+                ("image",): "Object Processing",
+                ("object",): "Object Processing",
+                ("measurement",): "Measurer",
+                ("image", "object"): "Object Processing",
+                ("image", "measurement"): "Object Processing",
+                ("object", "measurement"): "Object Processing",
+                ("image", "object", "measurement"): "Object Processing",
+            },
+            ("image", "object", "measurement"): {
+                ("image",): "Object Processing",
+                ("object",): "Object Processing",
+                ("measurement",): "Measurer",
+                ("image", "object"): "Object Processing",
+                ("image", "measurement"): "Object Processing",
+                ("object", "measurement"): "Object Processing",
+                ("image", "object", "measurement"): "Object Processing",
+            }
+        }
+
+        def normalize_types(conf_dict: dict) -> tuple:
+            types = [TYPE_MAP.get(c.get("type"), "custom") for c in conf_dict.values()]
+            return tuple(sorted(set(types)))
+
+        input_types = normalize_types(inputs)
+        output_types = normalize_types(outputs)
+
+        return CATEGORY_MATRIX.get(input_types, {}).get(output_types, "Custom")
+
+    # Helper function to convert algorithm folder name to class name
+    def convert_to_class_name(algorithm_folder_name: str) -> str:
+        """ Converts the algorithm folder name to a class name by capitalizing the first word
+        This is used to ensure that the class name follows Python's naming conventions and cellprofiler-plugin conventions
+        For example, if the algorithm_folder_name is "stardist_inference", it will return "RunStardist"; "classical_segmentation" will return "RunClassical"
+        """
+        first_word = algorithm_folder_name.split('_')[0]
+        return "Run" + first_word.capitalize()
 
     def lower(text: str) -> str:
         return text.lower()
@@ -269,14 +354,18 @@ def generate_cellprofiler_plugin(
     template = env.get_template(os.path.basename(template_path))
 
     # Precompute the category using our helper function.
-    # computed_category = determine_category(inputs, outputs, CATEGORY_MATRIX)
+    computed_category = determine_category_from_matrix(inputs, outputs)
+
+    # Convert algorithm folder name to class name
+    class_name: str = convert_to_class_name(algorithm_folder_name)
 
     cellprofiler_code: str = template.render(
         inputs=inputs,
         outputs=outputs,
+        category=computed_category,
         parameters=parameters,
         display_only=display_only or [],
-        algorithm_folder_name=algorithm_folder_name,
+        algorithm_folder_name=class_name,
         exec_function=exec_function,
         citations=citations,
         docker_image=docker_image

@@ -452,7 +452,5 @@ def main() -> None:
         f.write(cellprofiler_template_code)
     print("cellprofiler_plugin.py generated successfully!!")
 
-
-
 if __name__ == "__main__":
     main()

@@ -89,7 +89,7 @@ What do I get as output?
 - **{{ output_conf.get('label') }}**: {{ output_conf.get('description') }}
 {% endfor %}
 
-{% if computed_category == "Measurer" %}
+{% if computed_category == "Measurement" %}
 Measurements made by this module
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -208,13 +208,15 @@ class {{ algorithm_folder_name }}(Module):
         #
         self.execution_method = Choice(
             text="Execution method",
-            choices=["Docker", "Podman", "Python"],
+            {# Add Python option back when implemented #}
+            choices=["Docker", "Podman"],
             value="Docker",
             doc="""\
 Choose how to execute the algorithm:
 - Docker: Run the algorithm in a Docker container (recommended for reproducibility)
 - Podman: Run the algorithm in a Podman container (Docker alternative)
-- Python: Run directly in Python local environment (future - not yet implemented)
+**Note**
+- Python: "Future versions of this plugin may allow directly running in Python via a shared Python environment - if so, those developers will add Python as an option here. If not added, only container-based run is supported."
 """
         )
 
@@ -318,21 +320,18 @@ The image will be automatically downloaded on first use.
     def run(self, workspace):
         # Execute algorithm based on selected method
         execution_method = self.execution_method.value
-        
-        if execution_method == "Docker":
-            # Docker execution path
-            self._run_docker_execution(workspace)
-        elif execution_method == "Podman":
-            # Podman execution path
-            self._run_podman_execution(workspace)
+
+        if execution_method in ["Docker", "Podman"]:
+            # Container execution path
+            self._run_container_execution(workspace)
         elif execution_method == "Python":
             # Python execution path (future feature)
             raise NotImplementedError("Local Python environment execution is not yet implemented. Please use Docker or Podman execution.")
         else:
             raise ValueError(f"Unknown execution method: {execution_method}")
 
-    def _run_docker_execution(self, workspace):
-        """Execute the algorithm using Docker containers."""
+    def _run_container_execution(self, workspace):
+        """Execute the algorithm using Docker or Podman containers."""
         # Load input data and get names
         {% set has_image_inputs = inputs.values() | selectattr('type', 'equalto', 'image') | list | length > 0 %}
         {% if has_image_inputs %}
@@ -366,10 +365,13 @@ The image will be automatically downloaded on first use.
         {% endif %}
         {% endfor %}
 
-        # Set up Docker execution environment
-        # Define how to call docker
-        docker_path = "docker" if sys.platform.lower().startswith("win") else "/usr/local/bin/docker"
-        
+        # Set up Docker/Podman's execution environment
+        # Define how to call docker/podman
+        if self.execution_method.value == "Docker":
+            docker_path = "docker" if sys.platform.lower().startswith("win") else "/usr/local/bin/docker"
+        elif self.execution_method.value == "Podman":
+            docker_path = "podman" if sys.platform.lower().startswith("win") else "/opt/podman/bin/podman"
+
         # Create a unique folder for this run
         unique_name = str(uuid.uuid4())
         temp_dir = os.path.join(get_default_output_directory(), ".cellprofiler_temp", unique_name)
@@ -421,12 +423,12 @@ The image will be automatically downloaded on first use.
 
             LOGGER.info(f"Running Docker command: {' '.join(cmd)}")
 
-            # Execute Docker container
+            # Execute Docker/Podman container
             result = subprocess.run(cmd, capture_output=True, text=True, timeout=3600)
             
             if result.returncode != 0:
-                LOGGER.error(f"Docker execution failed: {result.stderr}")
-                raise RuntimeError(f"Docker execution failed: {result.stderr}")
+                LOGGER.error(f"Container execution failed: {result.stderr}")
+                raise FileNotFoundError(f" Sorry! {{ algorithm_folder_name }} seems to have crashed and we are not sure why, since it's in its own container!")
 
             # Load output data
             try:
@@ -455,146 +457,7 @@ The image will be automatically downloaded on first use.
                 {% endfor %}
             except FileNotFoundError as ex:
                 LOGGER.error(f"Algorithm output files not found: {ex}")
-                raise FileNotFoundError(f"I'm sorry, the {{ docker_image.get('name') }} algorithm seems to have crashed and I'm not sure why, since it's running in its own Docker container. Expected output files were not created. Please check the algorithm parameters and try again.")
-            except Exception as ex:
-                LOGGER.error(f"Error loading algorithm outputs: {ex}")
-                raise RuntimeError(f"Failed to load algorithm outputs: {ex}")
-
-        finally:
-            # Cleanup temporary files
-            try:
-                shutil.rmtree(temp_dir)
-            except OSError as ex:
-                LOGGER.warning(f"Unable to delete temporary directory {temp_dir}: {ex}")
-
-        # Process outputs and add to workspace
-        self._process_outputs(workspace)
-
-    def _run_podman_execution(self, workspace):
-        """Execute the algorithm using Podman containers."""
-        # Load input data and get names
-        {% set has_image_inputs = inputs.values() | selectattr('type', 'equalto', 'image') | list | length > 0 %}
-        {% if has_image_inputs %}
-        # Load image inputs
-        {% for key, input_conf in inputs.items() %}
-        {% if input_conf.get('type') == 'image' %}
-        {{ input_conf.get('name') }}_name = self.{{ input_conf.get('name') }}.value
-        images = workspace.image_set
-        {{ input_conf.get('name') }} = images.get_image({{ input_conf.get('name') }}_name)
-        {{ input_conf.get('name') }}_data = {{ input_conf.get('name') }}.pixel_data
-        dimensions = {{ input_conf.get('name') }}.dimensions
-        {% endif %}
-        {% endfor %}
-        {% else %}
-        # No image inputs - set default dimensions for any potential outputs
-        dimensions = 2  # Default to 2D
-        {% endif %}
-        
-        # Load non-image inputs
-        {% for key, input_conf in inputs.items() %}
-        {% if input_conf.get('type') in ['measurement', 'array', 'file'] %}
-        {{ input_conf.get('name') }}_path = self.{{ input_conf.get('name') }}.value
-        # Load {{ input_conf.get('name') }} data from file path
-        {% endif %}
-        {% endfor %}
-
-        # Get output names
-        {% for key, output_conf in outputs.items() %}
-        {% if output_conf.get('type') == 'image' %}
-        {{ output_conf.get('name') }}_name = self.{{ output_conf.get('name') }}.value
-        {% endif %}
-        {% endfor %}
-
-        # Set up Podman execution environment
-        # Define how to call podman
-        podman_path = "podman" if sys.platform.lower().startswith("win") else "/opt/podman/bin/podman"
-        
-        # Create a unique folder for this run
-        unique_name = str(uuid.uuid4())
-        temp_dir = os.path.join(get_default_output_directory(), ".cellprofiler_temp", unique_name)
-        temp_input_dir = os.path.join(temp_dir, "input")
-        temp_output_dir = os.path.join(temp_dir, "output")
-        
-        os.makedirs(temp_dir, exist_ok=True)
-        os.makedirs(temp_input_dir, exist_ok=True)
-        os.makedirs(temp_output_dir, exist_ok=True)
-        
-        try:
-            # Save input data to temporary directory
-            {% for key, input_conf in inputs.items() %}
-            {% if input_conf.get('type') == 'image' %}
-            temp_{{ input_conf.get('name') }}_path = os.path.join(temp_input_dir, f"{unique_name}_{{ input_conf.get('name') }}.tiff")
-            skimage.io.imsave(temp_{{ input_conf.get('name') }}_path, {{ input_conf.get('name') }}_data)
-            {% endif %}
-            {% endfor %}
-
-            # Construct and execute Podman command
-            cmd = [podman_path, "run", "--rm", "-v", f"{temp_dir}:/data", self.docker_image.value]
-            
-            {% set cli_tokens = exec_function.get('cli_command').split(' ') %}
-            {% for token in cli_tokens %}
-            cmd.append("{{ token }}")
-            {% endfor %}
-            
-            # Add input and parameter arguments
-            {% for key, input_conf in inputs.items() %}
-            {% if input_conf.get('cli_tag') %}
-            cmd.extend(["{{ input_conf.get('cli_tag') }}", "/data/input"])
-            {% endif %}
-            {% endfor %}
-            
-            {% for key, param in parameters.items() %}
-            {% if param.get('cli_tag') %}
-            {% if param.get('type') == "checkbox" %}
-            {% if param.get('append_value') %}
-            cmd.extend(["{{ param.get('cli_tag') }}", str(self.{{ param.get('name') }}.value)])
-            {% else %}
-            if self.{{ param.get('name') }}.value:
-                cmd.append("{{ param.get('cli_tag') }}")
-            {% endif %}
-            {% else %}
-            cmd.extend(["{{ param.get('cli_tag') }}", str(self.{{ param.get('name') }}.value)])
-            {% endif %}
-            {% endif %}
-            {% endfor %}
-
-            LOGGER.info(f"Running Podman command: {' '.join(cmd)}")
-
-            # Execute Podman container
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=3600)
-            
-            if result.returncode != 0:
-                LOGGER.error(f"Podman execution failed: {result.stderr}")
-                raise RuntimeError(f"Podman execution failed: {result.stderr}")
-
-            # Load output data
-            try:
-                {% for key, output_conf in outputs.items() %}
-                {% if output_conf.get('type') == 'image' %}
-                {{ output_conf.get('name') }}_output_path = os.path.join(temp_output_dir, f"{unique_name}_{{ output_conf.get('name') }}.tiff")
-                if os.path.exists({{ output_conf.get('name') }}_output_path):
-                    {{ output_conf.get('name') }}_data = skimage.io.imread({{ output_conf.get('name') }}_output_path)
-                else:
-                    LOGGER.warning(f"No {{ output_conf.get('name') }} output found")
-                    {% set first_image_input = inputs.values() | selectattr('type', 'equalto', 'image') | list %}
-                    {% if first_image_input %}
-                    {{ output_conf.get('name') }}_data = numpy.zeros_like({{ first_image_input[0].get('name') }}_data)
-                    {% else %} # Prevent Docker crashing
-                    {{ output_conf.get('name') }}_data = numpy.zeros((256, 256), dtype=numpy.uint8)
-                    {% endif %}
-                {% elif output_conf.get('type') == 'array' %}
-                {{ output_conf.get('name') }}_output_path = os.path.join(temp_output_dir, f"{unique_name}_{{ output_conf.get('name') }}.npy")
-                if os.path.exists({{ output_conf.get('name') }}_output_path):
-                    {{ output_conf.get('name') }}_data = numpy.load({{ output_conf.get('name') }}_output_path)
-                {% elif output_conf.get('type') == 'measurement' %}
-                {{ output_conf.get('name') }}_output_path = os.path.join(temp_output_dir, f"{unique_name}_{{ output_conf.get('name') }}.csv")
-                if os.path.exists({{ output_conf.get('name') }}_output_path):
-                    {{ output_conf.get('name') }}_data = {{ output_conf.get('name') }}_output_path
-                {% endif %}
-                {% endfor %}
-            except FileNotFoundError as ex:
-                LOGGER.error(f"Algorithm output files not found: {ex}")
-                raise FileNotFoundError(f"I'm sorry, the {{ docker_image.get('name') }} algorithm seems to have crashed and I'm not sure why, since it's running in its own Podman container. Expected output files were not created. Please check the algorithm parameters and try again.")
+                raise FileNotFoundError(f"I'm sorry, the {{ docker_image.get('name') }} algorithm seems to have crashed and I'm not sure why, since it's running in its own container. Expected output files were not created. Please check the algorithm parameters and try again.")
             except Exception as ex:
                 LOGGER.error(f"Error loading algorithm outputs: {ex}")
                 raise RuntimeError(f"Failed to load algorithm outputs: {ex}")

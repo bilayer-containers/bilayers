@@ -244,7 +244,7 @@ def generate_cellprofiler_plugin(
     def determine_category_from_matrix(inputs: dict, outputs: dict) -> str:
         """
         Determines the CellProfiler module category based on input and output types
-        Normalizes input/output types to 'image', 'object', or 'measurement'
+        Considers both primary type and subtype (especially for labeled/segmented images)
         Falls back to 'Custom' if no rule is matched
         """
 
@@ -324,14 +324,52 @@ def generate_cellprofiler_plugin(
             }
         }
 
-        def normalize_types(conf_dict: dict) -> tuple:
-            types = [TYPE_MAP.get(c.get("type"), "custom") for c in conf_dict.values()]
-            return tuple(sorted(set(types)))
+        def normalize_types(conf_dict: dict) -> set:
+            types = []
+            for c in conf_dict.values():
+                base_type = TYPE_MAP.get(c.get("type"), "custom")
+                
+                # Special handling for images with labeled subtype
+                if base_type == "image" and c.get("subtype"):
+                    subtypes = c.get("subtype", [])
+                    if "labeled" in subtypes:
+                        # Labeled images represent objects/segmentation
+                        types.append("object")
+                    else:
+                        types.append("image")
+                else:
+                    types.append(base_type)
+                    
+            return set(types)
+
+        def find_matching_category(input_set: set, output_set: set) -> str:
+            """
+            Simple lookup that checks if input/output sets match any category combination
+            """
+            # Convert matrix keys to sets for easy comparison
+            for input_tuple, output_dict in CATEGORY_MATRIX.items():
+                input_key_set = set(input_tuple)
+                if input_key_set == input_set:  # Exact match for inputs
+                    for output_tuple, category in output_dict.items():
+                        output_key_set = set(output_tuple)
+                        if output_key_set == output_set:  # Exact match for outputs
+                            return category
+            
+            # If no exact match, try subset matching (more permissive)
+            for input_tuple, output_dict in CATEGORY_MATRIX.items():
+                input_key_set = set(input_tuple)
+                if input_key_set.issubset(input_set):  # Input is subset of what we have
+                    for output_tuple, category in output_dict.items():
+                        output_key_set = set(output_tuple)
+                        if output_key_set.issubset(output_set):  # Output is subset of what we have
+                            return category
+            
+            return "Custom"
 
         input_types = normalize_types(inputs)
         output_types = normalize_types(outputs)
 
-        return CATEGORY_MATRIX.get(input_types, {}).get(output_types, "Custom")
+        return find_matching_category(input_types, output_types)
 
     # Helper function to convert algorithm folder name to class name
     def convert_to_class_name(algorithm_folder_name: str) -> str:
@@ -362,7 +400,7 @@ def generate_cellprofiler_plugin(
     cellprofiler_code: str = template.render(
         inputs=inputs,
         outputs=outputs,
-        category=computed_category,
+        computed_category=computed_category,
         parameters=parameters,
         display_only=display_only or [],
         algorithm_folder_name=class_name,

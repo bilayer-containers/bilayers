@@ -9,7 +9,7 @@
 
 #################################
 #
-# Imports from Python Standard Libraries
+# Imports from useful Python libraries
 #
 ##################################
 
@@ -30,114 +30,223 @@ import skimage
 
 {% set import_dict = {
     "module.image_segmentation": "ImageSegmentation",
+    "module.image_processing": "ImageProcessing",
+    "module.object_processing": "ObjectProcessing",
+    "module": "Module",
     "preferences": "get_default_output_directory",
     "object": "Objects",
     "setting": "Binary",
     "setting.subscriber": "ImageSubscriber",
     "setting.text": ["ImageName", "Integer", "Float", "Text", "Directory", "Filename"],
     "setting.choice": "Choice",
+    "image": "Image",
 } %}
 
 {% for key, value in import_dict.items() %}
 {% if value is iterable and not value is string %}
 from cellprofiler_core.{{ key }} import {{ value|join(", ") }}
 {% else %}
-from  cellprofiler_core.{{ key }} import {{ value }}
+from cellprofiler_core.{{ key }} import {{ value }}
 {% endif %}
 {% endfor %}
 
 LOGGER = logging.getLogger(__name__)
 
 __doc__ = f"""\
-{{ exec_function.get('script') }}
-===========
+{{ algorithm_folder_name }}
+{{ "=" * algorithm_folder_name|length }}
 
-**{{ exec_function.get('script') }}** is an auto-generated CellProfiler module based on Bilayers specification.
+**{{ algorithm_folder_name }}** is an auto-generated CellProfiler module based on Bilayers specification.
 
-{% if citations.algorithm %}
-To cite or reference the underlying algorithms, please see:
-{% for c in citations.algorithm.values() -%}
-- Name: {{ c.name }}
-  - DOI: {{ c.doi }}
-  - License: {{ c.license }}
-  - Description: {{ c.description }}
-{% endfor %}
+{% if exec_function.get('description') %}
+{{ exec_function.get('description') }}
+{% else %}
+This module processes {{ inputs.keys() | join(', ') }} and produces {{ outputs.keys() | join(', ') }}.
 {% endif %}
+
+This module uses Docker containers to run the underlying algorithm, ensuring reproducible results 
+across different systems. Make sure Docker Desktop is running before using this module.
+
+|
 
 ============ ============ ===============
 Supports 2D? Supports 3D? Respects masks?
 ============ ============ ===============
-Yes/No       Yes/No      Yes/No
+{% if computed_category in ["Image Segmentation", "Image Processing"] %}YES{% else %}NO{% endif %}          {% if computed_category in ["Image Segmentation", "Object Processing"] %}YES{% else %}NO{% endif %}          NO
 ============ ============ ===============
 
-Additional Notes:
-----------------
+What do I need as input?
+^^^^^^^^^^^^^^^^^^^^^^^^
 
+{% for key, input_conf in inputs.items() %}
+- **{{ input_conf.get('label') }}**: {{ input_conf.get('description') }}
+{% endfor %}
+
+What do I get as output?
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+{% for key, output_conf in outputs.items() %}
+- **{{ output_conf.get('label') }}**: {{ output_conf.get('description') }}
+{% endfor %}
+
+{% if computed_category == "Measurer" %}
+Measurements made by this module
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+{% for key, output_conf in outputs.items() %}
+{% if output_conf.get('type') == 'measurement' %}
+**{{ algorithm_folder_name }}**:
+
+- *{{ output_conf.get('name') }}*: {{ output_conf.get('description') }}
+{% endif %}
+{% endfor %}
+{% endif %}
+
+Technical notes
+^^^^^^^^^^^^^^^
+
+This module runs the {{ docker_image.get('name') }} algorithm in a Docker container.
+The Docker image used is: {{ docker_image.get('org') }}/{{ docker_image.get('name') }}:{{ docker_image.get('tag') }}
+
+{% if citations %}
+References
+^^^^^^^^^^
+
+{% for citation in citations.values() %}
+- {{ citation.name }}: {{ citation.description }}
+  DOI: {{ citation.doi }}
+  License: {{ citation.license }}
+{% endfor %}
+{% endif %}
 """
 
-class {{ algorithm_folder_name }}(ImageSegmentation):
-    category = "{{ computed_category }}"
+{% set category_to_class = {
+    "Image Processing": "ImageProcessing",
+    "Image Segmentation": "ImageSegmentation", 
+    "Object Processing": "ObjectProcessing",
+    "Measurer": "Module",
+    "Decoder": "Module",
+    "Custom": "Module"
+} %}
 
-    module_name = {{ algorithm_folder_name }}
+class {{ algorithm_folder_name }}({{ category_to_class.get(computed_category, "Module") }}):
+    #
+    # The module starts by declaring the name that's used for display,
+    # the category under which it is stored and the variable revision
+    # number which can be used to provide backwards compatibility if
+    # you add user-interface functionality later.
+    #
+    {% if computed_category == "Image Segmentation" %}
+    category = "Object Processing"
+    {% elif computed_category not in ["Image Processing", "Object Processing"] %}
+    category = "{{ computed_category }}"
+    {% endif %}
+    {# Image Processing and Object Processing modules don't have any category defined #}
+    
+    module_name = "{{ algorithm_folder_name }}"
 
     variable_revision_number = 1
 
+    #
+    # Citation - Please cite the following when using this module
+    #
+    {% if citations %}
     doi = {
-        {%- for citation in citations.values() %}
-        "This module uses {{ citation.name }} i.e. {{ citation.description }}"
-        "To cite this module, use:"
-        "- DOI: {{ citation.doi }}"
-        "- License: {{ citation.license }}"
-        {%- endfor %}
+        {% for citation in citations.values() %}
+        "Please cite {{ citation.name }} when using this module": "{{ citation.doi }}",
+        {% endfor %}
     }
+    {% endif %}
 
+    #
+    # "create_settings" is where you declare the user interface elements
+    # (the "settings") which the user will use to customize your module.
+    #
     def create_settings(self):
-        super( {{algorithm_folder_name}}, self).create_settings()
+        {% if computed_category in ["Image Segmentation", "Image Processing", "Object Processing"] %}
+        #
+        # The superclass ({{ category_to_class.get(computed_category, "Module") }}) defines settings
+        # for image input and output
+        #
+        super({{ algorithm_folder_name }}, self).create_settings()
+        {% endif %}
         
         {% set type_mapping = {
             "image": "ImageName",
             "measurement": "Filename",
             "array": "Filename",
             "executable": "Filename",
-            "file": "ImageName",
+            "file": "Filename",
             "radio": "Choice",
             "dropdown": "Choice",
             "checkbox": "Binary",
             "integer": "Integer",
             "float": "Float",
-            "textbox": "ImageName",
+            "textbox": "Text",
         } %}
         {% set default_type = "Text" %} {# Fallback type #}
 
-        # Docker Image Selection
+        {% if computed_category not in ["Image Segmentation", "Image Processing", "Object Processing"] %}
+        # Create input settings for non-standard modules
+        {% for key, input_conf in inputs.items() %}
+        {% if input_conf.get('type') == 'image' %}
+        self.{{ input_conf.get('name') }} = ImageSubscriber(
+            "{{ input_conf.get('label') }}",
+            doc="""\
+{{ input_conf.get('description') }}
+"""
+        )
+        {% else %}
+        self.{{ input_conf.get('name') }} = {{ type_mapping.get(input_conf.get('type'), default_type) }}(
+            text="{{ input_conf.get('label') }}",
+            {% if input_conf.get('default') is not none %}
+            value="{{ input_conf.get('default') }}",
+            {% endif %}
+            doc="""\
+{{ input_conf.get('description') }}
+"""
+        )
+        {% endif %}
+        {% endfor %}
+
+        # Create output settings for non-standard modules  
+        {% for key, output_conf in outputs.items() %}
+        {% if output_conf.get('type') == 'image' %}
+        self.{{ output_conf.get('name') }} = ImageName(
+            "{{ output_conf.get('label') }}",
+            "{{ output_conf.get('name', 'Output') }}",
+            doc="""\
+{{ output_conf.get('description') }}
+"""
+        )
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+
+        #
+        # Docker Image Selection - This module runs in Docker only
+        #
         self.docker_image = Choice(
-            text="Select your external docker image",
+            text="Docker image",
             choices=["{{ docker_image.get('org') }}/{{ docker_image.get('name') }}:{{ docker_image.get('tag') }}"],
             value="{{ docker_image.get('org') }}/{{ docker_image.get('name') }}:{{ docker_image.get('tag') }}",
             doc="""\
-Select which Docker image to use for running your plugin.
-Make sure Docker Desktop is running.
+The Docker image to use for running this algorithm. 
+Make sure Docker Desktop is running before using this module.
+The image will be automatically downloaded on first use.
 """
         )
         
-        {% for key, input_conf in inputs.items() %}
-        self.{{ input_conf.get('name') }} = {{ type_mapping[input_conf.get('type')] }}(
-            text="{{ input_conf.get('label') }}",
-            {% if input_conf.get('folder_name') is not none %}
-            value="{{ input_conf.get('folder_name') }}",
-            {% endif %}
-            doc="{{ input_conf.get('description') }}"
-
-        )
-        {% endfor %}
-
         {% for key, parameter in parameters.items() %}
-        self.{{ parameter.get('name') }} = {{ type_mapping[parameter.get('type')] }}(
+        #
+        # {{ parameter.get('label') }}
+        #
+        self.{{ parameter.get('name') }} = {{ type_mapping.get(parameter.get('type'), default_type) }}(
             text="{{ parameter.get('label') }}",
             {% if parameter.get('type') in ["radio", "dropdown"] %}
             choices=[
                 {% for option in parameter.get('options') %}
-                    "{{ option.value }}"{% if not loop.last %}, {% endif %}
+                "{{ option.value }}",
                 {% endfor %}
             ],
             {% endif %}
@@ -148,253 +257,409 @@ Make sure Docker Desktop is running.
             minval=float('-inf'),
             maxval=float('inf'),
             {% endif %}
-            doc="{{ parameter.get('description') }}"
+            doc="""\
+{{ parameter.get('description') }}
+"""
         )
         {% endfor %}
-        
+    #
+    # The "settings" method tells CellProfiler about the settings you
+    # have in your module. CellProfiler uses the list for saving
+    # and restoring values for your module when it saves or loads a
+    # pipeline file.
+    #
     def settings(self):
-
-        return [
-        self.x_name,
-        self.docker_image,
+        settings = []
+        
+        {% if computed_category in ["Image Segmentation", "Image Processing", "Object Processing"] %}
+        # Standard image processing settings
+        settings.extend([self.x_name, self.y_name])
+        {% else %}
+        # Custom module settings
         {% for key, input_conf in inputs.items() %}
-        self.{{ input_conf.get('name') }},
+        settings.append(self.{{ input_conf.get('name') }})
         {% endfor %}
+        {% for key, output_conf in outputs.items() %}
+        {% if output_conf.get('type') == 'image' %}
+        settings.append(self.{{ output_conf.get('name') }})
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+        
+        # Docker and parameter settings
+        settings.append(self.docker_image)
         {% for key, param in parameters.items() %}
-        self.{{ param.get('name') }},
+        settings.append(self.{{ param.get('name') }})
         {% endfor %}
-        self.y_name,
-        ]    
+        
+        return settings
 
+    #
+    # "visible_settings" tells CellProfiler which settings should be
+    # displayed and in what order.
+    #
+    def visible_settings(self):
+        visible = []
+        
+        {% if computed_category in ["Image Segmentation", "Image Processing", "Object Processing"] %}
+        visible.extend([self.x_name, self.y_name])
+        {% else %}
+        {% for key, input_conf in inputs.items() %}
+        visible.append(self.{{ input_conf.get('name') }})
+        {% endfor %}
+        {% for key, output_conf in outputs.items() %}
+        {% if output_conf.get('type') == 'image' %}
+        visible.append(self.{{ output_conf.get('name') }})
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+        
+        visible.append(self.docker_image)
+        {% for key, param in parameters.items() %}
+        visible.append(self.{{ param.get('name') }})
+        {% endfor %}
+        
+        return visible
+
+    #
+    # CellProfiler calls "run" on each image set in your pipeline.
+    # This is the core processing function that executes the algorithm.
+    #
     def run(self, workspace):
-        # 1. Retrive Input and Output Names + Load Input Image
+        # 1. Get input and output names + Load input data
+        {% if computed_category in ["Image Segmentation", "Image Processing", "Object Processing"] %}
+        # Standard image processing workflow
         x_name = self.x_name.value
         y_name = self.y_name.value
-
         images = workspace.image_set
         x = images.get_image(x_name)
         x_data = x.pixel_data
         dimensions = x.dimensions
-
-        # 2. Preprocessing Stuff
-
-        # 3. Run the Docker Container
-        docker_path = "docker" if sys.platform.lower().startswith("win") else "/usr/local/bin/docker"
-            
-        # Create a unique folder for this run
-        unique_name = str(uuid.uuid4())
-        temp_dir = os.path.join(get_default_output_directory(), ".cellprofiler_temp", unique_name)
-        temp_img_dir = os.path.join(temp_dir, "input_images")
-        output_folder_host = os.path.join(temp_dir, "output_images")
-        
-        os.makedirs(temp_dir, exist_ok=True)
-        os.makedirs(temp_img_dir, exist_ok=True)
-        os.makedirs(output_folder_host, exist_ok=True)
-            
-        temp_img_path = os.path.join(temp_img_dir, unique_name+".tiff")
-
-        # Save the input image in docker mounted path
-        skimage.io.imsave(temp_img_path, x_data)
-
-        # Construct Docker command
-        cmd = [docker_path, "run", "--rm", "-v", f"{temp_dir}:/data", self.docker_image.value]
-        {% set cli_tokens = exec_function.get('cli_command').split(' ') %}
-        {% for token in cli_tokens %}
-        cmd += ["{{ token }}"]
-        {% endfor %}
-        {% for key, input_conf in inputs.items() %}
-        cmd += ["{{ input_conf.get('cli_tag') }}", str(self.{{ input_conf.get('name') }}.value)]
-        {% endfor %}
-        {% for key, param in parameters.items() %}
-        # If type is checkbox and append value is True - append both cli_tag and value
-        {% if param.get('type') == "checkbox" %}
-        {# {% set checkbox_value = self|attr(param.get('name'))|attr('value') %} #}
-            {% if param.get('append_value') %}
-        cmd += ["{{ param.get('cli_tag') }}", str(self.{{ param.get('name') }}.value)]
-                {# {% endif %} #}
-            {% else %}
-                # If type is checkbox and append_value is True and value is also True - append only cli_tag        
-        cmd += ["{{ param.get('cli_tag') }}"]
-            {% endif %}
         {% else %}
-        {# For all the rest of the types except checkbox #}
-        cmd += ["{{ param.get('cli_tag') }}", str(self.{{ param.get('name') }}.value)]
+        # Custom module workflow - load inputs programmatically
+        {% for key, input_conf in inputs.items() %}
+        {% if input_conf.get('type') == 'image' %}
+        {{ input_conf.get('name') }}_name = self.{{ input_conf.get('name') }}.value
+        images = workspace.image_set
+        {{ input_conf.get('name') }} = images.get_image({{ input_conf.get('name') }}_name)
+        {{ input_conf.get('name') }}_data = {{ input_conf.get('name') }}.pixel_data
+        dimensions = {{ input_conf.get('name') }}.dimensions
+        {% elif input_conf.get('type') in ['measurement', 'array', 'file'] %}
+        {{ input_conf.get('name') }}_path = self.{{ input_conf.get('name') }}.value
+        # Load {{ input_conf.get('name') }} data from file path
         {% endif %}
         {% endfor %}
 
-        LOGGER.info(f"Running Docker command: {' '.join(cmd)}")
+        # Get output names
+        {% for key, output_conf in outputs.items() %}
+        {% if output_conf.get('type') == 'image' %}
+        {{ output_conf.get('name') }}_name = self.{{ output_conf.get('name') }}.value
+        {% endif %}
+        {% endfor %}
+        {% endif %}
 
-
+        # 2. Set up Docker execution environment
+        docker_path = "docker" if sys.platform.lower().startswith("win") else "/usr/local/bin/docker"
+        
+        # Create a unique folder for this run
+        unique_name = str(uuid.uuid4())
+        temp_dir = os.path.join(get_default_output_directory(), ".cellprofiler_temp", unique_name)
+        temp_input_dir = os.path.join(temp_dir, "input")
+        temp_output_dir = os.path.join(temp_dir, "output")
+        
+        os.makedirs(temp_dir, exist_ok=True)
+        os.makedirs(temp_input_dir, exist_ok=True)
+        os.makedirs(temp_output_dir, exist_ok=True)
+        
         try:
-            result = subprocess.run(cmd, capture_output=True, text=True)
+            # 3. Save input data to temporary directory
+            {% if computed_category in ["Image Segmentation", "Image Processing", "Object Processing"] %}
+            temp_input_path = os.path.join(temp_input_dir, f"{unique_name}.tiff")
+            skimage.io.imsave(temp_input_path, x_data)
+            {% else %}
+            # Save inputs programmatically
+            {% for key, input_conf in inputs.items() %}
+            {% if input_conf.get('type') == 'image' %}
+            temp_{{ input_conf.get('name') }}_path = os.path.join(temp_input_dir, f"{unique_name}_{{ input_conf.get('name') }}.tiff")
+            skimage.io.imsave(temp_{{ input_conf.get('name') }}_path, {{ input_conf.get('name') }}_data)
+            {% endif %}
+            {% endfor %}
+            {% endif %}
+
+            # 4. Construct and execute Docker command
+            cmd = [docker_path, "run", "--rm", "-v", f"{temp_dir}:/data", self.docker_image.value]
+            
+            {% set cli_tokens = exec_function.get('cli_command').split(' ') %}
+            {% for token in cli_tokens %}
+            cmd.append("{{ token }}")
+            {% endfor %}
+            
+            # Add input and parameter arguments
+            {% for key, input_conf in inputs.items() %}
+            {% if input_conf.get('cli_tag') %}
+            cmd.extend(["{{ input_conf.get('cli_tag') }}", "/data/input"])
+            {% endif %}
+            {% endfor %}
+            
+            {% for key, param in parameters.items() %}
+            {% if param.get('cli_tag') %}
+            {% if param.get('type') == "checkbox" %}
+            {% if param.get('append_value') %}
+            cmd.extend(["{{ param.get('cli_tag') }}", str(self.{{ param.get('name') }}.value)])
+            {% else %}
+            if self.{{ param.get('name') }}.value:
+                cmd.append("{{ param.get('cli_tag') }}")
+            {% endif %}
+            {% else %}
+            cmd.extend(["{{ param.get('cli_tag') }}", str(self.{{ param.get('name') }}.value)])
+            {% endif %}
+            {% endif %}
+            {% endfor %}
+
+            LOGGER.info(f"Running Docker command: {' '.join(cmd)}")
+
+            # Execute Docker container
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=3600)
+            
             if result.returncode != 0:
-                LOGGER.error(f"Docker error: {result.stderr}")
-                # fallback to blank segmentation
-                y_data = numpy.zeros_like(x_data)
+                LOGGER.error(f"Docker execution failed: {result.stderr}")
+                raise RuntimeError(f"Docker execution failed: {result.stderr}")
+
+            # 5. Load output data
+            {% if computed_category in ["Image Segmentation", "Image Processing", "Object Processing"] %}
+            # Standard image processing output
+            output_path = os.path.join(temp_output_dir, f"{unique_name}_output.tiff")
+            if os.path.exists(output_path):
+                y_data = skimage.io.imread(output_path)
             else:
-                # Suppose the Docker container saves output in as unique_name_segmented.tif in the specified path
-                # --------------- Modify the below block to match your Docker output -------------------------
-                output_seg_path = os.path.join(output_folder_host, unique_name+"_segmented.tif")
-                # --------------- Modify the above block to match your Docker output ------------------------
-                if os.path.exists(output_seg_path):
-                    # --------------- Modify this to match your Docker output -------------------------
-                    # Incase Docker output is npy array -- modify below line to load npy instead of tif for eg. y_data = numpy.load(output_seg_path)
-                    y_data = skimage.io.imread(output_seg_path)
-                    # --------------- Modify the above line to match your Docker output ------------------------
-                else:
-                    LOGGER.warning("No unique_name_segmented.tif found; using blank seg.")
-                    y_data = numpy.zeros_like(x_data)
-
-                if self.save_probability.value:
-                    # Suppose Docker inference script saves probabilities as unique_name_probabilities.npy
-                    # --------------- Otherwise modify this to match your Docker output -------------------------
-                    prob_file_path = os.path.join(output_folder_host, unique_name+"_probabilities.npy")
-                    # --------------- Modify the above block to match your Docker output ------------------------
-                    if os.path.exists(prob_file_path):
-                        prob_data = numpy.load(prob_file_path)
-                        # Assign probabilities to the workspace display data for later display
-                        workspace.display_data.probabilities = prob_data
-                    else:
-                        LOGGER.warning("No output probabilities file found; probabilities will not be displayed.")
-
+                LOGGER.warning("No output image found, using blank image")
+                y_data = numpy.zeros_like(x_data)
+            {% else %}
+            # Load outputs programmatically
+            {% for key, output_conf in outputs.items() %}
+            {% if output_conf.get('type') == 'image' %}
+            {{ output_conf.get('name') }}_output_path = os.path.join(temp_output_dir, f"{unique_name}_{{ output_conf.get('name') }}.tiff")
+            if os.path.exists({{ output_conf.get('name') }}_output_path):
+                {{ output_conf.get('name') }}_data = skimage.io.imread({{ output_conf.get('name') }}_output_path)
+            else:
+                LOGGER.warning(f"No {{ output_conf.get('name') }} output found")
+                {% set first_image_input = inputs.values() | selectattr('type', 'equalto', 'image') | list %}
+                {% if first_image_input %}
+                {{ output_conf.get('name') }}_data = numpy.zeros_like({{ first_image_input[0].get('name') }}_data)
+                {% else %} # Prevent Docker crashing
+                {{ output_conf.get('name') }}_data = numpy.zeros((256, 256), dtype=numpy.uint8)
+                {% endif %}
+            {% elif output_conf.get('type') == 'array' %}
+            {{ output_conf.get('name') }}_output_path = os.path.join(temp_output_dir, f"{unique_name}_{{ output_conf.get('name') }}.npy")
+            if os.path.exists({{ output_conf.get('name') }}_output_path):
+                {{ output_conf.get('name') }}_data = numpy.load({{ output_conf.get('name') }}_output_path)
+            {% elif output_conf.get('type') == 'measurement' %}
+            {{ output_conf.get('name') }}_output_path = os.path.join(temp_output_dir, f"{unique_name}_{{ output_conf.get('name') }}.csv")
+            if os.path.exists({{ output_conf.get('name') }}_output_path):
+                {{ output_conf.get('name') }}_data = {{ output_conf.get('name') }}_output_path
+            {% endif %}
+            {% endfor %}
+            {% endif %}
 
         finally:
-            # Cleanup
+            # 6. Cleanup temporary files
             try:
                 shutil.rmtree(temp_dir)
             except OSError as ex:
-                LOGGER.warning(f"Unable to delete {temp_dir}: {ex}")
+                LOGGER.warning(f"Unable to delete temporary directory {temp_dir}: {ex}")
 
+        # 7. Process outputs and add to workspace
+        {% if computed_category in ["Image Segmentation", "Image Processing", "Object Processing"] %}
+        # Standard image processing output handling
+        {% if computed_category == "Image Segmentation" %}
+        # Create objects for segmentation
+        objects = Objects()
+        objects.segmented = y_data
+        objects.parent_image = x.parent_image
+        workspace.object_set.add_objects(objects, y_name)
+        {% else %}
+        # Add processed image to image set
+        output_image = Image(y_data)
+        output_image.parent_image = x.parent_image
+        workspace.image_set.add(y_name, output_image)
+        {% endif %}
         
-        # 4. Convert to CP Objects
-        # Store segmented objects
-        output_objs = Objects()
-        output_objs.segmented = y_data
-        output_objs.parent_image = x.parent_image
-        workspace.object_set.add_objects(output_objs, y_name)
-
-        # Save measurements
+        # Add measurements if this is a segmentation module
+        {% if computed_category == "Image Segmentation" %}
         self.add_measurements(workspace)
-
-        # Display results on UI
+        {% endif %}
+        
+        # Prepare display data
         if self.show_window:
-            workspace.display_data.x_data = x.pixel_data if x.volumetric else x_data
+            workspace.display_data.x_data = x.pixel_data
             workspace.display_data.y_data = y_data
             workspace.display_data.dimensions = dimensions
+        {% else %}
+        # Handle outputs programmatically for custom modules
+        LOGGER.info(f"DEBUG: Processing custom module outputs (category: {{ computed_category }})")
+        {% for key, output_conf in outputs.items() %}
+        {% if output_conf.get('type') == 'image' %}
+        {% if computed_category == "Image Segmentation" %}
+        # Create objects for segmentation outputs
+        objects_{{ output_conf.get('name') }} = Objects()
+        objects_{{ output_conf.get('name') }}.segmented = {{ output_conf.get('name') }}_data
+        {% set first_image_input = inputs.values() | selectattr('type', 'equalto', 'image') | list %}
+        {% if first_image_input %}
+        objects_{{ output_conf.get('name') }}.parent_image = {{ first_image_input[0].get('name') }}.parent_image
+        {% endif %}
+        workspace.object_set.add_objects(objects_{{ output_conf.get('name') }}, {{ output_conf.get('name') }}_name)
+        {% else %}
+        # Add processed image to image set
+        output_image_{{ output_conf.get('name') }} = Image({{ output_conf.get('name') }}_data)
+        {% set first_image_input = inputs.values() | selectattr('type', 'equalto', 'image') | list %}
+        {% if first_image_input %}
+        output_image_{{ output_conf.get('name') }}.parent_image = {{ first_image_input[0].get('name') }}.parent_image
+        {% endif %}
+        workspace.image_set.add({{ output_conf.get('name') }}_name, output_image_{{ output_conf.get('name') }})
+        {% endif %}
+        {% endif %}
+        {% endfor %}
 
-    def visible_settings(self):
-        vis_settings = [
-            self.x_name,
-            self.docker_image,
+        # Store measurement and array outputs in display data
+        {% for key, output_conf in outputs.items() %}
+        {% if output_conf.get('type') in ['measurement', 'array'] %}
+        if '{{ output_conf.get('name') }}_data' in locals():
+            workspace.display_data.{{ output_conf.get('name') }} = {{ output_conf.get('name') }}_data
+        {% endif %}
+        {% endfor %}
+
+        # Prepare display data for custom modules
+        if self.show_window:
             {% for key, input_conf in inputs.items() %}
-            self.{{ input_conf.get('name') }},
+            {% if input_conf.get('type') == 'image' %}
+            workspace.display_data.{{ input_conf.get('name') }}_data = {{ input_conf.get('name') }}_data
+            workspace.display_data.dimensions = dimensions
+            {% endif %}
             {% endfor %}
-            {% for key, param in parameters.items() %}
-            self.{{ param.get('name') }},
+            {% for key, output_conf in outputs.items() %}
+            {% if output_conf.get('type') == 'image' %}
+            if '{{ output_conf.get('name') }}_data' in locals():
+                workspace.display_data.{{ output_conf.get('name') }}_data = {{ output_conf.get('name') }}_data
+            {% endif %}
             {% endfor %}
-            self.y_name,
-        ]
-        return vis_settings
+        {% endif %}
 
-    
-
+    #
+    # "display" lets you use matplotlib to display your results.
+    # This method is called when the user requests to see the output.
+    #
     def display(self, workspace, figure):
         """
-        Generic display function:
-        - Iterates over everything in workspace.display_data
-        - Tries to display each item as either an image or a table
+        Display the results of the module processing.
         """
-    
-        # Gather all keys stored in workspace.display_data
-        data_keys = list(workspace.display_data.keys())
-        print("Keys in workspace.display_data:", data_keys)
+        # Programmatically determine what images to display
+        displayable_images = []
         
-        num_columns = 3
-        num_rows = (len(workspace.display_data) + num_columns - 1) // num_columns
-
-        # Tell CellProfiler how many subplots we need
-        figure.set_subplots(num_rows, num_columns)
-
-        i = 0
-        # Keep the track of the index i, then compute row and column
-        {# for key, output_conf in outputs.items(): #}
-        for data_key in data_keys:
-            row = i // num_columns
-            col = i % num_columns
-
-            data = workspace.display_data[data_key]
-
-            # Try to guess how to display:
-            if isinstance(data, numpy.ndarray):
-                # If it's a numpy array, check shape / dtype to guess if it's an image
-                if data.ndim == 2:
-                    # 2D array => grayscale image
-                    figure.subplot_imshow(
-                        image=data,
-                        colormap="gray",
-                        title=data_key,
-                        x=row,
-                        y=col
-                    )
-                elif data.ndim == 3 and data.shape[2] in (3, 4):
-                    # Possibly a color image (RGB or RGBA)
-                    figure.subplot_imshow(
-                        image=data,
-                        title=data_key,
-                        x=row,
-                        y=col
-                    )
-                else:
-                    # 1D array or 4D array, or unknown shape => show as table
-                    figure.subplot_table(
-                        data=data,
-                        title=data_key,
-                        x=row,
-                        y=col
-                    )
+        {% if computed_category in ["Image Segmentation", "Image Processing", "Object Processing"] %}
+        # Standard categories: check for inherited x_data and y_data
+        if hasattr(workspace.display_data, 'x_data'):
+            displayable_images.append(('x_data', 'Input Image', 'input'))
+        if hasattr(workspace.display_data, 'y_data'):
+            {% if computed_category == "Image Segmentation" %}
+            displayable_images.append(('y_data', 'Segmented Objects', 'segmentation'))
+            {% else %}
+            displayable_images.append(('y_data', 'Processed Image', 'output'))
+            {% endif %}
+        {% endif %}
+        
+        # Add any additional images from inputs/outputs for all categories
+        {% for key, input_conf in inputs.items() %}
+        {% if input_conf.get('type') == 'image' %}
+        if hasattr(workspace.display_data, '{{ input_conf.get('name') }}_data'):
+            displayable_images.append(('{{ input_conf.get('name') }}_data', '{{ input_conf.get('label', input_conf.get('name')) }}', 'input'))
+        {% endif %}
+        {% endfor %}
+        
+        {% for key, output_conf in outputs.items() %}
+        {% if output_conf.get('type') == 'image' %}
+        if hasattr(workspace.display_data, '{{ output_conf.get('name') }}_data'):
+            {% if computed_category == "Image Segmentation" %}
+            displayable_images.append(('{{ output_conf.get('name') }}_data', '{{ output_conf.get('label', output_conf.get('name')) }}', 'segmentation'))
+            {% else %}
+            displayable_images.append(('{{ output_conf.get('name') }}_data', '{{ output_conf.get('label', output_conf.get('name')) }}', 'output'))
+            {% endif %}
+        {% endif %}
+        {% endfor %}
+        
+        # Remove duplicates while preserving order (in case x_data/y_data overlap with explicit inputs/outputs)
+        seen = set()
+        unique_images = []
+        for img_data, title, img_type in displayable_images:
+            if img_data not in seen:
+                seen.add(img_data)
+                unique_images.append((img_data, title, img_type))
+        displayable_images = unique_images
+        
+        # Calculate optimal grid layout
+        num_images = len(displayable_images)
+        if num_images == 0:
+            return  # Nothing to display
+        
+        # Smart grid calculation
+        if num_images == 1:
+            num_rows, num_cols = 1, 1
+        elif num_images == 2:
+            num_rows, num_cols = 1, 2
+        elif num_images <= 4:
+            num_rows, num_cols = 2, 2
+        elif num_images <= 6:
+            num_rows, num_cols = 2, 3
+        elif num_images <= 9:
+            num_rows, num_cols = 3, 3
+        else:
+            # For more than 9 images, use a wider layout
+            num_cols = min(4, num_images)
+            num_rows = (num_images + num_cols - 1) // num_cols
+        
+        figure.set_subplots(dimensions=workspace.display_data.dimensions, subplots=(num_rows, num_cols))
+        
+        # Display images in the calculated grid
+        for idx, (img_data, title, img_type) in enumerate(displayable_images):
+            row = idx // num_cols
+            col = idx % num_cols
+            
+            image = getattr(workspace.display_data, img_data)
+            
+            if img_type == 'segmentation':
+                figure.subplot_imshow_labels(
+                    image=image,
+                    sharexy=figure.subplot(0, 0) if idx > 0 else None,
+                    title=title,
+                    x=row,
+                    y=col,
+                )
             else:
-                # If not a numpy array, e.g. a list, dict, or something else
-                # fallback to table view
-                figure.subplot_table(
-                    data=data,
-                    title=data_key,
-                    x=row,
-                    y=col
-                )
-
-            {# if output_conf.get('type') == "image":
                 figure.subplot_imshow(
-                    image=workspace.display_data.output_conf['name'],
                     colormap="gray",
-                    sharexy=figure.subplot(0, 0),
-                    title=output_conf.get('label'),
+                    image=image,
+                    sharexy=figure.subplot(0, 0) if idx > 0 else None,
+                    title=title,
                     x=row,
-                    y=col
-                )
-            elif output_conf.get('type') == "measurement":
-                figure.subplot_table(
-                    data=workspace.display_data.output_conf['name'],
-                    title=output_conf.get('label'),
-                    x=row,
-                    y=col
-                )
-            elif output_conf.get('type') == "array":
-                figure.subplot_table(
-                    data=workspace.display_data.output_conf['name'],
-                    title=output_conf.get('label'),
-                    x=row,
-                    y=col
-                )
-            elif output_conf.get('type') == "file":
-                figure.subplot_table(
-                    data=workspace.display_data.output_conf['name'],
-                    title=output_conf.get('label'),
-                    x=row,
-                    y=col
+                    y=col,
                 )
 
-            i += 1 #}
+    #
+    # "volumetric" indicates whether or not this module supports 3D images.
+    # Return True if the module can handle 3D data, False otherwise.
+    #
+    def volumetric(self):
+        {% if computed_category in ["Image Segmentation", "Object Processing"] %}
+        return True
+        {% else %}
+        return False
+        {% endif %}
 
-    
+    #
+    # The "upgrade_settings" method allows for backwards compatibility
+    # when you modify the module's interface.
+    #
     def upgrade_settings(self, setting_values, variable_revision_number, module_name):
+        """
+        Upgrade settings from a previous version of the module.
+        """
         return setting_values, variable_revision_number

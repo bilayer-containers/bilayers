@@ -260,6 +260,19 @@ The image will be automatically downloaded on first use.
 """
         )
         {% endfor %}
+
+        #
+        # Clean up temporary files - Allow user to preserve temp files for debugging
+        #
+        self.clean_temp_files = Binary(
+            text="Clean up temporary files",
+            value=True,
+            doc="""\
+Select "Yes" to automatically delete temporary files after processing (recommended for normal use).
+Select "No" to preserve temporary files for debugging purposes. The path to the temporary directory will be logged for manual inspection.
+"""
+        )
+
     #
     # The "settings" method tells CellProfiler about the settings you
     # have in your module. CellProfiler uses the list for saving
@@ -282,6 +295,7 @@ The image will be automatically downloaded on first use.
         # Docker and parameter settings
         settings.append(self.execution_method)
         settings.append(self.docker_image)
+        settings.append(self.clean_temp_files)
         {% for key, param in parameters.items() %}
         settings.append(self.{{ param.get('name') }})
         {% endfor %}
@@ -307,6 +321,7 @@ The image will be automatically downloaded on first use.
         
         visible.append(self.execution_method)
         visible.append(self.docker_image)
+        visible.append(self.clean_temp_files)
         {% for key, param in parameters.items() %}
         visible.append(self.{{ param.get('name') }})
         {% endfor %}
@@ -428,7 +443,7 @@ The image will be automatically downloaded on first use.
             
             if result.returncode != 0:
                 LOGGER.error(f"Container execution failed: {result.stderr}")
-                raise FileNotFoundError(f" Sorry! {{ algorithm_folder_name }} seems to have crashed and we are not sure why, since it's in its own container!")
+                raise RuntimeError(f"Container execution failed: {result.stderr}")
 
             # Load output data
             try:
@@ -464,10 +479,14 @@ The image will be automatically downloaded on first use.
 
         finally:
             # Cleanup temporary files
-            try:
-                shutil.rmtree(temp_dir)
-            except OSError as ex:
-                LOGGER.warning(f"Unable to delete temporary directory {temp_dir}: {ex}")
+            if self.clean_temp_files.value:
+                try:
+                    shutil.rmtree(temp_dir)
+                except OSError as ex:
+                    LOGGER.warning(f"Unable to delete temporary directory {temp_dir}: {ex}")
+            else:
+                LOGGER.info(f"Preserving temporary files for debugging at: {temp_dir}")
+                LOGGER.info(f"You can manually inspect the temporary files at: {temp_dir}")
 
         # Process outputs and add to workspace
         self._process_outputs(workspace)

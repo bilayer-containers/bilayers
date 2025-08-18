@@ -262,7 +262,7 @@ def generate_cellprofiler_plugin(
             ("image",): {
                 ("image",): "Image Processing",
                 ("object",): "Image Segmentation",
-                ("measurement",): "Measurer",
+                ("measurement",): "Measurement",
                 ("image", "object"): "Image Segmentation",
                 ("image", "measurement"): "Image Processing",
                 ("object", "measurement"): "Image Segmentation",
@@ -271,7 +271,7 @@ def generate_cellprofiler_plugin(
             ("object",): {
                 ("image",): "Object Processing",
                 ("object",): "Object Processing",
-                ("measurement",): "Measurer",
+                ("measurement",): "Measurement",
                 ("image", "object"): "Object Processing",
                 ("image", "measurement"): "Object Processing",
                 ("object", "measurement"): "Object Processing",
@@ -280,7 +280,7 @@ def generate_cellprofiler_plugin(
             ("measurement",): {
                 ("image",): "Decoder",
                 ("object",): "Decoder",
-                ("measurement",): "Measurer",
+                ("measurement",): "Measurement",
                 ("image", "object"): "Decoder",
                 ("image", "measurement"): "Decoder",
                 ("object", "measurement"): "Decoder",
@@ -289,7 +289,7 @@ def generate_cellprofiler_plugin(
             ("image", "object"): {
                 ("image",): "Object Processing",
                 ("object",): "Object Processing",
-                ("measurement",): "Measurer",
+                ("measurement",): "Measurement",
                 ("image", "object"): "Object Processing",
                 ("image", "measurement"): "Object Processing",
                 ("object", "measurement"): "Object Processing",
@@ -298,7 +298,7 @@ def generate_cellprofiler_plugin(
             ("image", "measurement"): {
                 ("image",): "Image Processing",
                 ("object",): "Image Segmentation",
-                ("measurement",): "Measurer",
+                ("measurement",): "Measurement",
                 ("image", "object"): "Image Segmentation",
                 ("image", "measurement"): "Image Processing",
                 ("object", "measurement"): "Image Segmentation",
@@ -307,7 +307,7 @@ def generate_cellprofiler_plugin(
             ("object", "measurement"): {
                 ("image",): "Object Processing",
                 ("object",): "Object Processing",
-                ("measurement",): "Measurer",
+                ("measurement",): "Measurement",
                 ("image", "object"): "Object Processing",
                 ("image", "measurement"): "Object Processing",
                 ("object", "measurement"): "Object Processing",
@@ -316,7 +316,7 @@ def generate_cellprofiler_plugin(
             ("image", "object", "measurement"): {
                 ("image",): "Object Processing",
                 ("object",): "Object Processing",
-                ("measurement",): "Measurer",
+                ("measurement",): "Measurement",
                 ("image", "object"): "Object Processing",
                 ("image", "measurement"): "Object Processing",
                 ("object", "measurement"): "Object Processing",

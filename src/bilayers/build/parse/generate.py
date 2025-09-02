@@ -77,6 +77,139 @@ def generate_top_level_text(interface: str, citations: dict[str, Citations], out
     ])
     return title, full_description
 
+
+# The sparse matrix is based on things discussed here: https://docs.google.com/spreadsheets/d/1e3JXcwdtaJLQrNQApg0mAXccvQhirWZw1pk11TjpiME/edit?gid=0#gid=0
+def determine_category_from_matrix(inputs: dict, outputs: dict) -> str:
+    """Return a high-level algorithm category based on input/output type combinations.
+
+    This function (in future) may be reused beyond the CellProfiler plugin generator
+    (e.g., documentation grouping, interface filtering). 
+    It deliberately allows categories like "Decoder"
+    even if CellProfiler itself will later map that to an existing module
+    classification.
+    """
+
+    TYPE_MAP = {
+        "image": "image",
+        "measurement": "measurement",
+        "array": "measurement",
+        "file": "measurement",
+        "executable": "measurement",
+    }
+
+    CATEGORY_MATRIX = {
+        ("image",): {
+            ("image",): "Image Processing",
+            ("object",): "Image Segmentation",
+            ("measurement",): "Measurement",
+            ("image", "object"): "Image Segmentation",
+            ("image", "measurement"): "Image Processing",
+            ("object", "measurement"): "Image Segmentation",
+            ("image", "object", "measurement"): "Image Segmentation",
+        },
+        ("object",): {
+            ("image",): "Object Processing",
+            ("object",): "Object Processing",
+            ("measurement",): "Measurement",
+            ("image", "object"): "Object Processing",
+            ("image", "measurement"): "Object Processing",
+            ("object", "measurement"): "Object Processing",
+            ("image", "object", "measurement"): "Object Processing",
+        },
+        ("measurement",): {
+            ("image",): "Decoder",
+            ("object",): "Decoder",
+            ("measurement",): "Measurement",
+            ("image", "object"): "Decoder",
+            ("image", "measurement"): "Decoder",
+            ("object", "measurement"): "Decoder",
+            ("image", "object", "measurement"): "Decoder",
+        },
+        ("image", "object"): {
+            ("image",): "Object Processing",
+            ("object",): "Object Processing",
+            ("measurement",): "Measurement",
+            ("image", "object"): "Object Processing",
+            ("image", "measurement"): "Object Processing",
+            ("object", "measurement"): "Object Processing",
+            ("image", "object", "measurement"): "Object Processing",
+        },
+        ("image", "measurement"): {
+            ("image",): "Image Processing",
+            ("object",): "Image Segmentation",
+            ("measurement",): "Measurement",
+            ("image", "object"): "Image Segmentation",
+            ("image", "measurement"): "Image Processing",
+            ("object", "measurement"): "Image Segmentation",
+            ("image", "object", "measurement"): "Image Segmentation",
+        },
+        ("object", "measurement"): {
+            ("image",): "Object Processing",
+            ("object",): "Object Processing",
+            ("measurement",): "Measurement",
+            ("image", "object"): "Object Processing",
+            ("image", "measurement"): "Object Processing",
+            ("object", "measurement"): "Object Processing",
+            ("image", "object", "measurement"): "Object Processing",
+        },
+        ("image", "object", "measurement"): {
+            ("image",): "Object Processing",
+            ("object",): "Object Processing",
+            ("measurement",): "Measurement",
+            ("image", "object"): "Object Processing",
+            ("image", "measurement"): "Object Processing",
+            ("object", "measurement"): "Object Processing",
+            ("image", "object", "measurement"): "Object Processing",
+        }
+    }
+
+    def normalize_types(conf_dict: dict) -> set:
+        resolved = []
+        for c in conf_dict.values():
+            base_type = TYPE_MAP.get(c.get("type"), "custom")
+            if base_type == "image" and c.get("subtype"):
+                subtypes = c.get("subtype", [])
+                if "labeled" in subtypes:
+                    resolved.append("object")
+                else:
+                    resolved.append("image")
+            else:
+                resolved.append(base_type)
+        return set(resolved)
+
+    def find_matching_category(input_set: set, output_set: set) -> str:
+        """
+        Simple lookup that checks if input/output sets match any category combination
+        """
+        for input_tuple, output_dict in CATEGORY_MATRIX.items():
+            if set(input_tuple) == input_set:
+                for output_tuple, category in output_dict.items():
+                    if set(output_tuple) == output_set:
+                        return category
+
+        # If no exact match is found, try subset matching (more permissive)
+        for input_tuple, output_dict in CATEGORY_MATRIX.items():
+            if set(input_tuple).issubset(input_set):
+                for output_tuple, category in output_dict.items():
+                    if set(output_tuple).issubset(output_set):
+                        return category
+        return "Custom"
+
+    return find_matching_category(normalize_types(inputs), normalize_types(outputs))
+
+
+def normalize_category_for_cellprofiler(category: str) -> str:
+    """Map internal/general categories to ones CellProfiler recognizes.
+
+    Currently we collapse "Decoder" to "Measurement" so the generated
+    plugin fits within existing CP UI groupings. Additional mappings can
+    be adjusted here without touching the matrix logic.
+    """
+    if category == "Decoder":
+        return "Not Supported"
+    return category
+
+
 def generate_gradio_app(
     template_path: str,
     inputs: dict[str, InputOutput],
@@ -239,138 +372,7 @@ def generate_cellprofiler_plugin(
         loader=FileSystemLoader(searchpath=os.path.dirname(template_path)),
         autoescape=select_autoescape(['j2'])
     )
-
-    # The sparse matrix is based on things discussed here: https://docs.google.com/spreadsheets/d/1e3JXcwdtaJLQrNQApg0mAXccvQhirWZw1pk11TjpiME/edit?gid=0#gid=0
-    def determine_category_from_matrix(inputs: dict, outputs: dict) -> str:
-        """
-        Determines the CellProfiler module category based on input and output types
-        Considers both primary type and subtype (especially for labeled/segmented images)
-        Falls back to 'Custom' if no rule is matched
-        """
-
-        # Normalization map
-        TYPE_MAP = {
-            "image": "image",
-            "measurement": "measurement",
-            "array": "measurement",
-            "file": "measurement",
-            "executable": "measurement",
-        }
-
-        # Match matrix as per CellProfiler logic table
-        CATEGORY_MATRIX = {
-            ("image",): {
-                ("image",): "Image Processing",
-                ("object",): "Image Segmentation",
-                ("measurement",): "Measurement",
-                ("image", "object"): "Image Segmentation",
-                ("image", "measurement"): "Image Processing",
-                ("object", "measurement"): "Image Segmentation",
-                ("image", "object", "measurement"): "Image Segmentation",
-            },
-            ("object",): {
-                ("image",): "Object Processing",
-                ("object",): "Object Processing",
-                ("measurement",): "Measurement",
-                ("image", "object"): "Object Processing",
-                ("image", "measurement"): "Object Processing",
-                ("object", "measurement"): "Object Processing",
-                ("image", "object", "measurement"): "Object Processing",
-            },
-            ("measurement",): {
-                ("image",): "Decoder",
-                ("object",): "Decoder",
-                ("measurement",): "Measurement",
-                ("image", "object"): "Decoder",
-                ("image", "measurement"): "Decoder",
-                ("object", "measurement"): "Decoder",
-                ("image", "object", "measurement"): "Decoder",
-            },
-            ("image", "object"): {
-                ("image",): "Object Processing",
-                ("object",): "Object Processing",
-                ("measurement",): "Measurement",
-                ("image", "object"): "Object Processing",
-                ("image", "measurement"): "Object Processing",
-                ("object", "measurement"): "Object Processing",
-                ("image", "object", "measurement"): "Object Processing",
-            },
-            ("image", "measurement"): {
-                ("image",): "Image Processing",
-                ("object",): "Image Segmentation",
-                ("measurement",): "Measurement",
-                ("image", "object"): "Image Segmentation",
-                ("image", "measurement"): "Image Processing",
-                ("object", "measurement"): "Image Segmentation",
-                ("image", "object", "measurement"): "Image Segmentation",
-            },
-            ("object", "measurement"): {
-                ("image",): "Object Processing",
-                ("object",): "Object Processing",
-                ("measurement",): "Measurement",
-                ("image", "object"): "Object Processing",
-                ("image", "measurement"): "Object Processing",
-                ("object", "measurement"): "Object Processing",
-                ("image", "object", "measurement"): "Object Processing",
-            },
-            ("image", "object", "measurement"): {
-                ("image",): "Object Processing",
-                ("object",): "Object Processing",
-                ("measurement",): "Measurement",
-                ("image", "object"): "Object Processing",
-                ("image", "measurement"): "Object Processing",
-                ("object", "measurement"): "Object Processing",
-                ("image", "object", "measurement"): "Object Processing",
-            }
-        }
-
-        def normalize_types(conf_dict: dict) -> set:
-            types = []
-            for c in conf_dict.values():
-                base_type = TYPE_MAP.get(c.get("type"), "custom")
-                
-                # Special handling for images with labeled subtype
-                if base_type == "image" and c.get("subtype"):
-                    subtypes = c.get("subtype", [])
-                    if "labeled" in subtypes:
-                        # Labeled images represent objects/segmentation
-                        types.append("object")
-                    else:
-                        types.append("image")
-                else:
-                    types.append(base_type)
-                    
-            return set(types)
-
-        def find_matching_category(input_set: set, output_set: set) -> str:
-            """
-            Simple lookup that checks if input/output sets match any category combination
-            """
-            # Convert matrix keys to sets for easy comparison
-            for input_tuple, output_dict in CATEGORY_MATRIX.items():
-                input_key_set = set(input_tuple)
-                if input_key_set == input_set:  # Exact match for inputs
-                    for output_tuple, category in output_dict.items():
-                        output_key_set = set(output_tuple)
-                        if output_key_set == output_set:  # Exact match for outputs
-                            return category
-            
-            # If no exact match, try subset matching (more permissive)
-            for input_tuple, output_dict in CATEGORY_MATRIX.items():
-                input_key_set = set(input_tuple)
-                if input_key_set.issubset(input_set):  # Input is subset of what we have
-                    for output_tuple, category in output_dict.items():
-                        output_key_set = set(output_tuple)
-                        if output_key_set.issubset(output_set):  # Output is subset of what we have
-                            return category
-            
-            return "Custom"
-
-        input_types = normalize_types(inputs)
-        output_types = normalize_types(outputs)
-
-        return find_matching_category(input_types, output_types)
-
+    
     # Helper function to convert algorithm folder name to class name
     def convert_to_class_name(algorithm_folder_name: str) -> str:
         """ Converts the algorithm folder name to a class name by capitalizing the first word
@@ -391,8 +393,16 @@ def generate_cellprofiler_plugin(
 
     template = env.get_template(os.path.basename(template_path))
 
-    # Precompute the category using our helper function.
-    computed_category = determine_category_from_matrix(inputs, outputs)
+    # Precompute the category, then normalize it for CellProfiler usage
+    general_category = determine_category_from_matrix(inputs, outputs)
+    computed_category = normalize_category_for_cellprofiler(general_category)
+
+    # Abort generation if the category is explicitly not supported for CellProfiler
+    if computed_category == "Not Supported":
+        raise RuntimeError(
+            "CellProfiler plugin generation aborted: general category 'Decoder' is not supported as a CellProfiler module. "
+            "(We retain it for documentation / other interfaces.)"
+        )
 
     # Convert algorithm folder name to class name
     class_name: str = convert_to_class_name(algorithm_folder_name)

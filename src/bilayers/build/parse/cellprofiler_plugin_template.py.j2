@@ -120,7 +120,16 @@ References
 {% endif %}
 """
 
-class {{ algorithm_folder_name }}(Module):
+{% set category_to_class = {
+    "Image Processing": "ImageProcessing",
+    "Image Segmentation": "ImageSegmentation", 
+    "Object Processing": "ObjectProcessing",
+    "Measurement": "Module",
+    "Decoder": "Module",
+    "Custom": "Module"
+} %}
+
+class {{ algorithm_folder_name }}({{ category_to_class.get(computed_category, "Module") }}):
     #
     # The module starts by declaring the name that's used for display,
     # the category under which it is stored and the variable revision
@@ -171,12 +180,21 @@ class {{ algorithm_folder_name }}(Module):
         # Create input settings for all modules
         {% for key, input_conf in inputs.items() %}
         {% if input_conf.get('type') == 'image' %}
+        {% if input_conf.get('subtype') and 'labeled' in input_conf.get('subtype') %}
+        self.{{ input_conf.get('name') }} = LabelSubscriber(
+            "{{ input_conf.get('label') }}",
+            doc="""\
+{{ input_conf.get('description') }}
+"""
+        )
+        {% else %}
         self.{{ input_conf.get('name') }} = ImageSubscriber(
             "{{ input_conf.get('label') }}",
             doc="""\
 {{ input_conf.get('description') }}
 """
         )
+        {% endif %}
         {% else %}
         self.{{ input_conf.get('name') }} = {{ type_mapping.get(input_conf.get('type'), default_type) }}(
             text="{{ input_conf.get('label') }}",
@@ -193,6 +211,15 @@ class {{ algorithm_folder_name }}(Module):
         # Create output settings for all modules
         {% for key, output_conf in outputs.items() %}
         {% if output_conf.get('type') == 'image' %}
+        {% if output_conf.get('subtype') and 'labeled' in output_conf.get('subtype') %}
+        self.{{ output_conf.get('name') }} = LabelName(
+            "{{ output_conf.get('label') }}",
+            "{{ output_conf.get('name', 'Output') }}",
+            doc="""\
+{{ output_conf.get('description') }}
+"""
+        )
+        {% else %}
         self.{{ output_conf.get('name') }} = ImageName(
             "{{ output_conf.get('label') }}",
             "{{ output_conf.get('name', 'Output') }}",
@@ -200,6 +227,7 @@ class {{ algorithm_folder_name }}(Module):
 {{ output_conf.get('description') }}
 """
         )
+        {% endif %}
         {% endif %}
         {% endfor %}
 
@@ -216,7 +244,8 @@ Choose how to execute the algorithm:
 - Docker: Run the algorithm in a Docker container (recommended for reproducibility)
 - Podman: Run the algorithm in a Podman container (Docker alternative)
 **Note**
-- Python: "Future versions of this plugin may allow directly running in Python via a shared Python environment - if so, those developers will add Python as an option here. If not added, only container-based run is supported."
+- Python: "Future versions of this plugin may allow directly running in Python via a shared Python environment 
+    - if so, those developers will add Python as an option here. If not added, only container-based run is supported."
 """
         )
 
@@ -273,6 +302,31 @@ Select "No" to preserve temporary files for debugging purposes. The path to the 
 """
         )
 
+        {% set has_measurements = false %}
+        {% for output_conf in outputs.values() %}
+            {% if output_conf.get('type') == 'measurement' %}
+                {% set has_measurements = true %}
+            {% endif %}
+        {% endfor %}
+        {% if has_measurements %}
+        self.save_measurements = Binary(
+            text="Save measurement files",
+            value=True,
+            doc="""\
+Select "Yes" to save measurement files to a directory.
+Select "No" to skip saving measurement files."""
+        )
+
+        self.measurement_directory = Directory(
+            text="Output folder for measurements",
+            dir_choices=['Default Output Folder'],
+            value='Default Output Folder',
+            doc="""\
+Directory where measurement files will be saved. A subfolder matching the ImageSet number will be created.
+If set to "Default Output Folder", measurements will be saved in [DefaultOutputFolder]/measurements/[ImageSet_Number]/."""
+        )
+        {% endif %}
+
     #
     # The "settings" method tells CellProfiler about the settings you
     # have in your module. CellProfiler uses the list for saving
@@ -291,6 +345,16 @@ Select "No" to preserve temporary files for debugging purposes. The path to the 
         settings.append(self.{{ output_conf.get('name') }})
         {% endif %}
         {% endfor %}
+        {% set has_measurements = false %}
+        {% for output_conf in outputs.values() %}
+            {% if output_conf.get('type') == 'measurement' %}
+                {% set has_measurements = true %}
+            {% endif %}
+        {% endfor %}
+        {% if has_measurements %}
+        settings.append(self.save_measurements)
+        settings.append(self.measurement_directory)
+        {% endif %}
         
         # Docker and parameter settings
         settings.append(self.execution_method)
@@ -318,6 +382,18 @@ Select "No" to preserve temporary files for debugging purposes. The path to the 
         visible.append(self.{{ output_conf.get('name') }})
         {% endif %}
         {% endfor %}
+        
+        {% set has_measurements = false %}
+        {% for output_conf in outputs.values() %}
+            {% if output_conf.get('type') == 'measurement' %}
+                {% set has_measurements = true %}
+            {% endif %}
+        {% endfor %}
+        {% if has_measurements %}
+        visible.append(self.save_measurements)
+        if self.save_measurements.value:
+            visible.append(self.measurement_directory)
+        {% endif %}
         
         visible.append(self.execution_method)
         visible.append(self.docker_image)
@@ -354,10 +430,19 @@ Select "No" to preserve temporary files for debugging purposes. The path to the 
         {% for key, input_conf in inputs.items() %}
         {% if input_conf.get('type') == 'image' %}
         {{ input_conf.get('name') }}_name = self.{{ input_conf.get('name') }}.value
+        {% if input_conf.get('subtype') and 'labeled' in input_conf.get('subtype') %}
+        # Labeled image (objects) input: retrieve from object_set
+        objects_{{ input_conf.get('name') }} = workspace.object_set.get_objects({{ input_conf.get('name') }}_name)
+        {{ input_conf.get('name') }}_data = objects_{{ input_conf.get('name') }}.segmented
+        # Derive dimensions from array ndim (2 or 3)
+        dimensions = 3 if {{ input_conf.get('name') }}_data.ndim == 3 else 2
+        {% else %}
+        # Regular image input
         images = workspace.image_set
         {{ input_conf.get('name') }} = images.get_image({{ input_conf.get('name') }}_name)
         {{ input_conf.get('name') }}_data = {{ input_conf.get('name') }}.pixel_data
         dimensions = {{ input_conf.get('name') }}.dimensions
+        {% endif %}
         {% endif %}
         {% endfor %}
         {% else %}
@@ -465,9 +550,31 @@ Select "No" to preserve temporary files for debugging purposes. The path to the 
                 if os.path.exists({{ output_conf.get('name') }}_output_path):
                     {{ output_conf.get('name') }}_data = numpy.load({{ output_conf.get('name') }}_output_path)
                 {% elif output_conf.get('type') == 'measurement' %}
+                # Temporary path for measurement output
                 {{ output_conf.get('name') }}_output_path = os.path.join(temp_output_dir, f"{unique_name}_{{ output_conf.get('name') }}.csv")
+
+
                 if os.path.exists({{ output_conf.get('name') }}_output_path):
-                    {{ output_conf.get('name') }}_data = {{ output_conf.get('name') }}_output_path
+                    if self.save_measurements.value:
+                        # Get the output directory - either from setting or default output folder
+                        default_output_dir = get_default_output_directory()
+                        if self.measurement_directory.dir_choice == 'Default Output Folder':
+                            output_dir = default_output_dir
+                        else:
+                            output_dir = self.measurement_directory.get_absolute_path(default_output_dir)
+                        
+                        # Create measurement directory with ImageSet number subfolder
+                        measurement_dir = os.path.join(output_dir, "measurements", str(workspace.measurements.image_number))
+                        os.makedirs(measurement_dir, exist_ok=True)
+                        LOGGER.info(f"Saving measurements to: {measurement_dir}")
+                        
+                        # Copy to final location in measurement directory
+                        final_path = os.path.join(measurement_dir, f"{{ output_conf.get('name') }}.csv")
+                        shutil.copy2({{ output_conf.get('name') }}_output_path, final_path)
+                        {{ output_conf.get('name') }}_data = final_path
+                    else:
+                        # Just store the temp path if not saving measurements
+                        {{ output_conf.get('name') }}_data = {{ output_conf.get('name') }}_output_path
                 {% endif %}
                 {% endfor %}
             except FileNotFoundError as ex:
@@ -497,8 +604,8 @@ Select "No" to preserve temporary files for debugging purposes. The path to the 
         LOGGER.info(f"Processing custom module outputs (category: {{ computed_category }})")
         {% for key, output_conf in outputs.items() %}
         {% if output_conf.get('type') == 'image' %}
-        {% if computed_category == "Image Segmentation" %}
-        # Create objects for segmentation outputs
+        {% if output_conf.get('subtype') and 'labeled' in output_conf.get('subtype') %}
+        # Create objects for labeled/segmentation outputs
         objects_{{ output_conf.get('name') }} = Objects()
         objects_{{ output_conf.get('name') }}.segmented = {{ output_conf.get('name') }}_data
         {% set first_image_input = inputs.values() | selectattr('type', 'equalto', 'image') | list %}
@@ -507,7 +614,7 @@ Select "No" to preserve temporary files for debugging purposes. The path to the 
         {% endif %}
         workspace.object_set.add_objects(objects_{{ output_conf.get('name') }}, {{ output_conf.get('name') }}_name)
         {% else %}
-        # Add processed image to image set
+        # Add regular image to image set
         output_image_{{ output_conf.get('name') }} = Image({{ output_conf.get('name') }}_data)
         {% set first_image_input = inputs.values() | selectattr('type', 'equalto', 'image') | list %}
         {% if first_image_input %}
@@ -638,7 +745,16 @@ Select "No" to preserve temporary files for debugging purposes. The path to the 
     # Return True if the module can handle 3D data, False otherwise.
     #
     def volumetric(self):
-        {% if computed_category in ["Image Segmentation", "Object Processing"] %}
+        """Return True if this module supports 3D processing.
+        This is determined by checking if any input images require depth support.
+        """
+        {% set has_3d_input = false %}
+        {% for key, input_conf in inputs.items() %}
+        {% if input_conf.get('type') == 'image' and input_conf.get('subtype') and 'depth' in input_conf.get('subtype') %}
+        {% set has_3d_input = true %}
+        {% endif %}
+        {% endfor %}
+        {% if has_3d_input %}
         return True
         {% else %}
         return False

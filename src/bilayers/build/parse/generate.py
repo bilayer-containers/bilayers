@@ -45,7 +45,7 @@ def generate_top_level_text(interface: str, citations: dict[str, Citations], out
         }
     }
 
-    newline = "<br>" if output_html else "\n"
+    newline = "<br>" if output_html else "\n\n"
 
     app_descriptions_lines = ["**This interface provides the following tool(s):**"]
     citation_text_lines = ["**This project relies on citations! Please cite ALL of the following if you find this application useful in your research:**"]

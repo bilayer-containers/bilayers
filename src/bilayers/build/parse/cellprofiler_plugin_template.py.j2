@@ -30,8 +30,7 @@ import skimage
 
 {% set import_dict = {
     "module.image_segmentation": ["ImageSegmentation", "ObjectProcessing"],
-    "module": "ImageProcessing",
-    "module": "Module",
+    "module": ["ImageProcessing", "Module"],
     "preferences": "get_default_output_directory",
     "object": "Objects",
     "setting": "Binary",
@@ -594,11 +593,6 @@ If set to "Default Output Folder", measurements will be saved in [DefaultOutputF
                 LOGGER.info(f"Preserving temporary files for debugging at: {temp_dir}")
                 LOGGER.info(f"You can manually inspect the temporary files at: {temp_dir}")
 
-        # Process outputs and add to workspace
-        self._process_outputs(workspace)
-
-    def _process_outputs(self, workspace):
-        """Process algorithm outputs and add them to the workspace."""
         # Handle outputs programmatically for all modules
         LOGGER.info(f"Processing custom module outputs (category: {{ computed_category }})")
         {% for key, output_conf in outputs.items() %}

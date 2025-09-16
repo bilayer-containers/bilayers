@@ -1,0 +1,95 @@
+citations:
+  - name: "Gaussian Smoothing"
+    doi: doi_number
+    license: license_details
+    description: "Creates a gaussian blurred image based on the passed sigma"
+
+docker_image:
+  org: bilayer
+  name: gaussian_smoothing
+  tag: "1.0.0"
+  platform: "linux/amd64"
+
+algorithm_folder_name: "gaussian_smoothing"
+
+exec_function: 
+  name: "generate_cli_command"
+  cli_command: "python -m gaussian_smoothing"
+  hidden_args:
+
+inputs:
+  - name: input_images
+    type: image
+    label: "Drag and drop all images to be analyzed"
+    subtype: 
+      - grayscale
+      - color
+      - binary
+      - labeled
+    description: "Upload all images to be analyzed"
+    cli_tag: "--folder"
+    cli_order: 0
+    default: "directory"
+    optional: False
+    format: 
+      - tiff
+      - ometiff
+      - png
+      - jpg
+      - jpeg
+    folder_name: "/bilayers/input_images"
+    file_count: multiple
+    section_id: "inputs"
+    mode: "beginner"
+    depth: True
+    timepoints: True
+    tiled: True
+    pyramidal: True
+
+outputs:
+  - name: blurred_images
+    type: image
+    label: "Blurred Images"
+    subtype: 
+      - grayscale
+      - color
+      - binary
+    description: "Blurred images"
+    cli_tag: "None"
+    cli_order: 0
+    default: "directory"
+    optional: False 
+    format: 
+      - tiff
+      - ometiff
+    folder_name: "/bilayers/input_images" # discuss
+    file_count: multiple
+    section_id: "outputs"
+    mode: "beginner"
+    depth: True
+    timepoints: True
+    tiled: True
+    pyramidal: True
+    
+parameters:
+  - name: sigma_size
+    type: float
+    label: "Gaussian sigma size"
+    description: "Size of Gaussian sigma to apply"
+    default: 5
+    cli_tag: "--sigma_size"
+    optional: False
+    section_id: "input-args"
+    mode: "beginner"
+  - name: save_dir
+    type: textbox
+    label: "Save Directory"
+    description: "directory to save output files"
+    output_dir_set: True
+    default: "/bilayers/input_images"
+    cli_tag: "--save_dir"
+    optional: True
+    section_id: "output-args"
+    mode: "advanced"
+
+display_only:

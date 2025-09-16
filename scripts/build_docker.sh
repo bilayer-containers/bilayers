@@ -4,7 +4,7 @@
 set -e
 
 # List of algorithms and interfaces
-# ALGORITHM_NAMES=("classical_segmentation" "cellpose_inference" "instanseg_inference")
+ALGORITHM_NAMES=("classical_segmentation" "cellpose_inference" "instanseg_inference" "gaussian_smoothing")
 INTERFACE_NAMES=("gradio" "jupyter")
 ALGORITHM_NAMES=("classical_segmentation")
 

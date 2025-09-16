@@ -29,7 +29,6 @@ inputs:
       - grayscale
       - color
       - binary
-      - labeled
     description: "Input images to be analyzed"
     cli_tag: "--image_path"
     cli_order: 0

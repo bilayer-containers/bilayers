@@ -25,7 +25,6 @@ inputs:
       - grayscale
       - color
       - binary
-      - labeled
     description: "Upload all images to be analyzed"
     cli_tag: "--folder"
     cli_order: 0

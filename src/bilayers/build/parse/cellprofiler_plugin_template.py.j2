@@ -29,9 +29,8 @@ import skimage
 ##################################
 
 {% set import_dict = {
-    "module.image_segmentation": "ImageSegmentation",
-    "module.image_processing": "ImageProcessing",
-    "module.object_processing": "ObjectProcessing",
+    "module.image_segmentation": ["ImageSegmentation", "ObjectProcessing"],
+    "module": "ImageProcessing",
     "module": "Module",
     "preferences": "get_default_output_directory",
     "object": "Objects",

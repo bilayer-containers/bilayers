@@ -375,12 +375,10 @@ def generate_cellprofiler_plugin(
     
     # Helper function to convert algorithm folder name to class name
     def convert_to_class_name(algorithm_folder_name: str) -> str:
-        """ Converts the algorithm folder name to a class name by capitalizing the first word
-        This is used to ensure that the class name follows Python's naming conventions and cellprofiler-plugin conventions
-        For example, if the algorithm_folder_name is "stardist_inference", it will return "RunStardist"; "classical_segmentation" will return "RunClassical"
+        """ Converts the algorithm folder name to a class name by adding run and converting to CamaelCase
         """
-        first_word = algorithm_folder_name.split('_')[0]
-        return "Run" + first_word.capitalize()
+        camel_case = ''.join([x.capitalize() for x in algorithm_folder_name.split('_')])
+        return "Run" + camel_case
 
     def lower(text: str) -> str:
         return text.lower()
@@ -419,7 +417,7 @@ def generate_cellprofiler_plugin(
         docker_image=docker_image
     )
 
-    return cellprofiler_code
+    return cellprofiler_code, class_name
 
 def main() -> None:
     """Main function to parse config and generate Gradio and Jupyter notebook files."""
@@ -480,7 +478,9 @@ def main() -> None:
     cellprofiler_plugin_template_path: str = "cellprofiler_plugin_template.py.j2"
 
     # Generating CellProfiler Plugin file dynamically
-    cellprofiler_template_code: str = generate_cellprofiler_plugin(
+    cellprofiler_template_code: str
+    plugin_name: str
+    cellprofiler_template_code, plugin_name = generate_cellprofiler_plugin(
         cellprofiler_plugin_template_path,
         inputs,
         outputs,
@@ -492,13 +492,13 @@ def main() -> None:
         docker_image
     )
 
-    # Join folders and file name
-    cellprofiler_plugin_path: str = os.path.join(folderA, folderB, 'cellprofiler_plugin.py')
+    # Join folders and file name - file name MUST match plugin name (but in lowercase) to work
+    cellprofiler_plugin_path: str = os.path.join(folderA, folderB, f'{plugin_name.lower()}.py')
 
     # Generating CellProfiler Plugin file dynamically
     with open(cellprofiler_plugin_path, 'w') as f:
         f.write(cellprofiler_template_code)
-    print("cellprofiler_plugin.py generated successfully!!")
+    print("CellProfiler plugin generated successfully!!")
 
 if __name__ == "__main__":
     main()

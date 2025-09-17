@@ -402,7 +402,7 @@ If set to "Default Output Folder", measurements will be saved in [DefaultOutputF
         {% else %}
         {% if key[:3]=='set' %}
         visible.append(self.{{ param.get('name') }})
-        if self.{{ param.get('name') }}.value:
+        if self.{{ param.get('name') }}.value.lower()=="true":
             visible.append(self.{{ param.get('name').replace('set','val') }})
         {% endif %}
         {% endif %}
@@ -526,7 +526,7 @@ If set to "Default Output Folder", measurements will be saved in [DefaultOutputF
             cmd.extend(["{{ param.get('cli_tag') }}", str(self.{{ param.get('name') }}.value)])
             {% else %}
             {% if key[:3]=='set' %}
-            if self.{{ param.get('name') }}.value:
+            if self.{{ param.get('name') }}.value.lower() == "true":
                 cmd.extend(["{{ param.get('cli_tag') }}", str(self.{{ param.get('name').replace('set','val') }}.value)])
             {% endif %}
             {% endif %}

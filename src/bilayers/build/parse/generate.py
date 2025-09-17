@@ -415,7 +415,7 @@ def generate_cellprofiler_plugin(
             bool_param_dict["name"]=f"set_{paramkey}"
             bool_param_dict["type"]="radio"
             bool_param_dict["options"] = [{"label":"Yes","value":True},{"label":"No","value":False}]
-            bool_param_dict["value"]=False
+            bool_param_dict["default"]="False"
             newlabel = paramvalue["label"][0].lower()+paramvalue["label"][1:]
             bool_param_dict["label"] = f"Set a value for {newlabel}?"
             num_param_dict = {k:v for k,v in paramvalue.items()}

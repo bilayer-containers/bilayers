@@ -30,7 +30,6 @@ inputs:
       - grayscale
       - color
       - binary
-      - labeled
     description: "Path to the directory of input images"
     cli_tag: "--dir"
     cli_order: 0

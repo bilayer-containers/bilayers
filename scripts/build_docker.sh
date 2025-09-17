@@ -4,7 +4,7 @@
 set -e
 
 # List of algorithms and interfaces
-ALGORITHM_NAMES=("classical_segmentation" "cellpose_inference" "instanseg_inference" "gaussian_smoothing")
+ALGORITHM_NAMES=("classical_segmentation" "cellpose_inference" "instanseg_inference" "gaussian_smoothing" "stardist_inference")
 INTERFACE_NAMES=("gradio" "jupyter")
 
 # Build the Docker images for each algorithm and interface
@@ -28,7 +28,7 @@ for ALGORITHM_NAME in "${ALGORITHM_NAMES[@]}";
         # Building the Interface Docker image
         nox -s build_interface -- $INTERFACE_NAME $ALGORITHM_NAME
 
-        # Installing the Graadio interface
+        # Installing the Gradio interface
         nox -s install_gradio
     done
 done

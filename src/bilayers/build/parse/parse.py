@@ -16,11 +16,14 @@ class HiddenArgs(TypedDict, total=False):
     append_value: bool
     cli_order: int
 
+class DockerImage(TypedDict):
+    org: str
+    name: str
+    tag: str
+    platform: str
 
 class ExecFunction(TypedDict):
     name: str
-    script: str
-    module: str
     cli_command: str
     hidden_args: Optional[dict[str, HiddenArgs]]
 
@@ -72,6 +75,7 @@ class Config(TypedDict):
     outputs: dict[str, InputOutput]
     parameters: dict[str, Parameter]
     display_only: Optional[dict[str, Parameter]]
+    docker_image: DockerImage
 
 
 def parse_config(config_path: Optional[str] = None) -> Config:
@@ -109,7 +113,16 @@ def parse_config(config_path: Optional[str] = None) -> Config:
 
 def main(
     config_path: Optional[str] = None,
-) -> tuple[dict[str, InputOutput], dict[str, InputOutput], dict[str, Parameter], Optional[dict[str, Parameter]], ExecFunction, str, dict[str, Citations]]:
+) -> tuple[
+        dict[str, InputOutput],
+        dict[str, InputOutput],
+        dict[str, Parameter],
+        Optional[dict[str, Parameter]],
+        ExecFunction,
+        str,
+        dict[str, Citations],
+        DockerImage
+    ]:
     """
     Loads the configuration and extracts necessary information.
 
@@ -133,8 +146,6 @@ def main(
 
     exec_function: ExecFunction = config.get("exec_function", {})
     exec_function.setdefault("name", "")
-    exec_function.setdefault("script", "")
-    exec_function.setdefault("module", "")
     exec_function.setdefault("cli_command", "")
     exec_function.setdefault("hidden_args", {})
 
@@ -142,11 +153,14 @@ def main(
 
     citations: dict[str, Citations] = config.get("citations", {})
 
-    return inputs, outputs, parameters, display_only, exec_function, algorithm_folder_name, citations
+    # Since, we are sure that docker_image key exists in the config, we can safely use it.
+    docker_image: DockerImage = config["docker_image"]
+
+    return inputs, outputs, parameters, display_only, exec_function, algorithm_folder_name, citations, docker_image
 
 
 if __name__ == "__main__":
-    inputs, outputs, parameters, display_only, exec_function, algorithm_folder_name, citations = main()
+    inputs, outputs, parameters, display_only, exec_function, algorithm_folder_name, citations, docker_image = main()
     print(f"Inputs: {inputs}")
     print(f"Outputs: {outputs}")
     print(f"Parameters: {parameters}")
@@ -154,3 +168,4 @@ if __name__ == "__main__":
     print(f"Exec Function: {exec_function}")
     print(f"Folder Name: {algorithm_folder_name}")
     print(f"Citations: {citations}")
+    print(f"Docker Image: {docker_image}")

@@ -405,11 +405,35 @@ def generate_cellprofiler_plugin(
     # Convert algorithm folder name to class name
     class_name: str = convert_to_class_name(algorithm_folder_name)
 
+    # Some parameters are numeric but have a default of None, because sometimes they aren't set. Ick!
+    # Let's handle them by making a "set_x" setting, and a "value_x" setting, which is not visible if set_x is False
+    split_parameters = {}
+    parameters_flat = {}
+    for paramkey, paramvalue in parameters.items():
+        if paramvalue["type"] in ["float", "integer"] and paramvalue["default"] == "None":
+            bool_param_dict = {k:v for k,v in paramvalue.items()}
+            bool_param_dict["name"]=f"set_{paramkey}"
+            bool_param_dict["type"]="radio"
+            bool_param_dict["options"] = [{"label":"Yes","value":True},{"label":"No","value":False}]
+            bool_param_dict["value"]=False
+            newlabel = paramvalue["label"][0].lower()+paramvalue["label"][1:]
+            bool_param_dict["label"] = f"Set a value for {newlabel}?"
+            num_param_dict = {k:v for k,v in paramvalue.items()}
+            num_param_dict["name"]=f"val_{paramkey}"
+            num_param_dict["default"]=0
+            split_parameters[paramkey]={f"set_{paramkey}":bool_param_dict,f"val_{paramkey}":num_param_dict}
+            parameters_flat[f"set_{paramkey}"]=bool_param_dict
+            parameters_flat[f"val_{paramkey}"]=num_param_dict
+        else:
+            parameters_flat[paramkey]=paramvalue
+
+
     cellprofiler_code: str = template.render(
         inputs=inputs,
         outputs=outputs,
         computed_category=computed_category,
-        parameters=parameters,
+        parameters=parameters_flat,
+        split_parameters=split_parameters,
         display_only=display_only or [],
         algorithm_folder_name=class_name,
         exec_function=exec_function,

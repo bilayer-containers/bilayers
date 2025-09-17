@@ -397,7 +397,15 @@ If set to "Default Output Folder", measurements will be saved in [DefaultOutputF
         visible.append(self.docker_image)
         visible.append(self.clean_temp_files)
         {% for key, param in parameters.items() %}
+        {% if key[4:] not in split_parameters.keys()%}
         visible.append(self.{{ param.get('name') }})
+        {% else %}
+        {% if key[:3]=='set' %}
+        visible.append(self.{{ param.get('name') }})
+        if self.{{ param.get('name') }}.value:
+            visible.append(self.{{ param.get('name').replace('set','val') }})
+        {% endif %}
+        {% endif %}
         {% endfor %}
         
         return visible
@@ -514,10 +522,18 @@ If set to "Default Output Folder", measurements will be saved in [DefaultOutputF
                 cmd.append("{{ param.get('cli_tag') }}")
             {% endif %}
             {% else %}
+            {% if key[4:] not in split_parameters.keys()%}
             cmd.extend(["{{ param.get('cli_tag') }}", str(self.{{ param.get('name') }}.value)])
+            {% else %}
+            {% if key[:3]=='set' %}
+            if self.{{ param.get('name') }}.value:
+                cmd.extend(["{{ param.get('cli_tag') }}", str(self.{{ param.get('name').replace('set','val') }}.value)])
+            {% endif %}
+            {% endif %}
             {% endif %}
             {% endif %}
             {% endfor %}
+
 
             LOGGER.info(f"Running Docker command: {' '.join(cmd)}")
 

@@ -142,6 +142,8 @@ outputs:
       - ometiff
     folder_name: "/path/to/output_images" # folder_path
     file_count: ("single" | "multiple") # if it accepts single file or multiple files. If multiple, then it will be a folder
+    unique_string:
+      - "" # a unique string to identify the output files, this could be a suffix or prefix or any string in the filename
     section_id: "outputs"
     mode: ("beginner" | "advanced")
     # Extra flags ONLY IFF TYPE==IMAGE

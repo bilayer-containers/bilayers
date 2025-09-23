@@ -82,6 +82,8 @@ outputs:
       - png
     folder_name: # depends on --save_dir
     file_count: "multiple"
+    unique_string:
+      - "_cp_masks"
     section_id: "outputs"
     mode: "beginner"
     depth: True
@@ -106,6 +108,8 @@ outputs:
       - ometiff
     folder_name: # discuss - it depends on --save_dir
     file_count: "multiple"
+    unique_string:
+      - "_cp_masks"
     section_id: "outputs"
     mode: "beginner"
     depth: True
@@ -124,6 +128,8 @@ outputs:
       - npy
     folder_name: "/bilayers/input_images" # for cellpose, it would be same as input_images
     file_count: "single"
+    unique_string:
+      - "_seg"
     section_id: "outputs"
     mode: "advanced"
   - name: flows
@@ -144,6 +150,8 @@ outputs:
       - ometiff
     folder_name: # it depends on what user inputs
     file_count: "multiple"
+    unique_string:
+      - "_flows_cp_masks"
     section_id: "outputs"
     mode: "advanced"
     depth: True
@@ -168,6 +176,8 @@ outputs:
       - ometiff
     folder_name: # depends on what user inputs at --save_dir
     file_count: "multiple"
+    unique_string: 
+      - "_outlines_cp_masks"
     section_id: "outputs"
     mode: "advanced"
     depth: True
@@ -186,6 +196,8 @@ outputs:
       - txt
     folder_name: # depends on what user inputs at --save_dir
     file_count: "single"
+    unique_string:
+      - "_cp_outlines"
     section_id: "outputs"
     mode: "advanced"
     

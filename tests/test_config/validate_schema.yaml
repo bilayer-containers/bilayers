@@ -17,7 +17,7 @@ classes:
     class_uri: linkml:Any
 
   SpecContainer:
-    description: "SpecContianer class which holds all the high_level keywords from config.yaml file of specific algorithm"
+    description: "SpecContainer class which holds all the high_level keywords from config.yaml file of specific algorithm"
     slots: 
     - inputs
     - outputs
@@ -80,6 +80,8 @@ classes:
     aliases: ["outputs"]
     description: "Outputs of the algorithm to the next step in the workflow"
     is_a: AbstractWorkflowDetails
+    slots:
+      - unique_string
     rules: 
       - description: "Extra flags needed iff type is image"
         preconditions:
@@ -349,6 +351,11 @@ slots:
     description: "Folder name of the object"
     range: string
     required: false
+  unique_string:
+    description: "Unique substring to recognize and validate output files belonging to this output"
+    range: string
+    required: true
+    multivalued: true
   file_count:
     description: "Type of Number of files"
     range: FileTypeEnum

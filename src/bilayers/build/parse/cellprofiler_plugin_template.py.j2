@@ -550,8 +550,8 @@ If set to "Default Output Folder", measurements will be saved in [DefaultOutputF
                 {% for key, output_conf in outputs.items() %}
                 {% if output_conf.get('type') == 'image' %}
                 matched_files = []
-                for fmt in {{ output_conf.get('format', ['tif']) }}:
-                    for recognizer in {{ output_conf.get('unique_string', ['*']) }}:
+                for fmt in {{ output_conf.get('format', ['tif']) | safe }}:
+                    for recognizer in {{ output_conf.get('unique_string', ['*']) | safe }}:
                         pattern = os.path.join(temp_output_dir, f"*{recognizer}*.{fmt}")
                         matched_files.extend(glob.glob(pattern))
 
@@ -574,8 +574,8 @@ If set to "Default Output Folder", measurements will be saved in [DefaultOutputF
                     {% endif %}
                 {% elif output_conf.get('type') == 'array' %}
                 matched_files = []
-                for fmt in {{ output_conf.get('format', ['npy']) }}:
-                    for recognizer in {{ output_conf.get('unique_string', ['*']) }}:
+                for fmt in {{ output_conf.get('format', ['npy']) | safe }}:
+                    for recognizer in {{ output_conf.get('unique_string', ['*']) | safe }}:
                         pattern = os.path.join(temp_output_dir, f"*{recognizer}*.{fmt}")
                         matched_files.extend(glob.glob(pattern))
                 if matched_files:
@@ -587,8 +587,8 @@ If set to "Default Output Folder", measurements will be saved in [DefaultOutputF
                     {% endif %}
                 {% elif output_conf.get('type') == 'measurement' %}
                 matched_files = []
-                for fmt in {{ output_conf.get('format', ['csv']) }}:
-                    for recognizer in {{ output_conf.get('unique_string', ['*']) }}:
+                for fmt in {{ output_conf.get('format', ['csv']) | safe }}:
+                    for recognizer in {{ output_conf.get('unique_string', ['*']) | safe }}:
                         pattern = os.path.join(temp_output_dir, f"*{recognizer}*.{fmt}")
                         matched_files.extend(glob.glob(pattern))
                 if matched_files:

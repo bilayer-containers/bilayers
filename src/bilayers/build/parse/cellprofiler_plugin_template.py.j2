@@ -21,6 +21,7 @@ import logging
 import subprocess
 import numpy
 import skimage
+import glob
 
 #################################
 #
@@ -548,49 +549,70 @@ If set to "Default Output Folder", measurements will be saved in [DefaultOutputF
             try:
                 {% for key, output_conf in outputs.items() %}
                 {% if output_conf.get('type') == 'image' %}
-                {{ output_conf.get('name') }}_output_path = os.path.join(temp_output_dir, f"{unique_name}_{{ output_conf.get('name') }}.tiff")
-                if os.path.exists({{ output_conf.get('name') }}_output_path):
-                    {{ output_conf.get('name') }}_data = skimage.io.imread({{ output_conf.get('name') }}_output_path)
+                matched_files = []
+                for fmt in {{ output_conf.get('format', ['tif']) }}:
+                    for recognizer in {{ output_conf.get('unique_string', ['*']) }}:
+                        pattern = os.path.join(temp_output_dir, f"*{recognizer}*.{fmt}")
+                        matched_files.extend(glob.glob(pattern))
+
+                if matched_files:
+                    {% if output_conf.get('file_count') == 'multiple' %}
+                    # Load all matching files
+                    {{ output_conf.get('name') }}_data = [skimage.io.imread(f) for f in matched_files]
+                    {% else %}
+                    # Single file case (default)
+                    selected_file = matched_files[0]
+                    {{ output_conf.get('name') }}_data = skimage.io.imread(selected_file)
+                    {% endif %}
                 else:
-                    LOGGER.warning(f"No {{ output_conf.get('name') }} output found, creating zero array")
+                    LOGGER.warning("No matching output found for {{ output_conf.get('name') }}")
                     {% set first_image_input = inputs.values() | selectattr('type', 'equalto', 'image') | list %}
                     {% if first_image_input %}
                     {{ output_conf.get('name') }}_data = numpy.zeros_like({{ first_image_input[0].get('name') }}_data)
-                    {% else %} # Prevent Docker crashing
+                    {% else %}
                     {{ output_conf.get('name') }}_data = numpy.zeros((256, 256), dtype=numpy.uint8)
                     {% endif %}
                 {% elif output_conf.get('type') == 'array' %}
-                {{ output_conf.get('name') }}_output_path = os.path.join(temp_output_dir, f"{unique_name}_{{ output_conf.get('name') }}.npy")
-                if os.path.exists({{ output_conf.get('name') }}_output_path):
-                    {{ output_conf.get('name') }}_data = numpy.load({{ output_conf.get('name') }}_output_path)
+                matched_files = []
+                for fmt in {{ output_conf.get('format', ['npy']) }}:
+                    for recognizer in {{ output_conf.get('unique_string', ['*']) }}:
+                        pattern = os.path.join(temp_output_dir, f"*{recognizer}*.{fmt}")
+                        matched_files.extend(glob.glob(pattern))
+                if matched_files:
+                    {% if output_conf.get('file_count') == 'multiple' %}
+                    {{ output_conf.get('name') }}_data = [numpy.load(f) for f in matched_files]
+                    {% else %}
+                    selected_file = matched_files[0]
+                    {{ output_conf.get('name') }}_data = numpy.load(selected_file)
+                    {% endif %}
                 {% elif output_conf.get('type') == 'measurement' %}
-                # Temporary path for measurement output
-                {{ output_conf.get('name') }}_output_path = os.path.join(temp_output_dir, f"{unique_name}_{{ output_conf.get('name') }}.csv")
-
-
-                if os.path.exists({{ output_conf.get('name') }}_output_path):
+                matched_files = []
+                for fmt in {{ output_conf.get('format', ['csv']) }}:
+                    for recognizer in {{ output_conf.get('unique_string', ['*']) }}:
+                        pattern = os.path.join(temp_output_dir, f"*{recognizer}*.{fmt}")
+                        matched_files.extend(glob.glob(pattern))
+                if matched_files:
+                    {% if output_conf.get('file_count') == 'multiple' %}
+                    {{ output_conf.get('name') }}_data = matched_files  # store list of CSV paths
+                    {% else %}
+                    selected_file = matched_files[0]
                     if self.save_measurements.value:
-                        # Get the output directory - either from setting or default output folder
                         default_output_dir = get_default_output_directory()
                         if self.measurement_directory.dir_choice == 'Default Output Folder':
                             output_dir = default_output_dir
                         else:
                             output_dir = self.measurement_directory.get_absolute_path(default_output_dir)
-                        
-                        # Create measurement directory with ImageSet number subfolder
                         measurement_dir = os.path.join(output_dir, "measurements", str(workspace.measurements.image_number))
                         os.makedirs(measurement_dir, exist_ok=True)
-                        LOGGER.info(f"Saving measurements to: {measurement_dir}")
-                        
-                        # Copy to final location in measurement directory
-                        final_path = os.path.join(measurement_dir, f"{{ output_conf.get('name') }}.csv")
-                        shutil.copy2({{ output_conf.get('name') }}_output_path, final_path)
+                        final_path = os.path.join(measurement_dir, os.path.basename(selected_file))
+                        shutil.copy2(selected_file, final_path)
                         {{ output_conf.get('name') }}_data = final_path
                     else:
-                        # Just store the temp path if not saving measurements
-                        {{ output_conf.get('name') }}_data = {{ output_conf.get('name') }}_output_path
+                        {{ output_conf.get('name') }}_data = selected_file
+                    {% endif %}
                 {% endif %}
                 {% endfor %}
+
             except FileNotFoundError as ex:
                 LOGGER.error(f"Algorithm output files not found: {ex}")
                 raise FileNotFoundError(f"I'm sorry, the {{ docker_image.get('name') }} algorithm seems to have crashed and I'm not sure why, since it's running in its own container. Expected output files were not created. Please check the algorithm parameters and try again.")

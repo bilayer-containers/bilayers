@@ -277,7 +277,13 @@ The image will be automatically downloaded on first use.
             ],
             {% endif %}
             {% if parameter.get('default') is not none %}
+            {% if parameter.get('default') in [True, "True", "true"] %}
+            value=True,
+            {% elif parameter.get('default') in [False, "False", "false"] %}
+            value=False,
+            {% else %}
             value="{{ parameter.get('default') }}",
+            {% endif %}
             {% endif %}
             {% if parameter.get('type') in ["integer", "float"] %}
             minval=float('-inf'),

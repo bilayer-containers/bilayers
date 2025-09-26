@@ -1,7 +1,41 @@
 import nox
 import os
 import yaml
-from typing import Optional
+import requests
+from typing import Optional, Tuple
+
+####################
+# Helper functions
+####################
+
+def bump_version(tag: str) -> str:
+    """Bump the minor version in a semver string (e.g., 1.0.0 -> 1.1.0)"""
+    parts = tag.split(".")
+    if len(parts) != 3:
+        return tag  # fallback if tag not standard semver
+    major, minor, patch = map(int, parts)
+    return f"{major}.{minor+1}.{patch}"
+
+def resolve_tag(org: str, name: str, base_tag: str, interface: str) -> str:
+    """
+    Check DockerHub for existing tags and return the appropriate interface tag
+    """
+    interface_tag = f"{base_tag}-{interface}"
+    url = f"https://hub.docker.com/v2/repositories/{org}/{name}/tags/{interface_tag}/"
+    resp = requests.get(url)
+
+    if resp.status_code == 404:
+        # No such tag --> safe to use
+        return interface_tag
+    else:
+        # Tag exists, bump minor version
+        bumped = bump_version(base_tag)
+        return f"{bumped}-{interface}"
+
+
+####################
+# Nox sessions
+####################
 
 @nox.session
 def run_parse(session: nox.Session) -> None:
@@ -123,71 +157,44 @@ def build_algorithm(session: nox.Session) -> None:
 
 @nox.session
 def build_interface(session: nox.Session) -> None:
-    """
-    Build the Gradio docker Image
-    Args:
-        session (nox.Session): The Nox session object.
-    """
+    session.install("requests", "pyyaml")
     if len(session.posargs) != 2:
         session.error("Must provide interface and algorithm arguments")
 
     interface: str = session.posargs[0]
     algorithm: str = session.posargs[1]
-    print("Building Interface Nox-File: ", interface)
 
-    image_name = f"{algorithm}_{interface}_image"
-    print("Image Name: ", image_name)
+    with open("/tmp/platform.txt", "r") as f:
+        platform = f.read().strip()
+    with open("/tmp/docker_image_name.txt", "r") as f:
+        base_image = f.read().strip()
+    with open("/tmp/algorithm_folder_name.txt", "r") as f:
+        algorithm_folder_name = f.read().strip()
+
+    config_file_path = f"src/bilayers/algorithms/{algorithm}/config.yaml"
+    with open(config_file_path, "r") as file:
+        config = yaml.safe_load(file)
+
+    org: str = config.get("docker_image", {}).get("org", "bilayer")
+    name: str = config.get("docker_image", {}).get("name", algorithm)
+    tag: str = config.get("docker_image", {}).get("tag", "1.0.0")
+
+    # Resolve correct interface tag
+    interface_tag = resolve_tag(org, name, tag, interface)
+    full_image_name = f"{org}/{name}:{interface_tag}"
 
     dockerfile_path = f"src/bilayers/build/dockerfiles/{interface.capitalize()}.Dockerfile"
-    print("Dockerfile Path: ", dockerfile_path)
 
-    # Read the platform from the file
-    with open("/tmp/platform.txt", "r") as file:
-        platform = file.read().strip()
+    session.run(
+        "docker", "buildx", "build",
+        "--platform", platform,
+        "--build-arg", f"BASE_IMAGE={base_image}",
+        "--build-arg", f"FOLDER_NAME={algorithm_folder_name}",
+        "-t", full_image_name,
+        "-f", dockerfile_path,
+        "src/bilayers/build",
+    )
 
-    # Read the Docker image name from the file
-    with open("/tmp/docker_image_name.txt", "r") as file:
-        base_image = file.read().strip()
-
-    with open("/tmp/algorithm_folder_name.txt", "r") as file:
-        algorithm_folder_name = file.read().strip()
-
-    if interface == "gradio":
-        session.run(
-            "docker",
-            "buildx",
-            "build",
-            "--platform",
-            platform,
-            "--build-arg",
-            f"BASE_IMAGE={base_image}",
-            "--build-arg",
-            f"FOLDER_NAME={algorithm_folder_name}",
-            "-t",
-            image_name,
-            "-f",
-            dockerfile_path,
-            "src/bilayers/build",
-        )
-    elif interface == "jupyter":
-        session.run(
-            "docker",
-            "buildx",
-            "build",
-            "--platform",
-            platform,
-            "-f",
-            "Jupyter.Dockerfile",
-            "--build-arg",
-            f"BASE_IMAGE={base_image}",
-            "--build-arg",
-            f"FOLDER_NAME={algorithm_folder_name}",
-            "-t",
-            image_name,
-            "-f",
-            dockerfile_path,
-            "src/bilayers/build",
-        )
 
 
 @nox.session

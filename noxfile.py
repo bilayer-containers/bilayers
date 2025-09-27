@@ -2,36 +2,67 @@ import nox
 import os
 import yaml
 import requests
+import subprocess
 from typing import Optional, Tuple
 
 ####################
 # Helper functions
 ####################
 
-def bump_version(tag: str) -> str:
-    """Bump the minor version in a semver string (e.g., 1.0.0 -> 1.1.0)"""
-    parts = tag.split(".")
-    if len(parts) != 3:
-        return tag  # fallback if tag not standard semver
-    major, minor, patch = map(int, parts)
-    return f"{major}.{minor+1}.{patch}"
+def get_local_digest(image: str) -> str:
+    """Get local docker image digest (content hash)"""
+    try:
+        out = subprocess.check_output(
+            ["docker", "inspect", "--format={{.Id}}", image],
+            stderr=subprocess.STDOUT,
+        )
+        return out.decode().strip()
+    except subprocess.CalledProcessError:
+        return ""
 
-def resolve_tag(org: str, name: str, base_tag: str, interface: str) -> str:
-    """
-    Check DockerHub for existing tags and return the appropriate interface tag
-    """
-    interface_tag = f"{base_tag}-{interface}"
-    url = f"https://hub.docker.com/v2/repositories/{org}/{name}/tags/{interface_tag}/"
+def get_remote_digest(org: str, name: str, tag: str) -> str:
+    """Get remote digest from DockerHub for a specific tag"""
+    url = f"https://hub.docker.com/v2/repositories/{org}/{name}/tags/{tag}/"
     resp = requests.get(url)
+    if resp.status_code != 200:
+        return ""
+    data = resp.json()
+    images = data.get("images", [])
+    if not images:
+        return ""
+    return images[0].get("digest", "")
 
-    if resp.status_code == 404:
-        # No such tag --> safe to use
-        return interface_tag
+def decide_interface_tag(algo_name: str, interface: str) -> str:
+    """
+    Decide correct tag for bilayer/{algo_name}:{version}-{interface}.
+    Build candidate first, compare digests, then decide bump or reuse.
+    """
+    # Check DockerHub for tags
+    url = f"https://hub.docker.com/v2/repositories/bilayer/{algo_name}/tags/"
+    resp = requests.get(url)
+    if resp.status_code != 200:
+        return f"1.0.0-{interface}"  # no repo exists yet
+
+    tags = [t["name"] for t in resp.json().get("results", []) if t["name"].endswith(f"-{interface}")]
+    if not tags:
+        return f"1.0.0-{interface}"
+
+    # Get latest version number
+    versions = [t.split(f"-{interface}")[0] for t in tags]
+    latest = sorted(versions, key=lambda v: list(map(int, v.split("."))))[-1]
+    latest_tag = f"{latest}-{interface}"
+
+    # Compare candidate vs remote
+    local_digest = get_local_digest(f"bilayer/{algo_name}:build-candidate")
+    remote_digest = get_remote_digest("bilayer", algo_name, latest_tag)
+
+    if local_digest and remote_digest and local_digest == remote_digest:
+        # identical then reuse latest
+        return latest_tag
     else:
-        # Tag exists, bump minor version
-        bumped = bump_version(base_tag)
-        return f"{bumped}-{interface}"
-
+        # bump minor
+        major, minor, patch = map(int, latest.split("."))
+        return f"{major}.{minor+1}.{patch}-{interface}"
 
 ####################
 # Nox sessions
@@ -70,7 +101,10 @@ def run_generate(session: nox.Session) -> None:
 @nox.session
 def build_algorithm(session: nox.Session) -> None:
     """
-    Build the Algorithm docker Image
+    Pull or build the base Algorithm Docker image.
+    This is used only as the BASE_IMAGE for interfaces.
+    The final published image will always be under bilayer/*.
+    
     Args:
         session (nox.Session): The Nox session object
     """
@@ -157,6 +191,11 @@ def build_algorithm(session: nox.Session) -> None:
 
 @nox.session
 def build_interface(session: nox.Session) -> None:
+    """
+    Build the interface Docker image (Gradio/Jupyter).
+    Uses candidate built plus digest comparison to decide the final tag.
+    Final image is always tagged under bilayer/{algorithm}:{version}-{interface}.
+    """
     session.install("requests", "pyyaml")
     if len(session.posargs) != 2:
         session.error("Must provide interface and algorithm arguments")
@@ -164,37 +203,40 @@ def build_interface(session: nox.Session) -> None:
     interface: str = session.posargs[0]
     algorithm: str = session.posargs[1]
 
+    # Load platform, base image, algo folder
     with open("/tmp/platform.txt", "r") as f:
         platform = f.read().strip()
     with open("/tmp/docker_image_name.txt", "r") as f:
         base_image = f.read().strip()
     with open("/tmp/algorithm_folder_name.txt", "r") as f:
         algorithm_folder_name = f.read().strip()
+    
+    if not base_image:
+        session.error("BASE_IMAGE is empty or invalid. Did build_algorithm run first?")
 
-    config_file_path = f"src/bilayers/algorithms/{algorithm}/config.yaml"
-    with open(config_file_path, "r") as file:
-        config = yaml.safe_load(file)
-
-    org: str = config.get("docker_image", {}).get("org", "bilayer")
-    name: str = config.get("docker_image", {}).get("name", algorithm)
-    tag: str = config.get("docker_image", {}).get("tag", "1.0.0")
-
-    # Resolve correct interface tag
-    interface_tag = resolve_tag(org, name, tag, interface)
-    full_image_name = f"{org}/{name}:{interface_tag}"
-
+    # Build candidate first
     dockerfile_path = f"src/bilayers/build/dockerfiles/{interface.capitalize()}.Dockerfile"
+    candidate_name = f"bilayer/{algorithm_folder_name}:build-candidate"
 
     session.run(
         "docker", "buildx", "build",
         "--platform", platform,
         "--build-arg", f"BASE_IMAGE={base_image}",
         "--build-arg", f"FOLDER_NAME={algorithm_folder_name}",
-        "-t", full_image_name,
+        "-t", candidate_name,
         "-f", dockerfile_path,
         "src/bilayers/build",
     )
 
+
+    # Decide final tag (reuse or bump)
+    final_tag = decide_interface_tag(algorithm_folder_name, interface)
+    final_image_name = f"bilayer/{algorithm_folder_name}:{final_tag}"
+
+    # Retag candidate -> final
+    session.run("docker", "tag", candidate_name, final_image_name)
+
+    print(f"Final image built and tagged as: {final_image_name}")
 
 
 @nox.session

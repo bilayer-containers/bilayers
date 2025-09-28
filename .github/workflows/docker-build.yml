@@ -10,10 +10,29 @@ on:
   #   branches:
   #     - main
   workflow_dispatch:
+    inputs:
+      runner:
+        description: 'Select the runner to use'
+        required: true
+        default: 'self-hosted'
+        type: choice
+        options:
+          - self-hosted
+          - ubuntu-latest
+      algorithm:
+        description: 'Select the algorithm to build'
+        required: true
+        default: 'classical_segmentation cellpose_inference instanseg_inference gaussian_smoothing'
+        type: string
+      interface:
+        description: 'Select the interface to build'
+        required: true
+        default: 'gradio jupyter'
+        type: string
 
 jobs:
   check-machine:
-    runs-on: self-hosted
+    runs-on: ${{ github.event.inputs.runner }}
     steps:
       - name: Check Runner Architecture
         run: |
@@ -22,7 +41,7 @@ jobs:
 
   lint-validate-docs:
     name: Lint, Validate, and Generate Docs
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
@@ -53,9 +72,10 @@ jobs:
           ./scripts/gendoc.sh
 
   build:
-    name: Docker Build
-    runs-on: self-hosted
+    name: Build ${{ github.event.inputs.algorithm }} (${{ github.event.inputs.interface }})
+    runs-on: ${{ github.event.inputs.runner }}
     needs: lint-validate-docs
+    if: github.event_name == 'workflow_dispatch'   # only run build when manually triggered
 
     steps:
       - name: Checkout Repository
@@ -69,10 +89,10 @@ jobs:
       - name: Install nox
         run: |
           pip install nox
-          # TODO: remove this as a sessiond dependency
-          pip install pyyaml
 
-      - name: Run parse,generate and build docker images
+      - name: Run targeted Docker build
         run: |
           chmod +x ./scripts/build_docker.sh
-          ./scripts/build_docker.sh
+          ./scripts/build_docker.sh \
+            --algorithm ${{ github.event.inputs.algorithm }} \
+            --interface ${{ github.event.inputs.interface }}

@@ -64,6 +64,8 @@ outputs:
       - ometiff
     folder_name: "/bilayers/input_images" # discuss
     file_count: multiple
+    unique_string:
+      - "_output"
     section_id: "outputs"
     mode: "beginner"
     depth: True

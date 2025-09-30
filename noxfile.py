@@ -92,14 +92,6 @@ def tmp_path(filename, prefix="bilayers", sep="_"):
     return Path(tempdir) / f"{prefix}{sep}{filename}"
 
 @nox.session
-def doit(session: nox.Session) -> None:
-    session.install("pyaml", "-e", ".")
-    print("project root", PROJ_ROOT)
-    print("package root", PKG_ROOT)
-    session.run("python", "-c", "import bilayers; print(bilayers.__path__[0])")
-    session.run("python", "-c", "import pyaml; print(pyaml.__path__[0])")
-
-@nox.session
 def run_parse(session: nox.Session) -> None:
     """
     Runs the parse.py script with a specified configuration file.

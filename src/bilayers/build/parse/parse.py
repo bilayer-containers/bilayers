@@ -1,7 +1,7 @@
 import yaml
 import sys
-from typing import TypedDict, Any, Optional
-
+from typing import TypedDict, Any, Optional, Union
+from pathlib import Path
 
 class Citations(TypedDict):
     name: str
@@ -74,7 +74,7 @@ class Config(TypedDict):
     display_only: Optional[dict[str, Parameter]]
 
 
-def parse_config(config_path: Optional[str] = None) -> Config:
+def parse_config(config_path: Optional[Union[str, Path]] = None) -> Config:
     """
     Parses a YAML configuration file.
 
@@ -85,7 +85,11 @@ def parse_config(config_path: Optional[str] = None) -> Config:
         Config: A structured dictionary containing parsed YAML data.
     """
     if config_path is None:
-        config_path = "../../../src/bilayers/algorithms/classical_segmentation/config.yaml"
+        try:
+            import bilayers
+            config_path = bilayers.package_path() / "algorithms/classical_segmentation/config.yaml"
+        except ModuleNotFoundError:
+            config_path = Path("../../../src/bilayers/algorithms/classical_segmentation/config.yaml")
     with open(config_path, "r") as file:
         config = yaml.safe_load(file)
 
@@ -108,7 +112,7 @@ def parse_config(config_path: Optional[str] = None) -> Config:
 
 
 def main(
-    config_path: Optional[str] = None,
+    config_path: Optional[Union[str, Path]] = None,
 ) -> tuple[dict[str, InputOutput], dict[str, InputOutput], dict[str, Parameter], Optional[dict[str, Parameter]], ExecFunction, str, dict[str, Citations]]:
     """
     Loads the configuration and extracts necessary information.

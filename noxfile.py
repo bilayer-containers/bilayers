@@ -91,7 +91,7 @@ def build_algorithm(session: nox.Session) -> None:
             return
 
         docker_image_name: str = f"{org}/{name}:{tag}"
-        algorithm_folder_name: str = config.get("algorithm_folder_name", None)
+        algorithm_folder_name: str = config.get("algorithm_folder_name", "")
 
         # Save the platform details in a file
         with open("/tmp/platform.txt", "w") as file:

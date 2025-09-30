@@ -167,7 +167,7 @@ def build_algorithm(session: nox.Session) -> None:
     print("Building Algorithm Nox-File: ", algorithm)
     image_name = f"{algorithm}"
     print("Image Name: ", image_name)
-    config_file_path = Path(f"src/bilayers/algorithms/{algorithm}/config.yaml")
+    config_file_path = PKG_ROOT / f"algorithms/{algorithm}/config.yaml"
 
     # Start by checking the config file for DockerHub image details
     if os.path.exists(config_file_path):

@@ -5,6 +5,7 @@ import requests
 import subprocess
 from typing import Optional, Tuple
 from pathlib import Path
+from tempfile import gettempdir
 import bilayers
 
 ####################
@@ -81,6 +82,15 @@ PKG_ROOT = Path(bilayers.__path__[0])
 # /absolute/path/to/bilayers/
 PROJ_ROOT = (PKG_ROOT / "../..").resolve()
 
+def tmp_path(filename, prefix="bilayers", sep="_"):
+    assert type(filename) is str
+    assert len(filename) > 0
+    assert prefix is not None
+    assert sep is not None
+
+    tempdir = gettempdir()
+    return Path(tempdir) / f"{prefix}{sep}{filename}"
+
 @nox.session
 def doit(session: nox.Session) -> None:
     session.install("pyaml", "-e", ".")
@@ -151,7 +161,7 @@ def build_algorithm(session: nox.Session) -> None:
             print("Pull failed; attempting to build locally from Dockerfile.")
             session.run("docker", "buildx", "build", platform_opt, platform, "-t", image_name, "-f", dockerfile_path, algorithm_path)
             # Save the locally built Docker image name in a file
-            with open("/tmp/docker_image_name.txt", "w") as file:
+            with open(tmp_path("docker_image_name.txt"), "w") as file:
                 file.write(image_name)
         else:
             session.error(f"Neither Docker image on DockerHub nor Dockerfile found for {algorithm}")
@@ -187,11 +197,11 @@ def build_algorithm(session: nox.Session) -> None:
 
         # Save the platform details in a file
         # TODO: path-cleanup - use tempfile.gettempdir() here and everywhere else
-        with open("/tmp/platform.txt", "w") as file:
+        with open(tmp_path("platform.txt"), "w") as file:
             file.write(platform or "<none>")
 
         # Save the algorithm folder name in a file
-        with open("/tmp/algorithm_folder_name.txt", "w") as file:
+        with open(tmp_path("algorithm_folder_name.txt"), "w") as file:
             file.write(algorithm_folder_name)
 
         # Attempt to pull the image from DockerHub
@@ -203,7 +213,7 @@ def build_algorithm(session: nox.Session) -> None:
             session.run("docker", "pull", "--platform", platform, docker_image_name) # pyright: ignore
             print(f"Successfully pulled Docker image from DockerHub: {docker_image_name}")
             # Save the Docker image name in a file
-            with open("/tmp/docker_image_name.txt", "w") as file:
+            with open(tmp_path("docker_image_name.txt"), "w") as file:
                 file.write(docker_image_name)
         except Exception as e:
             print(f"Failed to pull Docker image from DockerHub. Error: {e}")
@@ -245,6 +255,7 @@ def build_interface(session: nox.Session) -> None:
     candidate_name = f"bilayer/{algorithm_folder_name}:build-candidate"
     print("Dockerfile Path: ", dockerfile_path)
 
+<<<<<<< HEAD
     session.run(
         "docker", "buildx", "build",
         "--platform", platform,
@@ -259,6 +270,18 @@ def build_interface(session: nox.Session) -> None:
     # Decide final tag (reuse or bump)
     final_tag = decide_interface_tag(algorithm_folder_name, interface, bump_type)
     final_image_name = f"bilayer/{algorithm_folder_name}:{final_tag}"
+=======
+    # Read the platform from the file
+    with open(tmp_path("platform.txt"), "r") as file:
+        platform = file.read().strip()
+
+    # Read the Docker image name from the file
+    with open(tmp_path("docker_image_name.txt"), "r") as file:
+        base_image = file.read().strip()
+
+    with open(tmp_path("algorithm_folder_name.txt"), "r") as file:
+        algorithm_folder_name = file.read().strip()
+>>>>>>> 7be51ae (Use system-preffered temp directories)
 
     # Retag candidate -> final
     session.run("docker", "tag", candidate_name, final_image_name)

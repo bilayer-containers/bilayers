@@ -1,4 +1,5 @@
 import pytest
+from tempfile import gettempdir
 from bilayers_cli.cli_generator import generate_cli_command
 
 @pytest.fixture
@@ -121,12 +122,12 @@ def test_file_input():
                 "cli_tag": "--input",
                 "cli_order": 1,
                 "default": "input.txt",
-                "folder_name": "/tmp"
+                "folder_name": gettempdir()
             }
         }
     }
     cli_command = generate_cli_command(config)
-    assert cli_command == ["run_algorithm", "--input /tmp"]
+    assert cli_command == ["run_algorithm", f"--input {gettempdir()}"]
 
 def test_missing_required_argument():
     """Test required argument raises ValueError if missing."""

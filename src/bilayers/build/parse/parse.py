@@ -3,6 +3,7 @@ import sys
 from typing import TypedDict, Any, Optional, Union
 from pathlib import Path
 
+
 class Citations(TypedDict):
     name: str
     doi: str
@@ -79,7 +80,7 @@ def parse_config(config_path: Optional[Union[str, Path]] = None) -> Config:
     Parses a YAML configuration file.
 
     Args:
-        config_path (Optional[str]): Path to the config file. Defaults to None.
+        config_path (Optional[str | Path]): Path to the config file. Defaults to None.
 
     Returns:
         Config: A structured dictionary containing parsed YAML data.
@@ -90,6 +91,14 @@ def parse_config(config_path: Optional[Union[str, Path]] = None) -> Config:
             config_path = bilayers.package_path() / "algorithms/classical_segmentation/config.yaml"
         except ModuleNotFoundError:
             config_path = Path("../../../src/bilayers/algorithms/classical_segmentation/config.yaml")
+    else:
+        # even if already type Path, convert
+        # to stop the type checker from complaining
+        config_path = Path(config_path)
+
+    if not config_path.exists():
+        raise FileNotFoundError(f"Configuration file not found: {config_path}")
+
     with open(config_path, "r") as file:
         config = yaml.safe_load(file)
 

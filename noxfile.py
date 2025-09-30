@@ -4,6 +4,8 @@ import yaml
 import requests
 import subprocess
 from typing import Optional, Tuple
+from pathlib import Path
+import bilayers
 
 ####################
 # Helper functions
@@ -73,6 +75,20 @@ def decide_interface_tag(algo_name: str, interface: str, bump_type: str = "minor
 # Nox sessions
 ####################
 
+
+# /absolute/path/to/bilayers/src/bilayers/
+PKG_ROOT = Path(bilayers.__path__[0])
+# /absolute/path/to/bilayers/
+PROJ_ROOT = (PKG_ROOT / "../..").resolve()
+
+@nox.session
+def doit(session: nox.Session) -> None:
+    session.install("pyaml", "-e", ".")
+    print("project root", PROJ_ROOT)
+    print("package root", PKG_ROOT)
+    session.run("python", "-c", "import bilayers; print(bilayers.__path__[0])")
+    session.run("python", "-c", "import pyaml; print(pyaml.__path__[0])")
+
 @nox.session
 def run_parse(session: nox.Session) -> None:
     """
@@ -81,11 +97,12 @@ def run_parse(session: nox.Session) -> None:
     Args:
         session (nox.Session): The Nox session object.
     """
+    session.install("-e", ".")
     session.install("pyyaml")
-    session.cd("src/bilayers/build/parse")
-    config_path = session.posargs[0]
+    session.cd(PKG_ROOT/"build/parse")
+    config_path = Path(session.posargs[0]).resolve()
     session.run("python", "parse.py", config_path)
-    session.cd("../../../..")
+    session.cd(PROJ_ROOT)
 
 
 @nox.session
@@ -96,11 +113,12 @@ def run_generate(session: nox.Session) -> None:
     Args:
         session (nox.Session): The Nox session object.
     """
+    session.install("-e", ".")
     session.install("pyyaml", "jinja2", "nbformat", "ipython", "ipywidgets")
-    session.cd("src/bilayers/build/parse")
-    config_path: str = session.posargs[0]
+    session.cd(PKG_ROOT/"build/parse")
+    config_path = Path(session.posargs[0]).resolve()
     session.run("python", "generate.py", config_path)
-    session.cd("../../../..")
+    session.cd(PROJ_ROOT)
 
 
 @nox.session
@@ -124,13 +142,14 @@ def build_algorithm(session: nox.Session) -> None:
             image_name (str): The name of the Docker image.
             algorithm (str): The name of the algorithm.
         """
-        dockerfile_path: str = f"src/bilayers/algorithms/{algorithm}/Dockerfile"
+        algorithm_path = PKG_ROOT / f"algorithms/{algorithm}"
+        dockerfile_path = algorithm_path / "Dockerfile"
         platform_opt: str = "--platform" if platform else ""
         platform = platform or ""
         # Proceed to build from Dockerfile if pull fails
         if os.path.exists(dockerfile_path):
             print("Pull failed; attempting to build locally from Dockerfile.")
-            session.run("docker", "buildx", "build", platform_opt, platform, "-t", image_name, "-f", dockerfile_path, f"src/bilayers/algorithms/{algorithm}")
+            session.run("docker", "buildx", "build", platform_opt, platform, "-t", image_name, "-f", dockerfile_path, algorithm_path)
             # Save the locally built Docker image name in a file
             with open("/tmp/docker_image_name.txt", "w") as file:
                 file.write(image_name)
@@ -146,7 +165,7 @@ def build_algorithm(session: nox.Session) -> None:
     print("Building Algorithm Nox-File: ", algorithm)
     image_name = f"{algorithm}"
     print("Image Name: ", image_name)
-    config_file_path = f"src/bilayers/algorithms/{algorithm}/config.yaml"
+    config_file_path = Path(f"src/bilayers/algorithms/{algorithm}/config.yaml")
 
     # Start by checking the config file for DockerHub image details
     if os.path.exists(config_file_path):
@@ -167,6 +186,7 @@ def build_algorithm(session: nox.Session) -> None:
         algorithm_folder_name: str = config.get("algorithm_folder_name", "")
 
         # Save the platform details in a file
+        # TODO: path-cleanup - use tempfile.gettempdir() here and everywhere else
         with open("/tmp/platform.txt", "w") as file:
             file.write(platform or "<none>")
 
@@ -221,8 +241,9 @@ def build_interface(session: nox.Session) -> None:
         session.error("BASE_IMAGE is empty or invalid. Did build_algorithm run first?")
 
     # Build candidate first
-    dockerfile_path = f"src/bilayers/build/dockerfiles/{interface.capitalize()}.Dockerfile"
+    dockerfile_path = PKG_ROOT/f"build/dockerfiles/{interface.capitalize()}.Dockerfile"
     candidate_name = f"bilayer/{algorithm_folder_name}:build-candidate"
+    print("Dockerfile Path: ", dockerfile_path)
 
     session.run(
         "docker", "buildx", "build",
@@ -243,6 +264,42 @@ def build_interface(session: nox.Session) -> None:
     session.run("docker", "tag", candidate_name, final_image_name)
 
     print(f"Final image built and tagged as: {final_image_name}")
+    if interface == "gradio":
+        session.run(
+            "docker",
+            "buildx",
+            "build",
+            "--platform",
+            platform,
+            "--build-arg",
+            f"BASE_IMAGE={base_image}",
+            "--build-arg",
+            f"FOLDER_NAME={algorithm_folder_name}",
+            "-t",
+            image_name,
+            "-f",
+            dockerfile_path,
+            "src/bilayers/build",
+        )
+    elif interface == "jupyter":
+        session.run(
+            "docker",
+            "buildx",
+            "build",
+            "--platform",
+            platform,
+            "-f",
+            "Jupyter.Dockerfile",
+            "--build-arg",
+            f"BASE_IMAGE={base_image}",
+            "--build-arg",
+            f"FOLDER_NAME={algorithm_folder_name}",
+            "-t",
+            final_image_name,
+            "-f",
+            dockerfile_path,
+            PKG_ROOT/"/build",
+        )
 
 
 @nox.session
@@ -254,20 +311,22 @@ def install_gradio(session: nox.Session) -> None:
 # Testing sessions
 @nox.session
 def test_parse(session: nox.Session) -> None:
+    session.install("-e", ".")
     session.install("pyyaml")
-    session.cd("src/bilayers/build/parse")
+    session.cd(PKG_ROOT/"build/parse")
     config_path = session.posargs[0]
     session.run("python", "parse.py", config_path)
-    session.cd("../../../..")
+    session.cd(PROJ_ROOT)
 
 
 @nox.session
 def test_generate(session: nox.Session) -> None:
+    session.install("-e", ".")
     session.install("pyyaml", "jinja2", "nbformat", "ipython", "ipywidgets")
-    session.cd("src/bilayers/build/parse")
+    session.cd(PKG_ROOT/"build/parse")
     config_path = session.posargs[0]
     session.run("python", "generate.py", config_path)
-    session.cd("../../../..")
+    session.cd(PROJ_ROOT)
 
 
 lint_locations = "src", "tests", "noxfile.py"
@@ -279,8 +338,8 @@ lint_locations = "src", "tests", "noxfile.py"
 # nox -rs lint -- --fix
 @nox.session
 def lint(session: nox.Session) -> None:
-    args = session.posargs or lint_locations
     session.install("ruff")
+    args = session.posargs or lint_locations
     session.run("ruff", "check", *args)
 
 
@@ -289,6 +348,6 @@ format_locations = lint_locations
 
 @nox.session
 def format(session: nox.Session) -> None:
-    args = session.posargs or format_locations
     session.install("ruff")
+    args = session.posargs or format_locations
     session.run("ruff", "format", *args)

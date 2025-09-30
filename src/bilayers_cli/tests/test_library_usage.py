@@ -1,14 +1,11 @@
-# test_library_usage.py
-
-# Import the functions you want to test.
-# Adjust these imports based on how your package is structured.
+import bilayers
+from bilayers.build.parse.parse import parse_config
 from bilayers_cli.cli_generator import main
-from src.bilayers.build.parse.parse import parse_config
 
 def test_main():
     # Use a real configuration file path from your project.
-    config_path = "../../bilayers/algorithms/classical_segmentation/config.yaml"
-    
+    config_path = bilayers.package_path() / "algorithms/classical_segmentation/config.yaml"
+
     # Parse the configuration file.
     config = parse_config(config_path)
 

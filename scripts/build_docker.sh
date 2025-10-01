@@ -6,6 +6,7 @@ set -e
 # List of algorithms and interfaces
 ALGORITHM_NAMES=()
 INTERFACE_NAMES=()
+BUMP_TYPE="minor"
 
 # Parse cli arguments
 while [[ "$#" -gt 0 ]]; do
@@ -23,6 +24,11 @@ while [[ "$#" -gt 0 ]]; do
         INTERFACE_NAMES+=("$1")
         shift
       done
+      ;;
+    --bump_type)
+      shift
+      BUMP_TYPE="$1"
+      shift
       ;;
     *)
       echo "Unknown parameter: $1"; exit 1 ;;
@@ -47,7 +53,7 @@ for ALGO in "${ALGORITHM_NAMES[@]}"; do
     nox -s run_parse -- "$CONFIG_PATH"
     nox -s run_generate -- "$CONFIG_PATH"
     nox -s build_algorithm -- "$ALGO"
-    nox -s build_interface -- "$IFACE" "$ALGO"
+    nox -s build_interface -- "$IFACE" "$ALGO" "$BUMP_TYPE"
 
     if [[ "$IFACE" == "gradio" ]]; then
       nox -s install_gradio

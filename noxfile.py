@@ -28,7 +28,7 @@ def get_remote_digest(org: str, name: str, tag: str) -> str:
         return ""
     data = resp.json()
     images = data.get("images", [])
-    if not images:
+    if len(images) == 0:
         return ""
     return images[0].get("digest", "")
 

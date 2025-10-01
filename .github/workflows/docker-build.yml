@@ -1,10 +1,10 @@
 name: Docker-Build Pipeline
 
 on:
-  push:
-    branches:
-      - main
   # TODO: disable until caching system is implemented
+  # push:
+  #   branches:
+  #     - main
   # pull_request:
   #   types: [opened, reopened, synchronize, ready_for_review, review_requested]
   #   branches:

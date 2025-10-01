@@ -32,7 +32,7 @@ def get_remote_digest(org: str, name: str, tag: str) -> str:
         return ""
     return images[0].get("digest", "")
 
-def decide_interface_tag(algo_name: str, interface: str) -> str:
+def decide_interface_tag(algo_name: str, interface: str, bump_type: str = "minor") -> str:
     """
     Decide correct tag for bilayer/{algo_name}:{version}-{interface}.
     Build candidate first, compare digests, then decide bump or reuse.
@@ -60,9 +60,14 @@ def decide_interface_tag(algo_name: str, interface: str) -> str:
         # identical then reuse latest
         return latest_tag
     else:
-        # bump minor
+        # bump version
         major, minor, patch = map(int, latest.split("."))
-        return f"{major}.{minor+1}.{patch}-{interface}"
+        if bump_type == "major":
+            return f"{major+1}.0.0-{interface}"
+        elif bump_type == "minor":
+            return f"{major}.{minor+1}.0-{interface}"
+        else:  # patch
+            return f"{major}.{minor}.{patch+1}-{interface}"
 
 ####################
 # Nox sessions
@@ -197,11 +202,12 @@ def build_interface(session: nox.Session) -> None:
     Final image is always tagged under bilayer/{algorithm}:{version}-{interface}.
     """
     session.install("requests", "pyyaml")
-    if len(session.posargs) != 2:
-        session.error("Must provide interface and algorithm arguments")
+    if len(session.posargs) < 2:
+        session.error("Must provide at least interface and algorithm arguments")
 
-    interface: str = session.posargs[0]
-    algorithm: str = session.posargs[1]
+    interface = session.posargs[0]
+    algorithm = session.posargs[1]
+    bump_type = session.posargs[2] if len(session.posargs) > 2 else "minor"
 
     # Load platform, base image, algo folder
     with open("/tmp/platform.txt", "r") as f:
@@ -230,7 +236,7 @@ def build_interface(session: nox.Session) -> None:
 
 
     # Decide final tag (reuse or bump)
-    final_tag = decide_interface_tag(algorithm_folder_name, interface)
+    final_tag = decide_interface_tag(algorithm_folder_name, interface, bump_type)
     final_image_name = f"bilayer/{algorithm_folder_name}:{final_tag}"
 
     # Retag candidate -> final

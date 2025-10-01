@@ -29,6 +29,15 @@ on:
         required: true
         default: 'gradio jupyter'
         type: string
+      bump_type:
+        description: 'Version bump type'
+        required: false
+        default: 'minor'
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
 
 jobs:
   check-machine:

@@ -303,8 +303,6 @@ def build_interface(session: nox.Session) -> None:
             "build",
             "--platform",
             platform,
-            "-f",
-            "Jupyter.Dockerfile",
             "--build-arg",
             f"BASE_IMAGE={base_image}",
             "--build-arg",

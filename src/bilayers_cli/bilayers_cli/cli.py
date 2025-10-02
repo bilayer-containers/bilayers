@@ -1,7 +1,7 @@
 import sys
 import argparse
-from src.bilayers.build.parse.parse import parse_config
-from src.bilayers_cli.bilayers_cli.cli_generator import main
+from bilayers.build.parse.parse import parse_config
+from bilayers_cli.bilayers_cli.cli_generator import main
 
 def cli() -> None:
     """CLI entry point for bilayers_cli"""

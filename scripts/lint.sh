@@ -1,11 +1,16 @@
-#!/bin/bash
-cd "$(dirname "$0")" || exit
-SCHEMA_FILE=${1:-"../tests/test_config/validate_schema.yaml"}
+#!/usr/bin/env bash
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PKG_ROOT="$("$SCRIPT_DIR"/pkg_path.sh)"
+PROJ_ROOT="$(cd "$PKG_ROOT/../.." && pwd)"
+
+cd "$SCRIPT_DIR" || exit
+
+SCHEMA_FILE=${1:-"$PROJ_ROOT/tests/test_config/validate_schema.yaml"}
 
 echo "Linting the schema: $SCHEMA_FILE"
-linkml-lint "$SCHEMA_FILE"
 
-if [ $? -eq 0 ]; then
+if linkml-lint "$SCHEMA_FILE"; then
     echo "Schema linting successful."
 else
     echo "Schema linting failed."

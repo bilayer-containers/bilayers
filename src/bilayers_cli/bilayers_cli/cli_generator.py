@@ -1,6 +1,6 @@
 import sys
 from typing import Any, Optional, Union
-from src.bilayers.build.parse.parse import Config, HiddenArgs
+from bilayers.build.parse.parse import Config, HiddenArgs
 
 def option_to_append(cli_tag: str, value: Any) -> str:
     """

@@ -1,7 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Exit on error
 set -e
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PKG_ROOT="$("$SCRIPT_DIR"/pkg_path.sh)"
 
 # List of algorithms and interfaces
 ALGORITHM_NAMES=()
@@ -49,7 +52,7 @@ for ALGO in "${ALGORITHM_NAMES[@]}"; do
   for IFACE in "${INTERFACE_NAMES[@]}"; do
     echo "Building Algorithm: $ALGO, Interface: $IFACE"
 
-    CONFIG_PATH="../../../../src/bilayers/algorithms/${ALGO}/config.yaml"
+    CONFIG_PATH="${PKG_ROOT}/algorithms/${ALGORITHM_NAME}/config.yaml"
     nox -s run_parse -- "$CONFIG_PATH"
     nox -s run_generate -- "$CONFIG_PATH"
     nox -s build_algorithm -- "$ALGO"

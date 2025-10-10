@@ -1,15 +1,8 @@
-from pathlib import Path
+# WARN: must come first to avoid circular imports
+from ._blpath import package_path, project_path
+from . import parse, generate
+from .cli_generator import generate_cli_command
+from .cli import cli
 
-def package_path():
-    """
-    Returns an absolute path to the bilayers package (this one)
-        /absolute/path/to/bilayers/src/bilayers/
-    """
-    return Path(__path__[0])
 
-def project_path():
-    """
-    Returns an absolute path to the project dir hosting the bilayers package
-        /absolute/path/to/bilayers/
-    """
-    return (package_path() / '../..').resolve()
+__all__ = ["package_path", "project_path", "parse", "generate", "generate_cli_command", "cli"]

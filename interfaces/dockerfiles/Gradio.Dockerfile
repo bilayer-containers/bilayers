@@ -14,16 +14,16 @@ ARG FOLDER_NAME
 # For more details, refer to:
 #   - https://github.com/gradio-app/gradio/issues/10662
 #   - https://github.com/gradio-app/gradio/pull/10908
-RUN python -m pip install pyyaml gradio gradio_client huggingface-hub pydantic==2.10.6
+RUN python -m pip install --no-cache-dir pyyaml gradio gradio_client huggingface-hub pydantic==2.10.6
 
 # Set the working directory within the container
 WORKDIR /bilayers
 
 # Add app.py file to the container
-ADD parse/generated_folders/$FOLDER_NAME/app.py /bilayers/
+COPY generated_folders/$FOLDER_NAME/app.py /bilayers/
 
 # Add __init__.py file for importing the files inside docker-container
-ADD __init__.py /bilayers/
+RUN /bilayers/__init__.py
 
 # Export the port
 EXPOSE 7878

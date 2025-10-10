@@ -5,6 +5,7 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PKG_ROOT="$("$SCRIPT_DIR"/pkg_path.sh)"
+PROJ_ROOT="$(cd "$PKG_ROOT/../.." && pwd)"
 
 # List of algorithms and interfaces
 ALGORITHM_NAMES=()
@@ -52,7 +53,7 @@ for ALGO in "${ALGORITHM_NAMES[@]}"; do
   for IFACE in "${INTERFACE_NAMES[@]}"; do
     echo "Building Algorithm: $ALGO, Interface: $IFACE"
 
-    CONFIG_PATH="${PKG_ROOT}/algorithms/${ALGO}/config.yaml"
+    CONFIG_PATH="${PROJ_ROOT}/algorithms/${ALGO}/config.yaml"
     nox -s run_parse -- "$CONFIG_PATH"
     nox -s run_generate -- "$CONFIG_PATH"
     nox -s build_algorithm -- "$ALGO"

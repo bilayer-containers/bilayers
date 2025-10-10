@@ -1,6 +1,7 @@
+from bilayers.parse import Config
 import pytest
 from tempfile import gettempdir
-from bilayers_cli.cli_generator import generate_cli_command
+from bilayers.cli_generator import generate_cli_command
 
 @pytest.fixture
 def sample_config():
@@ -77,8 +78,19 @@ def test_hidden_arguments(sample_config):
 
 def test_checkbox_without_append_value():
     """Test checkbox parameter without append_value should only include tag if True."""
-    config = {
-        "exec_function": {"cli_command": "run_algorithm"},
+    config = Config({
+        "citations": {},
+        "algorithm_folder_name": "",
+        "inputs": {},
+        "outputs": {},
+        "display_only": None,
+        "exec_function": {
+            "name": "",
+            "script": "",
+            "module": "",
+            "hidden_args": None,
+            "cli_command": "run_algorithm"
+        },
         "parameters": {
             "verbose": {
                 "name": "verbose",
@@ -89,14 +101,25 @@ def test_checkbox_without_append_value():
                 "append_value": False
             }
         }
-    }
+    })
     cli_command = generate_cli_command(config)
     assert cli_command == ["run_algorithm", "--verbose"]
 
 def test_checkbox_with_append_value():
     """Test checkbox parameter with append_value should include tag and value."""
-    config = {
-        "exec_function": {"cli_command": "run_algorithm"},
+    config = Config({
+        "citations": {},
+        "algorithm_folder_name": "",
+        "inputs": {},
+        "outputs": {},
+        "display_only": None,
+        "exec_function": {
+            "name": "",
+            "script": "",
+            "module": "",
+            "hidden_args": None,
+            "cli_command": "run_algorithm"
+        },
         "parameters": {
             "verbose": {
                 "name": "verbose",
@@ -107,14 +130,25 @@ def test_checkbox_with_append_value():
                 "append_value": True
             }
         }
-    }
+    })
     cli_command = generate_cli_command(config)
     assert cli_command == ["run_algorithm", "--verbose True"]
 
 def test_file_input():
     """Test input file handling correctly uses folder_name if provided."""
-    config = {
-        "exec_function": {"cli_command": "run_algorithm"},
+    config = Config({
+        "citations": {},
+        "algorithm_folder_name": "",
+        "outputs": {},
+        "display_only": None,
+        "parameters": {},
+        "exec_function": {
+            "name": "",
+            "script": "",
+            "module": "",
+            "hidden_args": None,
+            "cli_command": "run_algorithm"
+        },
         "inputs": {
             "input_file": {
                 "name": "input_file",
@@ -125,14 +159,25 @@ def test_file_input():
                 "folder_name": gettempdir()
             }
         }
-    }
+    })
     cli_command = generate_cli_command(config)
     assert cli_command == ["run_algorithm", f"--input {gettempdir()}"]
 
 def test_missing_required_argument():
     """Test required argument raises ValueError if missing."""
-    config = {
-        "exec_function": {"cli_command": "run_algorithm"},
+    config = Config({
+        "citations": {},
+        "algorithm_folder_name": "",
+        "inputs": {},
+        "outputs": {},
+        "display_only": None,
+        "exec_function": {
+            "name": "",
+            "script": "",
+            "module": "",
+            "hidden_args": None,
+            "cli_command": "run_algorithm"
+        },
         "parameters": {
             "threshold": {
                 "name": "threshold",
@@ -142,20 +187,31 @@ def test_missing_required_argument():
                 "optional": False
             }
         }
-    }
+    })
     with pytest.raises(ValueError, match="Error: 'threshold' is a required argument and must have a value!"):
         generate_cli_command(config)
 
 def test_order_of_arguments():
     """Ensure arguments appear in the correct order based on cli_order."""
-    config = {
-        "exec_function": {"cli_command": "run_algorithm"},
+    config = Config({
+        "citations": {},
+        "algorithm_folder_name": "",
+        "inputs": {},
+        "outputs": {},
+        "display_only": None,
+        "exec_function": {
+            "name": "",
+            "script": "",
+            "module": "",
+            "hidden_args": None,
+            "cli_command": "run_algorithm"
+        },
         "parameters": {
             "first": {"cli_tag": "--first", "cli_order": 1, "default": "1"},
             "second": {"cli_tag": "--second", "cli_order": -1, "default": "2"},
             "third": {"cli_tag": "--third", "cli_order": 3, "default": "3"},
         }
-    }
+    })
     cli_command = generate_cli_command(config)
 
     # Order should be: `run_algorithm` → `--first 1` (1) → `--third 3` (3) → `--second 2` (-1)

@@ -2,13 +2,12 @@ import os
 import sys
 from typing import Optional
 
-# Importing parse function from parse.py
-from parse import main as parse_config  # type: ignore
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 import nbformat as nbf
 
-# Import TypedDict definitions from parse.py
-from parse import InputOutput, Parameter, ExecFunction, Citations  # type: ignore
+from ._blpath import project_path
+from .parse import main as parse_config
+from .parse import InputOutput, Parameter, ExecFunction, Citations
 
 
 def generate_top_level_text(interface: str, citations: dict[str, Citations], output_html: bool = True) -> tuple[str, str]:
@@ -101,7 +100,8 @@ def generate_gradio_app(
     Returns:
         str: The rendered Gradio application code.
     """
-    env = Environment(loader=FileSystemLoader(searchpath=os.path.dirname(template_path)), autoescape=select_autoescape(["j2"]))
+    template_dir = project_path() / "interfaces/templates"
+    env = Environment(loader=FileSystemLoader(searchpath=str(template_dir)), autoescape=select_autoescape(["j2"]))
 
     def lower(text: str) -> str:
         return text.lower()
@@ -147,7 +147,8 @@ def generate_jupyter_notebook(
     Returns:
         nbf.NotebookNode: The generated Jupyter Notebook object.
     """
-    env = Environment(loader=FileSystemLoader(searchpath=os.path.dirname(template_path)), autoescape=select_autoescape(["j2"]))
+    template_dir = project_path() / "interfaces/templates"
+    env = Environment(loader=FileSystemLoader(searchpath=str(template_dir)), autoescape=select_autoescape(["j2"]))
 
     def lower(text: str) -> str:
         return text.lower()
@@ -210,34 +211,28 @@ def generate_jupyter_notebook(
     return nb
 
 
-def main() -> None:
+def main(config_path: str) -> None:
     """Main function to parse config and generate Gradio and Jupyter notebook files."""
     print("Parsing config...")
 
-    if len(sys.argv) > 1:
-        config_path: Optional[str] = sys.argv[1]
-    else:
-        config_path = None
-
     inputs, outputs, parameters, display_only, exec_function, algorithm_folder_name, citations = parse_config(config_path)
 
-    folderA: str = "generated_folders"
-    folderB: str = algorithm_folder_name
-    # Create Directory if they don't exist
-    os.makedirs(os.path.join(folderA, folderB), exist_ok=True)
+    algorithm_dir = str(project_path() / "interfaces/generated_folders" / algorithm_folder_name)
+    os.makedirs(algorithm_dir, exist_ok=True)
 
     ########################################
     # Logic for generating Gradio App
     ########################################
 
     # Template path for the Gradio app
-    gradio_template_path: str = "gradio_template.py.j2"
+    template_dir = project_path() / "interfaces/templates"
+    gradio_template_path: str = str(template_dir / "gradio_template.py.j2")
 
     # Generating the gradio algorithm+interface app dynamically
     gradio_app_code: str = generate_gradio_app(gradio_template_path, inputs, outputs, parameters, display_only, exec_function, citations)
 
     # Join folders and file name
-    gradio_app_path: str = os.path.join(folderA, folderB, "app.py")
+    gradio_app_path: str = os.path.join(algorithm_dir, "app.py")
 
     # Generating Gradio app file dynamically
     with open(gradio_app_path, "w") as f:
@@ -249,18 +244,15 @@ def main() -> None:
     ################################################
 
     # Template path for the Jupyter Notebook
-    jupyter_template_path: str = "jupyter_template.py.j2"
+    jupyter_template_path: str = str(template_dir / "jupyter_template.py.j2")
 
     # Generating Jupyter Notebook file dynamically
     jupyter_app_code: nbf.NotebookNode = generate_jupyter_notebook(jupyter_template_path, inputs, outputs, parameters, display_only, exec_function, citations)
 
     # Join folders and file name
-    jupyter_notebook_path: str = os.path.join(folderA, folderB, "generated_notebook.ipynb")
+    jupyter_notebook_path: str = os.path.join(algorithm_dir, "generated_notebook.ipynb")
 
     with open(jupyter_notebook_path, "w") as f:
         nbf.write(jupyter_app_code, f)
     print("Jupyter notebook saved as generated_notebook.ipynb")
 
-
-if __name__ == "__main__":
-    main()

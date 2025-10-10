@@ -7,7 +7,7 @@ FROM $BASE_IMAGE
 ARG FOLDER_NAME
 
 # Install the dependencies for the gradio app
-RUN python -m pip install pyyaml jupyter huggingface-hub==0.23.4 pydantic==2.7.4
+RUN python -m pip install --no-cache-dir pyyaml jupyter huggingface-hub==0.23.4 pydantic==2.7.4
 
 # Set the working directory within the container
 WORKDIR /bilayers
@@ -16,10 +16,10 @@ WORKDIR /bilayers
 # RUN python -m pip install numpy==1.23.0 opencv-python-headless==4.5.3.56 matplotlib==3.5.1
 
 # Add app.py file to the container
-ADD parse/generated_folders/$FOLDER_NAME/generated_notebook.ipynb /bilayers/
+COPY generated_folders/$FOLDER_NAME/generated_notebook.ipynb /bilayers/
 
 # Add __init__.py file for importing the files inside docker-container
-ADD __init__.py /bilayers/
+RUN touch /bilayers/__init__.py
 
 # Export the port
 EXPOSE 7878

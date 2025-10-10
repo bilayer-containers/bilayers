@@ -1,8 +1,9 @@
-import sys
 from typing import Any, Optional, Union
-from bilayers.build.parse.parse import Config, HiddenArgs
 
-def option_to_append(cli_tag: str, value: Any) -> str:
+from .parse import Config, HiddenArgs
+
+
+def _option_to_append(cli_tag: str, value: Any) -> str:
     """
     Formats CLI options for appending to the command.
 
@@ -14,7 +15,7 @@ def option_to_append(cli_tag: str, value: Any) -> str:
         str: The formatted CLI option.
     """
     # A protective layer not to append None values
-    # But also, this edge case is taken care before calling insert_into_jagged_array function
+    # But also, this edge case is taken care before calling _insert_into_jagged_array function
     if value is None:
         return ""
 
@@ -24,7 +25,7 @@ def option_to_append(cli_tag: str, value: Any) -> str:
         return f"{cli_tag}{value}"
     return f"{cli_tag} {value}"  # Append cli_tag and value
 
-def insert_into_jagged_array(
+def _insert_into_jagged_array(
     jagged_array: list[Optional[list[str]]],
     cli_order: int,
     cli_tag: str,
@@ -45,10 +46,10 @@ def insert_into_jagged_array(
     if jagged_array[abs(cli_order)] is None:
         jagged_array[abs(cli_order)] = []
 
-    result = option_to_append(cli_tag, value)
+    result = _option_to_append(cli_tag, value)
     jagged_array[abs(cli_order)].append(result) # pyright: ignore
 
-def generate_cli_command(parsed_config: Config) -> list[str]:
+def _generate_cli_command(parsed_config: Config) -> list[str]:
     """
     Generates a CLI command dynamically based on a parsed Bilayers YAML configuration.
 
@@ -86,7 +87,7 @@ def generate_cli_command(parsed_config: Config) -> list[str]:
         if param_type == "checkbox":
             append_value: Optional[bool] = param.get("append_value", False)
             if append_value:
-                insert_into_jagged_array(
+                _insert_into_jagged_array(
                     jagged_negative_array if cli_order < 0 else jagged_positive_array,
                     cli_order, cli_tag, default_value
                 )
@@ -118,12 +119,13 @@ def generate_cli_command(parsed_config: Config) -> list[str]:
             # - ("--option", "None")      → Skipped (Value is "None" as a string)
             # - ("None", "value")         → Skipped (cli_tag is "None" as a string)
             if cli_tag not in [None, "None"] and default_value not in [None, "None", ""]:
-                insert_into_jagged_array(
+                _insert_into_jagged_array(
                     jagged_negative_array if cli_order < 0 else jagged_positive_array, cli_order, cli_tag, default_value
                 )
 
     # Step-2: Handle hidden arguments
-    hidden_args: Optional[dict[str, HiddenArgs]] = exec_function.get("hidden_args", {})
+    print(exec_function)
+    hidden_args: Optional[dict[str, HiddenArgs]] = exec_function.get("hidden_args", {}) or {}
 
     # Ignoring pyright error for hidden_args.values() as it will always be a valid dictionary, most of the times empty though
     for arg in hidden_args.values(): # pyright: ignore
@@ -141,7 +143,7 @@ def generate_cli_command(parsed_config: Config) -> list[str]:
 
         if isinstance(value, bool):
             if hidden_append_value:
-                insert_into_jagged_array(
+                _insert_into_jagged_array(
                     jagged_negative_array if cli_order < 0 else jagged_positive_array, cli_order, cli_tag, value
                 )
             else:
@@ -154,7 +156,7 @@ def generate_cli_command(parsed_config: Config) -> list[str]:
                         jagged_positive_array[cli_order].append(cli_tag)
 
         else:
-            insert_into_jagged_array(
+            _insert_into_jagged_array(
                 jagged_negative_array if cli_order < 0 else jagged_positive_array, cli_order, cli_tag, value
             )
 
@@ -172,7 +174,7 @@ def generate_cli_command(parsed_config: Config) -> list[str]:
 
     return cli_command
 
-def main(parsed_config: Config, return_as_string: bool) -> Union[str, list[str]]:
+def generate_cli_command(parsed_config: Config, return_as_string: bool = False) -> Union[str, list[str]]:
     """
     Main entry point for generating the CLI command.
 
@@ -183,13 +185,8 @@ def main(parsed_config: Config, return_as_string: bool) -> Union[str, list[str]]
     Returns:
         Any: The CLI command as a string (for CLI usage) or a list (for library usage).
     """
-    try:
-        cli_command = generate_cli_command(parsed_config)
+    cli_command = _generate_cli_command(parsed_config)
 
-        if return_as_string:
-            return " ".join(cli_command) # CLI Usage (string)
-        return cli_command  # Library Usage (list)
-
-    except ValueError as e:
-        print(f"\n {e}\n")
-        sys.exit(1)
+    if return_as_string:
+        return " ".join(cli_command) # CLI Usage (string)
+    return cli_command  # Library Usage (list)

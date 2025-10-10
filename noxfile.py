@@ -3,10 +3,13 @@ import os
 import yaml
 import requests
 import subprocess
-from typing import Optional, Tuple
+from typing import Optional
 from pathlib import Path
 from tempfile import gettempdir
 import bilayers
+
+
+DOCKER_CMD = os.getenv("DOCKER_CMD", "docker")
 
 ####################
 # Helper functions
@@ -16,7 +19,7 @@ def get_local_digest(image: str) -> str:
     """Get local docker image digest (content hash)"""
     try:
         out = subprocess.check_output(
-            ["docker", "inspect", "--format={{.Id}}", image],
+            [DOCKER_CMD, "inspect", "--format={{.Id}}", image],
             stderr=subprocess.STDOUT,
         )
         return out.decode().strip()
@@ -100,11 +103,8 @@ def run_parse(session: nox.Session) -> None:
         session (nox.Session): The Nox session object.
     """
     session.install("-e", ".")
-    session.install("pyyaml")
-    session.cd(PKG_ROOT/"build/parse")
     config_path = Path(session.posargs[0]).resolve()
-    session.run("python", "parse.py", config_path)
-    session.cd(PROJ_ROOT)
+    session.run("bilayers_cli", "parse", str(config_path))
 
 
 @nox.session
@@ -116,11 +116,8 @@ def run_generate(session: nox.Session) -> None:
         session (nox.Session): The Nox session object.
     """
     session.install("-e", ".")
-    session.install("pyyaml", "jinja2", "nbformat", "ipython", "ipywidgets")
-    session.cd(PKG_ROOT/"build/parse")
     config_path = Path(session.posargs[0]).resolve()
-    session.run("python", "generate.py", config_path)
-    session.cd(PROJ_ROOT)
+    session.run("bilayers_cli", "generate", str(config_path))
 
 
 @nox.session
@@ -129,7 +126,7 @@ def build_algorithm(session: nox.Session) -> None:
     Pull or build the base Algorithm Docker image.
     This is used only as the BASE_IMAGE for interfaces.
     The final published image will always be under bilayer/*.
-    
+
     Args:
         session (nox.Session): The Nox session object
     """
@@ -144,14 +141,14 @@ def build_algorithm(session: nox.Session) -> None:
             image_name (str): The name of the Docker image.
             algorithm (str): The name of the algorithm.
         """
-        algorithm_path = PKG_ROOT / f"algorithms/{algorithm}"
+        algorithm_path = PROJ_ROOT / f"algorithms/{algorithm}"
         dockerfile_path = algorithm_path / "Dockerfile"
         platform_opt: str = "--platform" if platform else ""
         platform = platform or ""
         # Proceed to build from Dockerfile if pull fails
         if os.path.exists(dockerfile_path):
             print("Pull failed; attempting to build locally from Dockerfile.")
-            session.run("docker", "buildx", "build", platform_opt, platform, "-t", image_name, "-f", dockerfile_path, algorithm_path)
+            session.run(DOCKER_CMD, "buildx", "build", platform_opt, platform, "-t", image_name, "-f", dockerfile_path, algorithm_path)
             # Save the locally built Docker image name in a file
             with open(tmp_path("docker_image_name.txt"), "w") as file:
                 file.write(image_name)
@@ -167,7 +164,7 @@ def build_algorithm(session: nox.Session) -> None:
     print("Building Algorithm Nox-File: ", algorithm)
     image_name = f"{algorithm}"
     print("Image Name: ", image_name)
-    config_file_path = PKG_ROOT/f"algorithms/{algorithm}/config.yaml"
+    config_file_path = PROJ_ROOT / f"algorithms/{algorithm}/config.yaml"
 
     # Start by checking the config file for DockerHub image details
     if os.path.exists(config_file_path):
@@ -202,7 +199,7 @@ def build_algorithm(session: nox.Session) -> None:
             # Pyright reports an error since `platform` can be None, while `session.run()` expects `str | PathLike[str]`
             # However, we have a fallback function, that takes care of this scenario
             # Since this is a safe and expected, I have suppress the warning
-            session.run("docker", "pull", "--platform", platform, docker_image_name) # pyright: ignore
+            session.run(DOCKER_CMD, "pull", "--platform", platform, docker_image_name) # pyright: ignore
             print(f"Successfully pulled Docker image from DockerHub: {docker_image_name}")
             # Save the Docker image name in a file
             with open(tmp_path("docker_image_name.txt"), "w") as file:
@@ -238,23 +235,23 @@ def build_interface(session: nox.Session) -> None:
         base_image = f.read().strip()
     with open(tmp_path("algorithm_folder_name.txt"), "r") as f:
         algorithm_folder_name = f.read().strip()
-    
+
     if not base_image:
         session.error("BASE_IMAGE is empty or invalid. Did build_algorithm run first?")
 
     # Build candidate first
-    dockerfile_path = PKG_ROOT/f"build/dockerfiles/{interface.capitalize()}.Dockerfile"
+    dockerfile_path = PROJ_ROOT / f"interfaces/dockerfiles/{interface.capitalize()}.Dockerfile"
     candidate_name = f"bilayer/{algorithm_folder_name}:build-candidate"
     print("Dockerfile Path: ", dockerfile_path)
 
     session.run(
-        "docker", "buildx", "build",
+        DOCKER_CMD, "buildx", "build",
         "--platform", platform,
         "--build-arg", f"BASE_IMAGE={base_image}",
         "--build-arg", f"FOLDER_NAME={algorithm_folder_name}",
         "-t", candidate_name,
         "-f", dockerfile_path,
-        "src/bilayers/build",
+        str(PROJ_ROOT / "interfaces"),
     )
 
 
@@ -263,12 +260,12 @@ def build_interface(session: nox.Session) -> None:
     final_image_name = f"bilayer/{algorithm_folder_name}:{final_tag}"
 
     # Retag candidate -> final
-    session.run("docker", "tag", candidate_name, final_image_name)
+    session.run(DOCKER_CMD, "tag", candidate_name, final_image_name)
 
     print(f"Final image built and tagged as: {final_image_name}")
     if interface == "gradio":
         session.run(
-            "docker",
+            DOCKER_CMD,
             "buildx",
             "build",
             "--platform",
@@ -281,11 +278,11 @@ def build_interface(session: nox.Session) -> None:
             final_image_name,
             "-f",
             dockerfile_path,
-            PKG_ROOT/"build",
+            str(PROJ_ROOT / "interfaces"),
         )
     elif interface == "jupyter":
         session.run(
-            "docker",
+            DOCKER_CMD,
             "buildx",
             "build",
             "--platform",
@@ -298,7 +295,7 @@ def build_interface(session: nox.Session) -> None:
             final_image_name,
             "-f",
             dockerfile_path,
-            PKG_ROOT/"build",
+            str(PROJ_ROOT / "interfaces"),
         )
 
 
@@ -312,21 +309,15 @@ def install_gradio(session: nox.Session) -> None:
 @nox.session
 def test_parse(session: nox.Session) -> None:
     session.install("-e", ".")
-    session.install("pyyaml")
-    session.cd(PKG_ROOT/"build/parse")
     config_path = session.posargs[0]
-    session.run("python", "parse.py", config_path)
-    session.cd(PROJ_ROOT)
+    session.run("bilayers_cli", "parse", config_path)
 
 
 @nox.session
 def test_generate(session: nox.Session) -> None:
     session.install("-e", ".")
-    session.install("pyyaml", "jinja2", "nbformat", "ipython", "ipywidgets")
-    session.cd(PKG_ROOT/"build/parse")
     config_path = session.posargs[0]
-    session.run("python", "generate.py", config_path)
-    session.cd(PROJ_ROOT)
+    session.run("bilayers_cli", "generate", config_path)
 
 
 lint_locations = "src", "tests", "noxfile.py"

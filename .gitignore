@@ -49,3 +49,21 @@ docs/_build/           # Ignore _build within the docs directory if that's your 
 
 # Additional MyST outputs
 *.nbconvert/           # Ignore any nbconvert artifacts if notebooks are used
+
+# AI/Agents
+Agent.md
+agent.md
+Agents.md
+agents.md
+AGENT.md
+AGENTS.md
+Claude.md
+claude.md
+.cursor/
+.claude/
+*.mcp.json
+*.cursor
+*.mdc
+opencode.json
+opencode.jsonc
+.opencode/

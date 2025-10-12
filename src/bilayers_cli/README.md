@@ -44,12 +44,12 @@ will output the structured CLI command as a string:
 ### Library Usage
 If you want to use Bilayers CLI as a library in your Python projects:
 ```
-from src.bilayers.build.parse.parse import parse_config
+from bilayers.build.parse.parse import parse_config
 from bilayers_cli.cli_generator import main
 
 config = parse_config("path/to/config.yaml")
-cli_command = generate_cli_command(config)
-print(cli_command)  # Outputs the CLI command as a string
+cli_command = main(config, return_as_string=True)
+print(cli_command)  # Outputs the CLI command
 ```
 
 ## Development & Contribution

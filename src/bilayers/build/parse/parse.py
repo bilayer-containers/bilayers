@@ -1,6 +1,7 @@
 import yaml
 import sys
-from typing import TypedDict, Any, Optional
+from typing import TypedDict, Any, Optional, Union
+from pathlib import Path
 
 
 class Citations(TypedDict):
@@ -78,18 +79,30 @@ class Config(TypedDict):
     docker_image: DockerImage
 
 
-def parse_config(config_path: Optional[str] = None) -> Config:
+def parse_config(config_path: Optional[Union[str, Path]] = None) -> Config:
     """
     Parses a YAML configuration file.
 
     Args:
-        config_path (Optional[str]): Path to the config file. Defaults to None.
+        config_path (Optional[str | Path]): Path to the config file. Defaults to None.
 
     Returns:
         Config: A structured dictionary containing parsed YAML data.
     """
     if config_path is None:
-        config_path = "../../../src/bilayers/algorithms/classical_segmentation/config.yaml"
+        try:
+            import bilayers
+            config_path = bilayers.package_path() / "algorithms/classical_segmentation/config.yaml"
+        except ModuleNotFoundError:
+            config_path = Path("../../../src/bilayers/algorithms/classical_segmentation/config.yaml")
+    else:
+        # even if already type Path, convert
+        # to stop the type checker from complaining
+        config_path = Path(config_path)
+
+    if not config_path.exists():
+        raise FileNotFoundError(f"Configuration file not found: {config_path}")
+
     with open(config_path, "r") as file:
         config = yaml.safe_load(file)
 
@@ -112,17 +125,8 @@ def parse_config(config_path: Optional[str] = None) -> Config:
 
 
 def main(
-    config_path: Optional[str] = None,
-) -> tuple[
-        dict[str, InputOutput],
-        dict[str, InputOutput],
-        dict[str, Parameter],
-        Optional[dict[str, Parameter]],
-        ExecFunction,
-        str,
-        dict[str, Citations],
-        DockerImage
-    ]:
+    config_path: Optional[Union[str, Path]] = None,
+) -> tuple[dict[str, InputOutput], dict[str, InputOutput], dict[str, Parameter], Optional[dict[str, Parameter]], ExecFunction, str, dict[str, Citations]]:
     """
     Loads the configuration and extracts necessary information.
 

@@ -281,7 +281,7 @@ def build_interface(session: nox.Session) -> None:
             final_image_name,
             "-f",
             dockerfile_path,
-            "src/bilayers/build",
+            PKG_ROOT/"build",
         )
     elif interface == "jupyter":
         session.run(

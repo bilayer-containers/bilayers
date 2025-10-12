@@ -247,7 +247,6 @@ def build_interface(session: nox.Session) -> None:
     candidate_name = f"bilayer/{algorithm_folder_name}:build-candidate"
     print("Dockerfile Path: ", dockerfile_path)
 
-<<<<<<< HEAD
     session.run(
         "docker", "buildx", "build",
         "--platform", platform,
@@ -262,18 +261,6 @@ def build_interface(session: nox.Session) -> None:
     # Decide final tag (reuse or bump)
     final_tag = decide_interface_tag(algorithm_folder_name, interface, bump_type)
     final_image_name = f"bilayer/{algorithm_folder_name}:{final_tag}"
-=======
-    # Read the platform from the file
-    with open(tmp_path("platform.txt"), "r") as file:
-        platform = file.read().strip()
-
-    # Read the Docker image name from the file
-    with open(tmp_path("docker_image_name.txt"), "r") as file:
-        base_image = file.read().strip()
-
-    with open(tmp_path("algorithm_folder_name.txt"), "r") as file:
-        algorithm_folder_name = file.read().strip()
->>>>>>> 7be51ae (Use system-preffered temp directories)
 
     # Retag candidate -> final
     session.run("docker", "tag", candidate_name, final_image_name)
@@ -291,10 +278,10 @@ def build_interface(session: nox.Session) -> None:
             "--build-arg",
             f"FOLDER_NAME={algorithm_folder_name}",
             "-t",
-            image_name,
+            final_image_name,
             "-f",
             dockerfile_path,
-            PKG_ROOT/"build",
+            "src/bilayers/build",
         )
     elif interface == "jupyter":
         session.run(

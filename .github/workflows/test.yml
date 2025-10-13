@@ -2,8 +2,7 @@ name: Test
 
 on:
   push:
-    branches:
-      - main
+  pull_request:
   # TODO: disable until caching system is implemented
   # pull_request:
   #   types: [opened, reopened, synchronize, ready_for_review, review_requested]

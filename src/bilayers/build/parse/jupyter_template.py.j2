@@ -48,7 +48,16 @@ radio_options = {
 {% set input_label = key | lower | replace(" ", "_") %}
 
 {% if input_conf.get('type') in ['image', 'measurement', 'array', 'file', 'executable'] %}
-{{ input_label }} = widgets.FileUpload(multiple = {{ 'True' if input_conf.get('file_count') == "multiple" else 'False' }})
+mount_path = "{{ input_conf.get('folder_name', '/bilayers/input_images') }}"
+
+{{ input_label }} = widgets.HTML(
+    value=(
+        f"<div style='padding:8px; background:#eefaff; border-radius:6px;'>"
+        f"<b>Mounted Input Folder:</b> <code>{mount_path}</code><br>"
+        f"<i>Uploads are disabled — please ensure files already exist here.</i>"
+        f"</div>"
+    )
+)
 {%- endif %}
 
 # Add a description label
@@ -63,9 +72,9 @@ tab.set_title(1, "Description")
 {% if input_conf.get('type') in ['image', 'measurement', 'array', 'file', 'executable'] %}
 param_vars["{{ input_label }}"] = {
     "cli_tag": "{{ input_conf.get('cli_tag') }}",
-    "widget": {{ input_label }},
+    "widget": None,
     "cli_order": {{ input_conf.get('cli_order', 0) }},
-    "folder_name": "{{ input_conf.get('folder_name', '') }}",
+    "folder_name": "{{ input_conf.get('folder_name', '/bilayers/input_images') }}",
     "optional": {{ input_conf.get('optional', False) }}
 }
 {# param_vars.append(("{{ input_conf.get('cli_tag') }}", {{ input_label }}, {{ input_conf.get('cli_order', 0) }}, "{{ input_conf.get('folder_name', '') }}")) #}
@@ -319,15 +328,15 @@ def construct_cli_command() -> str:
         optional: bool = param_info["optional"]
 
         if "folder_name" in param_info or "append_value" in param_info: # Special case for 'File' type and checkbox
-            if isinstance(widget, widgets.FileUpload): # This is a 'File' type
-                folder_name: str = param_info["folder_name"]
+            # Handle mounted folder inputs (no upload)
+            if "folder_name" in param_info:
+                folder_name = param_info["folder_name"]
                 value = folder_name
-                # Validate and highlight the widget if needed
-                validate_and_highlight(widget, value, optional)
                 if cli_order < 0:
                     insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)
                 else:
                     insert_into_jagged_array(jagged_positive_array, cli_order, cli_tag, value)
+                continue  # Skip to next param
             elif isinstance(widget, widgets.Checkbox):  # This is a 'Checkbox' type
                 append_value: bool = param_info.get("append_value", False)
                 value = widget.value

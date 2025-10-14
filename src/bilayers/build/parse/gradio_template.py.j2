@@ -3,6 +3,9 @@ import gradio as gr
 import subprocess
 import shutil
 from typing import Any, Optional
+import uuid
+import datetime
+import glob
 
 def option_to_append(cli_tag: str, value: Any) -> str:
     """
@@ -148,18 +151,35 @@ def generate_cli_command(
                         shutil.copy(file_path, folder_name)
                     value = folder_name
                 # If the parameter is a TextBox, check if it has a directory-name i.e. it's coming for declaring ouput path
-                elif isinstance(value, str) and value!="":
-                    output_dir_set = cli_tags[key].get("output_dir_set") # May be missing, so .get() prevents crashes by returning None
-                    if output_dir_set == True:
-                        output_folder_name = value
-                        os.makedirs(output_folder_name, exist_ok=True)
-                        if cli_tag != "None":
-                            value = output_folder_name 
-                    elif output_dir_set == False:
-                        output_folder_name = default
-                        os.makedirs(default, exist_ok=True)
-                        if cli_tag != "None":
-                            value = default
+                elif isinstance(value, str) and value != "":
+                    # -------------------------------------------------------------
+                    # This section handles 3 major scenarios:
+                    #   (1) User explicitly provides an output directory name
+                    #   (2) User doesn’t provide one - Bilayers creates a default
+                    #   (3) Algorithm manages its own outputs (no CLI tag)
+                    # -------------------------------------------------------------
+                    output_dir_set = cli_tags[key].get("output_dir_set")
+                    cli_tag_present = cli_tag not in [None, "None", ""]
+
+                    # Determine base output folder:
+                    # - If the spec declares output_dir_set=True, use user's folder
+                    # - Otherwise, fall back to a default base folder ("outputs/")
+                    base_output_dir = value if output_dir_set else cli_tags[key].get("default", "outputs")
+
+                    # Construct a unique run-specific subfolder name to prevent overwriting
+                    # Example: outputs/run_20251013_1910_ab12
+                    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+                    unique_suffix = uuid.uuid4().hex[:4]
+                    unique_run_folder = os.path.join(base_output_dir, f"run_{timestamp}_{unique_suffix}")
+
+                    # Create the new sub folder
+                    os.makedirs(unique_run_folder, exist_ok=True)
+                    output_folder_name = unique_run_folder
+
+                    # IMPORTANT:
+                    # Update CLI value only if CLI tag actually exists (avoid breaking tools with no --save_dir)
+                    if cli_tag_present:
+                        value = output_folder_name
 
                 # For each parameter/input, we validate the provided value before constructing the CLI command.
                 # If the user input is an empty string or None, we explicitly set it to None.
@@ -321,13 +341,66 @@ def on_submit(
         print("Command executed successfully")
 
         # Check if output_folder_name is not None and is a directory
+        # -------------------------------------------------------------
+        # STEP: Collect and display output files after command execution
+        #
+        # The below logic ensures we always have a valid folder
+        # from which to display results in the Gradio interface,
+        # even if the algorithm does not explicitly define one.
+        # -------------------------------------------------------------
         if output_folder_name and os.path.exists(output_folder_name) and os.path.isdir(output_folder_name):
+        # ---------------------------------------------------------
+        # CASE 1: The output folder was explicitly defined and exists
+        #
+        # This covers algorithms that:
+        #   - Received an explicit CLI output flag (e.g., "--save_dir")
+        #   - Or used a user-defined path like /bilayers/input_images/
+        # ---------------------------------------------------------
             print("Folder exists")
-            # Display Output files
-            output_files = [os.path.join(output_folder_name, f) for f in os.listdir(output_folder_name) if os.path.isfile(os.path.join(output_folder_name, f))]
+            output_files = [os.path.join(output_folder_name, f)
+                            for f in os.listdir(output_folder_name)
+                            if os.path.isfile(os.path.join(output_folder_name, f))]
         else:
-            print("Folder does not exist or output_folder_name is None")
-            output_files = []
+        # ---------------------------------------------------------
+        # CASE 2: The algorithm did not define an explicit output path
+        #
+        # As a fallback, Bilayers will collect any generated files so
+        # they can be displayed or downloaded via the interface
+        #
+        # Strategy:
+        #   1. Walk the current directory recursively
+        #   2. Copy all non-system, non-code files into the fallback folder
+        #   3. Build the output list for Gradio to display
+        #
+        # This ensures every algorithm—no matter what extensions it writes—
+        # produces something viewable to the user
+        # ---------------------------------------------------------
+            possible_files = []
+
+            for root, _, files in os.walk("."):
+                for f in files:
+                    # Skip hidden, code, and notebook files
+                    if f.startswith(".") or f.endswith((".py", ".pyc", ".ipynb")):
+                        continue
+
+                    full_path = os.path.join(root, f)
+                    possible_files.append(full_path)
+
+            # Copy all detected files into the fallback folder
+            for file_path in possible_files:
+                try:
+                    shutil.copy(file_path, fallback_folder)
+                except Exception as e:
+                    print(f"Warning: could not copy {file_path}: {e}")
+
+            # Prepare list for Gradio display
+            output_files = [
+                os.path.join(fallback_folder, f)
+                for f in os.listdir(fallback_folder)
+                if os.path.isfile(os.path.join(fallback_folder, f))
+            ]
+            output_folder_name = fallback_folder
+            print(f"Collected {len(output_files)} output files in: {fallback_folder}")
 
         return output_files
 

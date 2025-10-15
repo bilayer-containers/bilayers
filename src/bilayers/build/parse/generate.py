@@ -42,7 +42,13 @@ def generate_top_level_text(interface: str, citations: dict[str, Citations], out
                 "doi": "10.48550/arXiv.190602569",
                 "license": "Apache License 2.0",
                 "description": "A simple web interface for deploying machine learning models"
-        }
+        },
+        "Streamlit": {
+                "name": "Streamlit",
+                "doi": "todo",
+                "license": "todo",
+                "description": "Another simple web interface for deploying machine learning models"
+        },
     }
 
     newline = "<br>" if output_html else "\n\n"
@@ -523,6 +529,51 @@ def main() -> None:
     with open(cellprofiler_plugin_path, 'w') as f:
         f.write(cellprofiler_template_code)
     print("CellProfiler plugin generated successfully!!")
+
+def generate_streamlit_app(
+    template_path: str,
+    inputs: dict[str, InputOutput],
+    outputs: dict[str, InputOutput],
+    parameters: dict[str, Parameter],
+    display_only: Optional[dict[str, Parameter]],
+    exec_function: ExecFunction,
+    citations: dict[str, Citations],
+) -> str:
+    """
+    Generates a Streamlit application dynamically using Jinja2 templates.
+
+    Args:
+        template_path (str): Path to the Streamlit template file.
+        inputs (dict[str, InputOutput]): dictionary of input configurations.
+        outputs (dict[str, InputOutput]): dictionary of output configurations.
+        parameters (dict[str, Parameter]): dictionary of parameter configurations.
+        display_only (Optional[dict[str, Parameter]]): dictionary of display-only parameters, or None.
+        exec_function (ExecFunction): Execution function details.
+        citations (dict[str, Citations]): Citations information.
+
+    Returns:
+        str: The rendered Streamlit application code.
+    """
+    env = Environment(loader=FileSystemLoader(searchpath=os.path.dirname(template_path)), autoescape=select_autoescape(["j2"]))
+
+    def lower(text: str) -> str:
+        return text.lower()
+
+    def replace(text: str, old: str, new: str) -> str:
+        return text.replace(old, new)
+
+    env.filters["lower"] = lower
+    env.filters["replace"] = replace
+
+    template = env.get_template(os.path.basename(template_path))
+
+    title, full_description = generate_top_level_text('Streamlit',citations, output_html=False)
+
+    streamlit_app_code: str = template.render(
+        inputs=inputs, outputs=outputs, parameters=parameters, display_only=display_only, exec_function=exec_function, title=title, description=full_description
+    )
+
+    return streamlit_app_code
 
 if __name__ == "__main__":
     main()

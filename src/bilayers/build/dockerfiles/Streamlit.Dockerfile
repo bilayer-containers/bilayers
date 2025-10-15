@@ -15,13 +15,13 @@ RUN python -m pip install pyyaml streamlit pydantic==2.10.6
 WORKDIR /bilayers
 
 # Add app.py file to the container
-ADD parse/generated_folders/$FOLDER_NAME/app.py /bilayers/
+ADD parse/generated_folders/$FOLDER_NAME/streamlit_app.py /bilayers/
 
 # Add __init__.py file for importing the files inside docker-container
 ADD __init__.py /bilayers/
 
 # Export the port
-EXPOSE 7878
+EXPOSE 8501
 
 # Define the command to run the app
-CMD ["python", "-u", "app.py"]
+CMD ["streamlit", "run", "streamlit_app.py"]

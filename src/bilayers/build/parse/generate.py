@@ -449,6 +449,51 @@ def generate_cellprofiler_plugin(
 
     return cellprofiler_code, class_name
 
+def generate_streamlit_app(
+    template_path: str,
+    inputs: dict[str, InputOutput],
+    outputs: dict[str, InputOutput],
+    parameters: dict[str, Parameter],
+    display_only: Optional[dict[str, Parameter]],
+    exec_function: ExecFunction,
+    citations: dict[str, Citations],
+) -> str:
+    """
+    Generates a Streamlit application dynamically using Jinja2 templates.
+
+    Args:
+        template_path (str): Path to the Streamlit template file.
+        inputs (dict[str, InputOutput]): dictionary of input configurations.
+        outputs (dict[str, InputOutput]): dictionary of output configurations.
+        parameters (dict[str, Parameter]): dictionary of parameter configurations.
+        display_only (Optional[dict[str, Parameter]]): dictionary of display-only parameters, or None.
+        exec_function (ExecFunction): Execution function details.
+        citations (dict[str, Citations]): Citations information.
+
+    Returns:
+        str: The rendered Streamlit application code.
+    """
+    env = Environment(loader=FileSystemLoader(searchpath=os.path.dirname(template_path)), autoescape=select_autoescape(["j2"]))
+
+    def lower(text: str) -> str:
+        return text.lower()
+
+    def replace(text: str, old: str, new: str) -> str:
+        return text.replace(old, new)
+
+    env.filters["lower"] = lower
+    env.filters["replace"] = replace
+
+    template = env.get_template(os.path.basename(template_path))
+
+    title, full_description = generate_top_level_text('Streamlit',citations, output_html=False)
+
+    streamlit_app_code: str = template.render(
+        inputs=inputs, outputs=outputs, parameters=parameters, display_only=display_only, exec_function=exec_function, title=title, description=full_description
+    )
+
+    return streamlit_app_code
+
 def main() -> None:
     """Main function to parse config and generate Gradio and Jupyter notebook files."""
     print("Parsing config...")
@@ -529,51 +574,24 @@ def main() -> None:
     with open(cellprofiler_plugin_path, 'w') as f:
         f.write(cellprofiler_template_code)
     print("CellProfiler plugin generated successfully!!")
+   
+    ########################################
+    # Logic for generating Streamlit App
+    ########################################
 
-def generate_streamlit_app(
-    template_path: str,
-    inputs: dict[str, InputOutput],
-    outputs: dict[str, InputOutput],
-    parameters: dict[str, Parameter],
-    display_only: Optional[dict[str, Parameter]],
-    exec_function: ExecFunction,
-    citations: dict[str, Citations],
-) -> str:
-    """
-    Generates a Streamlit application dynamically using Jinja2 templates.
+    # Template path for the Streamlit app
+    streamlit_template_path: str = "streamlit_template.py.j2"
 
-    Args:
-        template_path (str): Path to the Streamlit template file.
-        inputs (dict[str, InputOutput]): dictionary of input configurations.
-        outputs (dict[str, InputOutput]): dictionary of output configurations.
-        parameters (dict[str, Parameter]): dictionary of parameter configurations.
-        display_only (Optional[dict[str, Parameter]]): dictionary of display-only parameters, or None.
-        exec_function (ExecFunction): Execution function details.
-        citations (dict[str, Citations]): Citations information.
+    # Generating the gradio algorithm+interface app dynamically
+    streamlit_app_code: str = generate_streamlit_app(streamlit_template_path, inputs, outputs, parameters, display_only, exec_function, citations)
 
-    Returns:
-        str: The rendered Streamlit application code.
-    """
-    env = Environment(loader=FileSystemLoader(searchpath=os.path.dirname(template_path)), autoescape=select_autoescape(["j2"]))
+    # Join folders and file name
+    streamlit_app_path: str = os.path.join(folderA, folderB, "streamlit_app.py")
 
-    def lower(text: str) -> str:
-        return text.lower()
-
-    def replace(text: str, old: str, new: str) -> str:
-        return text.replace(old, new)
-
-    env.filters["lower"] = lower
-    env.filters["replace"] = replace
-
-    template = env.get_template(os.path.basename(template_path))
-
-    title, full_description = generate_top_level_text('Streamlit',citations, output_html=False)
-
-    streamlit_app_code: str = template.render(
-        inputs=inputs, outputs=outputs, parameters=parameters, display_only=display_only, exec_function=exec_function, title=title, description=full_description
-    )
-
-    return streamlit_app_code
+    # Generating Streamlit app file dynamically
+    with open(streamlit_app_path, "w") as f:
+        f.write(streamlit_app_code)
+    print("streamlit_app.py generated successfully!!")
 
 if __name__ == "__main__":
     main()

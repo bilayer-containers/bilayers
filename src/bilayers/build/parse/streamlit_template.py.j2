@@ -170,7 +170,7 @@ def generate_cli_command(
                     value = None
                     if optional is False:
                         error_message = f"{label} needs to have some value. It's Mandatory!"
-                        raise st.Error(error_message, duration = None)
+                        raise st.error(error_message)
                 elif value is not None:
                 # If the cli_tag is None, don't include it in the command but if cli_tag is "" then just include the value
                     if cli_tag != "None":
@@ -334,16 +334,18 @@ def on_submit(
     except subprocess.CalledProcessError as e:
         error_message = "Please take a screenshot of this error and raise an issue at the Bilayers repository on GitHub."
         error_message += f"Command failed with error: {e.stderr.decode()}\n\n"
-        raise st.error(error_message, duration = None)
+        raise st.error(error_message)
 
 with st.form("my_form"): 
 
-    {% if inputs is not none and inputs | length > 0 -%}
-    {% for key, input_conf in inputs.items() %}
 
+    {% if inputs is not none and inputs | length > 0 -%}
+    inputs_dict = {}
+    {% for key, input_conf in inputs.items() %}
     {% if input_conf.get('type') in ['image', 'measurement', 'array', 'file', 'executable'] %}
     {{ key | lower | replace(" ", "_") }}_description = st.markdown("{{ input_conf.get('description', '') }}")
-    {{ key | lower | replace(" ", "_") }} = st.file_uploader(label="{{ input_conf.get('label', '') }}")
+    {{ key | lower | replace(" ", "_") }} = st.file_uploader(label="{{ input_conf.get('label', '') }}", accept_multiple_files=True)
+    inputs_dict["{{ key | lower | replace(" ", "_") }}"]={"folder_name":"{{ input_conf.get('folder_name', '') }}","file_list":{{ key | lower | replace(" ", "_") }}}
     {% endif %}
 
 
@@ -406,40 +408,42 @@ with st.form("my_form"):
     {% endfor %}
     {%- endif %}
 
-
-    all_parameters: list[Any] = [
-
-    {# Getting inputs #}
-    {% if inputs -%}
-        {% for key, input_conf in inputs.items() -%}
-            {% if input_conf.get('type') in ['image', 'measurement', 'array', 'file', 'executable'] -%}
-                {{ key | lower | replace(" ", "_") }}_description,
-                {{ key | lower | replace(" ", "_") }},
-            {% else %}
-                {{ key | lower | replace(" ", "_") }},
-            {%- endif %}
-        {%- endfor %}
-    {%- endif %}
-
-    {# Getting parameters #}
-    {% if parameters -%}
-        {% for key, param_conf in parameters.items() -%}
-            {{ key | lower | replace(" ", "_") }},
-        {%- endfor %}
-    {%- endif %}
-
-    {# Getting display_only #}
-    {% if display_only -%}
-        {% for key, display_only_conf in display_only.items() -%}
-            {{ key | lower | replace(" ", "_") }},
-        {%- endfor %}
-    {%- endif %}
-    ]
-
     #download_results_from_here = gr.Files(label = "Download Output", file_count = "multiple")
     
     submitted = st.form_submit_button("Submit")
     if submitted:
-        st.markdown("submitted")
-        #on_submit(stuff) #todo fix this
+        #we need to download the files to local disk - yuck!
+        for k,v in inputs_dict.items():
+            thisinput_list = v["file_list"]
+            if len(thisinput_list) > 0:
+                thisinput_location = v["folder_name"]
+                if not os.path.exists(thisinput_location):
+                    os.makedirs(thisinput_location,exist_ok=True)
+                for eachfile in thisinput_list:
+                    local_name = os.path.join(thisinput_location,eachfile.name)
+                    with open(local_name,"wb") as f:
+                        f.write(eachfile.getbuffer())
+
+        on_submit(
+            {% if inputs -%}
+            {% for key, input_conf in inputs.items() -%}
+            {% if input_conf.get('type') in ['image', 'measurement', 'array', 'file', 'executable'] %}
+            {{ key | lower | replace(" ", "_") }}_description = {{ key | lower | replace(" ", "_") }}_description,
+            {{ key | lower | replace(" ", "_") }} = inputs_dict["{{ key | lower | replace(" ", "_") }}"]["folder_name"],
+            {% else %}
+            {{ key | lower | replace(" ", "_") }},
+            {%- endif %}
+            {%- endfor %}
+            {%- endif %}
+            {% if parameters -%}
+            {% for key, param_conf in parameters.items() -%}
+            {{ key | lower | replace(" ", "_") }} = {{ key | lower | replace(" ", "_") }},
+            {%- endfor %}
+            {%- endif %}
+            {% if display_only -%}
+            {% for key, display_only_conf in display_only.items() -%}
+            {{ key | lower | replace(" ", "_") }} = {{ key | lower | replace(" ", "_") }},
+            {%- endfor %}
+            {%- endif %}
+        )
 

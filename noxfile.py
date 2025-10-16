@@ -300,13 +300,33 @@ def build_interface(session: nox.Session) -> None:
             dockerfile_path,
             PKG_ROOT/"build",
         )
+    elif interface == "streamlit":
+        session.run(
+            "docker",
+            "buildx",
+            "build",
+            "--platform",
+            platform,
+            "--build-arg",
+            f"BASE_IMAGE={base_image}",
+            "--build-arg",
+            f"FOLDER_NAME={algorithm_folder_name}",
+            "-t",
+            final_image_name,
+            "-f",
+            dockerfile_path,
+            PKG_ROOT/"build",
+        )
 
+@nox.session
+def install_streamlit(session: nox.Session) -> None:
+    """Install Streamlit"""
+    session.install("streamlit")
 
 @nox.session
 def install_gradio(session: nox.Session) -> None:
     """Install Gradio"""
     session.install("gradio")
-
 
 # Testing sessions
 @nox.session

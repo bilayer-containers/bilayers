@@ -45,9 +45,8 @@ def generate_top_level_text(interface: str, citations: dict[str, Citations], out
         },
         "Streamlit": {
                 "name": "Streamlit",
-                "doi": "todo",
-                "license": "todo",
-                "description": "Another simple web interface for deploying machine learning models"
+                "license": "Apache License 2.0",
+                "description": "A library for easily creating custom web interfaces"
         },
     }
 

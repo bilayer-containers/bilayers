@@ -342,8 +342,8 @@ with st.form("my_form"):
     {% for key, input_conf in inputs.items() %}
 
     {% if input_conf.get('type') in ['image', 'measurement', 'array', 'file', 'executable'] %}
-    {{ key | lower | replace(" ", "_") }}_description = st.text(index="{{ input_conf.get('description', '') }}")
-    {{ key | lower | replace(" ", "_") }} = st.file_uploader(label="{{ input_conf.get('label', '') }}", file_count="{{ input_conf.get('file_count', 'single') }}")
+    {{ key | lower | replace(" ", "_") }}_description = st.markdown("{{ input_conf.get('description', '') }}")
+    {{ key | lower | replace(" ", "_") }} = st.file_uploader(label="{{ input_conf.get('label', '') }}")
     {% endif %}
 
 
@@ -355,17 +355,25 @@ with st.form("my_form"):
 
     {% set param_label = key | lower | replace(" ", "_") %}
 
-    {% if param_conf.get('type') == 'radio' %}
-    {{ param_label }} = st.radio(label="{{ param_conf.get('label', '') }}", help="{{ param_conf.get('description', '') }}", options=[{% for option in param_conf.get('options', []) %}"{{ option.label }}"{% if not loop.last %}, {% endif %}{% endfor %}], index="{{ param_conf.get('default', '') }}")
-    {% elif param_conf.get('type') == 'dropdown' %}
-    {{ param_label }} = st.selectbox(label="{{ param_conf.get('label', '') }}", help="{{ param_conf.get('description', '') }}", options=[{% for option in param_conf.get('options', []) %}("{{ option.label }}", "{{ option.value }}"){% if not loop.last %}, {% endif %}{% endfor %}], index="{{ param_conf.get('default', '') }}", multiselect={{ param_conf.get('multiselect', False) }})
-    {% elif param_conf.get('type') in ['integer', 'float'] %}
-    {{ param_label }} = st.number_input(label="{{ param_conf.get('label', '') }}", help="{{ param_conf.get('description', '') }}", index={{ param_conf.get('default', 0) }} if "{{param_conf.get('type') }}" == "integer" else {{ param_conf.get('default', 0.0)}})
-    {% elif param_conf.get('type') == 'textbox' %}
-    {{ param_label }} = st.text_input(label="{{ param_conf.get('label', '') }}", help="{{ param_conf.get('description', '') }}", index="{{ param_conf.get('default', '') }}") #TODO: investigate interactive
-    {% elif param_conf.get('type') == 'checkbox' %}
-    {{ param_label }} = st.checkbox(label="{{ param_conf.get('label', '') }}", help="{{ param_conf.get('description', '') }}", value={{ param_conf.get('default', False) }})
+    {% if param_conf.get('type') in ['radio', 'dropdown'] %}
+    options_list_{{ param_label }} = [{% for option in param_conf.get('options', []) %}"{{ option.label }}"{% if not loop.last %}, {% endif %}{% endfor %}]
+    default_index_{{ param_label }} = options_list_{{ param_label }}.index("{{ param_conf.get('default', '') }}")
     {% endif %}
+    {% if param_conf.get('type') == 'radio' -%}
+    {{ param_label }} = st.radio(label="{{ param_conf.get('label', '') }}", help="{{ param_conf.get('description', '') }}", options=options_list_{{ param_label }}, index=default_index_{{param_label}})
+    {% elif param_conf.get('type') == 'dropdown' -%}
+    {% if param_conf.get('multiselect',False) in [False, "False", "false"] %}
+    {{ param_label }} = st.selectbox(label="{{ param_conf.get('label', '') }}", help="{{ param_conf.get('description', '') }}", options=options_list_{{ param_label }}, index=default_index_{{param_label}})
+    {% else %}
+    {{ param_label }} = st.multiselect(label="{{ param_conf.get('label', '') }}", help="{{ param_conf.get('description', '') }}", options=options_list_{{ param_label }}, index=default_index_{{param_label}})
+    {% endif %}
+    {% elif param_conf.get('type') in ['integer', 'float'] -%}
+    {{ param_label }} = st.number_input(label="{{ param_conf.get('label', '') }}", help="{{ param_conf.get('description', '') }}", value={{ param_conf.get('default', 0) }} if "{{param_conf.get('type') }}" == "integer" else {{ param_conf.get('default', 0.0)}})
+    {% elif param_conf.get('type') == 'textbox' -%}
+    {{ param_label }} = st.text_input(label="{{ param_conf.get('label', '') }}", help="{{ param_conf.get('description', '') }}", value="{{ param_conf.get('default', '') }}") 
+    {% elif param_conf.get('type') == 'checkbox' -%}
+    {{ param_label }} = st.checkbox(label="{{ param_conf.get('label', '') }}", help="{{ param_conf.get('description', '') }}", value={{ param_conf.get('default', False) }})
+    {%- endif %}
 
     {% endfor %}
     {%- endif %}
@@ -373,17 +381,26 @@ with st.form("my_form"):
     {% if display_only is not none and display_only | length > 0 -%}
     {% for key, display_only_conf in display_only.items() %}
     {% set display_label = key | lower | replace(" ", "_") %}
-        
+
+
+    {% if display_only_conf.get('type') in ['radio', 'dropdown'] %}
+    options_list_{{ display_only_label }} = [{% for option in display_only_conf.get('options', []) %}"{{ option.label }}"{% if not loop.last %}, {% endif %}{% endfor %}]
+    default_index_{{ display_only_label }} = options_list_{{ display_only_label }}.index("{{ display_only_conf.get('default', '') }}")
+    {% endif %}    
     {% if display_only_conf.get('type') == 'radio' %}
-    {{ display_label }} = st.radio(label="{{ display_only_conf.get('label', '') }}", help="{{ display_only_conf.get('description', '') }}", options=[{% for option in display_only_conf.get('options', []) %}"{{ option.label }}"{% if not loop.last %}, {% endif %}{% endfor %}], index="{{ display_only_conf.get('default', '') }}", interactive=False)    
+    {{ display_label }} = st.radio(label="{{ display_only_conf.get('label', '') }}", help="{{ display_only_conf.get('description', '') }}", options=options_list_{ display_only_label }, index=default_index_{ display_only_label })    
     {% elif display_only_conf.get('type') == 'dropdown' %}
-    {{ display_label }} = st.selectbox(label="{{ display_only_conf.get('label', '') }}", help="{{ display_only_conf.get('description', '') }}", options=[{% for option in display_only_conf.get('options', []) %}("{{ option.label }}", "{{ option.value }}"){% if not loop.last %}, {% endif %}{% endfor %}], index="{{ display_only_conf.get('default', '') }}", interactive=False, multiselect={{ display_only_conf.get('multiselect', False) }})
+    {% if display_only_conf.get('multiselect',False) in [False, "False", "false"] %}
+    {{ display_only_label }} = st.selectbox(label="{{ display_only_conf.get('label', '') }}", help="{{ display_only_conf.get('description', '') }}", options=[options_list_{ display_only_label }], index=default_index_{ display_only_label })
+    {% else %}
+    {{ display_only_label }} = st.multiselect(label="{{ display_only_conf.get('label', '') }}", help="{{ display_only_conf.get('description', '') }}", options=[options_list_{ display_only_label }], index=default_index_{ display_only_label })
+    {% endif %}
     {% elif display_only_conf.get('type') in ['integer', 'float'] %}
-    {{ display_label }} = st.number_input(label="{{ display_only_conf.get('label', '') }}", help="{{ display_only_conf.get('description', '') }}", index={{ display_only_conf.get('default', 0) }} if "{{ display_only_conf.get('type') }}" == "integer" else {{ display_only_conf.get('default', 0.0) }}, interactive=False)
+    {{ display_label }} = st.number_input(label="{{ display_only_conf.get('label', '') }}", help="{{ display_only_conf.get('description', '') }}", value={{ display_only_conf.get('default', 0) }} if "{{ display_only_conf.get('type') }}" == "integer" else {{ display_only_conf.get('default', 0.0) }}, interactive=False)
     {% elif display_only_conf.get('type') == 'textbox' %}
-    {{ display_label }} = st.text_input(label="{{ display_only_conf.get('label', '') }}", help="{{ display_only_conf.get('description', '') }}", index="{{ display_only_conf.get('default', '') }}", interactive=False)
+    {{ display_label }} = st.text_input(label="{{ display_only_conf.get('label', '') }}", help="{{ display_only_conf.get('description', '') }}", value="{{ display_only_conf.get('default', '') }}", interactive=False)
     {% elif display_only_conf.get('type') == 'checkbox' %}
-    {{ display_label }} = st.checkbox(label="{{ display_only_conf.get('label', '') }}", help="{{ display_only_conf.get('description', '') }}", index={{ display_only_conf.get('default', False) }}, interactive=False)
+    {{ display_label }} = st.checkbox(label="{{ display_only_conf.get('label', '') }}", help="{{ display_only_conf.get('description', '') }}", value={{ display_only_conf.get('default', False) }}, interactive=False)
     {% endif %}
 
     {% endfor %}
@@ -420,7 +437,9 @@ with st.form("my_form"):
     ]
 
     #download_results_from_here = gr.Files(label = "Download Output", file_count = "multiple")
+    
     submitted = st.form_submit_button("Submit")
     if submitted:
-        on_submit(stuff) #todo fix this
+        st.markdown("submitted")
+        #on_submit(stuff) #todo fix this
 

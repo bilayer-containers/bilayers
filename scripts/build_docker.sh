@@ -40,11 +40,11 @@ done
 
 # Defaults if none passed
 if [[ ${#ALGORITHM_NAMES[@]} -eq 0 ]]; then
-  ALGORITHM_NAMES=("classical_segmentation" "gaussian_smoothing")
+  ALGORITHM_NAMES=("classical_segmentation" "cellpose_inference" "instanseg_inference" "gaussian_smoothing")
 fi
 
 if [[ ${#INTERFACE_NAMES[@]} -eq 0 ]]; then
-  INTERFACE_NAMES=("streamlit")
+  INTERFACE_NAMES=("gradio" "jupyter" "streamlit")
 fi
 
 # Build loop

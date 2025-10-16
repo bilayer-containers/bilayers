@@ -338,6 +338,10 @@ def on_submit(
 
 st.session_state.done_running = os.path.exists("outputs.zip")
 
+st.markdown(f"# {{ title }}")
+
+st.markdown("""{{ description }}""")
+
 with st.form("my_form"): 
 
 
@@ -426,7 +430,7 @@ with st.form("my_form"):
                     with open(local_name,"wb") as f:
                         f.write(eachfile.getbuffer())
         with st.empty():
-            st.markdown("processing")
+            st.markdown("Processing, please wait")
             outputs = on_submit(
                 {% if inputs -%}
                 {% for key, input_conf in inputs.items() -%}
@@ -449,9 +453,9 @@ with st.form("my_form"):
                 {%- endfor %}
                 {%- endif %}
             )
-            st.markdown("run complete, zipping results")
+            st.markdown("Run complete, zipping results for download")
             result = subprocess.run("python -m zipfile -c outputs.zip "+" ".join([x.replace(' ', '\ ') for x in outputs]), shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            st.markdown(f"results ready for download, {outputs}, {result}")
+            st.markdown(f"Results ready for download")
             st.session_state.done_running = True
 
 

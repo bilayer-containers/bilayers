@@ -9,7 +9,7 @@ ARG FOLDER_NAME
 # Install the dependencies for the streamlit app
 # Note:
 
-RUN python -m pip install pyyaml streamlit pydantic==2.10.6
+RUN python -m pip install pyyaml streamlit pydantic
 
 # Set the working directory within the container
 WORKDIR /bilayers

@@ -249,6 +249,7 @@ slots:
     range: HiddenArgs
   docker_image:
     description: "Description of docker_image for the specific algorithm"
+    required: true
     range: DockerImage
   org: 
     description: "Organization of the docker image"
@@ -268,6 +269,7 @@ slots:
     range: string
   algorithm_folder_name:
     description: "Main folder name of the algorithm to put the generated files in the folder"
+    required: true
     range: string
   citations:
     description: "Citations of the Algorithm"

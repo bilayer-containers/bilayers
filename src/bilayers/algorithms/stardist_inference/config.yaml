@@ -82,6 +82,8 @@ outputs:
       - ometiff
     folder_name: "/bilayers/output_images"
     file_count: multiple
+    unique_string:
+      - "*"
     section_id: "outputs"
     mode: "beginner"
     depth: True
@@ -103,6 +105,8 @@ outputs:
       - ometiff
     folder_name: "/bilayers/output_images"
     file_count: multiple
+    unique_string:
+      - "*"
     section_id: "outputs"
     mode: "advanced"
     depth: True
@@ -121,6 +125,8 @@ outputs:
       - npy
     folder_name: "/bilayers/output_images"
     file_count: multiple
+    unique_string:
+      - "*"
     section_id: "outputs"
     mode: "advanced"
     

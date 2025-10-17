@@ -8,7 +8,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 import nbformat as nbf
 
 # Import TypedDict definitions from parse.py
-from parse import InputOutput, Parameter, ExecFunction, Citations, DockerImage  # type: ignore
+from parse import Input, Output, Parameter, ExecFunction, Citations, DockerImage  # type: ignore
 
 
 def generate_top_level_text(interface: str, citations: dict[str, Citations], output_html: bool = True) -> tuple[str, str]:
@@ -212,8 +212,8 @@ def normalize_category_for_cellprofiler(category: str) -> str:
 
 def generate_gradio_app(
     template_path: str,
-    inputs: dict[str, InputOutput],
-    outputs: dict[str, InputOutput],
+    inputs: dict[str, Input],
+    outputs: dict[str, Output],
     parameters: dict[str, Parameter],
     display_only: Optional[dict[str, Parameter]],
     exec_function: ExecFunction,
@@ -224,8 +224,8 @@ def generate_gradio_app(
 
     Args:
         template_path (str): Path to the Gradio template file.
-        inputs (dict[str, InputOutput]): dictionary of input configurations.
-        outputs (dict[str, InputOutput]): dictionary of output configurations.
+        inputs (dict[str, Input]): dictionary of input configurations.
+        outputs (dict[str, Output]): dictionary of output configurations.
         parameters (dict[str, Parameter]): dictionary of parameter configurations.
         display_only (Optional[dict[str, Parameter]]): dictionary of display-only parameters, or None.
         exec_function (ExecFunction): Execution function details.
@@ -258,8 +258,8 @@ def generate_gradio_app(
 
 def generate_jupyter_notebook(
     template_path: str,
-    inputs: dict[str, InputOutput],
-    outputs: dict[str, InputOutput],
+    inputs: dict[str, Input],
+    outputs: dict[str, Output],
     parameters: dict[str, Parameter],
     display_only: Optional[dict[str, Parameter]],
     exec_function: ExecFunction,
@@ -270,8 +270,8 @@ def generate_jupyter_notebook(
 
     Args:
         template_path (str): Path to the Jupyter Notebook template file.
-        inputs (dict[str, InputOutput]): dictionary of input configurations.
-        outputs (dict[str, InputOutput]): dictionary of output configurations.
+        inputs (dict[str, Input]): dictionary of input configurations.
+        outputs (dict[str, Output]): dictionary of output configurations.
         parameters (dict[str, Parameter]): dictionary of parameter configurations.
         display_only (Optional[dict[str, Parameter]]): dictionary of display-only parameters, or None.
         exec_function (ExecFunction): Execution function details.
@@ -344,8 +344,8 @@ def generate_jupyter_notebook(
 
 def generate_cellprofiler_plugin(
         template_path: str,
-        inputs: dict[str, InputOutput],
-        outputs: dict[str, InputOutput],
+        inputs: dict[str, Input],
+        outputs: dict[str, Output],
         parameters: dict[str, Parameter],
         display_only: Optional[dict[str, Parameter]],
         algorithm_folder_name: str,
@@ -358,8 +358,8 @@ def generate_cellprofiler_plugin(
 
     Args:
         template_path (str): Path to the CellProfiler Plugin template file.
-        inputs (dict[str, InputOutput]): List of input configurations.
-        outputs (dict[str, InputOutput]): List of output configurations.
+        inputs (dict[str, Input]): List of input configurations.
+        outputs (dict[str, Output]): List of output configurations.
         parameters (dict[str, Parameter]): List of parameter configurations.
         display_only (Optional[dict[str, Parameter]]): List of display-only parameters, or None.
         exec_function (ExecFunction): Execution function details.

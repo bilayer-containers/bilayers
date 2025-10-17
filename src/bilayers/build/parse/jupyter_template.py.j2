@@ -1,6 +1,7 @@
 from ipywidgets import widgets, VBox, HBox, Tab, Accordion
 from IPython.display import display
 from typing import Any, Optional, Union
+import os, tempfile
 
 {% autoescape false %}
 inputs = {{inputs}}
@@ -41,7 +42,9 @@ radio_options = {
     {%- endif %}
     }
 
+{##########################}
 {# Parsing inputs section #}
+{##########################}
 {% if inputs -%}
 {% for key, input_conf in inputs.items() -%}
 
@@ -49,15 +52,26 @@ radio_options = {
 
 {% if input_conf.get('type') in ['image', 'measurement', 'array', 'file', 'executable'] %}
 mount_path = "{{ input_conf.get('folder_name', '/bilayers/input_images') }}"
+upload_temp_dir = tempfile.mkdtemp(prefix="jupyter_upload_")
 
-{{ input_label }} = widgets.HTML(
-    value=(
-        f"<div style='padding:8px; background:#eefaff; border-radius:6px;'>"
-        f"<b>Mounted Input Folder:</b> <code>{mount_path}</code><br>"
-        f"<i>Uploads are disabled — please ensure files already exist here.</i>"
-        f"</div>"
+# Check if mount folder exists and has files
+if os.path.exists(mount_path) and any(os.scandir(mount_path)):
+    # If mounted, display info and disable upload
+    {{ input_label }} = widgets.HTML(
+        value=(
+            f"<div style='padding:8px; background:#eaffea; border-radius:6px;'>"
+            f"<b>Using Mounted Directory:</b> <code>{mount_path}</code><br>"
+            f"<i>File upload is disabled for this input.</i>"
+            f"</div>"
+        )
     )
-)
+    current_input_dir = mount_path
+    is_mounted = True
+else:
+    # Otherwise, enable the FileUpload widget
+    {{ input_label }} = widgets.FileUpload(multiple=True, description="Upload Files")
+    current_input_dir = upload_temp_dir
+    is_mounted = False
 {%- endif %}
 
 # Add a description label
@@ -72,10 +86,11 @@ tab.set_title(1, "Description")
 {% if input_conf.get('type') in ['image', 'measurement', 'array', 'file', 'executable'] %}
 param_vars["{{ input_label }}"] = {
     "cli_tag": "{{ input_conf.get('cli_tag') }}",
-    "widget": None,
+    "widget": {{ input_label }} if not is_mounted else widgets.Label(value=f"Mounted: {mount_path}"),
     "cli_order": {{ input_conf.get('cli_order', 0) }},
-    "folder_name": "{{ input_conf.get('folder_name', '/bilayers/input_images') }}",
-    "optional": {{ input_conf.get('optional', False) }}
+    "folder_name": current_input_dir,
+    "optional": {{ input_conf.get('optional', False) }},
+    "is_mounted": is_mounted
 }
 {# param_vars.append(("{{ input_conf.get('cli_tag') }}", {{ input_label }}, {{ input_conf.get('cli_order', 0) }}, "{{ input_conf.get('folder_name', '') }}")) #}
 {%- endif %}
@@ -89,7 +104,9 @@ advanced_widgets.append(tab)
 {%- endfor %}
 {%- endif %}
 
+{##############################}
 {# Parsing parameters section #}
+{##############################}
 {% if parameters -%}
 {% for key, param_conf in parameters.items() -%}
 
@@ -147,7 +164,9 @@ advanced_widgets.append(tab)
 {%- endfor %}
 {%- endif %}
 
+{################################}
 {# Parsing display_only section #}
+{################################}
 {% if display_only -%}
 {% for key, display_only_conf in display_only.items() -%}
 
@@ -263,6 +282,39 @@ def validate_and_highlight(widget: widgets.Widget, value: Any, optional: bool) -
         widget.layout.border = ''
         return True
 
+def handle_file_upload(change: Any) -> None:
+    """
+    Handles file upload events by saving uploaded files to disk
+    and refreshing the CLI command.
+
+    This ensures FileUpload widget data (stored in memory) is
+    persisted to the temp or mounted folder before running CLI.
+
+    See also:
+    Resolves: https://github.com/bilayer-containers/bilayers/issues/118
+    """
+    widget = change["owner"]
+
+    # Find which param this widget belongs to
+    for key, param_info in param_vars.items():
+        if param_info.get("widget") is widget:
+            folder_name = param_info.get("folder_name", tempfile.mkdtemp(prefix="bilayers_upload_"))
+            os.makedirs(folder_name, exist_ok=True)
+
+            # ipywidgets v8: .value is a list of dicts
+            for file_data in widget.value:
+                file_name = file_data.get("name")
+                file_content = file_data.get("content")
+                if file_name and file_content:
+                    save_path = os.path.join(folder_name, file_name)
+                    with open(save_path, "wb") as f:
+                        f.write(file_content)
+                    print(f"Saved uploaded file: {save_path}!")
+
+            # Update CLI after saving files
+            cli_command.value = construct_cli_command()
+            break
+
 def construct_cli_command() -> str:
     """
     Constructs the CLI command dynamically based on selected widgets.
@@ -328,15 +380,49 @@ def construct_cli_command() -> str:
         optional: bool = param_info["optional"]
 
         if "folder_name" in param_info or "append_value" in param_info: # Special case for 'File' type and checkbox
-            # Handle mounted folder inputs (no upload)
+            # =====================================================
+            # Case A: Folder-based input (image, file, etc.)
+            # =====================================================
             if "folder_name" in param_info:
                 folder_name = param_info["folder_name"]
-                value = folder_name
+                is_mounted = param_info.get("is_mounted", False)
+                widget = param_info.get("widget")
+
+                # ----------------------------------------------
+                # Mounted folder: just use the existing path
+                # ----------------------------------------------
+                if is_mounted:
+                    value = folder_name
+
+                # ----------------------------------------------
+                # Upload mode: persist uploaded files to temp dir
+                # ----------------------------------------------
+                elif isinstance(widget, widgets.FileUpload) and widget.value:
+                    os.makedirs(folder_name, exist_ok=True)
+                    for file_info in widget.value:
+                        fname = file_info.get("name")
+                        content = file_info.get("content")
+                        if fname and content:
+                            with open(os.path.join(folder_name, fname), "wb") as f:
+                                f.write(content)
+                    print(f"Uploaded files saved to: {folder_name}")
+                    value = folder_name
+
+                # If neither mount nor upload happened, skip safely
+                else:
+                    print(f"No input files found for {cli_tag}")
+                    continue
+
+                # Insert folder path into CLI args
                 if cli_order < 0:
                     insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)
                 else:
                     insert_into_jagged_array(jagged_positive_array, cli_order, cli_tag, value)
-                continue  # Skip to next param
+                continue  # Move to next param
+
+            # =====================================================
+            # Case B: Checkbox (append_value = True)
+            # =====================================================
             elif isinstance(widget, widgets.Checkbox):  # This is a 'Checkbox' type
                 append_value: bool = param_info.get("append_value", False)
                 value = widget.value
@@ -422,7 +508,13 @@ cli_command: widgets.Textarea = widgets.Textarea(value=construct_cli_command(), 
 
 for key, param_info in param_vars.items():
     widget = param_info["widget"]
-    if hasattr(widget, 'observe'):
+
+    # Case A: FileUpload widget --> use custom handler
+    if isinstance(widget, widgets.FileUpload):
+        widget.observe(handle_file_upload, names='value')
+
+    # Case B: all other widgets --> use normal observer
+    elif hasattr(widget, 'observe'):
         widget.observe(update_command, names='value')
 
 if __name__ == "__main__":

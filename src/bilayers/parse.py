@@ -96,6 +96,7 @@ def load_config(config_path: Union[str, Path]):
 
     return config
 
+
 def parse_config(config_path: Union[str, Path]) -> Config:
     """
     Parses a YAML configuration file.
@@ -123,6 +124,7 @@ def parse_config(config_path: Union[str, Path]) -> Config:
         config["exec_function"]["hidden_args"] = {}
 
     return config
+
 
 def safe_parse_config(
     config_path: Union[str, Path],

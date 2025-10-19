@@ -3,6 +3,7 @@ import pytest
 from tempfile import gettempdir
 from bilayers.cli_generator import generate_cli_command
 
+
 @pytest.fixture
 def sample_config():
     """Sample YAML configuration converted to a dictionary for testing."""
@@ -10,46 +11,17 @@ def sample_config():
         "exec_function": {
             "cli_command": "run_algorithm",
             "hidden_args": {
-                "debug": {
-                    "cli_tag": "--debug",
-                    "value": "True",
-                    "cli_order": 2,
-                    "append_value": True
-                },
-                "log": {
-                    "cli_tag": "--log",
-                    "value": "/var/log/output.log",
-                    "cli_order": 3
-                }
-            }
-        },
-        "inputs": {
-            "input_file": {
-                "name": "input_file",
-                "type": "file",
-                "cli_tag": "--input",
-                "cli_order": 1,
-                "default": "input.txt"
-            }
-        },
-        "parameters": {
-            "threshold": {
-                "name": "threshold",
-                "type": "integer",
-                "cli_tag": "--threshold",
-                "cli_order": -1,
-                "default": 5
+                "debug": {"cli_tag": "--debug", "value": "True", "cli_order": 2, "append_value": True},
+                "log": {"cli_tag": "--log", "value": "/var/log/output.log", "cli_order": 3},
             },
-            "verbose": {
-                "name": "verbose",
-                "type": "checkbox",
-                "cli_tag": "--verbose",
-                "cli_order": -2,
-                "default": True,
-                "append_value": False
-            }
-        }
+        },
+        "inputs": {"input_file": {"name": "input_file", "type": "file", "cli_tag": "--input", "cli_order": 1, "default": "input.txt"}},
+        "parameters": {
+            "threshold": {"name": "threshold", "type": "integer", "cli_tag": "--threshold", "cli_order": -1, "default": 5},
+            "verbose": {"name": "verbose", "type": "checkbox", "cli_tag": "--verbose", "cli_order": -2, "default": True, "append_value": False},
+        },
     }
+
 
 def test_generate_cli_command(sample_config):
     """Test CLI command generation with valid configuration."""
@@ -63,12 +35,16 @@ def test_generate_cli_command(sample_config):
     # 5. `--threshold 5` (-1)
     # 6. `--verbose` (-2)
     expected_command = [
-        "run_algorithm", "--input input.txt",
-        "--debug True", "--log /var/log/output.log",
-        "--verbose", "--threshold 5",
+        "run_algorithm",
+        "--input input.txt",
+        "--debug True",
+        "--log /var/log/output.log",
+        "--verbose",
+        "--threshold 5",
     ]
 
     assert cli_command == expected_command
+
 
 def test_hidden_arguments(sample_config):
     """Ensure hidden arguments are always included in the CLI output."""
@@ -76,142 +52,94 @@ def test_hidden_arguments(sample_config):
     assert "--debug True" in cli_command
     assert "--log /var/log/output.log" in cli_command
 
+
 def test_checkbox_without_append_value():
     """Test checkbox parameter without append_value should only include tag if True."""
-    config = Config({
-        "citations": {},
-        "algorithm_folder_name": "",
-        "inputs": {},
-        "outputs": {},
-        "display_only": None,
-        "exec_function": {
-            "name": "",
-            "script": "",
-            "module": "",
-            "hidden_args": None,
-            "cli_command": "run_algorithm"
-        },
-        "parameters": {
-            "verbose": {
-                "name": "verbose",
-                "type": "checkbox",
-                "cli_tag": "--verbose",
-                "cli_order": 1,
-                "default": True,
-                "append_value": False
-            }
+    config = Config(
+        {
+            "citations": {},
+            "algorithm_folder_name": "",
+            "inputs": {},
+            "outputs": {},
+            "display_only": None,
+            "exec_function": {"name": "", "script": "", "module": "", "hidden_args": None, "cli_command": "run_algorithm"},
+            "parameters": {"verbose": {"name": "verbose", "type": "checkbox", "cli_tag": "--verbose", "cli_order": 1, "default": True, "append_value": False}},
         }
-    })
+    )
     cli_command = generate_cli_command(config)
     assert cli_command == ["run_algorithm", "--verbose"]
 
+
 def test_checkbox_with_append_value():
     """Test checkbox parameter with append_value should include tag and value."""
-    config = Config({
-        "citations": {},
-        "algorithm_folder_name": "",
-        "inputs": {},
-        "outputs": {},
-        "display_only": None,
-        "exec_function": {
-            "name": "",
-            "script": "",
-            "module": "",
-            "hidden_args": None,
-            "cli_command": "run_algorithm"
-        },
-        "parameters": {
-            "verbose": {
-                "name": "verbose",
-                "type": "checkbox",
-                "cli_tag": "--verbose",
-                "cli_order": 1,
-                "default": True,
-                "append_value": True
-            }
+    config = Config(
+        {
+            "citations": {},
+            "algorithm_folder_name": "",
+            "inputs": {},
+            "outputs": {},
+            "display_only": None,
+            "exec_function": {"name": "", "script": "", "module": "", "hidden_args": None, "cli_command": "run_algorithm"},
+            "parameters": {"verbose": {"name": "verbose", "type": "checkbox", "cli_tag": "--verbose", "cli_order": 1, "default": True, "append_value": True}},
         }
-    })
+    )
     cli_command = generate_cli_command(config)
     assert cli_command == ["run_algorithm", "--verbose True"]
 
+
 def test_file_input():
     """Test input file handling correctly uses folder_name if provided."""
-    config = Config({
-        "citations": {},
-        "algorithm_folder_name": "",
-        "outputs": {},
-        "display_only": None,
-        "parameters": {},
-        "exec_function": {
-            "name": "",
-            "script": "",
-            "module": "",
-            "hidden_args": None,
-            "cli_command": "run_algorithm"
-        },
-        "inputs": {
-            "input_file": {
-                "name": "input_file",
-                "type": "file",
-                "cli_tag": "--input",
-                "cli_order": 1,
-                "default": "input.txt",
-                "folder_name": gettempdir()
-            }
+    config = Config(
+        {
+            "citations": {},
+            "algorithm_folder_name": "",
+            "outputs": {},
+            "display_only": None,
+            "parameters": {},
+            "exec_function": {"name": "", "script": "", "module": "", "hidden_args": None, "cli_command": "run_algorithm"},
+            "inputs": {
+                "input_file": {"name": "input_file", "type": "file", "cli_tag": "--input", "cli_order": 1, "default": "input.txt", "folder_name": gettempdir()}
+            },
         }
-    })
+    )
     cli_command = generate_cli_command(config)
     assert cli_command == ["run_algorithm", f"--input {gettempdir()}"]
 
+
 def test_missing_required_argument():
     """Test required argument raises ValueError if missing."""
-    config = Config({
-        "citations": {},
-        "algorithm_folder_name": "",
-        "inputs": {},
-        "outputs": {},
-        "display_only": None,
-        "exec_function": {
-            "name": "",
-            "script": "",
-            "module": "",
-            "hidden_args": None,
-            "cli_command": "run_algorithm"
-        },
-        "parameters": {
-            "threshold": {
-                "name": "threshold",
-                "type": "integer",
-                "cli_tag": "--threshold",
-                "cli_order": 1,
-                "optional": False
-            }
+    config = Config(
+        {
+            "citations": {},
+            "algorithm_folder_name": "",
+            "inputs": {},
+            "outputs": {},
+            "display_only": None,
+            "exec_function": {"name": "", "script": "", "module": "", "hidden_args": None, "cli_command": "run_algorithm"},
+            "parameters": {"threshold": {"name": "threshold", "type": "integer", "cli_tag": "--threshold", "cli_order": 1, "optional": False}},
         }
-    })
+    )
     with pytest.raises(ValueError, match="Error: 'threshold' is a required argument and must have a value!"):
         generate_cli_command(config)
 
+
 def test_order_of_arguments():
     """Ensure arguments appear in the correct order based on cli_order."""
-    config = Config({
-        "citations": {},
-        "algorithm_folder_name": "",
-        "inputs": {},
-        "outputs": {},
-        "display_only": None,
-        "exec_function": {
-            "name": "",
-            "script": "",
-            "module": "",
-            "hidden_args": None,
-            "cli_command": "run_algorithm"
-        },
-        "parameters": {
-            "first": {"cli_tag": "--first", "cli_order": 1, "default": "1"},
-            "second": {"cli_tag": "--second", "cli_order": -1, "default": "2"},
-            "third": {"cli_tag": "--third", "cli_order": 3, "default": "3"},
+    config = Config(
+        {
+            "citations": {},
+            "algorithm_folder_name": "",
+            "inputs": {},
+            "outputs": {},
+            "display_only": None,
+            "exec_function": {"name": "", "script": "", "module": "", "hidden_args": None, "cli_command": "run_algorithm"},
+            "parameters": {
+                "first": {"cli_tag": "--first", "cli_order": 1, "default": "1"},
+                "second": {"cli_tag": "--second", "cli_order": -1, "default": "2"},
+                "third": {"cli_tag": "--third", "cli_order": 3, "default": "3"},
+            },
         }
-    })
+    )
     cli_command = generate_cli_command(config)
 
     # Order should be: `run_algorithm` → `--first 1` (1) → `--third 3` (3) → `--second 2` (-1)

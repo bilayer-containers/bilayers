@@ -15,6 +15,7 @@ DOCKER_CMD = os.getenv("DOCKER_CMD", "docker")
 # Helper functions
 ####################
 
+
 def get_local_digest(image: str) -> str:
     """Get local docker image digest (content hash)"""
     try:
@@ -25,6 +26,7 @@ def get_local_digest(image: str) -> str:
         return out.decode().strip()
     except subprocess.CalledProcessError:
         return ""
+
 
 def get_remote_digest(org: str, name: str, tag: str) -> str:
     """Get remote digest from DockerHub for a specific tag"""
@@ -37,6 +39,7 @@ def get_remote_digest(org: str, name: str, tag: str) -> str:
     if len(images) == 0:
         return ""
     return images[0].get("digest", "")
+
 
 def decide_interface_tag(algo_name: str, interface: str, bump_type: str = "minor") -> str:
     """
@@ -69,11 +72,12 @@ def decide_interface_tag(algo_name: str, interface: str, bump_type: str = "minor
         # bump version
         major, minor, patch = map(int, latest.split("."))
         if bump_type == "major":
-            return f"{major+1}.0.0-{interface}"
+            return f"{major + 1}.0.0-{interface}"
         elif bump_type == "minor":
-            return f"{major}.{minor+1}.0-{interface}"
+            return f"{major}.{minor + 1}.0-{interface}"
         else:  # patch
-            return f"{major}.{minor}.{patch+1}-{interface}"
+            return f"{major}.{minor}.{patch + 1}-{interface}"
+
 
 ####################
 # Nox sessions
@@ -85,6 +89,7 @@ PKG_ROOT = Path(bilayers.__path__[0])
 # /absolute/path/to/bilayers/
 PROJ_ROOT = (PKG_ROOT / "../..").resolve()
 
+
 def tmp_path(filename, prefix="bilayers", sep="_"):
     assert type(filename) is str
     assert len(filename) > 0
@@ -93,6 +98,7 @@ def tmp_path(filename, prefix="bilayers", sep="_"):
 
     tempdir = gettempdir()
     return Path(tempdir) / f"{prefix}{sep}{filename}"
+
 
 @nox.session
 def run_parse(session: nox.Session) -> None:
@@ -118,6 +124,7 @@ def run_generate_all(session: nox.Session) -> None:
     session.install("-e", ".")
     config_path = Path(session.posargs[0]).resolve()
     session.run("bilayers_cli", "generate", str(config_path))
+
 
 @nox.session
 def run_generate_interface(session: nox.Session) -> None:
@@ -212,7 +219,7 @@ def build_algorithm(session: nox.Session) -> None:
             # Pyright reports an error since `platform` can be None, while `session.run()` expects `str | PathLike[str]`
             # However, we have a fallback function, that takes care of this scenario
             # Since this is a safe and expected, I have suppress the warning
-            session.run(DOCKER_CMD, "pull", "--platform", platform, docker_image_name) # pyright: ignore
+            session.run(DOCKER_CMD, "pull", "--platform", platform, docker_image_name)  # pyright: ignore
             print(f"Successfully pulled Docker image from DockerHub: {docker_image_name}")
             # Save the Docker image name in a file
             with open(tmp_path("docker_image_name.txt"), "w") as file:
@@ -257,15 +264,21 @@ def build_interface(session: nox.Session) -> None:
     print("Dockerfile Path: ", dockerfile_path)
 
     session.run(
-        DOCKER_CMD, "buildx", "build",
-        "--platform", platform,
-        "--build-arg", f"BASE_IMAGE={base_image}",
-        "--build-arg", f"FOLDER_NAME={algorithm_folder_name}",
-        "-t", candidate_name,
-        "-f", dockerfile_path,
+        DOCKER_CMD,
+        "buildx",
+        "build",
+        "--platform",
+        platform,
+        "--build-arg",
+        f"BASE_IMAGE={base_image}",
+        "--build-arg",
+        f"FOLDER_NAME={algorithm_folder_name}",
+        "-t",
+        candidate_name,
+        "-f",
+        dockerfile_path,
         str(PROJ_ROOT / "interfaces"),
     )
-
 
     # Decide final tag (reuse or bump)
     final_tag = decide_interface_tag(algorithm_folder_name, interface, bump_type)
@@ -340,6 +353,7 @@ def test_pytest(session: nox.Session) -> None:
 
 lint_locations = "src", "tests", "noxfile.py"
 
+
 # to check but do nothing:
 # nox -rs lint
 # to auto-fix:
@@ -352,6 +366,7 @@ def lint(session: nox.Session) -> None:
 
 
 format_locations = lint_locations
+
 
 @nox.session
 def format(session: nox.Session) -> None:

@@ -2,6 +2,7 @@ import bilayers
 from bilayers.parse import parse_config
 from bilayers.cli_generator import generate_cli_command
 
+
 def test_main():
     # Use a real configuration file path from your project.
     config_path = bilayers.project_path() / "algorithms/classical_segmentation/config.yaml"
@@ -15,6 +16,7 @@ def test_main():
     # Output the result.
     print("Generated CLI Command:")
     print(cli_command)
+
 
 if __name__ == "__main__":
     test_main()

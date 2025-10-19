@@ -23,7 +23,7 @@ WORKDIR /bilayers
 COPY generated_folders/$FOLDER_NAME/app.py /bilayers/
 
 # Add __init__.py file for importing the files inside docker-container
-RUN /bilayers/__init__.py
+RUN touch /bilayers/__init__.py
 
 # Export the port
 EXPOSE 7878

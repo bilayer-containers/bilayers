@@ -120,8 +120,7 @@ def parse_config(config_path: Union[str, Path]) -> Config:
 
     return config
 
-
-def main(
+def safe_parse_config(
     config_path: Union[str, Path],
 ) -> tuple[
         dict[str, Input],
@@ -157,6 +156,7 @@ def main(
     exec_function.setdefault("cli_command", "")
     exec_function.setdefault("hidden_args", {})
 
+    # TODO: blank algorithm_folder_name is unsafe because we unconditionally create folders with it downstream
     algorithm_folder_name: str = config.get("algorithm_folder_name", "")
 
     citations: dict[str, Citations] = config.get("citations", {})

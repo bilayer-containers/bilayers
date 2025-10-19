@@ -238,8 +238,7 @@ def build_interface(session: nox.Session) -> None:
         session.error("Must provide at least interface and algorithm arguments")
 
     interface = session.posargs[0]
-    algorithm = session.posargs[1]
-    bump_type = session.posargs[2] if len(session.posargs) > 2 else "minor"
+    bump_type = session.posargs[1] if len(session.posargs) >= 2 else "minor"
 
     # Load platform, base image, algo folder
     with open(tmp_path("platform.txt"), "r") as f:

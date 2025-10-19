@@ -11,7 +11,7 @@ except ImportError:
     linkml = None
 
 
-def cli() -> None:
+def cli() -> None: # noqa: C901
     """CLI entry point for bilayers_cli"""
 
     # Creating an ArgumentParser object with a brief description of the tool

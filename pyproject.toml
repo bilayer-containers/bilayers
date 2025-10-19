@@ -20,7 +20,6 @@ readme = "README.md"
 license = "BSD-3-Clause"
 requires-python = ">=3.9"
 dependencies = [
-    "nox>=2024.4.15,<2025",
     "pyyaml>=6.0.1,<7",
     "jinja2",
     "nbformat",
@@ -28,6 +27,7 @@ dependencies = [
 
 [project.optional-dependencies]
 docs = ["mystmd>=1.3.17,<2"]
+nox = ["nox>=2024.4.15,<2025"]
 linkml = ["linkml"]
 test = ["pytest"]
 lint = ["ruff"]
@@ -67,7 +67,7 @@ python = ">=3.9"
 bilayers = { path = ".", editable = true }
 
 [tool.pixi.environments]
-dev = ["dev", "docs", "linkml", "test", "lint"]
+dev = ["dev", "docs", "linkml", "test", "lint", "nox"]
 
 [tool.ruff]
 # 80 columns are a thing of the past

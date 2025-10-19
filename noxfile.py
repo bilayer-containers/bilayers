@@ -97,7 +97,7 @@ def tmp_path(filename, prefix="bilayers", sep="_"):
 @nox.session
 def run_parse(session: nox.Session) -> None:
     """
-    Runs the parse.py script with a specified configuration file.
+    Runs the parse.parse_config with a specified configuration file.
 
     Args:
         session (nox.Session): The Nox session object.
@@ -108,9 +108,9 @@ def run_parse(session: nox.Session) -> None:
 
 
 @nox.session
-def run_generate(session: nox.Session) -> None:
+def run_generate_all(session: nox.Session) -> None:
     """
-    Runs the generate.py script with a specified configuration file.
+    Runs the generate.generate_all with a specified configuration file.
 
     Args:
         session (nox.Session): The Nox session object.
@@ -118,6 +118,19 @@ def run_generate(session: nox.Session) -> None:
     session.install("-e", ".")
     config_path = Path(session.posargs[0]).resolve()
     session.run("bilayers_cli", "generate", str(config_path))
+
+@nox.session
+def run_generate_interface(session: nox.Session) -> None:
+    """
+    Runs the generate.generate_interface with a specified configuration file.
+
+    Args:
+        session (nox.Session): The Nox session object.
+    """
+    session.install("-e", ".")
+    config_path = Path(session.posargs[0]).resolve()
+    interface_name = Path(session.posargs[1]).resolve()
+    session.run("bilayers_cli", "generate", "--interface", str(interface_name), str(config_path))
 
 
 @nox.session
@@ -240,7 +253,7 @@ def build_interface(session: nox.Session) -> None:
         session.error("BASE_IMAGE is empty or invalid. Did build_algorithm run first?")
 
     # Build candidate first
-    dockerfile_path = PROJ_ROOT / f"interfaces/dockerfiles/{interface.capitalize()}.Dockerfile"
+    dockerfile_path = PROJ_ROOT / f"interfaces/{interface}/{interface.capitalize()}.Dockerfile"
     candidate_name = f"bilayer/{algorithm_folder_name}:build-candidate"
     print("Dockerfile Path: ", dockerfile_path)
 
@@ -322,7 +335,6 @@ def test_generate(session: nox.Session) -> None:
 
 lint_locations = "src", "tests", "noxfile.py"
 
-
 # to check but do nothing:
 # nox -rs lint
 # to auto-fix:
@@ -335,7 +347,6 @@ def lint(session: nox.Session) -> None:
 
 
 format_locations = lint_locations
-
 
 @nox.session
 def format(session: nox.Session) -> None:

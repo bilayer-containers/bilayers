@@ -57,7 +57,7 @@ for ALGO in "${ALGORITHM_NAMES[@]}"; do
     nox -s run_parse -- "$CONFIG_PATH"
     nox -s run_generate_all -- "$CONFIG_PATH"
     nox -s build_algorithm -- "$ALGO"
-    nox -s build_interface -- "$IFACE" "$ALGO" "$BUMP_TYPE"
+    nox -s build_interface -- "$IFACE" "$BUMP_TYPE"
 
     if [[ "$IFACE" == "gradio" ]]; then
       nox -s install_gradio

@@ -333,6 +333,12 @@ def test_generate(session: nox.Session) -> None:
     session.run("bilayers_cli", "generate", config_path)
 
 
+@nox.session
+def test_pytest(session: nox.Session) -> None:
+    session.install("-e", ".[test,linkml]")
+    session.run("pytest", str(PROJ_ROOT / "tests"))
+
+
 lint_locations = "src", "tests", "noxfile.py"
 
 # to check but do nothing:
@@ -341,7 +347,7 @@ lint_locations = "src", "tests", "noxfile.py"
 # nox -rs lint -- --fix
 @nox.session
 def lint(session: nox.Session) -> None:
-    session.install("ruff")
+    session.install("-e", ".[lint]")
     args = session.posargs or lint_locations
     session.run("ruff", "check", *args)
 
@@ -350,6 +356,6 @@ format_locations = lint_locations
 
 @nox.session
 def format(session: nox.Session) -> None:
-    session.install("ruff")
+    session.install("-e", ".[lint]")
     args = session.posargs or format_locations
     session.run("ruff", "format", *args)

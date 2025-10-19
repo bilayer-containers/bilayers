@@ -1,9 +1,14 @@
 import sys
 import argparse
 
-from .parse import parse_config, safe_parse_config
+from .parse import parse_config, safe_parse_config, load_config
 from .generate import generate_all, generate_interface
 from .cli_generator import generate_cli_command
+
+try:
+    import linkml.validator
+except ImportError:
+    linkml = None
 
 
 def cli() -> None:
@@ -39,6 +44,13 @@ def cli() -> None:
         action="store_true",
         help="Generate CLI command string instead of generating full interface"
     )
+
+    if linkml:
+        validate_parser = subparsers.add_parser(
+            "validate",
+            help="Validate a Bilayers YAML config file."
+        )
+        validate_parser.add_argument("config", help="Path to the YAML config file.")
 
     # Using action="version" automatically prints the version string and exits
     parser.add_argument(
@@ -93,3 +105,14 @@ def cli() -> None:
             except Exception as e:
                 print(f"Error: generating interfaces: {e}")
                 sys.exit(1)
+
+    elif linkml and args.command == "validate":
+        from . import schema
+        config_yaml = load_config(config_path)
+        report = linkml.validator.validate(config_yaml, schema)
+
+        if not report.results:
+            print("No issues found")
+        else:
+            for result in report.results:
+                print(f"[{result.severity.value}] {result.message}")

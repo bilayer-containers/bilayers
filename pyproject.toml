@@ -29,6 +29,8 @@ dependencies = [
 [project.optional-dependencies]
 docs = ["mystmd>=1.3.17,<2"]
 linkml = ["linkml"]
+test = ["pytest"]
+lint = ["ruff"]
 dev = [
   "numpy",
   "scipy",
@@ -36,8 +38,6 @@ dev = [
   "ipython",
   "ipywidgets",
   "gradio",
-  "pytest",
-  "ruff",
   "pyright",
   "pre-commit",
   "mypy",
@@ -67,7 +67,7 @@ python = ">=3.9"
 bilayers = { path = ".", editable = true }
 
 [tool.pixi.environments]
-dev = ["dev", "docs", "linkml"]
+dev = ["dev", "docs", "linkml", "test", "lint"]
 
 [tool.ruff]
 # 80 columns are a thing of the past

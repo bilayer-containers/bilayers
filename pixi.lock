@@ -1079,7 +1079,7 @@ packages:
 - pypi: ./
   name: bilayers
   version: 0.1.0
-  sha256: e3fcadfbe7286b69da526bcf2518188c28e0e225da6779afed805974b520f2c9
+  sha256: 5ea285b7af0914bade8c5b85bf5788ddab7e5bc5a003992b260231a7c3db17cc
   requires_dist:
   - nox>=2024.4.15,<2025
   - pyyaml>=6.0.1,<7
@@ -1087,14 +1087,14 @@ packages:
   - nbformat
   - mystmd>=1.3.17,<2 ; extra == 'docs'
   - linkml ; extra == 'linkml'
+  - pytest ; extra == 'test'
+  - ruff ; extra == 'lint'
   - numpy ; extra == 'dev'
   - scipy ; extra == 'dev'
   - scikit-image ; extra == 'dev'
   - ipython ; extra == 'dev'
   - ipywidgets ; extra == 'dev'
   - gradio ; extra == 'dev'
-  - pytest ; extra == 'dev'
-  - ruff ; extra == 'dev'
   - pyright ; extra == 'dev'
   - pre-commit ; extra == 'dev'
   - mypy ; extra == 'dev'

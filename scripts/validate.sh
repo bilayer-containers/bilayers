@@ -2,11 +2,11 @@
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PKG_ROOT="$("$SCRIPT_DIR"/pkg_path.sh)"
-PROJ_ROOT="$(cd "$PKG_ROOT/../.." && pwd)"
+#PROJ_ROOT="$(cd "$PKG_ROOT/../.." && pwd)"
 
 cd "$SCRIPT_DIR" || exit
 
-SCHEMA_FILE=${1:-"$PROJ_ROOT/tests/test_config/validate_schema.yaml"}
+SCHEMA_FILE=${1:-"$PKG_ROOT/schema.yaml"}
 # List of algorithms and interfaces
 ALGORITHM_NAMES=("cellpose_inference" "classical_segmentation" "instanseg_inference") 
 
@@ -17,7 +17,8 @@ for ALGORITHM in "${ALGORITHM_NAMES[@]}"; do
     echo "Validating all config files in $CONFIG_DIR"
     for config in "$CONFIG_DIR"/*.yaml; do
         echo "Validating ${config} ..."
-        linkml validate --schema "$SCHEMA_FILE" --target-class SpecContainer "${config}" || {
+        #linkml validate --schema "$SCHEMA_FILE" --target-class SpecContainer "${config}" || {
+        bilayers_cli validate "${config}" || {
             echo "Validation failed for ${config}"
             exit 1
         }

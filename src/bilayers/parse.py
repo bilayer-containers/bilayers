@@ -83,16 +83,7 @@ class Config(TypedDict):
     docker_image: DockerImage
 
 
-def parse_config(config_path: Union[str, Path]) -> Config:
-    """
-    Parses a YAML configuration file.
-
-    Args:
-        config_path (Optional[str | Path]): Path to the config file. Defaults to None.
-
-    Returns:
-        Config: A structured dictionary containing parsed YAML data.
-    """
+def load_config(config_path: Union[str, Path]):
     # even if already type Path, convert
     # to stop the type checker from complaining
     config_path = Path(config_path)
@@ -103,6 +94,19 @@ def parse_config(config_path: Union[str, Path]) -> Config:
     with open(config_path, "r") as file:
         config = yaml.safe_load(file)
 
+    return config
+
+def parse_config(config_path: Union[str, Path]) -> Config:
+    """
+    Parses a YAML configuration file.
+
+    Args:
+        config_path (Optional[str | Path]): Path to the config file. Defaults to None.
+
+    Returns:
+        Config: A structured dictionary containing parsed YAML data.
+    """
+    config = load_config(config_path)
     # Convert lists to dictionaries using "name" as key
     config["inputs"] = {item["name"]: item for item in config.get("inputs", [])} if isinstance(config.get("inputs"), list) else {}
     config["outputs"] = {item["name"]: item for item in config.get("outputs", [])} if isinstance(config.get("outputs"), list) else {}

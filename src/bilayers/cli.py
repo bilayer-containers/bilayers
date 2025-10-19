@@ -1,8 +1,8 @@
 import sys
 import argparse
 
-from .parse import parse_config, main as parse_main
-from .generate import main as generate_main
+from .parse import parse_config, safe_parse_config
+from .generate import generate_all, generate_interface
 from .cli_generator import generate_cli_command
 
 
@@ -31,6 +31,10 @@ def cli() -> None:
     )
     generate_parser.add_argument("config", help="Path to the YAML config file.")
     generate_parser.add_argument(
+        "-i", "--interface",
+        help="Name of specific interface to generate (e.g. gradio, jupyter) or \"all\" for every interface. If not provided, \"all\" is assumed by default."
+    )
+    generate_parser.add_argument(
         "--cli",
         action="store_true",
         help="Generate CLI command string instead of generating full interface"
@@ -52,7 +56,7 @@ def cli() -> None:
 
     if args.command == "parse":
         try:
-            inputs, outputs, parameters, display_only, exec_function, algorithm_folder_name, citations = parse_main(args.config)
+            inputs, outputs, parameters, display_only, exec_function, algorithm_folder_name, citations = safe_parse_config(args.config)
 
             print(f"Inputs: {inputs}")
             print(f"Outputs: {outputs}")
@@ -68,19 +72,24 @@ def cli() -> None:
     elif args.command == "generate":
         if args.cli:
             try:
-                generate_main(config_path)
-            except Exception as e:
-                print(f"Error: generating interface: {e}")
-                sys.exit(1)
-        else:
-            try:
                 parsed_config = parse_config(config_path)
                 cli_command: str = str(generate_cli_command(parsed_config, return_as_string=True))
-                print("\nGenerated CLI Command:")
+                print("Generated CLI Command:")
                 print(cli_command)
             except Exception as e:
                 print(f"Error: generating CLI command: {e}")
                 sys.exit(1)
-
-if __name__ == "__main__":
-    cli()
+        elif args.interface and args.interface != "all":
+            try:
+                generate_interface(args.interface, config_path)
+                print("Finished generating interface: {args.interface}")
+            except Exception as e:
+                print(f"Error: generating interface {args.interface}: {e}")
+                sys.exit(1)
+        else:
+            try:
+                generate_all(config_path)
+                print("Finished generating all interfaces")
+            except Exception as e:
+                print(f"Error: generating interfaces: {e}")
+                sys.exit(1)

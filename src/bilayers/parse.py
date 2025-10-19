@@ -111,8 +111,7 @@ def parse_config(config_path: Union[str, Path]) -> Config:
 
     return config
 
-
-def main(
+def safe_parse_config(
     config_path: Union[str, Path],
 ) -> tuple[dict[str, InputOutput], dict[str, InputOutput], dict[str, Parameter], Optional[dict[str, Parameter]], ExecFunction, str, dict[str, Citations]]:
     """

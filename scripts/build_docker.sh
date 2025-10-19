@@ -55,7 +55,7 @@ for ALGO in "${ALGORITHM_NAMES[@]}"; do
 
     CONFIG_PATH="${PROJ_ROOT}/algorithms/${ALGO}/config.yaml"
     nox -s run_parse -- "$CONFIG_PATH"
-    nox -s run_generate -- "$CONFIG_PATH"
+    nox -s run_generate_all -- "$CONFIG_PATH"
     nox -s build_algorithm -- "$ALGO"
     nox -s build_interface -- "$IFACE" "$ALGO" "$BUMP_TYPE"
 

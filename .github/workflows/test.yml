@@ -27,9 +27,10 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install pytest pyyaml linkml nox
+          pip install -e ".[nox, test, linkml]"
 
       - name: Lint code with LinkML
         run: |
           chmod +x scripts/test_docker.sh
           scripts/test_docker.sh
+          nox -s test_pytest

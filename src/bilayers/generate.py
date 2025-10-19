@@ -26,11 +26,11 @@ def generate_top_level_text(interface_citation: Citations, citations: dict[str, 
         "name": "Bilayers",
         "doi": "",
         "license": "BSD 3-Clause",
-        "description": "A Container Specification and CI/CD built for whole-community support"
+        "description": "A Container Specification and CI/CD built for whole-community support",
     }
-    assert 'name' in interface_citation and interface_citation.get('name'), "Must provide a name for interface citation"
+    assert "name" in interface_citation and interface_citation.get("name"), "Must provide a name for interface citation"
 
-    interface_name = interface_citation.get('name')
+    interface_name = interface_citation.get("name")
 
     newline = "<br>" if output_html else "\n\n"
 
@@ -51,19 +51,16 @@ def generate_top_level_text(interface_citation: Citations, citations: dict[str, 
     for citation in [BILAYERS, interface_citation]:
         if citation.get("doi"):
             citation_text_lines.append(f"Cite {citation.get('name')} using {citation.get('doi', 'N/A')}")
-        license_info_lines.append(
-            f"{citation.get('name')} is provided under the {citation.get('license', 'Unknown')} license"
-        )
+        license_info_lines.append(f"{citation.get('name')} is provided under the {citation.get('license', 'Unknown')} license")
 
     title = "+".join(app_names_lines) + f" - Brought to you in {interface_name} by Bilayers"
     # Instead of joining with newlines, join with <br> so that the markdown cell shows line breaks.
-    full_description = f"{newline}".join([
-        f"{newline}".join(app_descriptions_lines),
-        f"{newline}".join(citation_text_lines),
-        f"{newline}".join(license_info_lines)
-    ])
+    full_description = f"{newline}".join(
+        [f"{newline}".join(app_descriptions_lines), f"{newline}".join(citation_text_lines), f"{newline}".join(license_info_lines)]
+    )
 
     return title, full_description
+
 
 def load_and_run_generate(
     path: Path,
@@ -89,6 +86,7 @@ def load_and_run_generate(
 
     return module.generate(generated_dir, inputs, outputs, parameters, display_only, exec_function, citations, docker_image)
 
+
 def generate_interface(interface_name: str, config_path: Union[str, Path]) -> None:
     """Main function to parse config and generate files for specified interface (e.g. gradio, jupyter, cellprofiler plugin)."""
     print("Parsing config...")
@@ -110,19 +108,10 @@ def generate_interface(interface_name: str, config_path: Union[str, Path]) -> No
     if generate_py.exists():
         print(f"Running generate for {interface_name}...")
 
-        load_and_run_generate(
-            generate_py,
-            generated_dir,
-            inputs,
-            outputs,
-            parameters,
-            display_only,
-            exec_function,
-            citations,
-            docker_image
-        )
+        load_and_run_generate(generate_py, generated_dir, inputs, outputs, parameters, display_only, exec_function, citations, docker_image)
     else:
         print(f"No generate.py found for interface: {interface_name}")
+
 
 def generate_all(config_path: Union[str, Path]) -> None:
     """Main function to parse config and generate files for every interface."""
@@ -143,16 +132,6 @@ def generate_all(config_path: Union[str, Path]) -> None:
         if generate_py.exists():
             print(f"Running generate for {os.path.basename(iface_dir)}...")
 
-            load_and_run_generate(
-                generate_py,
-                generated_dir,
-                inputs,
-                outputs,
-                parameters,
-                display_only,
-                exec_function,
-                citations,
-                docker_image
-            )
+            load_and_run_generate(generate_py, generated_dir, inputs, outputs, parameters, display_only, exec_function, citations, docker_image)
         else:
             print(f"No generate.py found for interface: {str(iface_dir)}")

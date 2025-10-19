@@ -11,54 +11,35 @@ except ImportError:
     linkml = None
 
 
-def cli() -> None: # noqa: C901
+def cli() -> None:  # noqa: C901
     """CLI entry point for bilayers_cli"""
 
     # Creating an ArgumentParser object with a brief description of the tool
     # This automatically adds support for -h/--help
-    parser = argparse.ArgumentParser(
-        description="Bilayers CLI tool that parses a Bilayers YAML config file and generates an executable CLI command."
-    )
+    parser = argparse.ArgumentParser(description="Bilayers CLI tool that parses a Bilayers YAML config file and generates an executable CLI command.")
 
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     # parse subcommand
-    parse_parser = subparsers.add_parser(
-        "parse",
-        help="Parse a Bilayers YAML config file."
-    )
+    parse_parser = subparsers.add_parser("parse", help="Parse a Bilayers YAML config file.")
     parse_parser.add_argument("config", help="Path to the YAML config file.")
 
     # generate subcommand
-    generate_parser = subparsers.add_parser(
-        "generate",
-        help="Generate outputs from a Bilayers YAML config file."
-    )
+    generate_parser = subparsers.add_parser("generate", help="Generate outputs from a Bilayers YAML config file.")
     generate_parser.add_argument("config", help="Path to the YAML config file.")
     generate_parser.add_argument(
-        "-i", "--interface",
-        help="Name of specific interface to generate (e.g. gradio, jupyter) or \"all\" for every interface. If not provided, \"all\" is assumed by default."
+        "-i",
+        "--interface",
+        help='Name of specific interface to generate (e.g. gradio, jupyter) or "all" for every interface. If not provided, "all" is assumed by default.',
     )
-    generate_parser.add_argument(
-        "--cli",
-        action="store_true",
-        help="Generate CLI command string instead of generating full interface"
-    )
+    generate_parser.add_argument("--cli", action="store_true", help="Generate CLI command string instead of generating full interface")
 
     if linkml:
-        validate_parser = subparsers.add_parser(
-            "validate",
-            help="Validate a Bilayers YAML config file."
-        )
+        validate_parser = subparsers.add_parser("validate", help="Validate a Bilayers YAML config file.")
         validate_parser.add_argument("config", help="Path to the YAML config file.")
 
     # Using action="version" automatically prints the version string and exits
-    parser.add_argument(
-        "-v", "--version",
-        action="version",
-        version="bilayers_cli 0.1.0",
-        help="Show the version number and exit."
-    )
+    parser.add_argument("-v", "--version", action="version", version="bilayers_cli 0.1.0", help="Show the version number and exit.")
 
     # Parse the command-line arguments
     args = parser.parse_args()
@@ -108,6 +89,7 @@ def cli() -> None: # noqa: C901
 
     elif linkml and args.command == "validate":
         from . import schema
+
         config_yaml = load_config(config_path)
         report = linkml.validator.validate(config_yaml, schema)
 

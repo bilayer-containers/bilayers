@@ -25,12 +25,8 @@ def _option_to_append(cli_tag: str, value: Any) -> str:
         return f"{cli_tag}{value}"
     return f"{cli_tag} {value}"  # Append cli_tag and value
 
-def _insert_into_jagged_array(
-    jagged_array: list[Optional[list[str]]],
-    cli_order: int,
-    cli_tag: str,
-    value: Any
-) -> None:
+
+def _insert_into_jagged_array(jagged_array: list[Optional[list[str]]], cli_order: int, cli_tag: str, value: Any) -> None:
     """
     Inserts CLI arguments into a structured array to maintain ordering.
 
@@ -47,7 +43,8 @@ def _insert_into_jagged_array(
         jagged_array[abs(cli_order)] = []
 
     result = _option_to_append(cli_tag, value)
-    jagged_array[abs(cli_order)].append(result) # pyright: ignore
+    jagged_array[abs(cli_order)].append(result)  # pyright: ignore
+
 
 def _generate_cli_command(parsed_config: Config) -> list[str]:
     """
@@ -70,7 +67,7 @@ def _generate_cli_command(parsed_config: Config) -> list[str]:
 
     # Step-1: Handle regular CLI Parameters i.e. inputs and parameters
     for key, param in cli_tags.items():
-        param_type = param.get("type") # type would always be present
+        param_type = param.get("type")  # type would always be present
         cli_tag = param.get("cli_tag", "")
         default_value = param.get("default", None)
         cli_order = param.get("cli_order", 0)
@@ -87,10 +84,7 @@ def _generate_cli_command(parsed_config: Config) -> list[str]:
         if param_type == "checkbox":
             append_value: Optional[bool] = param.get("append_value", False)
             if append_value:
-                _insert_into_jagged_array(
-                    jagged_negative_array if cli_order < 0 else jagged_positive_array,
-                    cli_order, cli_tag, default_value
-                )
+                _insert_into_jagged_array(jagged_negative_array if cli_order < 0 else jagged_positive_array, cli_order, cli_tag, default_value)
             else:
                 if default_value:
                     if cli_order < 0:
@@ -119,20 +113,18 @@ def _generate_cli_command(parsed_config: Config) -> list[str]:
             # - ("--option", "None")      → Skipped (Value is "None" as a string)
             # - ("None", "value")         → Skipped (cli_tag is "None" as a string)
             if cli_tag not in [None, "None"] and default_value not in [None, "None", ""]:
-                _insert_into_jagged_array(
-                    jagged_negative_array if cli_order < 0 else jagged_positive_array, cli_order, cli_tag, default_value
-                )
+                _insert_into_jagged_array(jagged_negative_array if cli_order < 0 else jagged_positive_array, cli_order, cli_tag, default_value)
 
     # Step-2: Handle hidden arguments
     print(exec_function)
     hidden_args: Optional[dict[str, HiddenArgs]] = exec_function.get("hidden_args", {}) or {}
 
     # Ignoring pyright error for hidden_args.values() as it will always be a valid dictionary, most of the times empty though
-    for arg in hidden_args.values(): # pyright: ignore
+    for arg in hidden_args.values():  # pyright: ignore
         cli_tag = arg.get("cli_tag", "")
         value = arg.get("value", "")
         cli_order = arg.get("cli_order", 0)
-        hidden_append_value : Optional[bool] = arg.get("append_value")
+        hidden_append_value: Optional[bool] = arg.get("append_value")
 
         if cli_order < 0:
             while len(jagged_negative_array) <= abs(cli_order):
@@ -143,9 +135,7 @@ def _generate_cli_command(parsed_config: Config) -> list[str]:
 
         if isinstance(value, bool):
             if hidden_append_value:
-                _insert_into_jagged_array(
-                    jagged_negative_array if cli_order < 0 else jagged_positive_array, cli_order, cli_tag, value
-                )
+                _insert_into_jagged_array(jagged_negative_array if cli_order < 0 else jagged_positive_array, cli_order, cli_tag, value)
             else:
                 if value:
                     if cli_order < 0:
@@ -156,9 +146,7 @@ def _generate_cli_command(parsed_config: Config) -> list[str]:
                         jagged_positive_array[cli_order].append(cli_tag)
 
         else:
-            _insert_into_jagged_array(
-                jagged_negative_array if cli_order < 0 else jagged_positive_array, cli_order, cli_tag, value
-            )
+            _insert_into_jagged_array(jagged_negative_array if cli_order < 0 else jagged_positive_array, cli_order, cli_tag, value)
 
     # Step-3: Merge Ordered CLI Arguments
     for index in range(1, len(jagged_positive_array)):
@@ -174,6 +162,7 @@ def _generate_cli_command(parsed_config: Config) -> list[str]:
 
     return cli_command
 
+
 def generate_cli_command(parsed_config: Config, return_as_string: bool = False) -> Union[str, list[str]]:
     """
     Main entry point for generating the CLI command.
@@ -188,5 +177,5 @@ def generate_cli_command(parsed_config: Config, return_as_string: bool = False) 
     cli_command = _generate_cli_command(parsed_config)
 
     if return_as_string:
-        return " ".join(cli_command) # CLI Usage (string)
+        return " ".join(cli_command)  # CLI Usage (string)
     return cli_command  # Library Usage (list)

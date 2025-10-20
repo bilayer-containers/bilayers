@@ -554,6 +554,9 @@ If set to "Default Output Folder", measurements will be saved in [DefaultOutputF
             # Load output data
             try:
                 {% for key, output_conf in outputs.items() %}
+                # --------------------
+                # Case 1: Image output
+                # --------------------
                 {% if output_conf.get('type') == 'image' %}
                 matched_files = []
                 for fmt in {{ output_conf.get('format', ['tif']) | safe }}:
@@ -561,23 +564,26 @@ If set to "Default Output Folder", measurements will be saved in [DefaultOutputF
                         pattern = os.path.join(temp_output_dir, f"*{recognizer}*.{fmt}")
                         matched_files.extend(glob.glob(pattern))
 
-                if matched_files:
-                    {% if output_conf.get('file_count') == 'multiple' %}
-                    # Load all matching files
-                    {{ output_conf.get('name') }}_data = [skimage.io.imread(f) for f in matched_files]
-                    {% else %}
-                    # Single file case (default)
+                # Single vs Multiple Image Handling
+                if len(matched_files) == 1:
+                    # Exactly one output file --> load it as a single numpy array
                     selected_file = matched_files[0]
                     {{ output_conf.get('name') }}_data = skimage.io.imread(selected_file)
-                    {% endif %}
+                elif len(matched_files) > 1:
+                    # Multiple output files --> load all as a list of numpy arrays
+                    {{ output_conf.get('name') }}_data = [skimage.io.imread(f) for f in matched_files]
                 else:
-                    LOGGER.warning("No matching output found for {{ output_conf.get('name') }}")
+                    # No matching output files found even though save flag is enabled --> create empty array
+                    LOGGER.warning(f"No matching output found for {{ output_conf.get('name') }} (save flag enabled)")
                     {% set first_image_input = inputs.values() | selectattr('type', 'equalto', 'image') | list %}
                     {% if first_image_input %}
                     {{ output_conf.get('name') }}_data = numpy.zeros_like({{ first_image_input[0].get('name') }}_data)
                     {% else %}
                     {{ output_conf.get('name') }}_data = numpy.zeros((256, 256), dtype=numpy.uint8)
                     {% endif %}
+                # --------------------
+                # Case 2: Array output
+                # --------------------
                 {% elif output_conf.get('type') == 'array' %}
                 matched_files = []
                 for fmt in {{ output_conf.get('format', ['npy']) | safe }}:
@@ -591,6 +597,9 @@ If set to "Default Output Folder", measurements will be saved in [DefaultOutputF
                     selected_file = matched_files[0]
                     {{ output_conf.get('name') }}_data = numpy.load(selected_file)
                     {% endif %}
+                # --------------------------
+                # Case 3: Measurement output
+                # --------------------------
                 {% elif output_conf.get('type') == 'measurement' %}
                 matched_files = []
                 for fmt in {{ output_conf.get('format', ['csv']) | safe }}:

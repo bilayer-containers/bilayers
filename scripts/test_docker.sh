@@ -4,7 +4,7 @@
 set -e
 
 # TODO: move this to either tests/ or scripts/
-SCRIPT_DIR="$(cd "$(dirname "$0")/scripts" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PKG_ROOT="$("$SCRIPT_DIR"/pkg_path.sh)"
 PROJ_ROOT="$(cd "$PKG_ROOT/../.." && pwd)"
 
@@ -21,10 +21,10 @@ for ALGORITHM_NAME in "${ALGORITHM_NAMES[@]}";
 
         # Running the parse script by giving actual config_path
         CONFIG_PATH="$PROJ_ROOT/tests/test_algorithm/correct_validation_config.yaml"
-        echo nox -s test_parse -- "$CONFIG_PATH"
+        nox -s test_parse -- "$CONFIG_PATH"
 
         # Running the generate file 
         CONFIG_PATH="$PROJ_ROOT/tests/test_algorithm/correct_validation_config.yaml"
-        echo nox -s test_generate -- "$CONFIG_PATH"
+        nox -s test_generate -- "$CONFIG_PATH"
     done
 done

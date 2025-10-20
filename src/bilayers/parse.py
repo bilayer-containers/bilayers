@@ -1,5 +1,4 @@
 import yaml
-import sys
 from typing import TypedDict, Any, Optional, Union
 from pathlib import Path
 
@@ -75,7 +74,21 @@ class Config(TypedDict):
     display_only: Optional[dict[str, Parameter]]
 
 
-def parse_config(config_path: Optional[Union[str, Path]] = None) -> Config:
+def load_config(config_path: Union[str, Path]):
+    # even if already type Path, convert
+    # to stop the type checker from complaining
+    config_path = Path(config_path)
+
+    if not config_path.exists():
+        raise FileNotFoundError(f"Configuration file not found: {config_path}")
+
+    with open(config_path, "r") as file:
+        config = yaml.safe_load(file)
+
+    return config
+
+
+def parse_config(config_path: Union[str, Path]) -> Config:
     """
     Parses a YAML configuration file.
 
@@ -85,23 +98,7 @@ def parse_config(config_path: Optional[Union[str, Path]] = None) -> Config:
     Returns:
         Config: A structured dictionary containing parsed YAML data.
     """
-    if config_path is None:
-        try:
-            import bilayers
-            config_path = bilayers.package_path() / "algorithms/classical_segmentation/config.yaml"
-        except ModuleNotFoundError:
-            config_path = Path("../../../src/bilayers/algorithms/classical_segmentation/config.yaml")
-    else:
-        # even if already type Path, convert
-        # to stop the type checker from complaining
-        config_path = Path(config_path)
-
-    if not config_path.exists():
-        raise FileNotFoundError(f"Configuration file not found: {config_path}")
-
-    with open(config_path, "r") as file:
-        config = yaml.safe_load(file)
-
+    config = load_config(config_path)
     # Convert lists to dictionaries using "name" as key
     config["inputs"] = {item["name"]: item for item in config.get("inputs", [])} if isinstance(config.get("inputs"), list) else {}
     config["outputs"] = {item["name"]: item for item in config.get("outputs", [])} if isinstance(config.get("outputs"), list) else {}
@@ -120,8 +117,8 @@ def parse_config(config_path: Optional[Union[str, Path]] = None) -> Config:
     return config
 
 
-def main(
-    config_path: Optional[Union[str, Path]] = None,
+def safe_parse_config(
+    config_path: Union[str, Path],
 ) -> tuple[dict[str, InputOutput], dict[str, InputOutput], dict[str, Parameter], Optional[dict[str, Parameter]], ExecFunction, str, dict[str, Citations]]:
     """
     Loads the configuration and extracts necessary information.
@@ -132,8 +129,6 @@ def main(
     Returns:
         tuple containing parsed configuration data.
     """
-    config_path = sys.argv[1] if len(sys.argv) > 1 else None
-
     config: Config = parse_config(config_path)
 
     inputs: dict[str, InputOutput] = config.get("inputs", {})
@@ -156,14 +151,3 @@ def main(
     citations: dict[str, Citations] = config.get("citations", {})
 
     return inputs, outputs, parameters, display_only, exec_function, algorithm_folder_name, citations
-
-
-if __name__ == "__main__":
-    inputs, outputs, parameters, display_only, exec_function, algorithm_folder_name, citations = main()
-    print(f"Inputs: {inputs}")
-    print(f"Outputs: {outputs}")
-    print(f"Parameters: {parameters}")
-    print(f"Display Only: {display_only}")
-    print(f"Exec Function: {exec_function}")
-    print(f"Folder Name: {algorithm_folder_name}")
-    print(f"Citations: {citations}")

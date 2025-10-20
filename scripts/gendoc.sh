@@ -4,7 +4,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PKG_ROOT="$("$SCRIPT_DIR"/pkg_path.sh)"
 PROJ_ROOT="$(cd "$PKG_ROOT/../.." && pwd)"
 
-SCHEMA_FILE="${PROJ_ROOT}/tests/test_config/validate_schema.yaml"
+SCHEMA_FILE="${PKG_ROOT}/schema.yaml"
 DOCS_DIR="${PROJ_ROOT}/docs/developer"
 # DOCS_OUTPUT = "${DOCS_DIR}/schema_docs.md"
 

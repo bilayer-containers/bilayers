@@ -494,24 +494,86 @@ If set to "Default Output Folder", measurements will be saved in [DefaultOutputF
 
         os.makedirs(temp_input_dir, exist_ok=True)
         os.makedirs(temp_output_dir, exist_ok=True)
+
+        # =============================================================
+        # Collect all input/output folder mounts dynamically 
+        # Note: Don't keep inputs and outputs in the same mount to avoid conflicts
+        # =============================================================
+        mounts = []
+        input_dirs = []
+        output_dirs = []
+
+        # ---- Handle INPUTS ----
+        {% set safe_inputs = inputs | tojson | replace('true', 'True') | replace('false', 'False') | replace('null', 'None') %}
+        for key, inp in {{ safe_inputs }}.items():
+            folder = inp.get("folder_name")
+            cli_tag = inp.get("cli_tag")
+            if folder:
+                # Make a host-side path for this input
+                host_subdir = os.path.join(temp_dir, "input", os.path.basename(folder.strip("/")))
+                os.makedirs(host_subdir, exist_ok=True)
+                mounts.append(("-v", f"{host_subdir}:{folder}"))
+                input_dirs.append((cli_tag, folder))
+            else:
+                # Default fallback for missing folder_name
+                folder = "/bilayers/input_images"
+                host_subdir = os.path.join(temp_dir, "input", "input_images")
+                os.makedirs(host_subdir, exist_ok=True)
+                mounts.append(("-v", f"{host_subdir}:{folder}"))
+                input_dirs.append((cli_tag, folder))
+
+        # ---- Handle OUTPUTS ----
+        {% set safe_outputs = outputs | tojson | replace('true', 'True') | replace('false', 'False') | replace('null', 'None') %}
+        for key, out in {{ safe_outputs }}.items():
+            folder = out.get("folder_name")
+            cli_tag = out.get("cli_tag")
+            if folder:
+                host_subdir = os.path.join(temp_dir, "output", os.path.basename(folder.strip("/")))
+                os.makedirs(host_subdir, exist_ok=True)
+                mounts.append(("-v", f"{host_subdir}:{folder}"))
+                output_dirs.append((cli_tag, folder))
+            else:
+                folder = "/bilayers/output"
+                host_subdir = os.path.join(temp_dir, "output", "output")
+                os.makedirs(host_subdir, exist_ok=True)
+                mounts.append(("-v", f"{host_subdir}:{folder}"))
+                output_dirs.append((cli_tag, folder))
+
+        # ---- Also include global output_dir_set parameter if any ----
+        {% set safe_params = parameters | tojson | replace('true', 'True') | replace('false', 'False') | replace('null', 'None') %}
+        for key, param in {{ safe_params }}.items():
+            if param.get("output_dir_set"):
+                cli_tag = param.get("cli_tag")
+                val = getattr(self, param.get("name")).value if hasattr(self, param.get("name")) else param.get("default")
+                if val:
+                    host_subdir = os.path.join(temp_dir, "output", os.path.basename(val.strip("/")))
+                    os.makedirs(host_subdir, exist_ok=True)
+                    mounts.append(("-v", f"{host_subdir}:{val}"))
+                    output_dirs.append((cli_tag, val))
         
         try:
-            # Save input images (flat, CellProfiler-style)
+            # ============================================================
+            # Save input images inside the correct mounted input subfolder
+            # ============================================================
             {% for key, input_conf in inputs.items() %}
             {% if input_conf.get('type') == 'image' %}
             {{ input_conf.get('name') }}_name = self.{{ input_conf.get('name') }}.value
             image = workspace.image_set.get_image({{ input_conf.get('name') }}_name)
             {{ input_conf.get('name') }}_data = image.pixel_data
 
+            # Determine the correct subfolder (matches the Docker mount)
+            folder_name = {{ (input_conf.get('folder_name') or '/bilayers/input_images') | tojson }}
+            host_input_subdir = os.path.join(temp_input_dir, os.path.basename(folder_name.strip("/")))
+            os.makedirs(host_input_subdir, exist_ok=True)
+
             input_patterns = {{ input_conf.get('unique_string', [input_conf.get('name')]) | tojson }}
             saved = False
 
             for recognizer in input_patterns:
-                # Skip meaningless patterns like "*" or ""
                 if recognizer.strip() in ["*", "", None]:
                     continue
                 safe_name = re.sub(r'[^A-Za-z0-9._-]', '_', recognizer)
-                input_image_path = os.path.join(temp_input_dir, f"{safe_name}.tif")
+                input_image_path = os.path.join(host_input_subdir, f"{safe_name}.tif")
                 skimage.io.imsave(input_image_path, {{ input_conf.get('name') }}_data)
                 LOGGER.info(f"Saved input image to: {input_image_path}")
                 saved = True
@@ -520,26 +582,47 @@ If set to "Default Output Folder", measurements will be saved in [DefaultOutputF
             if not saved:
                 # fallback: use sanitized logical name
                 safe_name = re.sub(r'[^A-Za-z0-9._-]', '_', {{ input_conf.get('name') }}_name)
-                input_image_path = os.path.join(temp_input_dir, f"{safe_name}.tif")
+                input_image_path = os.path.join(host_input_subdir, f"{safe_name}.tif")
                 skimage.io.imsave(input_image_path, {{ input_conf.get('name') }}_data)
                 LOGGER.info(f"Saved input image (fallback) to: {input_image_path}")
             {% endif %}
             {% endfor %}
 
+            # Deduplicate volume mounts by target container path
+            unique_mounts = []
+            seen_targets = set()
+
+            for flag, mapping in mounts:
+                try:
+                    target = mapping.split(":")[1]  # everything after the colon
+                except IndexError:
+                    target = mapping  # fallback, should never happen
+                if target not in seen_targets:
+                    seen_targets.add(target)
+                    unique_mounts.append((flag, mapping))
+                else:
+                    LOGGER.debug(f"Skipping duplicate mount for target: {target}")
+
+            mounts = unique_mounts
+            LOGGER.info(f"Final unique mounts: {[m[1] for m in mounts]}")
+
             # Construct and execute Docker command
-            cmd = [docker_path, "run", "--rm", "-v", f"{temp_dir}:/data", self.docker_image.value]
-            
+            cmd = [docker_path, "run", "--rm"]
+
+            for flag, mapping in mounts:
+                cmd.extend([flag, mapping])
+
+            cmd.append(self.docker_image.value)
+           
             {% set cli_tokens = exec_function.get('cli_command').split(' ') %}
             {% for token in cli_tokens %}
             cmd.append("{{ token }}")
             {% endfor %}
             
             # Add input and parameter arguments
-            {% for key, input_conf in inputs.items() %}
-            {% if input_conf.get('cli_tag') %}
-            cmd.extend(["{{ input_conf.get('cli_tag') }}", "/data/input"])
-            {% endif %}
-            {% endfor %}
+            for cli_tag, container_path in input_dirs:
+                if cli_tag and container_path:
+                    cmd.extend([cli_tag, container_path])
             
             {% for key, param in parameters.items() %}
             {% if param.get('cli_tag') %}
@@ -598,8 +681,8 @@ If set to "Default Output Folder", measurements will be saved in [DefaultOutputF
                         if recognizer.strip() in ["*", "", None]:
                             pattern = os.path.join(temp_output_dir, f"*.{fmt}")
                         else:
-                            pattern = os.path.join(temp_output_dir, f"*{recognizer}*.{fmt}")
-                        matched_files.extend(glob.glob(pattern))
+                            pattern = os.path.join(temp_output_dir, "**", f"*{recognizer}*.{fmt}") # Recursive search
+                        matched_files.extend(glob.glob(pattern, recursive=True))
 
                 if not matched_files:
                     LOGGER.warning(f"No matching output found for {output_name}")

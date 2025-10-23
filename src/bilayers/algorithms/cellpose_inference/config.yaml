@@ -84,7 +84,7 @@ outputs:
     optional: True
     format: 
       - png
-    folder_name: # depends on --save_dir
+    folder_name: "/bilayers/output_images"
     file_count: "multiple"
     unique_string:
       - "_cp_masks"
@@ -110,7 +110,7 @@ outputs:
     format: 
       - tiff
       - ometiff
-    folder_name: # discuss - it depends on --save_dir
+    folder_name: "/bilayers/output_images"
     file_count: "multiple"
     unique_string:
       - "_cp_masks"
@@ -130,7 +130,7 @@ outputs:
     optional: True
     format: 
       - npy
-    folder_name: "/bilayers/input_images" # for cellpose, it would be same as input_images
+    folder_name: "/bilayers/output_images" # for cellpose, it would be same as input_images
     file_count: "single"
     unique_string:
       - "_seg"
@@ -152,7 +152,7 @@ outputs:
     format: 
       - tiff
       - ometiff
-    folder_name: # it depends on what user inputs
+    folder_name: "/bilayers/output_images"
     file_count: "multiple"
     unique_string:
       - "_flows_cp_masks"
@@ -178,7 +178,7 @@ outputs:
     format: 
       - tiff
       - ometiff
-    folder_name: # depends on what user inputs at --save_dir
+    folder_name: "/bilayers/output_images"
     file_count: "multiple"
     unique_string: 
       - "_outlines_cp_masks"
@@ -198,7 +198,7 @@ outputs:
     optional: True
     format: 
       - txt
-    folder_name: # depends on what user inputs at --save_dir
+    folder_name: "/bilayers/output_images"
     file_count: "single"
     unique_string:
       - "_cp_outlines"
@@ -500,7 +500,7 @@ parameters:
     label: "Save Directory"
     description: "directory to save output files"
     output_dir_set: True
-    default: "/bilayers/input_images"
+    default: "/bilayers/output_images"
     cli_tag: "--savedir"
     optional: True
     section_id: "output-args"

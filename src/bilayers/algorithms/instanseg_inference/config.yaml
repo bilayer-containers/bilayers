@@ -40,7 +40,7 @@ inputs:
       - png
       - jpg
       - jpeg
-    folder_name: "input_images"
+    folder_name: "/bilayers/input_images"
     file_count: multiple
     unique_string:
       - "*"
@@ -68,7 +68,7 @@ outputs:
     format: 
       - tiff
       - ometiff
-    folder_name: "/bilayers/input_images"
+    folder_name: "/bilayers/output_images"
     file_count: multiple
     unique_string:
       - "*"

@@ -43,6 +43,8 @@ inputs:
       - jpeg
     folder_name: "/bilayers/input_images"
     file_count: "multiple"
+    unique_string:
+      - "*"
     section_id: "inputs"
     mode: "beginner"
     depth: True
@@ -61,6 +63,8 @@ inputs:
       - unix
     folder_name: "/bilayers/models"
     file_count: "single"
+    unique_string:
+      - "*"
     section_id: "inputs"
     mode: "advanced"
 

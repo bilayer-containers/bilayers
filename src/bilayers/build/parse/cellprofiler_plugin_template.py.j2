@@ -503,10 +503,26 @@ If set to "Default Output Folder", measurements will be saved in [DefaultOutputF
             image = workspace.image_set.get_image({{ input_conf.get('name') }}_name)
             {{ input_conf.get('name') }}_data = image.pixel_data
 
-            safe_name = re.sub(r'[^A-Za-z0-9._-]', '_', {{ input_conf.get('name') }}_name)
-            input_image_path = os.path.join(temp_input_dir, f"{safe_name}.tif")
-            skimage.io.imsave(input_image_path, {{ input_conf.get('name') }}_data)
-            LOGGER.info(f"Saved input image to: {input_image_path}")
+            input_patterns = {{ input_conf.get('unique_string', [input_conf.get('name')]) | tojson }}
+            saved = False
+
+            for recognizer in input_patterns:
+                # Skip meaningless patterns like "*" or ""
+                if recognizer.strip() in ["*", "", None]:
+                    continue
+                safe_name = re.sub(r'[^A-Za-z0-9._-]', '_', recognizer)
+                input_image_path = os.path.join(temp_input_dir, f"{safe_name}.tif")
+                skimage.io.imsave(input_image_path, {{ input_conf.get('name') }}_data)
+                LOGGER.info(f"Saved input image to: {input_image_path}")
+                saved = True
+                break
+
+            if not saved:
+                # fallback: use sanitized logical name
+                safe_name = re.sub(r'[^A-Za-z0-9._-]', '_', {{ input_conf.get('name') }}_name)
+                input_image_path = os.path.join(temp_input_dir, f"{safe_name}.tif")
+                skimage.io.imsave(input_image_path, {{ input_conf.get('name') }}_data)
+                LOGGER.info(f"Saved input image (fallback) to: {input_image_path}")
             {% endif %}
             {% endfor %}
 
@@ -575,9 +591,14 @@ If set to "Default Output Folder", measurements will be saved in [DefaultOutputF
                 output_formats = {{ output_conf.get('format', ['tif']) | tojson }}
                 matched_files = []
 
+                # unique_string : * --> act as wildcard for all formats
                 for fmt in output_formats:
                     for recognizer in search_patterns:
-                        pattern = os.path.join(temp_output_dir, f"*{recognizer}*.{fmt}")
+                        # Skip meaningless wildcard-only patterns
+                        if recognizer.strip() in ["*", "", None]:
+                            pattern = os.path.join(temp_output_dir, f"*.{fmt}")
+                        else:
+                            pattern = os.path.join(temp_output_dir, f"*{recognizer}*.{fmt}")
                         matched_files.extend(glob.glob(pattern))
 
                 if not matched_files:

@@ -42,6 +42,7 @@ classes:
       - default
       - optional
       - format
+      - unique_string
       - folder_name
       - file_count
       - section_id
@@ -80,8 +81,6 @@ classes:
     aliases: ["outputs"]
     description: "Outputs of the algorithm to the next step in the workflow"
     is_a: AbstractWorkflowDetails
-    slots:
-      - unique_string
     rules: 
       - description: "Extra flags needed iff type is image"
         preconditions:
@@ -354,7 +353,7 @@ slots:
     range: string
     required: false
   unique_string:
-    description: "Unique substring to recognize and validate output files belonging to this output"
+    description: "Unique substring(s) used to recognize and validate files belonging to this input or output"
     range: string
     required: true
     multivalued: true

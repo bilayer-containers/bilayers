@@ -39,6 +39,7 @@ class InputOutputBase(TypedDict, total=False):
     cli_order: Optional[int]
     default: str
     optional: bool
+    unique_string: list[str]
     format: list[str]
     folder_name: str
     file_count: str
@@ -53,8 +54,7 @@ class Input(InputOutputBase):
     pass
 
 class Output(InputOutputBase):
-    unique_string: list[str]
-
+    pass
 class Parameter(TypedDict, total=False):
     name: str
     type: str

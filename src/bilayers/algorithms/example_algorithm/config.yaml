@@ -116,6 +116,8 @@ inputs:
       - bat
     folder_name: "/path/to/executable" # folder_path or file_path if single file
     file_count: ("single" | "multiple") # if it accepts single file or multiple files. If multiple, then it will be a folder
+    unique_string:
+      - "*" # a unique string to identify and validate files belonging to this input
     section_id: "inputs"
     mode: ("beginner" | "advanced") # mode just for clean UI, to show objects in segregated sections
     

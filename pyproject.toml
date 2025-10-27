@@ -28,7 +28,7 @@ dependencies = [
 [project.optional-dependencies]
 docs = ["mystmd>=1.3.17,<2"]
 nox = ["nox>=2024.4.15,<2025"]
-linkml = ["linkml"]
+linkml = ["linkml", "check-jsonschema"]
 test = ["pytest"]
 lint = ["ruff"]
 dev = [

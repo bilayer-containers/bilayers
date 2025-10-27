@@ -71,6 +71,21 @@ def generate_cytomine(
     exec_function: ExecFunction,
     citations: dict[str, Citations],
 ):
+    """
+    Convert from the parsed contents of a Bilayers-schema-compliant config.yaml to a cytomine-schema-compliant json file.
+
+    The cytomine schema is defined here:
+      documentation: https://doc.uliege.cytomine.org/dev-guide/algorithms/task/descriptor-reference#schema
+      github: https://github.com/cytomine/cytomine/blob/main/app-engine/src/main/resources/schemas/tasks/task.v0.json
+
+    The results can be validated with:
+      check-jsonschema --schemafile interfaces/cytomine/task.v0.json interfaces/generated_folders/<algo_name>/cytomine.json
+
+    NOTE:
+      The jsonschema cli comes with the linkml optional dependency, however running
+          jsonschema -i interfaces/generated_folders/classical_segmentation/task.v0.json interfaces/cytomine/task.v0.json
+      does not work, and produces the warning that the jsonschema CLI is dperecated, and advises using check-jsonschema instead.
+    """
     # Create the Cytomine task schema
     task_schema = {
         "$schema": "https://json-schema.org/draft/2019-09/schema",

@@ -225,21 +225,33 @@ def generate_cli_command(
     print("Jagged Positive Array:", jagged_positive_array)
     print("Jagged Negative Array:", jagged_negative_array)
 
+    # Collect arguments separately from base command
+    arguments = []
+
     # Append Positive ordered elements
     for index in range(1, len(jagged_positive_array)):
         if jagged_positive_array[index]:
-            cli_command.extend(jagged_positive_array[index])
+            arguments.extend(jagged_positive_array[index])
 
     # Append elements with cli_order == 0
     if jagged_positive_array and jagged_positive_array[0]:
-        cli_command.extend(jagged_positive_array[0])
+        arguments.extend(jagged_positive_array[0])
 
     # Append Negative ordered elements
     for index in range(len(jagged_negative_array) - 1, 0, -1):
         if jagged_negative_array[index]:
-            cli_command.extend(jagged_negative_array[index])
+            arguments.extend(jagged_negative_array[index])
 
-    return " ".join(cli_command), folder_name, output_folder_name
+    # Build final command: base command + quoted arguments
+    base_command = cli_command[0]
+    if arguments:
+        # Quote the arguments string for proper shell parsing
+        args_string = " ".join(arguments)
+        full_command = f'{base_command} "{args_string}"'
+    else:
+        full_command = base_command
+
+    return full_command, folder_name, output_folder_name
 
 # Dynamically define on_submit with the exact parameter arguments
 def on_submit(
@@ -317,7 +329,31 @@ def on_submit(
 
     # Execute the CLI command
     try:
-        result = subprocess.run(cli_command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        # Use Popen to stream output in real-time
+        process = subprocess.Popen(
+            cli_command,
+            shell=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            universal_newlines=True,
+            bufsize=1
+        )
+
+        # Capture output line by line and print to console
+        stdout_log = []
+        for line in process.stdout:
+            print(line, end='')  # Print to console in real-time
+            stdout_log.append(line)
+
+        # Wait for process to complete
+        return_code = process.wait()
+
+        if return_code != 0:
+            error_message = "Please take a screenshot of this error and raise an issue at the Bilayers repository on GitHub.\n"
+            error_message += f"Command failed with return code {return_code}\n\n"
+            error_message += "".join(stdout_log)
+            raise gr.Error(error_message, duration = None)
+
         print("Command executed successfully")
 
         # Check if output_folder_name is not None and is a directory
@@ -329,11 +365,12 @@ def on_submit(
             print("Folder does not exist or output_folder_name is None")
             output_files = []
 
-        return output_files
+        # Return both output files and stdout log
+        return output_files, "".join(stdout_log)
 
-    except subprocess.CalledProcessError as e:
-        error_message = "Please take a screenshot of this error and raise an issue at the Bilayers repository on GitHub."
-        error_message += f"Command failed with error: {e.stderr.decode()}\n\n"
+    except Exception as e:
+        error_message = "Please take a screenshot of this error and raise an issue at the Bilayers repository on GitHub.\n"
+        error_message += f"Command failed with error: {str(e)}\n\n"
         raise gr.Error(error_message, duration = None)
         
 {% if inputs is not none and inputs | length > 0 -%}
@@ -418,11 +455,12 @@ all_parameters: list[Any] = [
 ]
 
 download_results_from_here = gr.Files(label = "Download Output", file_count = "multiple")
+command_output_log = gr.Textbox(label = "Command Output Log", lines=20, max_lines=50, autoscroll=True)
 
 app = gr.Interface(
-    fn=on_submit, 
+    fn=on_submit,
     inputs=all_parameters,
-    outputs=download_results_from_here, 
+    outputs=[download_results_from_here, command_output_log],
     title="{{ title }}",
     description="""{{ description }}"""
 )

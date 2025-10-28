@@ -41,7 +41,7 @@ done
 
 # Defaults if none passed
 if [[ ${#ALGORITHM_NAMES[@]} -eq 0 ]]; then
-  ALGORITHM_NAMES=("classical_segmentation" "cellpose_inference" "instanseg_inference" "gaussian_smoothing")
+  ALGORITHM_NAMES=("classical_segmentation" "cellpose_inference" "instanseg_inference" "gaussian_smoothing" "fiji_headless")
 fi
 
 if [[ ${#INTERFACE_NAMES[@]} -eq 0 ]]; then

@@ -1,0 +1,116 @@
+citations:
+  - name: "Fiji"
+    doi: "10.1038/nmeth.2019"
+    license: "GPL-2.0"
+    description: "Fiji headless macro script run under Bilayers framework"
+
+docker_image:
+  org: ""
+  name: ""
+  tag: ""
+  platform: "linux/amd64"
+
+algorithm_folder_name: "fiji_headless"
+
+exec_function:
+  name: "generate_cli_command"
+  cli_command: "xvfb-run -a /opt/imagej/fiji -batch /app/threshold.ijm"
+  hidden_args:
+
+inputs:
+  - name: input_images
+    type: image
+    label: "Drag and drop all images to be analyzed"
+    subtype:
+      - grayscale
+    description: "Upload all images to be analyzed (single channel grayscale)"
+    cli_tag: "folder="
+    cli_order: 1
+    default: "directory"
+    optional: False
+    format:
+      - tif
+      - tiff
+      - png
+      - jpg
+      - jpeg
+    folder_name: "/bilayers/input_images"
+    file_count: "multiple"
+    section_id: "inputs"
+    mode: "beginner"
+    depth: False
+    timepoints: False
+    tiled: False
+    pyramidal: False
+
+outputs:
+  - name: segmented_images
+    type: image
+    subtype:
+      - binary
+    label: "Segmented Images"
+    description: "Thresholded binary masks"
+    cli_tag: "None"
+    cli_order: 0
+    default: "directory"
+    optional: False
+    format:
+      - tif
+    folder_name: "/bilayers/output_images"
+    file_count: "multiple"
+    section_id: "outputs"
+    mode: "beginner"
+    depth: False
+    timepoints: False
+    tiled: False
+    pyramidal: False
+
+parameters:
+  - name: threshold_mode
+    type: dropdown
+    label: "Threshold Mode"
+    description: "Select threshold mode: above (pixels above threshold), below (pixels below threshold), or between (pixels between min and max threshold)"
+    default: "above"
+    cli_tag: "mode="
+    cli_order: 3
+    optional: False
+    section_id: "segmentation-params"
+    mode: "beginner"
+    options:
+      - label: "Above Threshold"
+        value: "above"
+      - label: "Below Threshold"
+        value: "below"
+      - label: "Between Thresholds"
+        value: "between"
+  - name: threshold
+    type: integer
+    label: "Min Threshold Value"
+    description: "Minimum threshold value for segmentation (0-255)"
+    default: 128
+    cli_tag: "min_threshold="
+    cli_order: 4
+    optional: False
+    section_id: "segmentation-params"
+    mode: "beginner"
+  - name: max_threshold
+    type: integer
+    label: "Max Threshold Value"
+    description: "Maximum threshold value for segmentation (0-255). Only used in 'between' mode."
+    default: 255
+    cli_tag: "max_threshold="
+    cli_order: 5
+    optional: True
+    section_id: "segmentation-params"
+    mode: "beginner"
+  - name: save_dir
+    type: textbox
+    label: "Save Directory"
+    description: "directory to save output files"
+    output_dir_set: True
+    default: "/bilayers/output_images"
+    cli_tag: "output="
+    cli_order: 2
+    optional: True
+    section_id: "output-args"
+    mode: "advanced"

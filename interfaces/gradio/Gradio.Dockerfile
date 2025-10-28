@@ -10,11 +10,11 @@ ARG FOLDER_NAME
 # Note:
 # - Gradio depends on pydantic. However, as of 04/03/2025, pydantic version 2.11 introduces a bug that breaks the Gradio app.
 # - As a workaround, we pin pydantic to version 2.10.6.
-# - If you encounter further issues, consider unpinning pydantic or trying another version.
+# - huggingface-hub > 0.26 removed HfFolder, causing import errors. Pin to 0.26.2.
 # For more details, refer to:
 #   - https://github.com/gradio-app/gradio/issues/10662
 #   - https://github.com/gradio-app/gradio/pull/10908
-RUN python -m pip install --no-cache-dir pyyaml gradio gradio_client huggingface-hub pydantic==2.10.6
+RUN python -m pip install --user --no-cache-dir pyyaml gradio gradio_client huggingface-hub==0.26.2 pydantic==2.10.6
 
 # Set the working directory within the container
 WORKDIR /bilayers

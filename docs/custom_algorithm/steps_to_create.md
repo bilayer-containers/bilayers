@@ -6,6 +6,7 @@ authors:
       - Broad Institute of MIT and Harvard
 ---
 
+
 ## 1. Fork bilayers repository
 Go to [Bilayers GitHub Repo](https://github.com/bilayer-containers/bilayers/tree/main)
 - Click the Fork button on top-right corner
@@ -17,6 +18,20 @@ cd bilayers
 - Set the original repository as your upstream
 ```{code} bash
 git remote add upstream https://github.com/bilayer-containers/bilayers.git
+```
+
+### Install Pixi and start the dev environment
+
+- Install Pixi (if not already installed). Example using pip:
+```{code} bash
+curl -fsSL https://pixi.sh/install.sh | sh
+# wget if you don't have curl
+wget -qO- https://pixi.sh/install.sh | sh
+```
+
+- Start the development shell:
+```{code} bash
+pixi shell -e dev
 ```
 
 ## 2. Add Your Algorithm Folder

@@ -67,3 +67,6 @@ claude.md
 opencode.json
 opencode.jsonc
 .opencode/
+
+# Introspection outputs
+.introspection/

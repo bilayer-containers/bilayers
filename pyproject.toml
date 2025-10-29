@@ -51,6 +51,9 @@ bilayers_cli = "bilayers.cli:cli"
 where = ["src"]
 include = ["bilayers*"]
 
+[tool.setuptools.package-data]
+bilayers = ["schema.yaml"]
+
 [tool.pixi.project]
 channels = ["conda-forge"]
 platforms = ["win-64", "linux-64", "osx-64", "osx-arm64"]

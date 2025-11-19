@@ -17,7 +17,7 @@ classes:
     class_uri: linkml:Any
 
   SpecContainer:
-    description: "SpecContianer class which holds all the high_level keywords from config.yaml file of specific algorithm"
+    description: "SpecContainer class which holds all the high_level keywords from config.yaml file of specific algorithm"
     slots: 
     - inputs
     - outputs
@@ -42,6 +42,7 @@ classes:
       - default
       - optional
       - format
+      - unique_string
       - folder_name
       - file_count
       - section_id
@@ -351,6 +352,11 @@ slots:
     description: "Folder name of the object"
     range: string
     required: false
+  unique_string:
+    description: "Unique substring(s) used to recognize and validate files belonging to this input or output"
+    range: string
+    required: true
+    multivalued: true
   file_count:
     description: "Type of Number of files"
     range: FileTypeEnum

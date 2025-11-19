@@ -1,0 +1,910 @@
+####################################
+# Auto-Generated CellProfiler Plugin
+# Generated from Bilayers Spec File
+####################################
+
+{# ======================================= #}
+{#  Jinja2 Template for a CellProfiler Plugin  #}
+{# ======================================= #}
+
+#################################
+#
+# Imports from useful Python libraries
+#
+##################################
+
+import os
+import sys
+import uuid
+import shutil
+import logging
+import subprocess
+import numpy
+import skimage
+import glob
+import tempfile
+import re
+
+#################################
+#
+# Imports from CellProfiler
+#
+##################################
+
+{% set import_dict = {
+    "module.image_segmentation": ["ImageSegmentation", "ObjectProcessing"],
+    "module": ["ImageProcessing", "Module"],
+    "preferences": "get_default_output_directory",
+    "object": "Objects",
+    "setting": "Binary",
+    "setting.subscriber": ["ImageSubscriber", "LabelSubscriber"],
+    "setting.text": ["ImageName", "Integer", "Float", "Text", "Directory", "Filename", "LabelName"],
+    "setting.choice": "Choice",
+    "image": "Image",
+} %}
+
+{% for key, value in import_dict.items() %}
+{% if value is iterable and not value is string %}
+from cellprofiler_core.{{ key }} import {{ value|join(", ") }}
+{% else %}
+from cellprofiler_core.{{ key }} import {{ value }}
+{% endif %}
+{% endfor %}
+
+LOGGER = logging.getLogger(__name__)
+
+__doc__ = f"""\
+{{ algorithm_folder_name }}
+{{ "=" * algorithm_folder_name|length }}
+
+**{{ algorithm_folder_name }}** is an auto-generated CellProfiler module based on Bilayers specification.
+
+{% if exec_function.get('description') %}
+{{ exec_function.get('description') }}
+{% else %}
+This module processes {{ inputs.keys() | join(', ') }} and produces {{ outputs.keys() | join(', ') }}.
+{% endif %}
+
+This module uses containers (Docker or Podman) to run the underlying algorithm, ensuring reproducible results 
+across different systems. Make sure your chosen container runtime (Docker Desktop or Podman) is running before using this module.
+
+|
+
+============ ============ ===============
+Supports 2D? Supports 3D? Respects masks?
+============ ============ ===============
+{% if computed_category in ["Image Segmentation", "Image Processing"] %}YES{% else %}NO{% endif %}          {% if computed_category in ["Image Segmentation", "Object Processing"] %}YES{% else %}NO{% endif %}          NO
+============ ============ ===============
+
+What do I need as input?
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+{% for key, input_conf in inputs.items() %}
+- **{{ input_conf.get('label') }}**: {{ input_conf.get('description') }}
+{% endfor %}
+
+What do I get as output?
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+{% for key, output_conf in outputs.items() %}
+- **{{ output_conf.get('label') }}**: {{ output_conf.get('description') }}
+{% endfor %}
+
+{% if computed_category == "Measurement" %}
+Measurements made by this module
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+{% for key, output_conf in outputs.items() %}
+{% if output_conf.get('type') == 'measurement' %}
+**{{ algorithm_folder_name }}**:
+
+- *{{ output_conf.get('name') }}*: {{ output_conf.get('description') }}
+{% endif %}
+{% endfor %}
+{% endif %}
+
+Technical notes
+^^^^^^^^^^^^^^^
+
+This module runs the {{ docker_image.get('name') }} algorithm in a container (Docker or Podman).
+The container image used is: {{ docker_image.get('org') }}/{{ docker_image.get('name') }}:{{ docker_image.get('tag') }}
+
+{% if citations %}
+References
+^^^^^^^^^^
+
+{% for citation in citations.values() %}
+- {{ citation.name }}: {{ citation.description }}
+  DOI: {{ citation.doi }}
+  License: {{ citation.license }}
+{% endfor %}
+{% endif %}
+"""
+
+{% set category_to_class = {
+    "Image Processing": "ImageProcessing",
+    "Image Segmentation": "ImageSegmentation", 
+    "Object Processing": "ObjectProcessing",
+    "Measurement": "Module",
+    "Decoder": "Module",
+    "Custom": "Module"
+} %}
+
+class {{ algorithm_folder_name }}({{ category_to_class.get(computed_category, "Module") }}):
+    #
+    # The module starts by declaring the name that's used for display,
+    # the category under which it is stored and the variable revision
+    # number which can be used to provide backwards compatibility if
+    # you add user-interface functionality later.
+    #
+    {% if computed_category == "Image Segmentation" %}
+    category = "Object Processing"
+    {% else %}
+    category = "{{ computed_category }}"
+    {% endif %}
+    
+    module_name = "{{ algorithm_folder_name }}"
+
+    variable_revision_number = 1
+
+    #
+    # Citation - Please cite the following when using this module
+    #
+    {% if citations %}
+    doi = {
+        {% for citation in citations.values() %}
+        "Please cite {{ citation.name }} when using this module": "{{ citation.doi }}",
+        {% endfor %}
+    }
+    {% endif %}
+
+    #
+    # "create_settings" is where you declare the user interface elements
+    # (the "settings") which the user will use to customize your module.
+    #
+    def create_settings(self):
+        {% set type_mapping = {
+            "image": "ImageName",
+            "measurement": "Filename",
+            "array": "Filename",
+            "executable": "Filename",
+            "file": "Filename",
+            "radio": "Choice",
+            "dropdown": "Choice",
+            "checkbox": "Binary",
+            "integer": "Integer",
+            "float": "Float",
+            "textbox": "Text",
+        } %}
+        {% set default_type = "Text" %} {# Fallback type #}
+
+        # Create input settings for all modules
+        {% for key, input_conf in inputs.items() %}
+        {% if input_conf.get('type') == 'image' %}
+        {% if input_conf.get('subtype') and 'labeled' in input_conf.get('subtype') %}
+        self.{{ input_conf.get('name') }} = LabelSubscriber(
+            "{{ input_conf.get('label') }}",
+            doc="""\
+{{ input_conf.get('description') }}
+"""
+        )
+        {% else %}
+        self.{{ input_conf.get('name') }} = ImageSubscriber(
+            "{{ input_conf.get('label') }}",
+            doc="""\
+{{ input_conf.get('description') }}
+"""
+        )
+        {% endif %}
+        {% else %}
+        self.{{ input_conf.get('name') }} = {{ type_mapping.get(input_conf.get('type'), default_type) }}(
+            text="{{ input_conf.get('label') }}",
+            {% if input_conf.get('default') is not none %}
+            value="{{ input_conf.get('default') }}",
+            {% endif %}
+            doc="""\
+{{ input_conf.get('description') }}
+"""
+        )
+        {% endif %}
+        {% endfor %}
+
+        # Create output settings for all modules
+        {% for key, output_conf in outputs.items() %}
+        {% if output_conf.get('type') == 'image' %}
+        {% if output_conf.get('subtype') and 'labeled' in output_conf.get('subtype') %}
+        self.{{ output_conf.get('name') }} = LabelName(
+            "{{ output_conf.get('label') }}",
+            "{{ output_conf.get('name', 'Output') }}",
+            doc="""\
+{{ output_conf.get('description') }}
+"""
+        )
+        {% else %}
+        self.{{ output_conf.get('name') }} = ImageName(
+            "{{ output_conf.get('label') }}",
+            "{{ output_conf.get('name', 'Output') }}",
+            doc="""\
+{{ output_conf.get('description') }}
+"""
+        )
+        {% endif %}
+        {% endif %}
+        {% endfor %}
+
+        #
+        # Container Runner Selection - Choose how to execute the algorithm
+        #
+        self.execution_method = Choice(
+            text="Execution method",
+            {# Add Python option back when implemented #}
+            choices=["Docker", "Podman"],
+            value="Docker",
+            doc="""\
+Choose how to execute the algorithm:
+- Docker: Run the algorithm in a Docker container (recommended for reproducibility)
+- Podman: Run the algorithm in a Podman container (Docker alternative)
+**Note**
+- Python: "Future versions of this plugin may allow directly running in Python via a shared Python environment 
+    - if so, those developers will add Python as an option here. If not added, only container-based run is supported."
+"""
+        )
+
+        #
+        # Container Image Selection - Works with both Docker and Podman
+        #
+        self.docker_image = Choice(
+            text="Container image",
+            choices=["{{ docker_image.get('org') }}/{{ docker_image.get('name') }}:{{ docker_image.get('tag') }}"],
+            value="{{ docker_image.get('org') }}/{{ docker_image.get('name') }}:{{ docker_image.get('tag') }}",
+            doc="""\
+The container image to use for running this algorithm.
+This works with both Docker and Podman container runtimes.
+Make sure your chosen container runtime is installed and running.
+The image will be automatically downloaded on first use.
+"""
+        )
+        
+        {% for key, parameter in parameters.items() %}
+        #
+        # {{ parameter.get('label') }}
+        #
+        self.{{ parameter.get('name') }} = {{ type_mapping.get(parameter.get('type'), default_type) }}(
+            text="{{ parameter.get('label') }}",
+            {% if parameter.get('type') in ["radio", "dropdown"] %}
+            choices=[
+                {% for option in parameter.get('options') %}
+                "{{ option.value }}",
+                {% endfor %}
+            ],
+            {% endif %}
+            {% if parameter.get('default') is not none %}
+            {% if parameter.get('default') in [True, "True", "true"] %}
+            value=True,
+            {% elif parameter.get('default') in [False, "False", "false"] %}
+            value=False,
+            {% else %}
+            value="{{ parameter.get('default') }}",
+            {% endif %}
+            {% endif %}
+            {% if parameter.get('type') in ["integer", "float"] %}
+            minval=float('-inf'),
+            maxval=float('inf'),
+            {% endif %}
+            doc="""\
+{{ parameter.get('description') }}
+"""
+        )
+        {% endfor %}
+
+        #
+        # Clean up temporary files - Allow user to preserve temp files for debugging
+        #
+        self.clean_temp_files = Binary(
+            text="Clean up temporary files",
+            value=True,
+            doc="""\
+Select "Yes" to automatically delete temporary files after processing (recommended for normal use).
+Select "No" to preserve temporary files for debugging purposes. The path to the temporary directory will be logged for manual inspection.
+"""
+        )
+
+        {% set has_measurements = false %}
+        {% for output_conf in outputs.values() %}
+            {% if output_conf.get('type') == 'measurement' %}
+                {% set has_measurements = true %}
+            {% endif %}
+        {% endfor %}
+        {% if has_measurements %}
+        self.save_measurements = Binary(
+            text="Save measurement files",
+            value=True,
+            doc="""\
+Select "Yes" to save measurement files to a directory.
+Select "No" to skip saving measurement files."""
+        )
+
+        self.measurement_directory = Directory(
+            text="Output folder for measurements",
+            dir_choices=['Default Output Folder'],
+            value='Default Output Folder',
+            doc="""\
+Directory where measurement files will be saved. A subfolder matching the ImageSet number will be created.
+If set to "Default Output Folder", measurements will be saved in [DefaultOutputFolder]/measurements/[ImageSet_Number]/."""
+        )
+        {% endif %}
+
+    #
+    # The "settings" method tells CellProfiler about the settings you
+    # have in your module. CellProfiler uses the list for saving
+    # and restoring values for your module when it saves or loads a
+    # pipeline file.
+    #
+    def settings(self):
+        settings = []
+        
+        # All module settings - inputs, outputs, docker, and parameters
+        {% for key, input_conf in inputs.items() %}
+        settings.append(self.{{ input_conf.get('name') }})
+        {% endfor %}
+        {% for key, output_conf in outputs.items() %}
+        {% if output_conf.get('type') == 'image' %}
+        settings.append(self.{{ output_conf.get('name') }})
+        {% endif %}
+        {% endfor %}
+        {% set has_measurements = false %}
+        {% for output_conf in outputs.values() %}
+            {% if output_conf.get('type') == 'measurement' %}
+                {% set has_measurements = true %}
+            {% endif %}
+        {% endfor %}
+        {% if has_measurements %}
+        settings.append(self.save_measurements)
+        settings.append(self.measurement_directory)
+        {% endif %}
+        
+        # Docker and parameter settings
+        settings.append(self.execution_method)
+        settings.append(self.docker_image)
+        settings.append(self.clean_temp_files)
+        {% for key, param in parameters.items() %}
+        settings.append(self.{{ param.get('name') }})
+        {% endfor %}
+        
+        return settings
+
+    #
+    # "visible_settings" tells CellProfiler which settings should be
+    # displayed and in what order.
+    #
+    def visible_settings(self):
+        visible = []
+        
+        # All module visible settings - inputs, outputs, docker, and parameters
+        {% for key, input_conf in inputs.items() %}
+        visible.append(self.{{ input_conf.get('name') }})
+        {% endfor %}
+        {% for key, output_conf in outputs.items() %}
+        {% if output_conf.get('type') == 'image' %}
+        visible.append(self.{{ output_conf.get('name') }})
+        {% endif %}
+        {% endfor %}
+        
+        {% set has_measurements = false %}
+        {% for output_conf in outputs.values() %}
+            {% if output_conf.get('type') == 'measurement' %}
+                {% set has_measurements = true %}
+            {% endif %}
+        {% endfor %}
+        {% if has_measurements %}
+        visible.append(self.save_measurements)
+        if self.save_measurements.value:
+            visible.append(self.measurement_directory)
+        {% endif %}
+        
+        visible.append(self.execution_method)
+        visible.append(self.docker_image)
+        visible.append(self.clean_temp_files)
+        {% for key, param in parameters.items() %}
+        {% if key[4:] not in split_parameters.keys()%}
+        visible.append(self.{{ param.get('name') }})
+        {% else %}
+        {% if key[:3]=='set' %}
+        visible.append(self.{{ param.get('name') }})
+        if self.{{ param.get('name') }}.value.lower()=="true":
+            visible.append(self.{{ param.get('name').replace('set','val') }})
+        {% endif %}
+        {% endif %}
+        {% endfor %}
+        
+        return visible
+
+    #
+    # CellProfiler calls "run" on each image set in your pipeline.
+    # This is the core processing function that executes the algorithm.
+    #
+    def run(self, workspace):
+        # Execute algorithm based on selected method
+        execution_method = self.execution_method.value
+
+        if execution_method in ["Docker", "Podman"]:
+            # Container execution path
+            self._run_container_execution(workspace)
+        elif execution_method == "Python":
+            # Python execution path (future feature)
+            raise NotImplementedError("Local Python environment execution is not yet implemented. Please use Docker or Podman execution.")
+        else:
+            raise ValueError(f"Unknown execution method: {execution_method}")
+
+    def _run_container_execution(self, workspace):
+        """Execute the algorithm using Docker or Podman containers."""
+        # Load input data and get names
+        {% set has_image_inputs = inputs.values() | selectattr('type', 'equalto', 'image') | list | length > 0 %}
+        {% if has_image_inputs %}
+        # Load image inputs
+        {% for key, input_conf in inputs.items() %}
+        {% if input_conf.get('type') == 'image' %}
+        {{ input_conf.get('name') }}_name = self.{{ input_conf.get('name') }}.value
+        {% if input_conf.get('subtype') and 'labeled' in input_conf.get('subtype') %}
+        # Labeled image (objects) input: retrieve from object_set
+        objects_{{ input_conf.get('name') }} = workspace.object_set.get_objects({{ input_conf.get('name') }}_name)
+        {{ input_conf.get('name') }}_data = objects_{{ input_conf.get('name') }}.segmented
+        # Derive dimensions from array ndim (2 or 3)
+        dimensions = 3 if {{ input_conf.get('name') }}_data.ndim == 3 else 2
+        {% else %}
+        # Regular image input
+        images = workspace.image_set
+        {{ input_conf.get('name') }} = images.get_image({{ input_conf.get('name') }}_name)
+        {{ input_conf.get('name') }}_data = {{ input_conf.get('name') }}.pixel_data
+        dimensions = {{ input_conf.get('name') }}.dimensions
+        {% endif %}
+        {% endif %}
+        {% endfor %}
+        {% else %}
+        # No image inputs - set default dimensions for any potential outputs
+        dimensions = 2  # Default to 2D
+        {% endif %}
+        
+        # Load non-image inputs
+        {% for key, input_conf in inputs.items() %}
+        {% if input_conf.get('type') in ['measurement', 'array', 'file'] %}
+        {{ input_conf.get('name') }}_path = self.{{ input_conf.get('name') }}.value
+        # Load {{ input_conf.get('name') }} data from file path
+        {% endif %}
+        {% endfor %}
+
+        # Get output names
+        {% for key, output_conf in outputs.items() %}
+        {% if output_conf.get('type') == 'image' %}
+        {{ output_conf.get('name') }}_name = self.{{ output_conf.get('name') }}.value
+        {% endif %}
+        {% endfor %}
+
+        # Set up Docker/Podman's execution environment
+        # Define how to call docker/podman
+        if self.execution_method.value == "Docker":
+            docker_path = "docker" if sys.platform.lower().startswith("win") else "/usr/local/bin/docker"
+        elif self.execution_method.value == "Podman":
+            docker_path = "podman" if sys.platform.lower().startswith("win") else "/opt/podman/bin/podman"
+
+        # Create temporary directory (same as official CP modules)
+        temp_dir = tempfile.mkdtemp(prefix=f"CP_{self.module_name}_")
+        temp_input_dir = os.path.join(temp_dir, "input")
+        temp_output_dir = os.path.join(temp_dir, "output")
+
+        os.makedirs(temp_input_dir, exist_ok=True)
+        os.makedirs(temp_output_dir, exist_ok=True)
+
+        # =============================================================
+        # Collect all input/output folder mounts dynamically 
+        # Note: Don't keep inputs and outputs in the same mount to avoid conflicts
+        # =============================================================
+        mounts = []
+        input_dirs = []
+        output_dirs = []
+
+        # ---- Handle INPUTS ----
+        {% set safe_inputs = inputs | tojson | replace('true', 'True') | replace('false', 'False') | replace('null', 'None') %}
+        for key, inp in {{ safe_inputs }}.items():
+            folder = inp.get("folder_name")
+            cli_tag = inp.get("cli_tag")
+            if folder:
+                # Make a host-side path for this input
+                host_subdir = os.path.join(temp_dir, "input", os.path.basename(folder.strip("/")))
+                os.makedirs(host_subdir, exist_ok=True)
+                mounts.append(("-v", f"{host_subdir}:{folder}"))
+                input_dirs.append((cli_tag, folder))
+            else:
+                # Default fallback for missing folder_name
+                folder = "/bilayers/input_images"
+                host_subdir = os.path.join(temp_dir, "input", "input_images")
+                os.makedirs(host_subdir, exist_ok=True)
+                mounts.append(("-v", f"{host_subdir}:{folder}"))
+                input_dirs.append((cli_tag, folder))
+
+        # ---- Handle OUTPUTS ----
+        {% set safe_outputs = outputs | tojson | replace('true', 'True') | replace('false', 'False') | replace('null', 'None') %}
+        for key, out in {{ safe_outputs }}.items():
+            folder = out.get("folder_name")
+            cli_tag = out.get("cli_tag")
+            if folder:
+                host_subdir = os.path.join(temp_dir, "output", os.path.basename(folder.strip("/")))
+                os.makedirs(host_subdir, exist_ok=True)
+                mounts.append(("-v", f"{host_subdir}:{folder}"))
+                output_dirs.append((cli_tag, folder))
+            else:
+                folder = "/bilayers/output"
+                host_subdir = os.path.join(temp_dir, "output", "output")
+                os.makedirs(host_subdir, exist_ok=True)
+                mounts.append(("-v", f"{host_subdir}:{folder}"))
+                output_dirs.append((cli_tag, folder))
+
+        # ---- Also include global output_dir_set parameter if any ----
+        {% set safe_params = parameters | tojson | replace('true', 'True') | replace('false', 'False') | replace('null', 'None') %}
+        for key, param in {{ safe_params }}.items():
+            if param.get("output_dir_set"):
+                cli_tag = param.get("cli_tag")
+                val = getattr(self, param.get("name")).value if hasattr(self, param.get("name")) else param.get("default")
+                if val:
+                    host_subdir = os.path.join(temp_dir, "output", os.path.basename(val.strip("/")))
+                    os.makedirs(host_subdir, exist_ok=True)
+                    mounts.append(("-v", f"{host_subdir}:{val}"))
+                    output_dirs.append((cli_tag, val))
+        
+        try:
+            # ============================================================
+            # Save input images inside the correct mounted input subfolder
+            # ============================================================
+            {% for key, input_conf in inputs.items() %}
+            {% if input_conf.get('type') == 'image' %}
+            {{ input_conf.get('name') }}_name = self.{{ input_conf.get('name') }}.value
+            image = workspace.image_set.get_image({{ input_conf.get('name') }}_name)
+            {{ input_conf.get('name') }}_data = image.pixel_data
+
+            # Determine the correct subfolder (matches the Docker mount)
+            folder_name = {{ (input_conf.get('folder_name') or '/bilayers/input_images') | tojson }}
+            host_input_subdir = os.path.join(temp_input_dir, os.path.basename(folder_name.strip("/")))
+            os.makedirs(host_input_subdir, exist_ok=True)
+
+            input_patterns = {{ input_conf.get('unique_string', [input_conf.get('name')]) | tojson }}
+            saved = False
+
+            for recognizer in input_patterns:
+                if recognizer.strip() in ["*", "", None]:
+                    continue
+                safe_name = re.sub(r'[^A-Za-z0-9._-]', '_', recognizer)
+                input_image_path = os.path.join(host_input_subdir, f"{safe_name}.tif")
+                skimage.io.imsave(input_image_path, {{ input_conf.get('name') }}_data)
+                LOGGER.info(f"Saved input image to: {input_image_path}")
+                saved = True
+                break
+
+            if not saved:
+                # fallback: use sanitized logical name
+                safe_name = re.sub(r'[^A-Za-z0-9._-]', '_', {{ input_conf.get('name') }}_name)
+                input_image_path = os.path.join(host_input_subdir, f"{safe_name}.tif")
+                skimage.io.imsave(input_image_path, {{ input_conf.get('name') }}_data)
+                LOGGER.info(f"Saved input image (fallback) to: {input_image_path}")
+            {% endif %}
+            {% endfor %}
+
+            # Deduplicate volume mounts by target container path
+            unique_mounts = []
+            seen_targets = set()
+
+            for flag, mapping in mounts:
+                try:
+                    target = mapping.split(":")[1]  # everything after the colon
+                except IndexError:
+                    target = mapping  # fallback, should never happen
+                if target not in seen_targets:
+                    seen_targets.add(target)
+                    unique_mounts.append((flag, mapping))
+                else:
+                    LOGGER.debug(f"Skipping duplicate mount for target: {target}")
+
+            mounts = unique_mounts
+            LOGGER.info(f"Final unique mounts: {[m[1] for m in mounts]}")
+
+            # Construct and execute Docker command
+            cmd = [docker_path, "run", "--rm"]
+
+            for flag, mapping in mounts:
+                cmd.extend([flag, mapping])
+
+            cmd.append(self.docker_image.value)
+           
+            {% set cli_tokens = exec_function.get('cli_command').split(' ') %}
+            {% for token in cli_tokens %}
+            cmd.append("{{ token }}")
+            {% endfor %}
+            
+            # Add input and parameter arguments
+            for cli_tag, container_path in input_dirs:
+                if cli_tag and container_path:
+                    cmd.extend([cli_tag, container_path])
+            
+            {% for key, param in parameters.items() %}
+            {% if param.get('cli_tag') %}
+            {% if param.get('type') == "checkbox" %}
+            {% if param.get('append_value') %}
+            cmd.extend(["{{ param.get('cli_tag') }}", str(self.{{ param.get('name') }}.value)])
+            {% else %}
+            if self.{{ param.get('name') }}.value:
+                cmd.append("{{ param.get('cli_tag') }}")
+            {% endif %}
+            {% else %}
+            {% if key[4:] not in split_parameters.keys()%}
+            cmd.extend(["{{ param.get('cli_tag') }}", str(self.{{ param.get('name') }}.value)])
+            {% else %}
+            {% if key[:3]=='set' %}
+            if self.{{ param.get('name') }}.value.lower() == "true":
+                cmd.extend(["{{ param.get('cli_tag') }}", str(self.{{ param.get('name').replace('set','val') }}.value)])
+            {% endif %}
+            {% endif %}
+            {% endif %}
+            {% endif %}
+            {% endfor %}
+
+
+            LOGGER.info(f"Running Docker command: {' '.join(cmd)}")
+
+            # Execute Docker/Podman container
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=3600)
+            
+            if result.returncode != 0:
+                LOGGER.error(f"Container execution failed: {result.stderr}")
+                raise RuntimeError(f"Container execution failed: {result.stderr}")
+
+            # Load output data
+            try:
+                # ============================================================
+                # Load and register outputs programmatically
+                # ============================================================
+                LOGGER.info("Loading algorithm outputs from container run...")
+
+                {% for key, output_conf in outputs.items() %}
+                # --------------------------
+                # Handle output: {{ key }}
+                # --------------------------
+                output_type = "{{ output_conf.get('type', 'image') }}"
+                output_name = "{{ output_conf.get('name', key) }}"
+                output_subtype = "{{ output_conf.get('subtype', '') | safe }}"
+                search_patterns = {{ output_conf.get('unique_string', ['*']) | tojson }}
+                output_formats = {{ output_conf.get('format', ['tif']) | tojson }}
+                matched_files = []
+
+                # unique_string : * --> act as wildcard for all formats
+                for fmt in output_formats:
+                    for recognizer in search_patterns:
+                        # Skip meaningless wildcard-only patterns
+                        if recognizer.strip() in ["*", "", None]:
+                            pattern = os.path.join(temp_output_dir, f"*.{fmt}")
+                        else:
+                            pattern = os.path.join(temp_output_dir, "**", f"*{recognizer}*.{fmt}") # Recursive search
+                        matched_files.extend(glob.glob(pattern, recursive=True))
+
+                if not matched_files:
+                    LOGGER.warning(f"No matching output found for {output_name}")
+                else:
+                    if output_type == "image":
+                        # Load one or multiple images
+                        if len(matched_files) == 1:
+                            data = skimage.io.imread(matched_files[0])
+                        else:
+                            data = [skimage.io.imread(f) for f in matched_files]
+
+                        # Register as Image or Object
+                        if "labeled" in output_subtype.lower() or output_type == "object":
+                            obj = Objects()
+                            obj.segmented = data
+                            {% set first_image_input = inputs.values() | selectattr('type', 'equalto', 'image') | list %}
+                            {% if first_image_input %}
+                            obj.parent_image = {{ first_image_input[0].get('name') }}.parent_image
+                            {% endif %}
+                            workspace.object_set.add_objects(obj, output_name)
+                        else:
+                            image = Image(data)
+                            {% if first_image_input %}
+                            image.parent_image = {{ first_image_input[0].get('name') }}.parent_image
+                            {% endif %}
+                            workspace.image_set.add(output_name, image)
+                        # FIX: Use setattr and add _data suffix for the display() function
+                        setattr(workspace.display_data, f"{output_name}_data", data)
+
+                    elif output_type == "array":
+                        if len(matched_files) == 1:
+                            data = numpy.load(matched_files[0])
+                        else:
+                            data = [numpy.load(f) for f in matched_files]
+                        # FIX: Use setattr and add _data suffix for the display() function
+                        setattr(workspace.display_data, f"{output_name}_data", data)
+
+                    elif output_type == "measurement":
+                        selected_file = matched_files[0]
+                        if hasattr(self, "save_measurements") and self.save_measurements.value:
+                            default_output_dir = get_default_output_directory()
+                            if hasattr(self, "measurement_directory"):
+                                if self.measurement_directory.dir_choice == "Default Output Folder":
+                                    output_dir = default_output_dir
+                                else:
+                                    output_dir = self.measurement_directory.get_absolute_path(default_output_dir)
+                            else:
+                                output_dir = default_output_dir
+                            measurement_dir = os.path.join(output_dir, "measurements", str(workspace.measurements.image_number))
+                            os.makedirs(measurement_dir, exist_ok=True)
+                            final_path = os.path.join(measurement_dir, os.path.basename(selected_file))
+                            shutil.copy2(selected_file, final_path)
+                            LOGGER.info(f"Saved measurement file for {output_name} at: {final_path}")
+                            # FIX: Use setattr and add _data suffix for the display() function
+                            setattr(workspace.display_data, f"{output_name}_data", final_path)
+                        else:
+                            # FIX: Use setattr and add _data suffix for the display() function
+                            setattr(workspace.display_data, f"{output_name}_data", selected_file)
+                    else:
+                        LOGGER.warning(f"Unknown output type {output_type} for {output_name}")
+
+                {% endfor %}
+
+            except FileNotFoundError as ex:
+                LOGGER.error(f"Algorithm output files not found: {ex}")
+                raise FileNotFoundError(f"I'm sorry, the {{ docker_image.get('name') }} algorithm seems to have crashed and I'm not sure why, since it's running in its own container. Expected output files were not created. Please check the algorithm parameters and try again.")
+            except Exception as ex:
+                LOGGER.error(f"Error loading algorithm outputs: {ex}")
+                raise RuntimeError(f"Failed to load algorithm outputs: {ex}")
+
+        finally:
+            # Clean up temp files (CellProfiler-style)
+            if self.clean_temp_files.value:
+                try:
+                    shutil.rmtree(temp_dir)
+                    LOGGER.info(f"Temporary directory cleaned up: {temp_dir}")
+                except OSError as ex:
+                    LOGGER.warning(f"Unable to delete temp directory {temp_dir}: {ex}")
+            else:
+                LOGGER.info(f"Preserving temporary files for debugging at: {temp_dir}")
+
+        # Store measurement and array outputs in display data
+        {% for key, output_conf in outputs.items() %}
+        {% if output_conf.get('type') in ['measurement', 'array'] %}
+        if '{{ output_conf.get('name') }}_data' in locals():
+            workspace.display_data.{{ output_conf.get('name') }} = {{ output_conf.get('name') }}_data
+        {% endif %}
+        {% endfor %}
+
+        # Prepare display data for all modules
+        if self.show_window:
+            # Set dimensions (either from image inputs or default)
+            if 'dimensions' in locals():
+                workspace.display_data.dimensions = dimensions
+            else:
+                workspace.display_data.dimensions = 2  # Default to 2D
+                
+            {% for key, input_conf in inputs.items() %}
+            {% if input_conf.get('type') == 'image' %}
+            workspace.display_data.{{ input_conf.get('name') }}_data = {{ input_conf.get('name') }}_data
+            {% endif %}
+            {% endfor %}
+            {% for key, output_conf in outputs.items() %}
+            {% if output_conf.get('type') == 'image' %}
+            if '{{ output_conf.get('name') }}_data' in locals():
+                workspace.display_data.{{ output_conf.get('name') }}_data = {{ output_conf.get('name') }}_data
+            {% endif %}
+            {% endfor %}
+
+    #
+    # "display" lets you use matplotlib to display your results.
+    # This method is called when the user requests to see the output.
+    #
+    def display(self, workspace, figure):
+        """
+        Display the results of the module processing.
+        """
+        # Programmatically determine what images to display
+        displayable_images = []
+        
+        # Add all images from inputs/outputs for all categories
+        {% for key, input_conf in inputs.items() %}
+        {% if input_conf.get('type') == 'image' %}
+        if hasattr(workspace.display_data, '{{ input_conf.get('name') }}_data'):
+            displayable_images.append(('{{ input_conf.get('name') }}_data', '{{ input_conf.get('label', input_conf.get('name')) }}', 'input'))
+        {% endif %}
+        {% endfor %}
+        
+        {% for key, output_conf in outputs.items() %}
+        {% if output_conf.get('type') == 'image' %}
+        if hasattr(workspace.display_data, '{{ output_conf.get('name') }}_data'):
+            {% if computed_category == "Image Segmentation" %}
+            displayable_images.append(('{{ output_conf.get('name') }}_data', '{{ output_conf.get('label', output_conf.get('name')) }}', 'segmentation'))
+            {% else %}
+            displayable_images.append(('{{ output_conf.get('name') }}_data', '{{ output_conf.get('label', output_conf.get('name')) }}', 'output'))
+            {% endif %}
+        {% endif %}
+        {% endfor %}
+        
+        # Remove duplicates while preserving order (in case input/output data attributes overlap)
+        seen = set()
+        unique_images = []
+        for img_data, title, img_type in displayable_images:
+            if img_data not in seen:
+                seen.add(img_data)
+                unique_images.append((img_data, title, img_type))
+        displayable_images = unique_images
+        
+        # Calculate optimal grid layout
+        num_images = len(displayable_images)
+        if num_images == 0:
+            return  # Nothing to display
+        
+        # Smart grid calculation
+        if num_images == 1:
+            num_rows, num_cols = 1, 1
+        elif num_images == 2:
+            num_rows, num_cols = 1, 2
+        elif num_images <= 4:
+            num_rows, num_cols = 2, 2
+        elif num_images <= 6:
+            num_rows, num_cols = 2, 3
+        elif num_images <= 9:
+            num_rows, num_cols = 3, 3
+        else:
+            # For more than 9 images, use a wider layout
+            num_cols = min(4, num_images)
+            num_rows = (num_images + num_cols - 1) // num_cols
+        
+        figure.set_subplots(dimensions=workspace.display_data.dimensions, subplots=(num_rows, num_cols))
+        
+        # Display images in the calculated grid
+        for idx, (img_data, title, img_type) in enumerate(displayable_images):
+            row = idx // num_cols
+            col = idx % num_cols
+            
+            image = getattr(workspace.display_data, img_data)
+            
+            if img_type == 'segmentation':
+                figure.subplot_imshow_labels(
+                    image=image,
+                    sharexy=figure.subplot(0, 0) if idx > 0 else None,
+                    title=title,
+                    x=row,
+                    y=col,
+                )
+            else:
+                figure.subplot_imshow(
+                    colormap="gray",
+                    image=image,
+                    sharexy=figure.subplot(0, 0) if idx > 0 else None,
+                    title=title,
+                    x=row,
+                    y=col,
+                )
+
+    #
+    # "volumetric" indicates whether or not this module supports 3D images.
+    # Return True if the module can handle 3D data, False otherwise.
+    #
+    def volumetric(self):
+        """Return True if this module supports 3D processing.
+        This is determined by checking if any input images require depth support.
+        """
+        {% set has_3d_input = false %}
+        {% for key, input_conf in inputs.items() %}
+        {% if input_conf.get('type') == 'image' and input_conf.get('subtype') and 'depth' in input_conf.get('subtype') %}
+        {% set has_3d_input = true %}
+        {% endif %}
+        {% endfor %}
+        {% if has_3d_input %}
+        return True
+        {% else %}
+        return False
+        {% endif %}
+
+    #
+    # The "upgrade_settings" method allows for backwards compatibility
+    # when you modify the module's interface.
+    #
+    def upgrade_settings(self, setting_values, variable_revision_number, module_name):
+        """
+        Upgrade settings from a previous version of the module.
+        """
+        return setting_values, variable_revision_number

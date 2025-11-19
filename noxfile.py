@@ -232,11 +232,11 @@ def build_interface(session: nox.Session) -> None:
     bump_type = session.posargs[2] if len(session.posargs) > 2 else "minor"
 
     # Load platform, base image, algo folder
-    with open("/tmp/platform.txt", "r") as f:
+    with open(tmp_path("platform.txt"), "r") as f:
         platform = f.read().strip()
-    with open("/tmp/docker_image_name.txt", "r") as f:
+    with open(tmp_path("docker_image_name.txt"), "r") as f:
         base_image = f.read().strip()
-    with open("/tmp/algorithm_folder_name.txt", "r") as f:
+    with open(tmp_path("algorithm_folder_name.txt"), "r") as f:
         algorithm_folder_name = f.read().strip()
     
     if not base_image:

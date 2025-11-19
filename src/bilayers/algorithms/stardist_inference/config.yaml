@@ -1,0 +1,247 @@
+citations:
+  - name: "Stardist_2018"
+    doi: "10.1007/978-3-030-00934-2_30"
+    license: "BSD-3-Clause"
+    description: "Segments images using stardist"
+  - name: "Stardist_2020"
+    doi: "10.1109/WACV45572.2020.9093435"
+    license: "BSD-3-Clause"
+    description: "Segments images using stardist"
+  - name: "Stardist_2022"
+    doi: "10.1109/ISBIC56247.2022.9854534"
+    license: "BSD-3-Clause"
+    description: "Segments images using stardist"
+
+docker_image:
+  org: rajavishah
+  name: stardist
+  tag: "7.0.0"
+  platform: "linux/arm64/v8"
+
+algorithm_folder_name: "stardist_inference"
+
+exec_function: 
+  name: "generate_cli_command"
+  cli_command: "python stardist_inference.py"
+  hidden_args:
+
+inputs:
+  - name: input_images
+    type: image
+    label: "Drag and drop all images to be analyzed"
+    subtype: 
+      - grayscale
+      - color
+    description: "Upload all images to be analyzed"
+    cli_tag: "--input_folder"
+    cli_order: 0
+    default: "directory"
+    optional: False
+    format: 
+      - tiff
+      - ometiff
+      - png
+      - jpg
+      - jpeg
+    folder_name: "/bilayers/input_images"
+    file_count: "multiple"
+    unique_string:
+      - "*"
+    section_id: "inputs"
+    mode: "beginner"
+    depth: True
+    timepoints: True
+    tiled: True
+    pyramidal: True
+  - name: custom_model_path
+    type: file
+    label: "Custom Model Path"
+    description: "Upolad the custom trained model"
+    cli_tag: "--model_path"
+    cli_order: 0
+    default: "directory"
+    optional: True
+    format:
+      - h5
+    folder_name: "/bilayers/model"
+    file_count: "multiple"
+    unique_string:
+      - "*"
+    section_id: "inputs"
+    mode: "beginner"
+
+outputs:
+  - name: segmented_images
+    type: image
+    label: "Segmented Images"
+    subtype: 
+      - labeled
+    description: "Segmented images"
+    cli_tag: "--output_folder"
+    cli_order: 0
+    default: "directory"
+    optional: False 
+    format: 
+      - tiff
+      - ometiff
+    folder_name: "/bilayers/output_images"
+    file_count: multiple
+    unique_string:
+      - "*"
+    section_id: "outputs"
+    mode: "beginner"
+    depth: True
+    timepoints: True
+    tiled: True
+    pyramidal: True
+  - name: probability_images
+    type: image
+    label: "Probability Images"
+    subtype: 
+      - labeled
+    description: "Probability images"
+    cli_tag: "--save_probabilities"
+    cli_order: 0
+    default: "directory"
+    optional: False 
+    format: 
+      - tiff
+      - ometiff
+    folder_name: "/bilayers/output_images"
+    file_count: multiple
+    unique_string:
+      - "*"
+    section_id: "outputs"
+    mode: "advanced"
+    depth: True
+    timepoints: True
+    tiled: True
+    pyramidal: True
+  - name: probability_array
+    type: array
+    label: "Probability Array"
+    description: "Probability Array"
+    cli_tag: "--save_probabilities"
+    cli_order: 0
+    default: "directory"
+    optional: False 
+    format: 
+      - npy
+    folder_name: "/bilayers/output_images"
+    file_count: multiple
+    unique_string:
+      - "*"
+    section_id: "outputs"
+    mode: "advanced"
+    
+parameters:
+  - name: model_type
+    type: radio
+    label: "Select a Model Type"
+    description: "Select a model type from 2D or 3D"
+    options:
+      - label: "2D"
+        value: "2D"
+      - label: "3D"
+        value: "3D"
+    default: "2D"
+    cli_tag: "--model_type"
+    optional: False
+    section_id: "input-args"
+    mode: "beginner"
+  - name: model_name
+    type: radio
+    label: "Select from pre-trained models"
+    description: "Select a pre-trained model or if choosing custom model, then press ignore"
+    options:
+      - label: "2D Versatile Fluorescence"
+        value: "2D_versatile_fluo"
+      - label: "2D Paper DSB 2018"
+        value: "2D_paper_dsb2018"
+      - label: "2D Versatile HE"
+        value: "2D_versatile_he"
+      - label: "2D Demo"
+        value: "2D_demo"
+      - label: "3D Demo"
+        value: "3D_demo"
+      - label: "Ignore"
+        value: "None"
+    default: "2D_versatile_fluo"
+    cli_tag: "--model_name"
+    optional: True
+    section_id: "parameter-args"
+    mode: "beginner"
+  - name: segmented_images_path
+    type: textbox
+    label: "Output Image Path"
+    description: "Segmented Images will be saved here"
+    default: "/bilayers/output_images"
+    cli_tag: "--output_folder"
+    cli_order: 0
+    optional: True
+    section_id: "parameter-args"
+    mode: "beginner" 
+  - name: probability_threshold
+    type: float
+    label: "Probability Threshold"
+    description: "The  probability threshold is the value used to determine the pixels used for mask creation all pixels with probability above threshold kept for masks"
+    default: 0.5
+    cli_tag: "--prob_thresh"
+    cli_order: 0
+    optional: True
+    section_id: "parameter-args"
+    mode: "advanced"
+  - name: nms_threshold
+    type: float
+    label: "Overlap Threshold"
+    description: "Prevent overlapping"
+    default: 0.4
+    cli_tag: "--nms_thresh"
+    cli_order: 0
+    optional: True
+    section_id: "parameter-args"
+    mode: "advanced"
+  - name: n_tiles_x
+    type: integer
+    label: "Horizontal Tiles"
+    description: "Specify the number of tiles to break the image down into along the x-axis (horizontal)"
+    default: 1
+    cli_tag: "--n_tiles_x"
+    cli_order: 0
+    optional: True
+    section_id: "parameter-args"
+    mode: "advanced"
+  - name: n_tiles_y
+    type: integer
+    label: "Vertical Tiles"
+    description: "Specify the number of tiles to break the image down into along the y-axis (vertical)"
+    default: 1
+    cli_tag: "--n_tiles_y"
+    cli_order: 0
+    optional: True
+    section_id: "parameter-args"
+    mode: "advanced"
+  - name: save_probability
+    type: checkbox
+    label: "Save probability image"
+    description: "If enabled, the probability scores from the model will be recorded as a new image. Probability scales from 0-1, with 1 representing absolute certainty of a pixel being in a cell. You may want to use a custom threshold to manually generate objects"
+    default: False
+    cli_tag: "--save_probabilities"
+    cli_order: 0
+    optional: True
+    append_value: False
+    section_id: "parameter-args"
+    mode: "advanced"
+  - name: use_gpu
+    type: checkbox
+    label: "Use GPU"
+    description: "If enabled, the model will use the GPU for inference"
+    default: False
+    cli_tag: "--gpu"
+    cli_order: 0
+    optional: True
+    append_value: False
+    section_id: "parameter-args"
+    mode: "advanced"
+
+display_only:

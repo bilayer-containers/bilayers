@@ -25,7 +25,6 @@ inputs:
       - grayscale
       - color
       - binary
-      - labeled
     description: "Upload all images to be analyzed"
     cli_tag: "--folder"
     cli_order: 0
@@ -39,6 +38,8 @@ inputs:
       - jpeg
     folder_name: "/bilayers/input_images"
     file_count: multiple
+    unique_string:
+      - "*"
     section_id: "inputs"
     mode: "beginner"
     depth: True
@@ -63,8 +64,10 @@ outputs:
     format: 
       - tiff
       - ometiff
-    folder_name: "/bilayers/input_images" # discuss
+    folder_name: "/bilayers/output_images" # discuss
     file_count: multiple
+    unique_string:
+      - "_output"
     section_id: "outputs"
     mode: "beginner"
     depth: True
@@ -73,17 +76,6 @@ outputs:
     pyramidal: True
     
 parameters:
-  # - name: input_images
-  #   type: files
-  #   label: "Drag and drop all images to be analyzed"
-  #   description: "Upload all images to be analyzed"
-  #   file_count: multiple
-  #   default: "directory"
-  #   cli_tag: "--folder"
-  #   optional: False
-  #   section_id: "input-args"
-  #   folder_name: "/bilayers/input_images"
-  #   mode: "beginner"
   - name: threshold_method
     type: radio
     label: "Select a Threshold Method"
@@ -121,7 +113,7 @@ parameters:
     label: "Save Directory"
     description: "directory to save output files"
     output_dir_set: True
-    default: "/bilayers/input_images"
+    default: "/bilayers/output_images"
     cli_tag: "--save_dir"
     optional: True
     section_id: "output-args"

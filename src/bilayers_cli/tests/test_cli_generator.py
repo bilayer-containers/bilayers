@@ -60,13 +60,13 @@ def test_generate_cli_command(sample_config):
     # 3. `--debug True` (2)
     # 4. `--log /var/log/output.log` (3)
     # 5. `--threshold 5` (-1)
-    # 6. `--verbose` (-2) 
+    # 6. `--verbose` (-2)
     expected_command = [
         "run_algorithm", "--input input.txt",
         "--debug True", "--log /var/log/output.log",
-        "--verbose", "--threshold 5", 
+        "--verbose", "--threshold 5",
     ]
-    
+
     assert cli_command == expected_command
 
 def test_hidden_arguments(sample_config):
@@ -157,6 +157,6 @@ def test_order_of_arguments():
         }
     }
     cli_command = generate_cli_command(config)
-    
+
     # Order should be: `run_algorithm` → `--first 1` (1) → `--third 3` (3) → `--second 2` (-1)
     assert cli_command == ["run_algorithm", "--first 1", "--third 3", "--second 2"]

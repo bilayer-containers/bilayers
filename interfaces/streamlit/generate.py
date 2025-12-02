@@ -1,3 +1,4 @@
+
 from typing import Optional
 from pathlib import Path
 
@@ -9,13 +10,13 @@ from bilayers.generate import generate_top_level_text
 
 
 CITATION: Citations = {
-    "name": "Gradio",
-    "doi": "10.48550/arXiv.190602569",
+    "name": "Streamlit",
+    "doi": "",
     "license": "Apache License 2.0",
-    "description": "A simple web interface for deploying machine learning models"
+    "description": "A library for easily creating custom web interfaces",
 }
 
-def generate_gradio_app(
+def generate_streamlit_app(
     template_dir: Path,
     template_name: str,
     inputs: dict[str, Input],
@@ -26,11 +27,11 @@ def generate_gradio_app(
     citations: dict[str, Citations],
 ) -> str:
     """
-    Generates a Gradio application dynamically using Jinja2 templates.
+    Generates a Streamlit application dynamically using Jinja2 templates.
 
     Args:
-        template_dir (Path): Path to the Gradio template file's containing dir.
-        template_name (str): name of the Gradio template file.
+        template_dir (Path): Path to the Streamlit template file's containing dir.
+        template_name (str): name of the Streamlit template file.
         inputs (dict[str, Input]): dictionary of input configurations.
         outputs (dict[str, Output]): dictionary of output configurations.
         parameters (dict[str, Parameter]): dictionary of parameter configurations.
@@ -39,7 +40,7 @@ def generate_gradio_app(
         citations (dict[str, Citations]): Citations information.
 
     Returns:
-        str: The rendered Gradio application code.
+        str: The rendered Streamlit application code.
     """
     env = Environment(loader=FileSystemLoader(searchpath=str(template_dir)), autoescape=select_autoescape(["j2"]))
 
@@ -56,11 +57,12 @@ def generate_gradio_app(
 
     title, full_description = generate_top_level_text(CITATION, citations, output_html=False)
 
-    gradio_app_code: str = template.render(
+    streamlit_app_code: str = template.render(
         inputs=inputs, outputs=outputs, parameters=parameters, display_only=display_only, exec_function=exec_function, title=title, description=full_description
     )
 
-    return gradio_app_code
+    return streamlit_app_code
+
 
 def generate(
     output_dir: Path,
@@ -72,11 +74,11 @@ def generate(
     citations: dict[str, Citations],
     docker_image: DockerImage,
 ):
-    gradio_template_path = project_path() / "interfaces/gradio"
+    streamlit_template_path = project_path() / "interfaces/streamlit"
 
-    gradio_app_code = generate_gradio_app(
-        gradio_template_path,
-        "gradio_template.py.j2",
+    streamlit_app_code = generate_streamlit_app(
+        streamlit_template_path,
+        "streamlit_template.py.j2",
         inputs,
         outputs,
         parameters,
@@ -84,9 +86,9 @@ def generate(
         exec_function,
         citations)
 
-    gradio_app_path = output_dir / "app.py"
 
-    with open(gradio_app_path, "w") as f:
-        f.write(gradio_app_code)
+    streamlit_app_path = output_dir / "streamlit_app.py"
 
-    print("app.py generated successfully!!")
+    with open(streamlit_app_path, "w") as f:
+        f.write(streamlit_app_code)
+    print("streamlit_app.py generated successfully!!")

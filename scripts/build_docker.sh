@@ -45,7 +45,7 @@ if [[ ${#ALGORITHM_NAMES[@]} -eq 0 ]]; then
 fi
 
 if [[ ${#INTERFACE_NAMES[@]} -eq 0 ]]; then
-  INTERFACE_NAMES=("gradio" "jupyter" "cellprofiler_plugin")
+  INTERFACE_NAMES=("gradio" "jupyter" "streamlit" "cellprofiler_plugin")
 fi
 
 # Build loop
@@ -61,6 +61,8 @@ for ALGO in "${ALGORITHM_NAMES[@]}"; do
 
     if [[ "$IFACE" == "gradio" ]]; then
       nox -s install_gradio
+    elif [[ "$IFACE" == "streamlit" ]]; then
+      nox -s install_streamlit
     fi
   done
 done

@@ -13,7 +13,7 @@ citations:
     description: "Segments images using stardist"
 
 docker_image:
-  org: rajavishah
+  org: bilayer
   name: stardist
   tag: "7.0.0"
   platform: "linux/arm64/v8"

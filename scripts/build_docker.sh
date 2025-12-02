@@ -61,6 +61,8 @@ for ALGO in "${ALGORITHM_NAMES[@]}"; do
 
     if [[ "$IFACE" == "gradio" ]]; then
       nox -s install_gradio
+    elif [[ "$IFACE" == "streamlit" ]]; then
+      nox -s install_streamlit
     fi
   done
 done

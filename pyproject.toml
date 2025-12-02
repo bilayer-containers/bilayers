@@ -62,6 +62,7 @@ env = { DOCKER_CMD = "$(command -v podman || command -v docker)" }
 
 [tool.pixi.dependencies]
 python = ">=3.9"
+requests = ">=2.32.5,<3"
 
 [tool.pixi.pypi-dependencies]
 bilayers = { path = ".", editable = true }

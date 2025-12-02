@@ -82,12 +82,11 @@ outputs:
     default: "directory"
     optional: False 
     format: 
-      - tiff
-      - ometiff
+      - tif
     folder_name: "/bilayers/output_images"
     file_count: multiple
     unique_string:
-      - "*"
+      - "_segmented.tif"
     section_id: "outputs"
     mode: "beginner"
     depth: True
@@ -105,12 +104,11 @@ outputs:
     default: "directory"
     optional: False 
     format: 
-      - tiff
-      - ometiff
+      - tif
     folder_name: "/bilayers/output_images"
     file_count: multiple
     unique_string:
-      - "*"
+      - "_probabilities.tif"
     section_id: "outputs"
     mode: "advanced"
     depth: True
@@ -130,7 +128,7 @@ outputs:
     folder_name: "/bilayers/output_images"
     file_count: multiple
     unique_string:
-      - "*"
+      - "_probabilities.npy"
     section_id: "outputs"
     mode: "advanced"
     

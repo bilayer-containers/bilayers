@@ -108,8 +108,7 @@ outputs:
     default: "directory"
     optional: True
     format: 
-      - tiff
-      - ometiff
+      - tif
     folder_name: "/bilayers/output_images"
     file_count: "multiple"
     unique_string:

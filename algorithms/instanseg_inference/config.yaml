@@ -68,10 +68,10 @@ outputs:
     format: 
       - tiff
       - ometiff
-    folder_name: "/bilayers/output_images"
+    folder_name: "/bilayers/input_images"
     file_count: multiple
     unique_string:
-      - "*"
+      - "prediction"
     section_id: "outputs"
     mode: "beginner"
     depth: True

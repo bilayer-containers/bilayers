@@ -29,7 +29,7 @@ class ExecFunction(TypedDict):
     hidden_args: Optional[dict[str, HiddenArgs]]
 
 
-class InputOutput(TypedDict, total=False):
+class InputOutputBase(TypedDict, total=False):
     name: str
     type: str
     label: str
@@ -39,6 +39,7 @@ class InputOutput(TypedDict, total=False):
     cli_order: Optional[int]
     default: str
     optional: bool
+    unique_string: list[str]
     format: list[str]
     folder_name: str
     file_count: str
@@ -49,7 +50,11 @@ class InputOutput(TypedDict, total=False):
     tiled: Optional[bool]  # w.r.t type == image
     pyramidal: Optional[bool]  # w.r.t type == image
 
+class Input(InputOutputBase):
+    pass
 
+class Output(InputOutputBase):
+    pass
 class Parameter(TypedDict, total=False):
     name: str
     type: str
@@ -72,8 +77,8 @@ class Config(TypedDict):
     citations: dict[str, Citations]
     algorithm_folder_name: str
     exec_function: ExecFunction
-    inputs: dict[str, InputOutput]
-    outputs: dict[str, InputOutput]
+    inputs: dict[str, Input]
+    outputs: dict[str, Output]
     parameters: dict[str, Parameter]
     display_only: Optional[dict[str, Parameter]]
     docker_image: DockerImage
@@ -125,8 +130,17 @@ def parse_config(config_path: Optional[Union[str, Path]] = None) -> Config:
 
 
 def main(
-    config_path: Optional[Union[str, Path]] = None,
-) -> tuple[dict[str, InputOutput], dict[str, InputOutput], dict[str, Parameter], Optional[dict[str, Parameter]], ExecFunction, str, dict[str, Citations]]:
+    config_path: Optional[str] = None,
+) -> tuple[
+        dict[str, Input],
+        dict[str, Output],
+        dict[str, Parameter],
+        Optional[dict[str, Parameter]],
+        ExecFunction,
+        str,
+        dict[str, Citations],
+        DockerImage
+    ]:
     """
     Loads the configuration and extracts necessary information.
 
@@ -140,9 +154,9 @@ def main(
 
     config: Config = parse_config(config_path)
 
-    inputs: dict[str, InputOutput] = config.get("inputs", {})
+    inputs: dict[str, Input] = config.get("inputs", {})
 
-    outputs: dict[str, InputOutput] = config.get("outputs", {})
+    outputs: dict[str, Output] = config.get("outputs", {})
 
     parameters: dict[str, Parameter] = config.get("parameters", {})
 

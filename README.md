@@ -1,3 +1,6 @@
+
+[![DOI](https://zenodo.org/badge/813721018.svg)](https://doi.org/10.5281/zenodo.17652333)
+
 ## BiLayers 
 
 ![Bilayers Logo](./assets/logo_full.png)

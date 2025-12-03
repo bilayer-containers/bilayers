@@ -16,11 +16,13 @@ class HiddenArgs(TypedDict, total=False):
     append_value: bool
     cli_order: int
 
+
 class DockerImage(TypedDict):
     org: str
     name: str
     tag: str
     platform: str
+
 
 class ExecFunction(TypedDict):
     name: str
@@ -49,11 +51,15 @@ class InputOutputBase(TypedDict, total=False):
     tiled: Optional[bool]  # w.r.t type == image
     pyramidal: Optional[bool]  # w.r.t type == image
 
+
 class Input(InputOutputBase):
     pass
 
+
 class Output(InputOutputBase):
     pass
+
+
 class Parameter(TypedDict, total=False):
     name: str
     type: str
@@ -128,16 +134,7 @@ def parse_config(config_path: Union[str, Path]) -> Config:
 
 def safe_parse_config(
     config_path: Union[str, Path],
-) -> tuple[
-        dict[str, Input],
-        dict[str, Output],
-        dict[str, Parameter],
-        Optional[dict[str, Parameter]],
-        ExecFunction,
-        str,
-        dict[str, Citations],
-        DockerImage
-    ]:
+) -> tuple[dict[str, Input], dict[str, Output], dict[str, Parameter], Optional[dict[str, Parameter]], ExecFunction, str, dict[str, Citations], DockerImage]:
     """
     Loads the configuration and extracts necessary information.
 

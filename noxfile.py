@@ -287,6 +287,7 @@ def build_interface(session: nox.Session) -> None:
     # Retag candidate -> final
     session.run(DOCKER_CMD, "tag", candidate_name, final_image_name)
 
+    # TODO: below conditionals are identical and do not include cellprofiler_plugin
     print(f"Final image built and tagged as: {final_image_name}")
     if interface == "gradio":
         session.run(
@@ -334,15 +335,15 @@ def install_gradio(session: nox.Session) -> None:
 @nox.session
 def test_parse(session: nox.Session) -> None:
     session.install("-e", ".")
-    config_path = session.posargs[0]
-    session.run("bilayers_cli", "parse", config_path)
+    config_path = Path(session.posargs[0]).resolve()
+    session.run("bilayers_cli", "parse", str(config_path))
 
 
 @nox.session
 def test_generate(session: nox.Session) -> None:
     session.install("-e", ".")
-    config_path = session.posargs[0]
-    session.run("bilayers_cli", "generate", config_path)
+    config_path = Path(session.posargs[0]).resolve()
+    session.run("bilayers_cli", "generate", str(config_path))
 
 
 @nox.session

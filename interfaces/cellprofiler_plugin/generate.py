@@ -144,7 +144,7 @@ def normalize_category_for_cellprofiler(category: str) -> str:
 
 def generate_cellprofiler_plugin(
         template_dir: Path,
-        template_path: str,
+        template_name: str,
         inputs: dict[str, Input],
         outputs: dict[str, Output],
         parameters: dict[str, Parameter],
@@ -159,7 +159,7 @@ def generate_cellprofiler_plugin(
 
     Args:
         template_dir (Path): Path to the Gradio template file's containing dir.
-        template_path (str): Path to the CellProfiler Plugin template file.
+        template_name (str): name of the Gradio template file.
         inputs (dict[str, Input]): List of input configurations.
         outputs (dict[str, Output]): List of output configurations.
         parameters (dict[str, Parameter]): List of parameter configurations.
@@ -170,10 +170,7 @@ def generate_cellprofiler_plugin(
     Returns:
         .py file: The generated CellProfiler Plugin file.
     """
-    env = Environment(
-        loader=FileSystemLoader(searchpath=os.path.dirname(template_dir)),
-        autoescape=select_autoescape(['j2'])
-    )
+    env = Environment(loader=FileSystemLoader(searchpath=str(template_dir)), autoescape=select_autoescape(["j2"]))
 
     # Helper function to convert algorithm folder name to class name
     def convert_to_class_name(algorithm_folder_name: str) -> str:
@@ -191,7 +188,7 @@ def generate_cellprofiler_plugin(
     env.filters['lower'] = lower
     env.filters['replace'] = replace
 
-    template = env.get_template(os.path.basename(template_path))
+    template = env.get_template(template_name)
 
     # Precompute the category, then normalize it for CellProfiler usage
     general_category = determine_category_from_matrix(inputs, outputs)

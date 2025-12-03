@@ -49,7 +49,7 @@ def cli() -> None:  # noqa: C901
 
     if args.command == "parse":
         try:
-            inputs, outputs, parameters, display_only, exec_function, algorithm_folder_name, citations = safe_parse_config(args.config)
+            inputs, outputs, parameters, display_only, exec_function, algorithm_folder_name, citations, docker_image = safe_parse_config(args.config)
 
             print(f"Inputs: {inputs}")
             print(f"Outputs: {outputs}")
@@ -58,6 +58,7 @@ def cli() -> None:  # noqa: C901
             print(f"Exec Function: {exec_function}")
             print(f"Folder Name: {algorithm_folder_name}")
             print(f"Citations: {citations}")
+            print(f"Docker Image: {docker_image['org']}/{docker_image['name']} ({docker_image['tag']}) - {docker_image['platform']}")
         except Exception as e:
             print(f"Error parsing config: {e}")
             sys.exit(1)

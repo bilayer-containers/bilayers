@@ -45,7 +45,7 @@ if [[ ${#ALGORITHM_NAMES[@]} -eq 0 ]]; then
 fi
 
 if [[ ${#INTERFACE_NAMES[@]} -eq 0 ]]; then
-  INTERFACE_NAMES=("gradio" "jupyter")
+  INTERFACE_NAMES=("gradio" "jupyter" "cellprofiler_plugin")
 fi
 
 # Build loop

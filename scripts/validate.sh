@@ -8,7 +8,7 @@ cd "$SCRIPT_DIR" || exit
 
 SCHEMA_FILE=${1:-"$PKG_ROOT/schema.yaml"}
 # List of algorithms and interfaces
-ALGORITHM_NAMES=("cellpose_inference" "classical_segmentation" "instanseg_inference") 
+ALGORITHM_NAMES=("cellpose_inference" "classical_segmentation" "instanseg_inference" "stardist_inference")
 
 echo "Validating all config files against the schema $SCHEMA_FILE"
 

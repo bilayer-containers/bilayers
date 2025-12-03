@@ -36,6 +36,8 @@ inputs:
     label: "files_optional_true_correct"
     description: "Files correct version. with optional flag True"
     file_count: "single"
+    unique_string:
+      - "*"
     default: "single"
     cli_tag: "--files_correct_true"
     cli_order: 0
@@ -49,6 +51,8 @@ inputs:
     label: "files_optional_false_correct"
     description: "Files correct version. with optional flag False"
     file_count: "single"
+    unique_string:
+      - "*"
     default: "single"
     cli_tag: "--files_correct_false"
     optional: False
@@ -70,6 +74,8 @@ outputs:
       - npz
     folder_name: "/path/to/array"
     file_count: "single"
+    unique_string:
+      - "*"
     section_id: "outputs"
     mode: "beginner"
 

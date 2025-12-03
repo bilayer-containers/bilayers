@@ -2,7 +2,6 @@ import argparse
 import os
 import skimage.io
 from skimage.transform import resize
-import numpy as np
 import imageio
 from stardist.models import StarDist2D, StarDist3D
 from csbdeep.utils import normalize

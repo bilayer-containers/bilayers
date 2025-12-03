@@ -46,7 +46,7 @@ def _insert_into_jagged_array(jagged_array: list[Optional[list[str]]], cli_order
     jagged_array[abs(cli_order)].append(result)  # pyright: ignore
 
 
-def _generate_cli_command(parsed_config: Config) -> list[str]:
+def _generate_cli_command(parsed_config: Config) -> list[str]: # noqa: C901
     """
     Generates a CLI command dynamically based on a parsed Bilayers YAML configuration.
 

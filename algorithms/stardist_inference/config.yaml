@@ -75,7 +75,7 @@ outputs:
     type: image
     label: "Segmented Images"
     subtype: 
-      - labeled
+      - label
     description: "Segmented images"
     cli_tag: "--output_folder"
     cli_order: 0
@@ -98,7 +98,7 @@ outputs:
     type: image
     label: "Probability Images"
     subtype: 
-      - labeled
+      - label
     description: "Probability images"
     cli_tag: "--save_probabilities"
     cli_order: 0

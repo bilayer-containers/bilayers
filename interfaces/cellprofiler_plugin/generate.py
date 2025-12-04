@@ -101,7 +101,7 @@ def determine_category_from_matrix(inputs: dict, outputs: dict) -> str:
             base_type = TYPE_MAP.get(c.get("type"), "custom")
             if base_type == "image" and c.get("subtype"):
                 subtypes = c.get("subtype", [])
-                if "labeled" in subtypes:
+                if "label" in subtypes:
                     resolved.append("object")
                 else:
                     resolved.append("image")

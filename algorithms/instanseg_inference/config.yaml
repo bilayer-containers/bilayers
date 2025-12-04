@@ -59,7 +59,7 @@ outputs:
       - grayscale
       - color
       - binary
-      - labeled
+      - label
     description: "Output images"
     cli_tag: "None"
     cli_order: 0

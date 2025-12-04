@@ -181,7 +181,7 @@ class {{ algorithm_folder_name }}({{ category_to_class.get(computed_category, "M
         # Create input settings for all modules
         {% for key, input_conf in inputs.items() %}
         {% if input_conf.get('type') == 'image' %}
-        {% if input_conf.get('subtype') and 'labeled' in input_conf.get('subtype') %}
+        {% if input_conf.get('subtype') and 'label' in input_conf.get('subtype') %}
         self.{{ input_conf.get('name') }} = LabelSubscriber(
             "{{ input_conf.get('label') }}",
             doc="""\
@@ -212,7 +212,7 @@ class {{ algorithm_folder_name }}({{ category_to_class.get(computed_category, "M
         # Create output settings for all modules
         {% for key, output_conf in outputs.items() %}
         {% if output_conf.get('type') == 'image' %}
-        {% if output_conf.get('subtype') and 'labeled' in output_conf.get('subtype') %}
+        {% if output_conf.get('subtype') and 'label' in output_conf.get('subtype') %}
         self.{{ output_conf.get('name') }} = LabelName(
             "{{ output_conf.get('label') }}",
             "{{ output_conf.get('name', 'Output') }}",
@@ -445,8 +445,8 @@ If set to "Default Output Folder", measurements will be saved in [DefaultOutputF
         {% for key, input_conf in inputs.items() %}
         {% if input_conf.get('type') == 'image' %}
         {{ input_conf.get('name') }}_name = self.{{ input_conf.get('name') }}.value
-        {% if input_conf.get('subtype') and 'labeled' in input_conf.get('subtype') %}
-        # Labeled image (objects) input: retrieve from object_set
+        {% if input_conf.get('subtype') and 'label' in input_conf.get('subtype') %}
+        # Label image (objects) input: retrieve from object_set
         objects_{{ input_conf.get('name') }} = workspace.object_set.get_objects({{ input_conf.get('name') }}_name)
         {{ input_conf.get('name') }}_data = objects_{{ input_conf.get('name') }}.segmented
         # Derive dimensions from array ndim (2 or 3)
@@ -695,7 +695,7 @@ If set to "Default Output Folder", measurements will be saved in [DefaultOutputF
                             data = [skimage.io.imread(f) for f in matched_files]
 
                         # Register as Image or Object
-                        if "labeled" in output_subtype.lower() or output_type == "object":
+                        if "label" in output_subtype.lower() or output_type == "object":
                             obj = Objects()
                             obj.segmented = data
                             {% set first_image_input = inputs.values() | selectattr('type', 'equalto', 'image') | list %}

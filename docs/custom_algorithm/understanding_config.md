@@ -265,7 +265,7 @@ The name field must be unique within each section—inputs, outputs, parameters,
         - grayscale
         - color
         - binary
-        - labeled
+        - label
       description: "these are accepted input_images for xyz algorithm"
       cli_tag: "--input_images" # tag to be used in CLI
       cli_order: Integer # default is 0. Could be positive, negative or zero. If negative, then it will be appended at the end of the command. BUT IT IS OPTIONAL TO PROVIDE THIS FLAG.

@@ -55,7 +55,7 @@ outputs:
       - grayscale
       - color
       - binary
-      - labeled
+      - label
     description: "Segmented images"
     cli_tag: "None"
     cli_order: 0

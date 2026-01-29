@@ -73,9 +73,6 @@ outputs:
     type: image
     label: "Segmented png images"
     subtype: 
-      - grayscale
-      - color
-      - binary
       - label
     description: "Segmented image if --save_png flag is true."
     cli_tag: "None"
@@ -98,9 +95,6 @@ outputs:
     type: image
     label: "Segmented tiff images"
     subtype: 
-      - grayscale
-      - color
-      - binary
       - label
     description: "Segmented image if --save_tif flag is true."
     cli_tag: "None"
@@ -139,22 +133,18 @@ outputs:
     type: image
     label: "Flows"
     subtype: 
-      - grayscale
       - color
-      - binary
-      - label
     description: "Flows image if --save_flows flag is true."
     cli_tag: "None"
     cli_order: 0
     default: "directory"
     optional: True
     format: 
-      - tiff
-      - ometiff
+      - tif
     folder_name: "/bilayers/output_images"
     file_count: "multiple"
     unique_string:
-      - "_flows_cp_masks"
+      - "_flows"
     section_id: "outputs"
     mode: "advanced"
     depth: True
@@ -166,21 +156,17 @@ outputs:
     label: "Outlines"
     subtype: 
       - grayscale
-      - color
-      - binary
-      - label
     description: "Outlines image if --save_outlines flag is true."
     cli_tag: "None"
     cli_order: 0
     default: "directory"
     optional: True
     format: 
-      - tiff
-      - ometiff
+      - png
     folder_name: "/bilayers/output_images"
     file_count: "multiple"
     unique_string: 
-      - "_outlines_cp_masks"
+      - "_outlines"
     section_id: "outputs"
     mode: "advanced"
     depth: True

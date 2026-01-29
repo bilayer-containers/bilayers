@@ -86,7 +86,7 @@ outputs:
     folder_name: "/bilayers/output_images"
     file_count: multiple
     unique_string:
-      - "_segmented.tif"
+      - "_segmented"
     section_id: "outputs"
     mode: "beginner"
     depth: True
@@ -97,7 +97,7 @@ outputs:
     type: image
     label: "Probability Images"
     subtype: 
-      - label
+      - grayscale
     description: "Probability images"
     cli_tag: "--save_probabilities"
     cli_order: 0
@@ -108,7 +108,7 @@ outputs:
     folder_name: "/bilayers/output_images"
     file_count: multiple
     unique_string:
-      - "_probabilities.tif"
+      - "_probabilities"
     section_id: "outputs"
     mode: "advanced"
     depth: True
@@ -128,7 +128,7 @@ outputs:
     folder_name: "/bilayers/output_images"
     file_count: multiple
     unique_string:
-      - "_probabilities.npy"
+      - "_probabilities"
     section_id: "outputs"
     mode: "advanced"
     

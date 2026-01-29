@@ -27,7 +27,7 @@ dependencies = [
 
 [project.optional-dependencies]
 docs = ["mystmd>=1.3.17,<2"]
-nox = ["nox>=2024.4.15,<2025"]
+nox = ["nox"]
 linkml = ["linkml"]
 test = ["pytest"]
 lint = ["ruff"]
@@ -55,8 +55,11 @@ include = ["bilayers*"]
 channels = ["conda-forge"]
 platforms = ["win-64", "linux-64", "osx-64", "osx-arm64"]
 
-[tool.pixi.activation]
-env = { DOCKER_CMD = "$(command -v podman || command -v docker)" }
+[tool.pixi.feature.podman.activation]
+env = { DOCKER_CMD = "podman" }
+
+[tool.pixi.feature.docker.activation]
+env = { DOCKER_CMD = "docker" }
 
 [tool.pixi.tasks]
 
@@ -68,7 +71,8 @@ requests = ">=2.32.5,<3"
 bilayers = { path = ".", editable = true }
 
 [tool.pixi.environments]
-dev = ["dev", "docs", "linkml", "test", "lint", "nox"]
+dev = ["dev", "docs", "linkml", "test", "lint", "nox", "podman"]
+dockerdev = ["dev", "docs", "linkml", "test", "lint", "nox", "docker"]
 
 [tool.ruff]
 # 80 columns are a thing of the past

@@ -76,7 +76,7 @@ outputs:
       - grayscale
       - color
       - binary
-      - labeled
+      - label
     description: "Segmented image if --save_png flag is true."
     cli_tag: "None"
     cli_order: 0
@@ -101,7 +101,7 @@ outputs:
       - grayscale
       - color
       - binary
-      - labeled
+      - label
     description: "Segmented image if --save_tif flag is true."
     cli_tag: "None"
     cli_order: 0
@@ -142,7 +142,7 @@ outputs:
       - grayscale
       - color
       - binary
-      - labeled
+      - label
     description: "Flows image if --save_flows flag is true."
     cli_tag: "None"
     cli_order: 0
@@ -168,7 +168,7 @@ outputs:
       - grayscale
       - color
       - binary
-      - labeled
+      - label
     description: "Outlines image if --save_outlines flag is true."
     cli_tag: "None"
     cli_order: 0

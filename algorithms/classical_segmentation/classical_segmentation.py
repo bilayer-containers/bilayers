@@ -56,20 +56,20 @@ def example_function(image_list: list[str], threshold_method: str, min_size: flo
 
         # Label the image
         # return_num=False ensures only an array is returned, hence type ignore is used
-        labeled_image: NDArray[Any] = skimage.measure.label(th_image)  # type: ignore
+        label_image: NDArray[Any] = skimage.measure.label(th_image)  # type: ignore
 
         areas: NDArray[Any] = scipy.ndimage.sum(
-            numpy.ones(labeled_image.shape),
-            labeled_image,
-            numpy.array(list(range(0, labeled_image.max() + 1)), dtype=numpy.int32),
+            numpy.ones(label_image.shape),
+            label_image,
+            numpy.array(list(range(0, label_image.max() + 1)), dtype=numpy.int32),
         )
         areas = numpy.array(areas, dtype=int)
         min_allowed_area: float = numpy.pi * (min_size * min_size) / 4
         max_allowed_area: float = numpy.pi * (max_size * max_size) / 4
         # area_image has the area of the object at every pixel within the object
-        area_image: NDArray[Any] = areas[labeled_image]
-        labeled_image[area_image < min_allowed_area] = 0
-        labeled_image[area_image > max_allowed_area] = 0
+        area_image: NDArray[Any] = areas[label_image]
+        label_image[area_image < min_allowed_area] = 0
+        label_image[area_image > max_allowed_area] = 0
 
         # Construct filename from input
         base_filename: str = os.path.basename(image_path).split(".")[0]
@@ -79,7 +79,7 @@ def example_function(image_list: list[str], threshold_method: str, min_size: flo
             os.makedirs(save_dir)
 
         # Save file
-        skimage.io.imsave(output_filename, labeled_image)
+        skimage.io.imsave(output_filename, label_image)
         print(f"Output saved to: {output_filename}")
 
         # Append output filename to the list

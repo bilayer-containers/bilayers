@@ -814,7 +814,7 @@ If set to "Default Output Folder", measurements will be saved in [DefaultOutputF
         {% for key, output_conf in outputs.items() %}
         {% if output_conf.get('type') == 'image' %}
         if hasattr(workspace.display_data, '{{ output_conf.get('name') }}_data'):
-            {% if computed_category == "Image Segmentation" %}
+            {% if 'label' in ','.join(output_conf.get('subtype')).lower() %}
             displayable_images.append(('{{ output_conf.get('name') }}_data', '{{ output_conf.get('label', output_conf.get('name')) }}', 'segmentation'))
             {% else %}
             displayable_images.append(('{{ output_conf.get('name') }}_data', '{{ output_conf.get('label', output_conf.get('name')) }}', 'output'))

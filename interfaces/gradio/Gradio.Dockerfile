@@ -7,7 +7,7 @@ FROM $BASE_IMAGE
 ARG FOLDER_NAME
 
 # Install the dependencies for the gradio app
-RUN python -m pip install --no-cache-dir pyyaml gradio==4.44.1 huggingface-hub==0.34.3
+RUN python -m pip install --no-cache-dir pyyaml pydantic==2.10.6 gradio==4.44.1 huggingface-hub==0.34.3
 
 # Set the working directory within the container
 WORKDIR /bilayers

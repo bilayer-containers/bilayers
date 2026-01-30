@@ -24,6 +24,7 @@ def generate_gradio_app(
     display_only: Optional[dict[str, Parameter]],
     exec_function: ExecFunction,
     citations: dict[str, Citations],
+    docker_image: DockerImage,
 ) -> str:
     """
     Generates a Gradio application dynamically using Jinja2 templates.
@@ -82,7 +83,8 @@ def generate(
         parameters,
         display_only,
         exec_function,
-        citations)
+        citations,
+        docker_image)
 
     gradio_app_path = output_dir / "app.py"
 

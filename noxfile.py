@@ -328,7 +328,7 @@ def build_interface(session: nox.Session) -> None:
         )
     elif interface == "streamlit":
         session.run(
-            "docker",
+            DOCKER_CMD,
             "buildx",
             "build",
             "--platform",
@@ -341,7 +341,7 @@ def build_interface(session: nox.Session) -> None:
             final_image_name,
             "-f",
             dockerfile_path,
-            PKG_ROOT/"build",
+            PROJ_ROOT/"interfaces",
         )
 
 @nox.session

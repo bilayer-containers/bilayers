@@ -15,10 +15,10 @@ RUN python -m pip install pyyaml streamlit pydantic
 WORKDIR /bilayers
 
 # Add app.py file to the container
-ADD parse/generated_folders/$FOLDER_NAME/streamlit_app.py /bilayers/
+ADD generated_folders/$FOLDER_NAME/streamlit_app.py /bilayers/
 
 # Add __init__.py file for importing the files inside docker-container
-ADD __init__.py /bilayers/
+RUN touch /bilayers/__init__.py
 
 # Export the port
 EXPOSE 8501

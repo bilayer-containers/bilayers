@@ -365,7 +365,8 @@ with st.form("my_form"):
 
     {% if param_conf.get('type') in ['radio', 'dropdown'] %}
     options_list_{{ param_label }} = [{% for option in param_conf.get('options', []) %}"{{ option.label }}"{% if not loop.last %}, {% endif %}{% endfor %}]
-    default_index_{{ param_label }} = options_list_{{ param_label }}.index("{{ param_conf.get('default', '') }}")
+    options_list_{{ param_label }}_values = [{% for option in param_conf.get('options', []) %}"{{ option.value }}"{% if not loop.last %}, {% endif %}{% endfor %}]
+    default_index_{{ param_label }} = options_list_{{ param_label }}_values.index("{{ param_conf.get('default', '') }}")
     {% endif %}
     {% if param_conf.get('type') == 'radio' -%}
     {{ param_label }} = st.radio(label="{{ param_conf.get('label', '') }}", help="{{ param_conf.get('description', '') }}", options=options_list_{{ param_label }}, index=default_index_{{param_label}})
@@ -393,7 +394,8 @@ with st.form("my_form"):
 
     {% if display_only_conf.get('type') in ['radio', 'dropdown'] %}
     options_list_{{ display_only_label }} = [{% for option in display_only_conf.get('options', []) %}"{{ option.label }}"{% if not loop.last %}, {% endif %}{% endfor %}]
-    default_index_{{ display_only_label }} = options_list_{{ display_only_label }}.index("{{ display_only_conf.get('default', '') }}")
+    options_list_{{ display_only_label }}_values = [{% for option in display_only_conf.get('options', []) %}"{{ option.value }}"{% if not loop.last %}, {% endif %}{% endfor %}]
+    default_index_{{ display_only_label }} = options_list_{{ display_only_label }}_values.index("{{ display_only_conf.get('default', '') }}")
     {% endif %}    
     {% if display_only_conf.get('type') == 'radio' %}
     {{ display_label }} = st.radio(label="{{ display_only_conf.get('label', '') }}", help="{{ display_only_conf.get('description', '') }}", options=options_list_{ display_only_label }, index=default_index_{ display_only_label })    

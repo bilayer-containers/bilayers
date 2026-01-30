@@ -676,6 +676,7 @@ If set to "Default Output Folder", measurements will be saved in [DefaultOutputF
                 output_type = "{{ output_conf.get('type', 'image') }}"
                 output_name = "{{ output_conf.get('name', key) }}"
                 output_subtype = "{{ output_conf.get('subtype', '') | safe }}"
+                output_plurality =  "{{ output_conf.get('file_count', key) }}"
                 search_patterns = {{ output_conf.get('unique_string', ['*']) | tojson }}
                 output_formats = {{ output_conf.get('format', ['tif']) | tojson }}
                 matched_files = []
@@ -698,7 +699,17 @@ If set to "Default Output Folder", measurements will be saved in [DefaultOutputF
                         if len(matched_files) == 1:
                             data = skimage.io.imread(matched_files[0])
                         else:
-                            data = [skimage.io.imread(f) for f in matched_files]
+                            if output_plurality != "single":
+                                data = [skimage.io.imread(f) for f in matched_files]
+                            else:
+                                #try to see if this directly abuts the delimiter
+                                pattern_2 = os.path.join(temp_output_dir, "**", f"*{recognizer}.{fmt}")
+                                if len(glob.glob(pattern_2, recursive=True)) == 1:
+                                    #yay, we guessed right
+                                    data = data = skimage.io.imread(glob.glob(pattern_2, recursive=True)[0])
+                                else:
+                                    #well, let's hope for the best
+                                    data = skimage.io.imread(matched_files[0])
 
                         # Register as Image or Object
                         if "label" in output_subtype.lower() or output_type == "object":

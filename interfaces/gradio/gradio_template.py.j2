@@ -385,7 +385,10 @@ def on_submit(
 
                     full_path = os.path.join(root, f)
                     possible_files.append(full_path)
-
+            
+            fallback_folder = "outputs"
+            os.makedirs(fallback_folder ,exist_ok=True)
+            
             # Copy all detected files into the fallback folder
             for file_path in possible_files:
                 try:
@@ -446,15 +449,15 @@ def on_submit(
 {% set display_label = key | lower | replace(" ", "_") %}
     
 {% if display_only_conf.get('type') == 'radio' %}
-{{ display_label }} = gr.Radio(label="{{ display_only_conf.get('label', '') }}", info="{{ display_only_conf.get('description', '') }}", choices=[{% for option in display_only_conf.get('options', []) %}"{{ option.label }}"{% if not loop.last %}, {% endif %}{% endfor %}], value="{{ display_only_conf.get('default', '') }}", interactive=False)    
+{{ display_label }} = gr.Radio(label="{{ display_only_conf.get('label', '') }} (Can't be changed, display only)", info="{{ display_only_conf.get('description', '') }}", choices=[{% for option in display_only_conf.get('options', []) %}"{{ option.label }}"{% if not loop.last %}, {% endif %}{% endfor %}], value="{{ display_only_conf.get('default', '') }}", interactive=False)    
 {% elif display_only_conf.get('type') == 'dropdown' %}
-{{ display_label }} = gr.Dropdown(label="{{ display_only_conf.get('label', '') }}", info="{{ display_only_conf.get('description', '') }}", choices=[{% for option in display_only_conf.get('options', []) %}("{{ option.label }}", "{{ option.value }}"){% if not loop.last %}, {% endif %}{% endfor %}], value="{{ display_only_conf.get('default', '') }}", interactive=False, multiselect={{ display_only_conf.get('multiselect', False) }})
+{{ display_label }} = gr.Dropdown(label="{{ display_only_conf.get('label', '') }} (Can't be changed, display only)", info="{{ display_only_conf.get('description', '') }}", choices=[{% for option in display_only_conf.get('options', []) %}("{{ option.label }}", "{{ option.value }}"){% if not loop.last %}, {% endif %}{% endfor %}], value="{{ display_only_conf.get('default', '') }}", interactive=False, multiselect={{ display_only_conf.get('multiselect', False) }})
 {% elif display_only_conf.get('type') in ['integer', 'float'] %}
-{{ display_label }} = gr.Number(label="{{ display_only_conf.get('label', '') }}", info="{{ display_only_conf.get('description', '') }}", value={{ display_only_conf.get('default', 0) }} if "{{ display_only_conf.get('type') }}" == "integer" else {{ display_only_conf.get('default', 0.0) }}, interactive=False)
+{{ display_label }} = gr.Number(label="{{ display_only_conf.get('label', '') }} (Can't be changed, display only)", info="{{ display_only_conf.get('description', '') }}", value={{ display_only_conf.get('default', 0) }} if "{{ display_only_conf.get('type') }}" == "integer" else {{ display_only_conf.get('default', 0.0) }}, interactive=False)
 {% elif display_only_conf.get('type') == 'textbox' %}
-{{ display_label }} = gr.Textbox(label="{{ display_only_conf.get('label', '') }}", info="{{ display_only_conf.get('description', '') }}", value="{{ display_only_conf.get('default', '') }}", interactive=False)
+{{ display_label }} = gr.Textbox(label="{{ display_only_conf.get('label', '') }} (Can't be changed, display only)", info="{{ display_only_conf.get('description', '') }}", value="{{ display_only_conf.get('default', '') }}", interactive=False)
 {% elif display_only_conf.get('type') == 'checkbox' %}
-{{ display_label }} = gr.Checkbox(label="{{ display_only_conf.get('label', '') }}", info="{{ display_only_conf.get('description', '') }}", value={{ display_only_conf.get('default', False) }}, interactive=False)
+{{ display_label }} = gr.Checkbox(label="{{ display_only_conf.get('label', '') }} (Can't be changed, display only)", info="{{ display_only_conf.get('description', '') }}", value={{ display_only_conf.get('default', False) }}, interactive=False)
 {% endif %}
 
 {% endfor %}

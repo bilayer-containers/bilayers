@@ -65,9 +65,9 @@ outputs:
     format: 
       - tiff
     folder_name: "/bilayers/input_images"
-    file_count: multiple
+    file_count: single
     unique_string:
-      - "prediction."
+      - "prediction"
     section_id: "outputs"
     mode: "beginner"
     depth: True
@@ -87,7 +87,7 @@ outputs:
     format: 
       - tiff
     folder_name: "/bilayers/input_images"
-    file_count: multiple
+    file_count: single
     unique_string:
       - "prediction_overlay"
     section_id: "outputs"

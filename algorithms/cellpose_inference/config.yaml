@@ -82,7 +82,7 @@ outputs:
     format: 
       - png
     folder_name: "/bilayers/output_images"
-    file_count: "multiple"
+    file_count: "single"
     unique_string:
       - "_cp_masks"
     section_id: "outputs"
@@ -104,7 +104,7 @@ outputs:
     format: 
       - tif
     folder_name: "/bilayers/output_images"
-    file_count: "multiple"
+    file_count: "single"
     unique_string:
       - "_cp_masks"
     section_id: "outputs"
@@ -142,7 +142,7 @@ outputs:
     format: 
       - tif
     folder_name: "/bilayers/output_images"
-    file_count: "multiple"
+    file_count: "single"
     unique_string:
       - "_flows"
     section_id: "outputs"
@@ -164,7 +164,7 @@ outputs:
     format: 
       - png
     folder_name: "/bilayers/output_images"
-    file_count: "multiple"
+    file_count: "single"
     unique_string: 
       - "_outlines"
     section_id: "outputs"

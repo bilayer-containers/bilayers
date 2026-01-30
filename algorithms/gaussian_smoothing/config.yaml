@@ -54,7 +54,6 @@ outputs:
     subtype: 
       - grayscale
       - color
-      - binary
     description: "Blurred images"
     cli_tag: "None"
     cli_order: 0
@@ -62,9 +61,8 @@ outputs:
     optional: False 
     format: 
       - tiff
-      - ometiff
     folder_name: "/bilayers/output_images"
-    file_count: multiple
+    file_count: single
     unique_string:
       - "_output"
     section_id: "outputs"

@@ -52,9 +52,6 @@ outputs:
     type: image
     label: "Segmented Images"
     subtype: 
-      - grayscale
-      - color
-      - binary
       - label
     description: "Segmented images"
     cli_tag: "None"
@@ -63,9 +60,8 @@ outputs:
     optional: False 
     format: 
       - tiff
-      - ometiff
     folder_name: "/bilayers/output_images" # discuss
-    file_count: multiple
+    file_count: single
     unique_string:
       - "_output"
     section_id: "outputs"

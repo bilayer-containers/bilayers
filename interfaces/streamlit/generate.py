@@ -5,7 +5,7 @@ from pathlib import Path
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from bilayers import project_path
-from bilayers.parse import Citations, Input, Output, Parameter, ExecFunction
+from bilayers.parse import Citations, Input, Output, Parameter, ExecFunction, DockerImage
 from bilayers.generate import generate_top_level_text
 
 
@@ -73,6 +73,7 @@ def generate(
     display_only: Optional[dict[str, Parameter]],
     exec_function: ExecFunction,
     citations: dict[str, Citations],
+    docker_image: DockerImage
 ):
     streamlit_template_path = project_path() / "interfaces/streamlit"
 

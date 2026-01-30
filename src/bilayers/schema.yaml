@@ -413,4 +413,4 @@ enums:
       grayscale:
       color:
       binary:
-      labeled:
+      label:

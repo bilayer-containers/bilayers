@@ -16,7 +16,7 @@ URI: [SubTypeEnum](SubTypeEnum.md)
 | grayscale | None |  |
 | color | None |  |
 | binary | None |  |
-| labeled | None |  |
+| label | None |  |
 
 
 
@@ -65,8 +65,8 @@ permissible_values:
     text: color
   binary:
     text: binary
-  labeled:
-    text: labeled
+  label:
+    text: label
 
 ```
 </details>

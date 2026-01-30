@@ -1,4 +1,5 @@
 import os
+import glob
 import streamlit as st
 import subprocess
 import shutil
@@ -314,6 +315,13 @@ def on_submit(
     # Generate the CLI command
     cli_command, folder_name, output_folder_name = generate_cli_command(cli_tags, **kwargs)
     print("Generated CLI command:", cli_command)
+    
+    if output_folder_name is None:
+        #we don't know the output folder name, so we will track the input folder(s) for new files
+        existing_input_files = {}
+        {% for key, input_conf in inputs.items() %}
+        existing_input_files["{{ input_conf.get('folder_name', '') }}"] = glob.glob(f"{{ input_conf.get('folder_name', '') }}/*")
+        {% endfor %}
 
     # Execute the CLI command
     try:
@@ -328,6 +336,9 @@ def on_submit(
         else:
             print("Folder does not exist or output_folder_name is None")
             output_files = []
+            if output_folder_name == None:
+                for eachinputfolder, eachorigfiles in existing_input_files.items():
+                    output_files += list(set(glob.glob(f"{eachinputfolder}/*")) - set(eachorigfiles))
 
         return output_files
 

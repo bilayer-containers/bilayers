@@ -702,14 +702,9 @@ If set to "Default Output Folder", measurements will be saved in [DefaultOutputF
                             if output_plurality != "single":
                                 data = [skimage.io.imread(f) for f in matched_files]
                             else:
-                                #try to see if this directly abuts the delimiter
-                                pattern_2 = os.path.join(temp_output_dir, "**", f"*{recognizer}.{fmt}")
-                                if len(glob.glob(pattern_2, recursive=True)) == 1:
-                                    #yay, we guessed right
-                                    data = data = skimage.io.imread(glob.glob(pattern_2, recursive=True)[0])
-                                else:
-                                    #well, let's hope for the best
-                                    data = skimage.io.imread(matched_files[0])
+                                import difflib
+                                data = skimage.io.imread(difflib.get_close_matches(recognizer,matched_files,n=1,cutoff=0)[0])
+                                LOGGER.warning(f"Multiple files matching unique string {recognizer} were found. We're using our best guess.")
 
                         # Register as Image or Object
                         if "label" in output_subtype.lower() or output_type == "object":

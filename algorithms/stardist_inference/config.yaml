@@ -84,7 +84,7 @@ outputs:
     format: 
       - tif
     folder_name: "/bilayers/output_images"
-    file_count: multiple
+    file_count: single
     unique_string:
       - "_segmented"
     section_id: "outputs"
@@ -106,7 +106,7 @@ outputs:
     format: 
       - tif
     folder_name: "/bilayers/output_images"
-    file_count: multiple
+    file_count: single
     unique_string:
       - "_probabilities"
     section_id: "outputs"
@@ -126,7 +126,7 @@ outputs:
     format: 
       - npy
     folder_name: "/bilayers/output_images"
-    file_count: multiple
+    file_count: single
     unique_string:
       - "_probabilities"
     section_id: "outputs"

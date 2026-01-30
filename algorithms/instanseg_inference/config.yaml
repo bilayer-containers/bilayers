@@ -67,7 +67,29 @@ outputs:
     folder_name: "/bilayers/input_images"
     file_count: single
     unique_string:
-      - "prediction"
+      - "prediction."
+    section_id: "outputs"
+    mode: "beginner"
+    depth: True
+    timepoints: True
+    tiled: True
+    pyramidal: True
+  - name: overlay_images
+    type: image
+    label: "Overlay Images"
+    subtype: 
+      - color
+    description: "Overlay images"
+    cli_tag: "None"
+    cli_order: 0
+    default: "directory"
+    optional: False
+    format: 
+      - tiff
+    folder_name: "/bilayers/input_images"
+    file_count: multiple
+    unique_string:
+      - "prediction_overlay"
     section_id: "outputs"
     mode: "beginner"
     depth: True

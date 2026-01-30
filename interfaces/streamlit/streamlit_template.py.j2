@@ -391,26 +391,26 @@ with st.form("my_form"):
     {% for key, display_only_conf in display_only.items() %}
     {% set display_label = key | lower | replace(" ", "_") %}
 
-
+    st.markdown("_The following parameters cannot be changed, they are shown here for display only_")
     {% if display_only_conf.get('type') in ['radio', 'dropdown'] %}
     options_list_{{ display_only_label }} = [{% for option in display_only_conf.get('options', []) %}"{{ option.label }}"{% if not loop.last %}, {% endif %}{% endfor %}]
     options_list_{{ display_only_label }}_values = [{% for option in display_only_conf.get('options', []) %}"{{ option.value }}"{% if not loop.last %}, {% endif %}{% endfor %}]
     default_index_{{ display_only_label }} = options_list_{{ display_only_label }}_values.index("{{ display_only_conf.get('default', '') }}")
     {% endif %}    
     {% if display_only_conf.get('type') == 'radio' %}
-    {{ display_label }} = st.radio(label="{{ display_only_conf.get('label', '') }}", help="{{ display_only_conf.get('description', '') }}", options=options_list_{ display_only_label }, index=default_index_{ display_only_label })    
+    {{ display_label }} = st.radio(label="{{ display_only_conf.get('label', '') }}", help="{{ display_only_conf.get('description', '') }}", options=options_list_{ display_only_label }, index=default_index_{ display_only_label }, disabled = True)    
     {% elif display_only_conf.get('type') == 'dropdown' %}
     {% if display_only_conf.get('multiselect',False) in [False, "False", "false"] %}
-    {{ display_only_label }} = st.selectbox(label="{{ display_only_conf.get('label', '') }}", help="{{ display_only_conf.get('description', '') }}", options=[options_list_{ display_only_label }], index=default_index_{ display_only_label })
+    {{ display_only_label }} = st.selectbox(label="{{ display_only_conf.get('label', '') }}", help="{{ display_only_conf.get('description', '') }}", options=[options_list_{ display_only_label }], index=default_index_{ display_only_label }, disabled = True)
     {% else %}
-    {{ display_only_label }} = st.multiselect(label="{{ display_only_conf.get('label', '') }}", help="{{ display_only_conf.get('description', '') }}", options=[options_list_{ display_only_label }], index=default_index_{ display_only_label })
+    {{ display_only_label }} = st.multiselect(label="{{ display_only_conf.get('label', '') }}", help="{{ display_only_conf.get('description', '') }}", options=[options_list_{ display_only_label }], index=default_index_{ display_only_label }, disabled = True)
     {% endif %}
     {% elif display_only_conf.get('type') in ['integer', 'float'] %}
-    {{ display_label }} = st.number_input(label="{{ display_only_conf.get('label', '') }}", help="{{ display_only_conf.get('description', '') }}", value={{ display_only_conf.get('default', 0) }} if "{{ display_only_conf.get('type') }}" == "integer" else {{ display_only_conf.get('default', 0.0) }}, interactive=False)
+    {{ display_label }} = st.number_input(label="{{ display_only_conf.get('label', '') }}", help="{{ display_only_conf.get('description', '') }}", value={{ display_only_conf.get('default', 0) }} if "{{ display_only_conf.get('type') }}" == "integer" else {{ display_only_conf.get('default', 0.0) }}, disabled = True)
     {% elif display_only_conf.get('type') == 'textbox' %}
-    {{ display_label }} = st.text_input(label="{{ display_only_conf.get('label', '') }}", help="{{ display_only_conf.get('description', '') }}", value="{{ display_only_conf.get('default', '') }}", interactive=False)
+    {{ display_label }} = st.text_input(label="{{ display_only_conf.get('label', '') }}", help="{{ display_only_conf.get('description', '') }}", value="{{ display_only_conf.get('default', '') }}", disabled = True)
     {% elif display_only_conf.get('type') == 'checkbox' %}
-    {{ display_label }} = st.checkbox(label="{{ display_only_conf.get('label', '') }}", help="{{ display_only_conf.get('description', '') }}", value={{ display_only_conf.get('default', False) }}, interactive=False)
+    {{ display_label }} = st.checkbox(label="{{ display_only_conf.get('label', '') }}", help="{{ display_only_conf.get('description', '') }}", value={{ display_only_conf.get('default', False) }}, disabled = True)
     {% endif %}
 
     {% endfor %}

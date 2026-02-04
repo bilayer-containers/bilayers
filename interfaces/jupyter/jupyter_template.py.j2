@@ -9,6 +9,7 @@ outputs = {{outputs}}
 parameters = {{parameters}}
 display_only = {{display_only}}
 exec_function = {{exec_function}}
+cli_sequence = {{ cli_sequence | tojson | replace('true', 'True') | replace('false', 'False') | safe }}
 
 {% endautoescape %}
 
@@ -234,33 +235,6 @@ def option_to_append(cli_tag: str, value: Any) -> Optional[str]:
             return f"{cli_tag}{value}"  # Append cli_tag and value with "="
         return f"{cli_tag} {value}"  # Append cli_tag and value
 
-def insert_into_jagged_array(
-    jagged_array: list[Optional[list[str]]], 
-    cli_order: int, 
-    cli_tag: str, 
-    value: Any
-    ) -> None:
-    """
-    Inserts CLI arguments into a structured array to maintain ordering.
-
-    Args:
-        jagged_array (list[Optional[list[str]]]): The structured array for CLI options.
-        cli_order (int): The order in which arguments should appear.
-        cli_tag (str): The CLI tag.
-        value (Any): The value to append.
-    """
-    # Check the length of Jagged Array and dynamically append with None if required
-    while len(jagged_array) <= abs(cli_order):
-        jagged_array.append(None)
-
-    # Initialize the sublist if it's not already
-    jagged_array[abs(cli_order)] = jagged_array[abs(cli_order)] or []
-
-    # Append the cli_tag and value to the appropriate sublist
-    result = option_to_append(cli_tag, value)
-    if result is not None: # Only append if the result is not None
-        jagged_array[abs(cli_order)].append(result)
-
 def validate_and_highlight(widget: widgets.Widget, value: Any, optional: bool) -> bool:
     """
     Validates whether the given widget's value is present for non-optional fields.
@@ -322,176 +296,100 @@ def construct_cli_command() -> str:
     Returns:
         str: The constructed CLI command string.
     """
-    {# cli_command: str = "{{ exec_function.get('cli_command', '') }}" #}
-    cli_command_parts = [ cli_command_base]
+    cli_command_parts = [cli_command_base]
 
-    # Initialize jagged arrays
-    jagged_positive_array: list[Optional[list[str]]] = []
-    jagged_negative_array: list[Optional[list[str]]] = []
+    for item in cli_sequence:
+        name = item.get("name", "")
+        source = item.get("source", "")
+        cli_tag = item.get("cli_tag", "")
+        optional = item.get("optional", False)
+        append_value = item.get("append_value", False)
 
-    {% autoescape false %}
-    hidden_args = {{ exec_function.get("hidden_args", {}) }}
-    print("Hidden Args:", hidden_args)
-    {% endautoescape %}
-
-    if hidden_args:
-        for hidden_arg in hidden_args.values(): # Iterating over dictionary values, not keys
-            cli_tag = hidden_arg.get('cli_tag', '')
-            cli_order = hidden_arg.get('cli_order', 0)
-            value = hidden_arg.get('value', '')
-            append_value = hidden_arg.get('append_value', False)
-
-            if cli_order < 0:
-                while len(jagged_negative_array) <= abs(cli_order):
-                    jagged_negative_array.append(None)  # Append None to fill gaps
-
-            while len(jagged_positive_array) <= cli_order:
-                jagged_positive_array.append(None)  # Append None to fill gaps
-
-            if isinstance(value, bool): # Special case for boolean values
+        if source == "hidden":
+            value = item.get("value", "")
+            if isinstance(value, bool):
                 if append_value:
-                    if cli_order < 0:
-                        insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)
-                    else:
-                        insert_into_jagged_array(jagged_positive_array, cli_order, cli_tag, value)
+                    option = option_to_append(cli_tag, value)
+                    if option is not None:
+                        cli_command_parts.append(option)
                 else:
-                    if value:
-                        if cli_order < 0:
-                            jagged_negative_array[abs(cli_order)] = jagged_negative_array[abs(cli_order)] or []
-                            # Usually, the whole pair is ignored if cli_tag is "None" but since, here we are appending only cli_tag and not value, we need to check for "None" value
-                            # Same case are followed for param_vars below (In total, 4 places we are manually checking for "None" value)
-                            if cli_tag != "None": # Ignore the cli_tag and value pair if cli_tag is "None"
-                                jagged_negative_array[abs(cli_order)].append(cli_tag)
-                        else:
-                            jagged_positive_array[abs(cli_order)] = jagged_positive_array[abs(cli_order)] or []
-                            if cli_tag != "None": # Ignore the cli_tag and value pair if cli_tag is "None"
-                                jagged_positive_array[abs(cli_order)].append(cli_tag)
-
-            else: # For all other types except boolean
-                if cli_order < 0:
-                    insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)
-                else:
-                    insert_into_jagged_array(jagged_positive_array, cli_order, cli_tag, value)
-
-    for key, param_info in param_vars.items():
-        cli_tag: str = param_info["cli_tag"]
-        widget: Union[widgets.Widget, widgets.FileUpload, widgets.Checkbox] = param_info["widget"]
-        cli_order: int = param_info["cli_order"]
-        optional: bool = param_info["optional"]
-
-        if "folder_name" in param_info or "append_value" in param_info: # Special case for 'File' type and checkbox
-            # =====================================================
-            # Case A: Folder-based input (image, file, etc.)
-            # =====================================================
-            if "folder_name" in param_info:
-                folder_name = param_info["folder_name"]
-                is_mounted = param_info.get("is_mounted", False)
-                widget = param_info.get("widget")
-
-                # ----------------------------------------------
-                # Mounted folder: just use the existing path
-                # ----------------------------------------------
-                if is_mounted:
-                    value = folder_name
-
-                # ----------------------------------------------
-                # Upload mode: persist uploaded files to temp dir
-                # ----------------------------------------------
-                elif isinstance(widget, widgets.FileUpload) and widget.value:
-                    os.makedirs(folder_name, exist_ok=True)
-                    for file_info in widget.value:
-                        fname = file_info.get("name")
-                        content = file_info.get("content")
-                        if fname and content:
-                            with open(os.path.join(folder_name, fname), "wb") as f:
-                                f.write(content)
-                    print(f"Uploaded files saved to: {folder_name}")
-                    value = folder_name
-
-                # If neither mount nor upload happened, skip safely
-                else:
-                    print(f"No input files found for {cli_tag}")
-                    continue
-
-                # Insert folder path into CLI args
-                if cli_order < 0:
-                    insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)
-                else:
-                    insert_into_jagged_array(jagged_positive_array, cli_order, cli_tag, value)
-                continue  # Move to next param
-
-            # =====================================================
-            # Case B: Checkbox (append_value = True)
-            # =====================================================
-            elif isinstance(widget, widgets.Checkbox):  # This is a 'Checkbox' type
-                append_value: bool = param_info.get("append_value", False)
-                value = widget.value
-                # For checkboxes, the value is always either True or False, so the optional check isn’t needed since a value is always present
-                if append_value: # If value needs to appended along with cli_tag - Special case for Checkbox
-                    if cli_order < 0:
-                        insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)
-                    else:
-                        insert_into_jagged_array(jagged_positive_array, cli_order, cli_tag, value)
-                else: # Otherwise, just append the cli_tag - iff value is True
-                    if value:
-                        if cli_order < 0:
-                            while len(jagged_negative_array) <= abs(cli_order):
-                                jagged_negative_array.append(None)
-                            jagged_negative_array[abs(cli_order)] = jagged_negative_array[abs(cli_order)] or []
-                            if cli_tag != "None":
-                                jagged_negative_array[abs(cli_order)].append(cli_tag)
-                        else:
-                            while len(jagged_positive_array) <= abs(cli_order):
-                                jagged_positive_array.append(None)
-                            jagged_positive_array[abs(cli_order)] = jagged_positive_array[abs(cli_order)] or []
-                            if cli_tag != "None":
-                                jagged_positive_array[abs(cli_order)].append(cli_tag)
-
-        else:  # Handling other types then Files and Checkbox
-            if isinstance(widget, widgets.RadioButtons):
-                value = widget.value
-                # If the user selected "ignore", convert it to None so that the flag is omitted.
-                if value == "ignore":
-                    value = None
-                # Validate and highlight the widget if needed
-                validate_and_highlight(widget, value, optional)
-                if value != "None":  # Ensure the value is not "None" (None helps in ignoring the whole cli_tag & value pair)
-                    if cli_order < 0:
-                        insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)
-                    else:
-                        insert_into_jagged_array(jagged_positive_array, cli_order, cli_tag, value)
-            elif isinstance(widget, widgets.Textarea): 
-                value = widget.value
-                # Validate and highlight the widget if needed
-                validate_and_highlight(widget, value, optional)
-                if value: # None value should be ignored
-                    if cli_order < 0:
-                        insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)
-                    else:
-                        insert_into_jagged_array(jagged_positive_array, cli_order, cli_tag, value)
+                    if value and cli_tag != "None":
+                        cli_command_parts.append(cli_tag)
             else:
-                value = widget.value
-                # Validate and highlight the widget if needed
-                validate_and_highlight(widget, value, optional)
-                if cli_order < 0:
-                    insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)
-                else:
-                    insert_into_jagged_array(jagged_positive_array, cli_order, cli_tag, value)
+                option = option_to_append(cli_tag, value)
+                if option is not None:
+                    cli_command_parts.append(option)
+            continue
 
+        param_key = name.lower().replace(" ", "_")
+        param_info = param_vars.get(param_key)
+        if not param_info:
+            continue
 
-    # Append Positive ordered elements
-    for index in range(1, len(jagged_positive_array)):
-        if jagged_positive_array[index]:
-            cli_command_parts.extend(jagged_positive_array[index])
+        widget: Union[widgets.Widget, widgets.FileUpload, widgets.Checkbox] = param_info["widget"]
+        optional = param_info.get("optional", False)
 
-    # Append elements with cli_order == 0
-    if jagged_positive_array and jagged_positive_array[0]:
-        cli_command_parts.extend(jagged_positive_array[0])
+        # =====================================================
+        # Case A: Folder-based input (image, file, etc.)
+        # =====================================================
+        if "folder_name" in param_info:
+            folder_name = param_info["folder_name"]
+            is_mounted = param_info.get("is_mounted", False)
+            widget = param_info.get("widget")
 
-    # Append Negative ordered elements in reverse order
-    for index in range(len(jagged_negative_array) - 1, 0, -1):
-        if jagged_negative_array[index]:
-            cli_command_parts.extend(jagged_negative_array[index])
+            if is_mounted:
+                value = folder_name
+            elif isinstance(widget, widgets.FileUpload) and widget.value:
+                os.makedirs(folder_name, exist_ok=True)
+                for file_info in widget.value:
+                    fname = file_info.get("name")
+                    content = file_info.get("content")
+                    if fname and content:
+                        with open(os.path.join(folder_name, fname), "wb") as f:
+                            f.write(content)
+                print(f"Uploaded files saved to: {folder_name}")
+                value = folder_name
+            else:
+                print(f"No input files found for {cli_tag}")
+                continue
+
+            option = option_to_append(cli_tag, value)
+            if option is not None:
+                cli_command_parts.append(option)
+            continue
+
+        # =====================================================
+        # Case B: Checkbox
+        # =====================================================
+        if isinstance(widget, widgets.Checkbox):
+            append_value = param_info.get("append_value", False)
+            value = widget.value
+            if append_value:
+                option = option_to_append(cli_tag, value)
+                if option is not None:
+                    cli_command_parts.append(option)
+            else:
+                if value and cli_tag != "None":
+                    cli_command_parts.append(cli_tag)
+            continue
+
+        # =====================================================
+        # Case C: Other widgets
+        # =====================================================
+        if isinstance(widget, widgets.RadioButtons):
+            value = widget.value
+            if value == "ignore":
+                value = None
+        else:
+            value = widget.value
+
+        validate_and_highlight(widget, value, optional)
+        if value in [None, "", "None"]:
+            continue
+
+        option = option_to_append(cli_tag, value)
+        if option is not None:
+            cli_command_parts.append(option)
 
     return " ".join(cli_command_parts)
 

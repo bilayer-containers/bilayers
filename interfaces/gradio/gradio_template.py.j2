@@ -264,7 +264,11 @@ def on_submit(
                         continue
                     full_path = os.path.join(root, f)
                     possible_files.append(full_path)
-
+            
+            fallback_folder = "outputs"
+            os.makedirs(fallback_folder ,exist_ok=True)
+            
+            # Copy all detected files into the fallback folder
             for file_path in possible_files:
                 try:
                     shutil.copy(file_path, fallback_folder)

@@ -18,50 +18,37 @@ def option_to_append(cli_tag: str, value: Any) -> str:
     Returns:
         str: The formatted CLI option.
     """
+    if value is None:
+        return ""
+    
     if cli_tag == "":
         return str(value)  # Append only the value
-    else:
-        if "=" in cli_tag:
-            return f"{cli_tag}{value}"
-        return f"{cli_tag} {value}"  # Append cli_tag and value
+    elif "=" in cli_tag:
+        return f"{cli_tag}{value}"
+    return f"{cli_tag} {value}"  # Append cli_tag and value
 
-def insert_into_jagged_array(
-    jagged_array: list[Optional[list[str]]], 
-    cli_order: int,
-    cli_tag: str, 
-    value: Any
-    ) -> None:
+def cli_tag_is_valid(cli_tag: Optional[str]) -> bool:
     """
-    Inserts CLI arguments into a structured array to maintain ordering.
+    Checks if the CLI tag is valid (not None, not "None", not empty)
 
     Args:
-        jagged_array (list[Optional[list[str]]]): The structured array for CLI options.
-        cli_order (int): The order in which arguments should appear.
-        cli_tag (str): The CLI tag.
-        value (Any): The value to append.
+        cli_tag (Optional[str]): The CLI tag to check
+
+    Returns:
+        bool: True if valid, False otherwise
     """
-    # Check the length of Jagged Array and dynamically append with None if required
-    while len(jagged_array) <= abs(cli_order):
-        jagged_array.append(None)
+    return cli_tag not in [None, "None", ""]
 
-    # Initialize the sublist if it's not already
-    {# jagged_array[abs(cli_order)] = jagged_array[abs(cli_order)] or [] #}
-    if jagged_array[abs(cli_order)] is None:
-        jagged_array[abs(cli_order)] = []
-
-    # Append the cli_tag and value to the appropriate sublist
-    result = option_to_append(cli_tag, value)
-    jagged_array[abs(cli_order)].append(result)
 
 def generate_cli_command(
-    cli_tags: dict[str, dict[str, Any]], 
+    cli_sequence: list[dict[str, Any]], 
     **kwargs: Any
     ) -> tuple[str, Optional[str], Optional[str]]:
     """
-    Generates the CLI command dynamically based on user inputs.
+    Generates the CLI command dynamically based on pre-ordered CLI sequence and user inputs
 
     Args:
-        cli_tags (dict[str, dict[str, Any]]): Mapping of parameters to CLI tags.
+        cli_sequence (list[dict[str, Any]]): Pre-ordered sequence of inputs/parameters/hidden_args.
         **kwargs (Any): User-provided parameter values.
 
     Returns:
@@ -93,171 +80,118 @@ def generate_cli_command(
 
     folder_name = None
     output_folder_name = None
-    append_value = None
 
-    # Jagged Array Define
-    jagged_positive_array = []
-    jagged_negative_array = []
+    # Iterate through the pre-ordered CLI sequence
+    for item in cli_sequence:
+        name = item.get("name", "")
+        source = item.get("source", "")
+        cli_tag = item.get("cli_tag", "")
+        item_type = item.get("type", "")
+        optional = item.get("optional", False)
+        label = item.get("label", "")
+        append_value = item.get("append_value", False)
+        
+        # Get value from kwargs (user input) or use default
+        if source == "hidden":
+            # Hidden arguments always use their configured value
+            value = item.get("value", "")
+        else:
+            # Regular inputs/parameters: use user input if provided, else use default
+            param_key = name.lower().replace(" ", "_")
+            value = kwargs.get(param_key, item.get("default"))
 
-    # Update cli_args with user parameters or defaults
-    for key, value in kwargs.items():
-        if key in cli_tags:
-            cli_tag: str = cli_tags[key].get("cli_tag", None)
-            default: Any = cli_tags[key].get("default", None)
-            cli_order: int = cli_tags[key].get("cli_order", 0)
-            label: str = cli_tags[key].get("label", None)
-            optional: bool = cli_tags[key].get("optional", False)
+        # Skip processing if value is None/empty and optional
+        if value in [None, "", "None"] and optional:
+            continue
 
-            # First, check the condition if cli_order is negative then dynamically append the size of jagged_negative_array
-            if cli_order < 0:
-                while len(jagged_negative_array) <= abs(cli_order):
-                    jagged_negative_array.append(None)  # Append None to fill gaps
+        # Validate mandatory parameters
+        if value in [None, "", "None"] and not optional:
+            error_message = f"{label} needs to have some value. It's Mandatory!"
+            raise gr.Error(error_message, duration=None)
 
-            while len(jagged_positive_array) <= cli_order:
-                jagged_positive_array.append(None)  # Append None to fill gaps
-
-            if isinstance(value, bool):
-                append_value = cli_tags[key].get("append_value", False)
-                if append_value:
-                    if cli_order < 0:
-                        insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)  
-                    else:
-                        insert_into_jagged_array(jagged_positive_array, cli_order, cli_tag, value)
-                else:
-                    if value: 
-                        if cli_order < 0:
-                            jagged_negative_array[abs(cli_order)] = jagged_negative_array[abs(cli_order)] or []
-                            jagged_negative_array[abs(cli_order)].append(cli_tag)
-                        else:
-                            jagged_positive_array[cli_order] = jagged_positive_array[cli_order] or []
-                            jagged_positive_array[cli_order].append(cli_tag)
+        # Handle boolean types (checkbox)
+        if isinstance(value, bool):
+            if append_value:
+                # Append both tag and value
+                option = option_to_append(cli_tag, value)
+                if option:
+                    cli_command.append(option)
             else:
-                # Handle Radio type mappings dynamically
-                if key in radio_options and value in radio_options[key]:
-                    value = radio_options[key].get(value, value)
-                    # Handle the case where the user explicitly selects "ignore" for this parameter.
-                    # We set the value to None so that later, during validation before adding it to the command,
-                    # a missing mandatory value (None) will trigger an error.
-                    if value == "ignore":
-                        # Make value None if "ignore" is selected
-                        value = None
-                # If the parameter is a list (mainly `inputs` section where type can be either of image, file, measurement, array, executable), convert it to a string
-                elif isinstance(value, list):
-                    folder_name = cli_tags[key]["folder_name"] # Direct access since it's guarranteed to exist
-                    print("Folder Name:", folder_name)
-                    os.makedirs(folder_name, exist_ok=True)
-                    print("Value of dir", value)
-                    for file_path in value:
-                        shutil.copy(file_path, folder_name)
-                    value = folder_name
-                # If the parameter is a TextBox, check if it has a directory-name i.e. it's coming for declaring ouput path
-                elif isinstance(value, str) and value != "":
-                    # -------------------------------------------------------------
-                    # This section handles 3 major scenarios:
-                    #   (1) User explicitly provides an output directory name
-                    #   (2) User doesn’t provide one - Bilayers creates a default
-                    #   (3) Algorithm manages its own outputs (no CLI tag)
-                    # -------------------------------------------------------------
-                    output_dir_set = cli_tags[key].get("output_dir_set")
-                    cli_tag_present = cli_tag not in [None, "None", ""]
+                # Only append tag if true
+                if value and cli_tag and cli_tag_is_valid(cli_tag):
+                    cli_command.append(cli_tag)
 
-                    # Determine base output folder:
-                    # - If the spec declares output_dir_set=True, use user's folder
-                    # - Otherwise, fall back to a default base folder ("outputs/")
-                    base_output_dir = value if output_dir_set else cli_tags[key].get("default", "outputs")
+        # Handle list types (inputs with file/image/measurement/etc.)
+        elif isinstance(value, list):
+            folder_name = item.get("folder_name")
+            if not folder_name:
+                if optional:
+                    # optional file input; nothing to do
+                    continue
+                raise gr.Error(f"{label}: folder_name missing in spec.", duration=None)
 
-                    # Construct a unique run-specific subfolder name to prevent overwriting
-                    # Example: outputs/run_20251013_1910_ab12
-                    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-                    unique_suffix = uuid.uuid4().hex[:4]
-                    unique_run_folder = os.path.join(base_output_dir, f"run_{timestamp}_{unique_suffix}")
+            if not value:  # just in case
+                if optional:
+                    continue
+                raise gr.Error(f"{label} needs a file. It's Mandatory!", duration=None)
 
-                    # Create the new sub folder
-                    os.makedirs(unique_run_folder, exist_ok=True)
-                    output_folder_name = unique_run_folder
+            os.makedirs(folder_name, exist_ok=True)
+            for file_path in value:
+                shutil.copy(file_path, folder_name)
+            value = folder_name
+            if cli_tag and cli_tag_is_valid(cli_tag):
+                option = option_to_append(cli_tag, value)
+                if option:
+                    cli_command.append(option)
 
-                    # IMPORTANT:
-                    # Update CLI value only if CLI tag actually exists (avoid breaking tools with no --save_dir)
-                    if cli_tag_present:
-                        value = output_folder_name
+        # Handle text output paths, check if it has a directory-name i.e. it's coming for declaring ouput path
+        elif isinstance(value, str) and item_type == "textbox" and item.get("output_dir_set"):
+            # -------------------------------------------------------------
+            # This section handles 3 major scenarios:
+            #   (1) User explicitly provides an output directory name
+            #   (2) User doesn’t provide one - Bilayers creates a default
+            #   (3) Algorithm manages its own outputs (no CLI tag)
+            # -------------------------------------------------------------
+            output_dir_set = item.get("output_dir_set", False)
+            cli_tag_present = cli_tag_is_valid(cli_tag)
+            
+            # Determine base output folder:
+            # - If the spec declares output_dir_set=True, use user's folder
+            # - Otherwise, fall back to a default base folder ("outputs/")                
+            base_output_dir = value if output_dir_set else item.get("default", "outputs")
+            
+            # Construct a unique run-specific subfolder name to prevent overwriting
+            # Example: outputs/run_20251013_1910_ab12        
+            timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            unique_suffix = uuid.uuid4().hex[:4]
+            unique_run_folder = os.path.join(base_output_dir, f"run_{timestamp}_{unique_suffix}")
+            
+            # Create new subfolder
+            os.makedirs(unique_run_folder, exist_ok=True)
+            output_folder_name = unique_run_folder
+            
+            if cli_tag_present:
+                value = output_folder_name
+                option = option_to_append(cli_tag, value)
+                if option:
+                    cli_command.append(option)
 
-                # For each parameter/input, we validate the provided value before constructing the CLI command.
-                # If the user input is an empty string or None, we explicitly set it to None.
-                # For mandatory parameter/input (optional is False), this triggers an error,
-                # ensuring that all required values are provided by the user.
-                if value == "" or value == None:
-                    print("Which cli_tag is coming here?", cli_tag)
-                    value = None
-                    if optional is False:
-                        error_message = f"{label} needs to have some value. It's Mandatory!"
-                        raise gr.Error(error_message, duration = None)
-                elif value is not None:
-                # If the cli_tag is None, don't include it in the command but if cli_tag is "" then just include the value
-                    if cli_tag != "None":
-                        if cli_order < 0: 
-                            insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)
-                        else:
-                            insert_into_jagged_array(jagged_positive_array, cli_order, cli_tag, value)
-
-    # Add hidden arguments to the command
-    {% autoescape false %}
-    hidden_args = {{ exec_function.get("hidden_args", {}) }}
-    print("Hidden Args:", hidden_args)
-    {% endautoescape %}
-
-    # If hidden_args exists
-    if hidden_args:
-        for arg in hidden_args.values():  # Iterate over dictionary values, not keys
-            cli_tag = arg.get("cli_tag", '')
-            value = arg.get("value", '')
-            append_value = arg.get("append_value", False)
-            cli_order = arg.get("cli_order", 0)
-
-            if cli_order < 0:
-                while len(jagged_negative_array) <= abs(cli_order):
-                    jagged_negative_array.append(None)  # Append None to fill gaps
-
-            while len(jagged_positive_array) <= cli_order:
-                jagged_positive_array.append(None)  # Append None to fill gaps
-
-            if isinstance(value, bool):
-                if append_value:
-                    if cli_order < 0:
-                        insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)  
-                    else:
-                        insert_into_jagged_array(jagged_positive_array, cli_order, cli_tag, value)
-                else:
-                    if value: 
-                        if cli_order < 0:
-                            jagged_negative_array[abs(cli_order)] = jagged_negative_array[abs(cli_order)] or []
-                            jagged_negative_array[abs(cli_order)].append(cli_tag)
-                        else:
-                            jagged_positive_array[cli_order] = jagged_positive_array[cli_order] or []
-                            jagged_positive_array[cli_order].append(cli_tag)
-
-            else:
-                if cli_order < 0:
-                    insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)
-                else:
-                    insert_into_jagged_array(jagged_positive_array, cli_order, cli_tag, value)
-
-    # Debug if Jagged Array is storing the correct values
-    print("Jagged Positive Array:", jagged_positive_array)
-    print("Jagged Negative Array:", jagged_negative_array)
-
-    # Append Positive ordered elements
-    for index in range(1, len(jagged_positive_array)):
-        if jagged_positive_array[index]:
-            cli_command.extend(jagged_positive_array[index])
-
-    # Append elements with cli_order == 0
-    if jagged_positive_array and jagged_positive_array[0]:
-        cli_command.extend(jagged_positive_array[0])
-
-    # Append Negative ordered elements
-    for index in range(len(jagged_negative_array) - 1, 0, -1):
-        if jagged_negative_array[index]:
-            cli_command.extend(jagged_negative_array[index])
+        # Handle all other types (radio, dropdown, textbox, number, etc.)
+        elif value is not None:
+            # Map radio/dropdown selections to values
+            param_key = name.lower().replace(" ", "_")
+            if param_key in radio_options and value in radio_options[param_key]:
+                value = radio_options[param_key].get(value, value)
+                
+                if value == "ignore":
+                    # Skip adding the whole "--cli_tag <value>" pair; if "ignore" is selected
+                    continue
+            
+            # Add to command if cli_tag is valid
+            if cli_tag and cli_tag_is_valid(cli_tag):
+                option = option_to_append(cli_tag, value)
+                if option:
+                    cli_command.append(option)
 
     return " ".join(cli_command), folder_name, output_folder_name
 
@@ -298,41 +232,13 @@ def on_submit(
     {% endif %}
     }
 
-    # Mapping of parameter tags to CLI tags
-    cli_tags = {
-    {% for key, input_conf in inputs.items() %}
-    "{{ key | lower | replace(' ', '_') }}": {
-        "cli_tag": "{{ input_conf.get('cli_tag', '') }}",
-        "default": "{{ input_conf.get('default', '') }}",
-        "cli_order": {{ input_conf.get('cli_order', 0) }},
-        "optional": {{ input_conf.get('optional', False) }},
-        "label": "{{ input_conf.get('label', '') }}",
-        {% if input_conf.get('type') in ['image', 'measurement', 'file', 'array', 'executable'] %}
-        "folder_name": "{{ input_conf.get('folder_name', '') }}"
-        {% endif %}
-    },
-    {% endfor %}
-    {% for key, param_conf in parameters.items() %}
-    "{{ key | lower | replace(' ', '_') }}": {
-        "cli_tag": "{{ param_conf.get('cli_tag', '') }}",
-        "default": "{{ param_conf.get('default', '') }}",
-        "cli_order": {{ param_conf.get('cli_order', 0) }},
-        "optional": {{ param_conf.get('optional', False) }},
-        "label": "{{ param_conf.get('label', '') }}",
-        {% if param_conf.get('type') == 'checkbox' and param_conf.get('append_value') is defined %}
-        "append_value": {{ param_conf.get('append_value', False) }},
-        {% endif %}
-        {% if param_conf.get('type') == 'textbox' and param_conf.get('output_dir_set') is defined %}
-        "output_dir_set": {{ param_conf.get('output_dir_set', False) }},
-        {% endif %}
-    }{% if not loop.last %},{% endif %}
-    {% endfor %}
-    }
-
     print("Received parameters:", kwargs)
 
-    # Generate the CLI command
-    cli_command, folder_name, output_folder_name = generate_cli_command(cli_tags, **kwargs)
+    # CLI sequence is passed in from the template context as a pre-ordered list
+    cli_sequence = {{ cli_sequence | tojson | replace('true', 'True') | replace('false', 'False') | safe }}
+
+    # Generate the CLI command using the pre-ordered sequence
+    cli_command, folder_name, output_folder_name = generate_cli_command(cli_sequence, **kwargs)
     print("Generated CLI command:", cli_command)
 
     # Execute the CLI command
@@ -341,48 +247,21 @@ def on_submit(
         print("Command executed successfully")
 
         # Check if output_folder_name is not None and is a directory
-        # -------------------------------------------------------------
-        # STEP: Collect and display output files after command execution
-        #
-        # The below logic ensures we always have a valid folder
-        # from which to display results in the Gradio interface,
-        # even if the algorithm does not explicitly define one.
-        # -------------------------------------------------------------
         if output_folder_name and os.path.exists(output_folder_name) and os.path.isdir(output_folder_name):
-        # ---------------------------------------------------------
-        # CASE 1: The output folder was explicitly defined and exists
-        #
-        # This covers algorithms that:
-        #   - Received an explicit CLI output flag (e.g., "--save_dir")
-        #   - Or used a user-defined path like /bilayers/input_images/
-        # ---------------------------------------------------------
             print("Folder exists")
             output_files = [os.path.join(output_folder_name, f)
                             for f in os.listdir(output_folder_name)
                             if os.path.isfile(os.path.join(output_folder_name, f))]
         else:
-        # ---------------------------------------------------------
-        # CASE 2: The algorithm did not define an explicit output path
-        #
-        # As a fallback, Bilayers will collect any generated files so
-        # they can be displayed or downloaded via the interface
-        #
-        # Strategy:
-        #   1. Walk the current directory recursively
-        #   2. Copy all non-system, non-code files into the fallback folder
-        #   3. Build the output list for Gradio to display
-        #
-        # This ensures every algorithm—no matter what extensions it writes—
-        # produces something viewable to the user
-        # ---------------------------------------------------------
+            # Fallback: collect all generated files
             possible_files = []
+            fallback_folder = "outputs_fallback"
+            os.makedirs(fallback_folder, exist_ok=True)
 
             for root, _, files in os.walk("."):
                 for f in files:
-                    # Skip hidden, code, and notebook files
                     if f.startswith(".") or f.endswith((".py", ".pyc", ".ipynb")):
                         continue
-
                     full_path = os.path.join(root, f)
                     possible_files.append(full_path)
             
@@ -396,7 +275,6 @@ def on_submit(
                 except Exception as e:
                     print(f"Warning: could not copy {file_path}: {e}")
 
-            # Prepare list for Gradio display
             output_files = [
                 os.path.join(fallback_folder, f)
                 for f in os.listdir(fallback_folder)
@@ -419,7 +297,6 @@ def on_submit(
 {{ key | lower | replace(" ", "_") }}_description = gr.Markdown(value="{{ input_conf.get('description', '') }}")
 {{ key | lower | replace(" ", "_") }} = gr.Files(label="{{ input_conf.get('label', '') }}", file_count="{{ input_conf.get('file_count', 'single') }}")
 {% endif %}
-
 
 {% endfor %}
 {%- endif %}

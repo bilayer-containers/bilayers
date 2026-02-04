@@ -10,7 +10,7 @@ PROJ_ROOT="$(cd "$PKG_ROOT/../.." && pwd)"
 
 # List of algorithms and interfaces
 ALGORITHM_NAMES=("test_algorithm")
-INTERFACE_NAMES=("gradio" "jupyter" "cellprofiler_plugin")
+INTERFACE_NAMES=("gradio" "jupyter" "streamlit")
 
 # Build the Docker images for each algorithm and interface
 for ALGORITHM_NAME in "${ALGORITHM_NAMES[@]}";

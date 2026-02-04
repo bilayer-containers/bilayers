@@ -1,0 +1,479 @@
+import os
+import glob
+import streamlit as st
+import subprocess
+import shutil
+from typing import Any, Optional
+
+def option_to_append(cli_tag: str, value: Any) -> str:
+    """
+    Formats CLI options for appending to the command.
+
+    Args:
+        cli_tag (str): CLI tag (e.g., "--option").
+        value (Any): The value to append.
+
+    Returns:
+        str: The formatted CLI option.
+    """
+    if cli_tag == "":
+        return str(value)  # Append only the value
+    else:
+        if "=" in cli_tag:
+            return f"{cli_tag}{value}"
+        return f"{cli_tag} {value}"  # Append cli_tag and value
+
+def insert_into_jagged_array(
+    jagged_array: list[Optional[list[str]]], 
+    cli_order: int,
+    cli_tag: str, 
+    value: Any
+    ) -> None:
+    """
+    Inserts CLI arguments into a structured array to maintain ordering.
+
+    Args:
+        jagged_array (list[Optional[list[str]]]): The structured array for CLI options.
+        cli_order (int): The order in which arguments should appear.
+        cli_tag (str): The CLI tag.
+        value (Any): The value to append.
+    """
+    # Check the length of Jagged Array and dynamically append with None if required
+    while len(jagged_array) <= abs(cli_order):
+        jagged_array.append(None)
+
+    # Initialize the sublist if it's not already
+    {# jagged_array[abs(cli_order)] = jagged_array[abs(cli_order)] or [] #}
+    if jagged_array[abs(cli_order)] is None:
+        jagged_array[abs(cli_order)] = []
+
+    # Append the cli_tag and value to the appropriate sublist
+    result = option_to_append(cli_tag, value)
+    jagged_array[abs(cli_order)].append(result)
+
+def generate_cli_command(
+    cli_tags: dict[str, dict[str, Any]], 
+    **kwargs: Any
+    ) -> tuple[str, Optional[str], Optional[str]]:
+    """
+    Generates the CLI command dynamically based on user inputs.
+
+    Args:
+        cli_tags (dict[str, dict[str, Any]]): Mapping of parameters to CLI tags.
+        **kwargs (Any): User-provided parameter values.
+
+    Returns:
+        tuple[str, Optional[str], Optional[str]]: CLI command, folder_name, and output_folder_name.
+    """
+    cli_command = ["{{ exec_function.get("cli_command", "") }}"]
+
+    # Radio options mapping
+    radio_options = {
+    {% if parameters %}
+    {% for key, param_conf in parameters.items() if param_conf.get('type') in ['radio', 'dropdown'] -%}
+        "{{ key | lower | replace(' ', '_') }}": {
+            {% for option in param_conf.get('options', []) -%}
+            "{{ option.get('label', '') }}": "{{ option.get('value', '') }}"{% if not loop.last %}, {% endif %}
+            {%- endfor %}
+        },
+    {%- endfor %}
+    {%- endif %}
+    {% if display_only %}
+    {% for key, display_only_conf in display_only.items() if display_only_conf.get('type') in ['radio', 'dropdown'] -%}
+        "{{ key | lower | replace(' ', '_') }}": {
+            {% for option in display_only_conf.get('options', []) -%}
+            "{{ option.get('label', '') }}": "{{ option.get('value', '') }}"{% if not loop.last %}, {% endif %}
+            {%- endfor %}
+        },
+    {%- endfor %}
+    {%- endif %}
+    }
+
+    folder_name = None
+    output_folder_name = None
+    append_value = None
+
+    # Jagged Array Define
+    jagged_positive_array = []
+    jagged_negative_array = []
+
+    # Update cli_args with user parameters or defaults
+    for key, value in kwargs.items():
+        if key in cli_tags:
+            cli_tag: str = cli_tags[key].get("cli_tag", None)
+            default: Any = cli_tags[key].get("default", None)
+            cli_order: int = cli_tags[key].get("cli_order", 0)
+            label: str = cli_tags[key].get("label", None)
+            optional: bool = cli_tags[key].get("optional", False)
+
+            # First, check the condition if cli_order is negative then dynamically append the size of jagged_negative_array
+            if cli_order < 0:
+                while len(jagged_negative_array) <= abs(cli_order):
+                    jagged_negative_array.append(None)  # Append None to fill gaps
+
+            while len(jagged_positive_array) <= cli_order:
+                jagged_positive_array.append(None)  # Append None to fill gaps
+
+            if isinstance(value, bool):
+                append_value = cli_tags[key].get("append_value", False)
+                if append_value:
+                    if cli_order < 0:
+                        insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)  
+                    else:
+                        insert_into_jagged_array(jagged_positive_array, cli_order, cli_tag, value)
+                else:
+                    if value: 
+                        if cli_order < 0:
+                            jagged_negative_array[abs(cli_order)] = jagged_negative_array[abs(cli_order)] or []
+                            jagged_negative_array[abs(cli_order)].append(cli_tag)
+                        else:
+                            jagged_positive_array[cli_order] = jagged_positive_array[cli_order] or []
+                            jagged_positive_array[cli_order].append(cli_tag)
+            else:
+                # Handle Radio type mappings dynamically
+                if key in radio_options and value in radio_options[key]:
+                    value = radio_options[key].get(value, value)
+                    # Handle the case where the user explicitly selects "ignore" for this parameter.
+                    # We set the value to None so that later, during validation before adding it to the command,
+                    # a missing mandatory value (None) will trigger an error.
+                    if value == "ignore":
+                        # Make value None if "ignore" is selected
+                        value = None
+                # If the parameter is a list (mainly `inputs` section where type can be either of image, file, measurement, array, executable), convert it to a string
+                elif isinstance(value, list):
+                    folder_name = cli_tags[key]["folder_name"] # Direct access since it's guarranteed to exist
+                    print("Folder Name:", folder_name)
+                    os.makedirs(folder_name, exist_ok=True)
+                    print("Value of dir", value)
+                    for file_path in value:
+                        shutil.copy(file_path, folder_name)
+                    value = folder_name
+                # If the parameter is a TextBox, check if it has a directory-name i.e. it's coming for declaring ouput path
+                elif isinstance(value, str) and value!="":
+                    output_dir_set = cli_tags[key].get("output_dir_set") # May be missing, so .get() prevents crashes by returning None
+                    if output_dir_set == True:
+                        output_folder_name = value
+                        os.makedirs(output_folder_name, exist_ok=True)
+                        if cli_tag != "None":
+                            value = output_folder_name 
+                    elif output_dir_set == False:
+                        output_folder_name = default
+                        os.makedirs(default, exist_ok=True)
+                        if cli_tag != "None":
+                            value = default
+
+                # For each parameter/input, we validate the provided value before constructing the CLI command.
+                # If the user input is an empty string or None, we explicitly set it to None.
+                # For mandatory parameter/input (optional is False), this triggers an error,
+                # ensuring that all required values are provided by the user.
+                if value == "" or value == None:
+                    print("Which cli_tag is coming here?", cli_tag)
+                    value = None
+                    if optional is False:
+                        error_message = f"{label} needs to have some value. It's Mandatory!"
+                        raise st.error(error_message)
+                elif value is not None:
+                # If the cli_tag is None, don't include it in the command but if cli_tag is "" then just include the value
+                    if cli_tag != "None":
+                        if cli_order < 0: 
+                            insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)
+                        else:
+                            insert_into_jagged_array(jagged_positive_array, cli_order, cli_tag, value)
+
+    # Add hidden arguments to the command
+    {% autoescape false %}
+    hidden_args = {{ exec_function.get("hidden_args", {}) }}
+    print("Hidden Args:", hidden_args)
+    {% endautoescape %}
+
+    # If hidden_args exists
+    if hidden_args:
+        for arg in hidden_args.values():  # Iterate over dictionary values, not keys
+            cli_tag = arg.get("cli_tag", '')
+            value = arg.get("value", '')
+            append_value = arg.get("append_value", False)
+            cli_order = arg.get("cli_order", 0)
+
+            if cli_order < 0:
+                while len(jagged_negative_array) <= abs(cli_order):
+                    jagged_negative_array.append(None)  # Append None to fill gaps
+
+            while len(jagged_positive_array) <= cli_order:
+                jagged_positive_array.append(None)  # Append None to fill gaps
+
+            if isinstance(value, bool):
+                if append_value:
+                    if cli_order < 0:
+                        insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)  
+                    else:
+                        insert_into_jagged_array(jagged_positive_array, cli_order, cli_tag, value)
+                else:
+                    if value: 
+                        if cli_order < 0:
+                            jagged_negative_array[abs(cli_order)] = jagged_negative_array[abs(cli_order)] or []
+                            jagged_negative_array[abs(cli_order)].append(cli_tag)
+                        else:
+                            jagged_positive_array[cli_order] = jagged_positive_array[cli_order] or []
+                            jagged_positive_array[cli_order].append(cli_tag)
+
+            else:
+                if cli_order < 0:
+                    insert_into_jagged_array(jagged_negative_array, cli_order, cli_tag, value)
+                else:
+                    insert_into_jagged_array(jagged_positive_array, cli_order, cli_tag, value)
+
+    # Debug if Jagged Array is storing the correct values
+    print("Jagged Positive Array:", jagged_positive_array)
+    print("Jagged Negative Array:", jagged_negative_array)
+
+    # Append Positive ordered elements
+    for index in range(1, len(jagged_positive_array)):
+        if jagged_positive_array[index]:
+            cli_command.extend(jagged_positive_array[index])
+
+    # Append elements with cli_order == 0
+    if jagged_positive_array and jagged_positive_array[0]:
+        cli_command.extend(jagged_positive_array[0])
+
+    # Append Negative ordered elements
+    for index in range(len(jagged_negative_array) - 1, 0, -1):
+        if jagged_negative_array[index]:
+            cli_command.extend(jagged_negative_array[index])
+
+    return " ".join(cli_command), folder_name, output_folder_name
+
+# Dynamically define on_submit with the exact parameter arguments
+def on_submit(
+{% if inputs -%}
+{% for key, input_conf in inputs.items() -%}
+{% if input_conf.get('type') in ['image', 'measurement', 'array', 'file', 'executable'] %}
+{{ key | lower | replace(" ", "_") }}_description,
+{{ key | lower | replace(" ", "_") }},
+{% else %}
+{{ key | lower | replace(" ", "_") }},
+{%- endif %}
+{%- endfor %}
+{%- endif %}
+{% if parameters -%}
+{% for key, param_conf in parameters.items() -%}
+{{ key | lower | replace(" ", "_") }},
+{%- endfor %}
+{%- endif %}
+{% if display_only -%}
+{% for key, display_only_conf in display_only.items() -%}
+{{ key | lower | replace(" ", "_") }},
+{%- endfor %}
+{%- endif %}
+):
+
+    kwargs = {
+    {% if inputs %}
+    {% for key, input_conf in inputs.items() %}
+        "{{ key | lower | replace(' ', '_') }}": {{ key | lower | replace(' ', '_') }},
+    {% endfor %}
+    {% endif %}
+    {% if parameters %}
+    {% for key, param_conf in parameters.items() %}
+        "{{ key | lower | replace(' ', '_') }}": {{ key | lower | replace(' ', '_') }},
+    {% endfor %}
+    {% endif %}
+    }
+
+    # Mapping of parameter tags to CLI tags
+    cli_tags = {
+    {% for key, input_conf in inputs.items() %}
+    "{{ key | lower | replace(' ', '_') }}": {
+        "cli_tag": "{{ input_conf.get('cli_tag', '') }}",
+        "default": "{{ input_conf.get('default', '') }}",
+        "cli_order": {{ input_conf.get('cli_order', 0) }},
+        "optional": {{ input_conf.get('optional', False) }},
+        "label": "{{ input_conf.get('label', '') }}",
+        {% if input_conf.get('type') in ['image', 'measurement', 'file', 'array', 'executable'] %}
+        "folder_name": "{{ input_conf.get('folder_name', '') }}"
+        {% endif %}
+    },
+    {% endfor %}
+    {% for key, param_conf in parameters.items() %}
+    "{{ key | lower | replace(' ', '_') }}": {
+        "cli_tag": "{{ param_conf.get('cli_tag', '') }}",
+        "default": "{{ param_conf.get('default', '') }}",
+        "cli_order": {{ param_conf.get('cli_order', 0) }},
+        "optional": {{ param_conf.get('optional', False) }},
+        "label": "{{ param_conf.get('label', '') }}",
+        {% if param_conf.get('type') == 'checkbox' and param_conf.get('append_value') is defined %}
+        "append_value": {{ param_conf.get('append_value', False) }},
+        {% endif %}
+        {% if param_conf.get('type') == 'textbox' and param_conf.get('output_dir_set') is defined %}
+        "output_dir_set": {{ param_conf.get('output_dir_set', False) }},
+        {% endif %}
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+    }
+
+    print("Received parameters:", kwargs)
+
+    # Generate the CLI command
+    cli_command, folder_name, output_folder_name = generate_cli_command(cli_tags, **kwargs)
+    print("Generated CLI command:", cli_command)
+    
+    if output_folder_name is None:
+        #we don't know the output folder name, so we will track the input folder(s) for new files
+        existing_input_files = {}
+        {% for key, input_conf in inputs.items() %}
+        existing_input_files["{{ input_conf.get('folder_name', '') }}"] = glob.glob(f"{{ input_conf.get('folder_name', '') }}/*")
+        {% endfor %}
+
+    # Execute the CLI command
+    try:
+        result = subprocess.run(cli_command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        print("Command executed successfully")
+
+        # Check if output_folder_name is not None and is a directory
+        if output_folder_name and os.path.exists(output_folder_name) and os.path.isdir(output_folder_name):
+            print("Folder exists")
+            # Display Output files
+            output_files = [os.path.join(output_folder_name, f) for f in os.listdir(output_folder_name) if os.path.isfile(os.path.join(output_folder_name, f))]
+        else:
+            print("Folder does not exist or output_folder_name is None")
+            output_files = []
+            if output_folder_name == None:
+                for eachinputfolder, eachorigfiles in existing_input_files.items():
+                    output_files += list(set(glob.glob(f"{eachinputfolder}/*")) - set(eachorigfiles))
+
+        return output_files
+
+    except subprocess.CalledProcessError as e:
+        error_message = "Please take a screenshot of this error and raise an issue at the Bilayers repository on GitHub."
+        error_message += f"Command failed with error: {e.stderr.decode()}\n\n"
+        raise st.error(error_message)
+
+st.session_state.done_running = os.path.exists("outputs.zip")
+
+st.markdown(f"# {{ title }}")
+
+st.markdown("""{{ description }}""")
+
+with st.form("my_form"): 
+
+
+    {% if inputs is not none and inputs | length > 0 -%}
+    inputs_dict = {}
+    {% for key, input_conf in inputs.items() %}
+    {% if input_conf.get('type') in ['image', 'measurement', 'array', 'file', 'executable'] %}
+    {{ key | lower | replace(" ", "_") }}_description = st.markdown("{{ input_conf.get('description', '') }}")
+    {{ key | lower | replace(" ", "_") }} = st.file_uploader(label="{{ input_conf.get('label', '') }}", accept_multiple_files=True)
+    inputs_dict["{{ key | lower | replace(" ", "_") }}"]={"folder_name":"{{ input_conf.get('folder_name', '') }}","file_list":{{ key | lower | replace(" ", "_") }}}
+    {% endif %}
+
+
+    {% endfor %}
+    {%- endif %}
+
+    {% if parameters is not none and parameters | length > 0 -%}
+    {% for key, param_conf in parameters.items() %}
+
+    {% set param_label = key | lower | replace(" ", "_") %}
+
+    {% if param_conf.get('type') in ['radio', 'dropdown'] %}
+    options_list_{{ param_label }} = [{% for option in param_conf.get('options', []) %}"{{ option.label }}"{% if not loop.last %}, {% endif %}{% endfor %}]
+    options_list_{{ param_label }}_values = [{% for option in param_conf.get('options', []) %}"{{ option.value }}"{% if not loop.last %}, {% endif %}{% endfor %}]
+    default_index_{{ param_label }} = options_list_{{ param_label }}_values.index("{{ param_conf.get('default', '') }}")
+    {% endif %}
+    {% if param_conf.get('type') == 'radio' -%}
+    {{ param_label }} = st.radio(label="{{ param_conf.get('label', '') }}", help="{{ param_conf.get('description', '') }}", options=options_list_{{ param_label }}, index=default_index_{{param_label}})
+    {% elif param_conf.get('type') == 'dropdown' -%}
+    {% if param_conf.get('multiselect',False) in [False, "False", "false"] %}
+    {{ param_label }} = st.selectbox(label="{{ param_conf.get('label', '') }}", help="{{ param_conf.get('description', '') }}", options=options_list_{{ param_label }}, index=default_index_{{param_label}})
+    {% else %}
+    {{ param_label }} = st.multiselect(label="{{ param_conf.get('label', '') }}", help="{{ param_conf.get('description', '') }}", options=options_list_{{ param_label }}, index=default_index_{{param_label}})
+    {% endif %}
+    {% elif param_conf.get('type') in ['integer', 'float'] -%}
+    {{ param_label }} = st.number_input(label="{{ param_conf.get('label', '') }}", help="{{ param_conf.get('description', '') }}", value={{ param_conf.get('default', 0) }} if "{{param_conf.get('type') }}" == "integer" else {{ param_conf.get('default', 0.0)}})
+    {% elif param_conf.get('type') == 'textbox' -%}
+    {{ param_label }} = st.text_input(label="{{ param_conf.get('label', '') }}", help="{{ param_conf.get('description', '') }}", value="{{ param_conf.get('default', '') }}") 
+    {% elif param_conf.get('type') == 'checkbox' -%}
+    {{ param_label }} = st.checkbox(label="{{ param_conf.get('label', '') }}", help="{{ param_conf.get('description', '') }}", value={{ param_conf.get('default', False) }})
+    {%- endif %}
+
+    {% endfor %}
+    {%- endif %}
+
+    {% if display_only is not none and display_only | length > 0 -%}
+    {% for key, display_only_conf in display_only.items() %}
+    {% set display_label = key | lower | replace(" ", "_") %}
+
+    st.markdown("_The following parameters cannot be changed, they are shown here for display only_")
+    {% if display_only_conf.get('type') in ['radio', 'dropdown'] %}
+    options_list_{{ display_only_label }} = [{% for option in display_only_conf.get('options', []) %}"{{ option.label }}"{% if not loop.last %}, {% endif %}{% endfor %}]
+    options_list_{{ display_only_label }}_values = [{% for option in display_only_conf.get('options', []) %}"{{ option.value }}"{% if not loop.last %}, {% endif %}{% endfor %}]
+    default_index_{{ display_only_label }} = options_list_{{ display_only_label }}_values.index("{{ display_only_conf.get('default', '') }}")
+    {% endif %}    
+    {% if display_only_conf.get('type') == 'radio' %}
+    {{ display_label }} = st.radio(label="{{ display_only_conf.get('label', '') }}", help="{{ display_only_conf.get('description', '') }}", options=options_list_{ display_only_label }, index=default_index_{ display_only_label }, disabled = True)    
+    {% elif display_only_conf.get('type') == 'dropdown' %}
+    {% if display_only_conf.get('multiselect',False) in [False, "False", "false"] %}
+    {{ display_only_label }} = st.selectbox(label="{{ display_only_conf.get('label', '') }}", help="{{ display_only_conf.get('description', '') }}", options=[options_list_{ display_only_label }], index=default_index_{ display_only_label }, disabled = True)
+    {% else %}
+    {{ display_only_label }} = st.multiselect(label="{{ display_only_conf.get('label', '') }}", help="{{ display_only_conf.get('description', '') }}", options=[options_list_{ display_only_label }], index=default_index_{ display_only_label }, disabled = True)
+    {% endif %}
+    {% elif display_only_conf.get('type') in ['integer', 'float'] %}
+    {{ display_label }} = st.number_input(label="{{ display_only_conf.get('label', '') }}", help="{{ display_only_conf.get('description', '') }}", value={{ display_only_conf.get('default', 0) }} if "{{ display_only_conf.get('type') }}" == "integer" else {{ display_only_conf.get('default', 0.0) }}, disabled = True)
+    {% elif display_only_conf.get('type') == 'textbox' %}
+    {{ display_label }} = st.text_input(label="{{ display_only_conf.get('label', '') }}", help="{{ display_only_conf.get('description', '') }}", value="{{ display_only_conf.get('default', '') }}", disabled = True)
+    {% elif display_only_conf.get('type') == 'checkbox' %}
+    {{ display_label }} = st.checkbox(label="{{ display_only_conf.get('label', '') }}", help="{{ display_only_conf.get('description', '') }}", value={{ display_only_conf.get('default', False) }}, disabled = True)
+    {% endif %}
+
+    {% endfor %}
+    {%- endif %}
+
+    #download_results_from_here = gr.Files(label = "Download Output", file_count = "multiple")
+    
+    submitted = st.form_submit_button("Submit")
+    if submitted:
+        #we need to download the files to local disk - yuck!
+        for k,v in inputs_dict.items():
+            thisinput_list = v["file_list"]
+            if len(thisinput_list) > 0:
+                thisinput_location = v["folder_name"]
+                if not os.path.exists(thisinput_location):
+                    os.makedirs(thisinput_location,exist_ok=True)
+                for eachfile in thisinput_list:
+                    local_name = os.path.join(thisinput_location,eachfile.name)
+                    with open(local_name,"wb") as f:
+                        f.write(eachfile.getbuffer())
+        with st.empty():
+            st.markdown("Processing, please wait")
+            outputs = on_submit(
+                {% if inputs -%}
+                {% for key, input_conf in inputs.items() -%}
+                {% if input_conf.get('type') in ['image', 'measurement', 'array', 'file', 'executable'] %}
+                {{ key | lower | replace(" ", "_") }}_description = {{ key | lower | replace(" ", "_") }}_description,
+                {{ key | lower | replace(" ", "_") }} = inputs_dict["{{ key | lower | replace(" ", "_") }}"]["folder_name"],
+                {% else %}
+                {{ key | lower | replace(" ", "_") }},
+                {%- endif %}
+                {%- endfor %}
+                {%- endif %}
+                {% if parameters -%}
+                {% for key, param_conf in parameters.items() -%}
+                {{ key | lower | replace(" ", "_") }} = {{ key | lower | replace(" ", "_") }},
+                {%- endfor %}
+                {%- endif %}
+                {% if display_only -%}
+                {% for key, display_only_conf in display_only.items() -%}
+                {{ key | lower | replace(" ", "_") }} = {{ key | lower | replace(" ", "_") }},
+                {%- endfor %}
+                {%- endif %}
+            )
+            st.markdown("Run complete, zipping results for download")
+            result = subprocess.run("python -m zipfile -c outputs.zip "+" ".join([x.replace(' ', '\ ') for x in outputs]), shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            st.markdown(f"Results ready for download")
+            st.session_state.done_running = True
+
+
+if st.session_state.done_running:
+    with open("outputs.zip","rb") as file:
+        st.download_button(label="Download results", data = file, file_name= "outputs.zip" )
+        
+

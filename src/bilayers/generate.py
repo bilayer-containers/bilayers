@@ -72,6 +72,7 @@ def load_and_run_generate(
     exec_function: ExecFunction,
     citations: dict[str, Citations],
     docker_image: DockerImage,
+    cli_sequence: dict[str, dict],
 ):
     path = Path(path).resolve()
     spec = importlib.util.spec_from_file_location("external_module", path)
@@ -84,14 +85,14 @@ def load_and_run_generate(
         return
     spec.loader.exec_module(module)
 
-    return module.generate(generated_dir, inputs, outputs, parameters, display_only, exec_function, citations, docker_image)
+    return module.generate(generated_dir, inputs, outputs, parameters, display_only, exec_function, citations, docker_image, cli_sequence)
 
 
 def generate_interface(interface_name: str, config_path: Union[str, Path]) -> None:
     """Main function to parse config and generate files for specified interface (e.g. gradio, jupyter, cellprofiler plugin)."""
     print("Parsing config...")
 
-    inputs, outputs, parameters, display_only, exec_function, algorithm_folder_name, citations, docker_image = safe_parse_config(config_path)
+    inputs, outputs, parameters, display_only, exec_function, algorithm_folder_name, citations, docker_image, cli_sequence = safe_parse_config(config_path)
 
     interfaces_dir = project_path() / "interfaces"
 
@@ -108,7 +109,7 @@ def generate_interface(interface_name: str, config_path: Union[str, Path]) -> No
     if generate_py.exists():
         print(f"Running generate for {interface_name}...")
 
-        load_and_run_generate(generate_py, generated_dir, inputs, outputs, parameters, display_only, exec_function, citations, docker_image)
+        load_and_run_generate(generate_py, generated_dir, inputs, outputs, parameters, display_only, exec_function, citations, docker_image, cli_sequence)
     else:
         print(f"No generate.py found for interface: {interface_name}")
 
@@ -117,7 +118,7 @@ def generate_all(config_path: Union[str, Path]) -> None:
     """Main function to parse config and generate files for every interface."""
     print("Parsing config...")
 
-    inputs, outputs, parameters, display_only, exec_function, algorithm_folder_name, citations, docker_image = safe_parse_config(config_path)
+    inputs, outputs, parameters, display_only, exec_function, algorithm_folder_name, citations, docker_image, cli_sequence = safe_parse_config(config_path)
 
     interfaces_dir = project_path() / "interfaces"
 
@@ -132,6 +133,6 @@ def generate_all(config_path: Union[str, Path]) -> None:
         if generate_py.exists():
             print(f"Running generate for {os.path.basename(iface_dir)}...")
 
-            load_and_run_generate(generate_py, generated_dir, inputs, outputs, parameters, display_only, exec_function, citations, docker_image)
+            load_and_run_generate(generate_py, generated_dir, inputs, outputs, parameters, display_only, exec_function, citations, docker_image, cli_sequence)
         else:
             print(f"No generate.py found for interface: {str(iface_dir)}")

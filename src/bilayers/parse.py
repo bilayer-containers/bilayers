@@ -132,9 +132,66 @@ def parse_config(config_path: Union[str, Path]) -> Config:
     return config
 
 
+def build_cli_sequence(parsed_config: Config) -> dict[str, dict[str, Any]]:
+    """
+    Builds an ordered dictionary of CLI parameters (inputs + parameters + hidden_args)
+    sorted by cli_order field. Centralizes CLI ordering logic so interfaces don't need to handle it.
+    
+    Args:
+        parsed_config: The full parsed configuration
+    
+    Returns:
+        Ordered dict[str, dict[str, Any]] with keys=param names, values=metadata dicts
+        Ordering: positives (1,2,3...) → zeros (0) → negatives descending (-1,-2,-3...)
+        Note: Dict preserves insertion order (Python 3.7+), so CLI order is maintained
+    """
+    inputs = parsed_config.get("inputs", {})
+    parameters = parsed_config.get("parameters", {})
+    hidden_args = parsed_config.get("exec_function", {}).get("hidden_args", {})
+    
+    # Collect all items with their metadata
+    all_items = []
+    
+    # Add inputs
+    for name, config in inputs.items():
+        item = dict(config)
+        item["name"] = name
+        item["source"] = "input"
+        all_items.append(item)
+    
+    # Add parameters
+    for name, config in parameters.items():
+        item = dict(config)
+        item["name"] = name
+        item["source"] = "parameter"
+        all_items.append(item)
+    
+    # Add hidden_args
+    for name, config in hidden_args.items():
+        item = dict(config)
+        item["name"] = name
+        item["source"] = "hidden"
+        all_items.append(item)
+    
+    # Sort by cli_order: positives ascending (1,2,3...) → zeros (0) → negatives descending (-1,-2,-3...)
+    def sort_key(item: dict[str, Any]) -> tuple[int, int]:
+        order = item.get("cli_order", 0)
+        if order > 0:
+            return (0, order)  # Positives first, ascending
+        elif order == 0:
+            return (1, 0)  # Zeros second
+        else:
+            return (2, -order)  # Negatives last, by absolute value ascending
+    
+    sorted_items = sorted(all_items, key=sort_key)
+    
+    # Return as ordered dict (preserves insertion order)
+    return {item["name"]: item for item in sorted_items}
+
+
 def safe_parse_config(
     config_path: Union[str, Path],
-) -> tuple[dict[str, Input], dict[str, Output], dict[str, Parameter], Optional[dict[str, Parameter]], ExecFunction, str, dict[str, Citations], DockerImage]:
+) -> tuple[dict[str, Input], dict[str, Output], dict[str, Parameter], Optional[dict[str, Parameter]], ExecFunction, str, dict[str, Citations], DockerImage, dict[str, dict[str, Any]]]:
     """
     Loads the configuration and extracts necessary information.
 
@@ -142,7 +199,7 @@ def safe_parse_config(
         config_path (Optional[str]): Path to the configuration file.
 
     Returns:
-        tuple containing parsed configuration data.
+        tuple containing parsed configuration data including cli_sequence (ordered dict of inputs/parameters/hidden_args).
     """
     config: Config = parse_config(config_path)
 
@@ -166,5 +223,7 @@ def safe_parse_config(
 
     # Since, we are sure that docker_image key exists in the config, we can safely use it.
     docker_image: DockerImage = config["docker_image"]
+    
+    cli_sequence = build_cli_sequence(config)
 
-    return inputs, outputs, parameters, display_only, exec_function, algorithm_folder_name, citations, docker_image
+    return inputs, outputs, parameters, display_only, exec_function, algorithm_folder_name, citations, docker_image, cli_sequence

@@ -152,7 +152,8 @@ def generate_cellprofiler_plugin(
         algorithm_folder_name: str,
         exec_function: ExecFunction,
         citations: dict[str, Citations],
-        docker_image: DockerImage
+        docker_image: DockerImage,
+        cli_sequence: dict[str, dict],
     ):
     """
     Generates a CellProfiler Plugin dynamically using Jinja2 templates.
@@ -166,6 +167,7 @@ def generate_cellprofiler_plugin(
         display_only (Optional[dict[str, Parameter]]): List of display-only parameters, or None.
         exec_function (ExecFunction): Execution function details.
         citations (dict[str, Citations]): Citations information.
+        cli_sequence (dict[str, dict]): Pre-ordered sequence of CLI arguments.
 
     Returns:
         .py file: The generated CellProfiler Plugin file.
@@ -239,7 +241,8 @@ def generate_cellprofiler_plugin(
         exec_function=exec_function,
         # TODO: call generate_top_level_text or include the BILAYERS citation defined there
         citations=citations,
-        docker_image=docker_image
+        docker_image=docker_image,
+        cli_sequence=cli_sequence
     )
 
     return cellprofiler_code, class_name
@@ -253,6 +256,7 @@ def generate(
     exec_function: ExecFunction,
     citations: dict[str, Citations],
     docker_image: DockerImage,
+    cli_sequence: dict[str, dict],
 ):
     cellprofiler_template_path = project_path() / "interfaces/cellprofiler_plugin"
 
@@ -266,7 +270,8 @@ def generate(
         output_dir.stem,
         exec_function,
         citations,
-        docker_image)
+        docker_image,
+        cli_sequence)
 
     # join folders and file name - file name MUST match plugin name (but in lowercase) to work
     cellprofiler_plugin_path = output_dir / f"{plugin_name.lower()}.py"

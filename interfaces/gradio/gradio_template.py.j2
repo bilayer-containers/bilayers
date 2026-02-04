@@ -2,6 +2,7 @@ import os
 import gradio as gr
 import subprocess
 import shutil
+import zipfile
 from typing import Any, Optional
 import uuid
 import datetime
@@ -195,6 +196,25 @@ def generate_cli_command(
 
     return " ".join(cli_command), folder_name, output_folder_name
 
+def create_zip_from_files(output_files: list[str], output_folder_name: Optional[str]) -> Optional[str]:
+    """
+    Creates a zip archive from the output files and returns the zip path
+    """
+    if not output_files:
+        return None
+
+    base_dir = output_folder_name or os.getcwd()
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    zip_name = f"outputs_{timestamp}.zip"
+    zip_path = os.path.join(base_dir, zip_name)
+
+    with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
+        for file_path in output_files:
+            if os.path.isfile(file_path):
+                zipf.write(file_path, arcname=os.path.basename(file_path))
+
+    return zip_path
+
 # Dynamically define on_submit with the exact parameter arguments
 def on_submit(
 {% if inputs -%}
@@ -279,7 +299,8 @@ def on_submit(
             output_folder_name = fallback_folder
             print(f"Collected {len(output_files)} output files in: {fallback_folder}")
 
-        return output_files
+        zip_path = create_zip_from_files(output_files, output_folder_name)
+        return output_files, zip_path
 
     except subprocess.CalledProcessError as e:
         error_message = "Please take a screenshot of this error and raise an issue at the Bilayers repository on GitHub."
@@ -367,11 +388,12 @@ all_parameters: list[Any] = [
 ]
 
 download_results_from_here = gr.Files(label = "Download Output", file_count = "multiple")
+download_all_zip = gr.DownloadButton(label = "Download All (zip)")
 
 app = gr.Interface(
     fn=on_submit, 
     inputs=all_parameters,
-    outputs=download_results_from_here, 
+    outputs=[download_results_from_here, download_all_zip], 
     title="{{ title }}",
     description="""{{ description }}""",
     allow_flagging="never",

@@ -373,7 +373,8 @@ app = gr.Interface(
     inputs=all_parameters,
     outputs=download_results_from_here, 
     title="{{ title }}",
-    description="""{{ description }}"""
+    description="""{{ description }}""",
+    allow_flagging="never",
 )
 
 if __name__ == "__main__":

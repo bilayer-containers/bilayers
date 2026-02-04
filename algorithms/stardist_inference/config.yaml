@@ -13,7 +13,7 @@ citations:
     description: "Segments images using stardist"
 
 docker_image:
-  org: rajavishah
+  org: bilayer
   name: stardist
   tag: "7.0.0"
   platform: "linux/arm64/v8"
@@ -82,12 +82,11 @@ outputs:
     default: "directory"
     optional: False 
     format: 
-      - tiff
-      - ometiff
+      - tif
     folder_name: "/bilayers/output_images"
-    file_count: multiple
+    file_count: single
     unique_string:
-      - "*"
+      - "_segmented"
     section_id: "outputs"
     mode: "beginner"
     depth: True
@@ -98,19 +97,18 @@ outputs:
     type: image
     label: "Probability Images"
     subtype: 
-      - label
+      - grayscale
     description: "Probability images"
     cli_tag: "--save_probabilities"
     cli_order: 0
     default: "directory"
     optional: False 
     format: 
-      - tiff
-      - ometiff
+      - tif
     folder_name: "/bilayers/output_images"
-    file_count: multiple
+    file_count: single
     unique_string:
-      - "*"
+      - "_probabilities"
     section_id: "outputs"
     mode: "advanced"
     depth: True
@@ -128,9 +126,9 @@ outputs:
     format: 
       - npy
     folder_name: "/bilayers/output_images"
-    file_count: multiple
+    file_count: single
     unique_string:
-      - "*"
+      - "_probabilities"
     section_id: "outputs"
     mode: "advanced"
     

@@ -528,10 +528,16 @@ If set to "Default Output Folder", measurements will be saved in [DefaultOutputF
             folder = out.get("folder_name")
             cli_tag = out.get("cli_tag")
             if folder:
-                host_subdir = os.path.join(temp_dir, "output", os.path.basename(folder.strip("/")))
-                os.makedirs(host_subdir, exist_ok=True)
-                mounts.append(("-v", f"{host_subdir}:{folder}"))
-                output_dirs.append((cli_tag, folder))
+                if folder not in [x[1] for x in input_dirs]:
+                    host_subdir = os.path.join(temp_dir, "output", os.path.basename(folder.strip("/")))
+                    os.makedirs(host_subdir, exist_ok=True)
+                    mounts.append(("-v", f"{host_subdir}:{folder}"))
+                    output_dirs.append((cli_tag, folder))
+                else:
+                    # Some algorithms, like instanseg, use the input directory instead
+                    host_subdir = os.path.join(temp_dir, "input", os.path.basename(folder.strip("/")))
+                    output_dirs.append((cli_tag, folder))
+                    temp_output_dir = temp_input_dir
             else:
                 folder = "/bilayers/output"
                 host_subdir = os.path.join(temp_dir, "output", "output")
@@ -670,6 +676,7 @@ If set to "Default Output Folder", measurements will be saved in [DefaultOutputF
                 output_type = "{{ output_conf.get('type', 'image') }}"
                 output_name = "{{ output_conf.get('name', key) }}"
                 output_subtype = "{{ output_conf.get('subtype', '') | safe }}"
+                output_plurality =  "{{ output_conf.get('file_count', key) }}"
                 search_patterns = {{ output_conf.get('unique_string', ['*']) | tojson }}
                 output_formats = {{ output_conf.get('format', ['tif']) | tojson }}
                 matched_files = []
@@ -692,7 +699,12 @@ If set to "Default Output Folder", measurements will be saved in [DefaultOutputF
                         if len(matched_files) == 1:
                             data = skimage.io.imread(matched_files[0])
                         else:
-                            data = [skimage.io.imread(f) for f in matched_files]
+                            if output_plurality != "single":
+                                data = [skimage.io.imread(f) for f in matched_files]
+                            else:
+                                import difflib
+                                data = skimage.io.imread(difflib.get_close_matches(recognizer,matched_files,n=1,cutoff=0)[0])
+                                LOGGER.warning(f"Multiple files matching unique string {recognizer} were found. We're using our best guess.")
 
                         # Register as Image or Object
                         if "label" in output_subtype.lower() or output_type == "object":
@@ -814,7 +826,7 @@ If set to "Default Output Folder", measurements will be saved in [DefaultOutputF
         {% for key, output_conf in outputs.items() %}
         {% if output_conf.get('type') == 'image' %}
         if hasattr(workspace.display_data, '{{ output_conf.get('name') }}_data'):
-            {% if computed_category == "Image Segmentation" %}
+            {% if 'label' in ','.join(output_conf.get('subtype')).lower() %}
             displayable_images.append(('{{ output_conf.get('name') }}_data', '{{ output_conf.get('label', output_conf.get('name')) }}', 'segmentation'))
             {% else %}
             displayable_images.append(('{{ output_conf.get('name') }}_data', '{{ output_conf.get('label', output_conf.get('name')) }}', 'output'))

@@ -142,12 +142,12 @@ def build_cli_sequence(parsed_config: Config) -> dict[str, dict[str, Any]]:
     
     Returns:
         Ordered dict[str, dict[str, Any]] with keys=param names, values=metadata dicts
-        Ordering: positives (1,2,3...) → zeros (0) → negatives descending (-1,-2,-3...)
+        Ordering: positives ascending (1,2,3...) -> zeros (0) -> negatives by absolute value descending (-2,-1)
         Note: Dict preserves insertion order (Python 3.7+), so CLI order is maintained
     """
     inputs = parsed_config.get("inputs", {})
     parameters = parsed_config.get("parameters", {})
-    hidden_args = parsed_config.get("exec_function", {}).get("hidden_args", {})
+    hidden_args = parsed_config.get("exec_function", {}).get("hidden_args", {}) or {}
     
     # Collect all items with their metadata
     all_items = []
@@ -173,7 +173,7 @@ def build_cli_sequence(parsed_config: Config) -> dict[str, dict[str, Any]]:
         item["source"] = "hidden"
         all_items.append(item)
     
-    # Sort by cli_order: positives ascending (1,2,3...) → zeros (0) → negatives descending (-1,-2,-3...)
+    # Sort by cli_order: positives ascending (1,2,3...) -> zeros (0) -> negatives by value ascending (-2,-1)
     def sort_key(item: dict[str, Any]) -> tuple[int, int]:
         order = item.get("cli_order", 0)
         if order > 0:
@@ -181,7 +181,7 @@ def build_cli_sequence(parsed_config: Config) -> dict[str, dict[str, Any]]:
         elif order == 0:
             return (1, 0)  # Zeros second
         else:
-            return (2, -order)  # Negatives last, by absolute value ascending
+            return (2, order)  # Negatives last, ascending by value (-2 before -1)
     
     sorted_items = sorted(all_items, key=sort_key)
     

@@ -168,7 +168,7 @@ def build_algorithm(session: nox.Session) -> None:
         # Proceed to build from Dockerfile if pull fails
         if os.path.exists(dockerfile_path):
             print("Pull failed; attempting to build locally from Dockerfile.")
-            session.run(DOCKER_CMD, "buildx", "build", platform_opt, platform, "-t", image_name, "-f", dockerfile_path, algorithm_path)
+            session.run(DOCKER_CMD, "buildx", "build", platform_opt, platform, "-t", image_name, "-f", dockerfile_path, algorithm_path, external=True)
             # Save the locally built Docker image name in a file
             with open(tmp_path("docker_image_name.txt"), "w") as file:
                 file.write(image_name)
@@ -219,7 +219,7 @@ def build_algorithm(session: nox.Session) -> None:
             # Pyright reports an error since `platform` can be None, while `session.run()` expects `str | PathLike[str]`
             # However, we have a fallback function, that takes care of this scenario
             # Since this is a safe and expected, I have suppress the warning
-            session.run(DOCKER_CMD, "pull", "--platform", platform, docker_image_name)  # pyright: ignore
+            session.run(DOCKER_CMD, "pull", "--platform", platform, docker_image_name, external=True)  # pyright: ignore
             print(f"Successfully pulled Docker image from DockerHub: {docker_image_name}")
             # Save the Docker image name in a file
             with open(tmp_path("docker_image_name.txt"), "w") as file:
@@ -278,6 +278,7 @@ def build_interface(session: nox.Session) -> None:
         "-f",
         dockerfile_path,
         str(PROJ_ROOT / "interfaces"),
+        external=True,
     )
 
     # Decide final tag (reuse or bump)
@@ -285,7 +286,7 @@ def build_interface(session: nox.Session) -> None:
     final_image_name = f"bilayer/{algorithm_folder_name}:{final_tag}"
 
     # Retag candidate -> final
-    session.run(DOCKER_CMD, "tag", candidate_name, final_image_name)
+    session.run(DOCKER_CMD, "tag", candidate_name, final_image_name, external=True)
 
     # TODO: below conditionals are identical and do not include cellprofiler_plugin
     print(f"Final image built and tagged as: {final_image_name}")
@@ -305,6 +306,7 @@ def build_interface(session: nox.Session) -> None:
             "-f",
             dockerfile_path,
             str(PROJ_ROOT / "interfaces"),
+            external=True,
         )
     elif interface == "jupyter":
         session.run(
@@ -322,6 +324,7 @@ def build_interface(session: nox.Session) -> None:
             "-f",
             dockerfile_path,
             str(PROJ_ROOT / "interfaces"),
+            external=True,
         )
 
 

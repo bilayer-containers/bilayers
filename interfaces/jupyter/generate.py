@@ -26,6 +26,7 @@ def generate_jupyter_notebook(
     exec_function: ExecFunction,
     citations: dict[str, Citations],
     docker_image: DockerImage,
+    cli_sequence: dict[str, dict],
 ) -> nbf.NotebookNode:
     """
     Generates a Jupyter Notebook dynamically using Jinja2 templates.
@@ -39,6 +40,7 @@ def generate_jupyter_notebook(
         display_only (Optional[dict[str, Parameter]]): dictionary of display-only parameters, or None.
         exec_function (ExecFunction): Execution function details.
         citations (dict[str, Citations]): Citations information.
+        cli_sequence (dict[str, dict]): Pre-ordered sequence of CLI arguments.
 
     Returns:
         nbf.NotebookNode: The generated Jupyter Notebook object.
@@ -58,7 +60,14 @@ def generate_jupyter_notebook(
         return nbf.v4.new_markdown_cell(content)
 
     template = env.get_template(template_name)
-    notebook_content: str = template.render(inputs=inputs, outputs=outputs, parameters=parameters, display_only=display_only, exec_function=exec_function)
+    notebook_content: str = template.render(
+        inputs=inputs,
+        outputs=outputs,
+        parameters=parameters,
+        display_only=display_only,
+        exec_function=exec_function,
+        cli_sequence=list(cli_sequence.values()),
+    )
 
     title, full_description = generate_top_level_text(CITATION, citations, output_html=True)
 
@@ -114,6 +123,7 @@ def generate(
     exec_function: ExecFunction,
     citations: dict[str, Citations],
     docker_image: DockerImage,
+    cli_sequence: dict[str, dict],
 ):
     jupyter_template_path = project_path() / "interfaces/jupyter"
 
@@ -126,7 +136,8 @@ def generate(
         display_only,
         exec_function,
         citations,
-        docker_image)
+        docker_image,
+        cli_sequence)
 
     jupyter_notebook_path = output_dir / "generated_notebook.ipynb"
 

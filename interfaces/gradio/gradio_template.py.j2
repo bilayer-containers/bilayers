@@ -308,11 +308,11 @@ def on_submit(
                 except Exception as e:
                     print(f"Warning: could not copy {file_path}: {e}")
 
-            output_files = [
+            output_files = sorted([
                 os.path.join(fallback_folder, f)
                 for f in os.listdir(fallback_folder)
                 if os.path.isfile(os.path.join(fallback_folder, f))
-            ]
+            ])
             output_folder_name = fallback_folder
             print(f"Collected {len(output_files)} output files in: {fallback_folder}")
 
@@ -365,9 +365,22 @@ def on_submit(
 
 {# --- normal parameters --- #}
 {% elif param_conf.get('type') == 'radio' %}
-{{ param_label }} = gr.Radio(label="{{ param_conf.get('label', '') }}", info="{{ param_conf.get('description', '') }}", choices=[{% for option in param_conf.get('options', []) %}"{{ option.label }}"{% if not loop.last %}, {% endif %}{% endfor %}], value="{{ param_conf.get('default', '') }}")
+{# Find the label that matches the default value #}
+{% set default_label = '' %}
+{% for option in param_conf.get('options', []) %}
+{% if option.get('value', '') == param_conf.get('default', '') %}
+{% set default_label = option.get('label', '') %}
+{% endif %}
+{% endfor %}
+{{ param_label }} = gr.Radio(label="{{ param_conf.get('label', '') }}", info="{{ param_conf.get('description', '') }}", choices=[{% for option in param_conf.get('options', []) %}"{{ option.label }}"{% if not loop.last %}, {% endif %}{% endfor %}], value="{{ default_label}}")
 {% elif param_conf.get('type') == 'dropdown' %}
-{{ param_label }} = gr.Dropdown(label="{{ param_conf.get('label', '') }}", info="{{ param_conf.get('description', '') }}", choices=[{% for option in param_conf.get('options', []) %}("{{ option.label }}", "{{ option.value }}"){% if not loop.last %}, {% endif %}{% endfor %}], value="{{ param_conf.get('default', '') }}", multiselect={{ param_conf.get('multiselect', False) }})
+{% set default_label = '' %}
+{% for option in param_conf.get('options', []) %}
+{% if option.get('value', '') == param_conf.get('default', '') %}
+{% set default_label = option.get('label', '') %}
+{% endif %}
+{% endfor %}
+{{ param_label }} = gr.Dropdown(label="{{ param_conf.get('label', '') }}", info="{{ param_conf.get('description', '') }}", choices=[{% for option in param_conf.get('options', []) %}("{{ option.label }}", "{{ option.value }}"){% if not loop.last %}, {% endif %}{% endfor %}], value="{{ default_label }}", multiselect={{ param_conf.get('multiselect', False) }})
 {% elif param_conf.get('type') in ['integer', 'float'] %}
 {{ param_label }} = gr.Number(label="{{ param_conf.get('label', '') }}", info="{{ param_conf.get('description', '') }}", value={{ param_conf.get('default', 0) }} if "{{ param_conf.get('type') }}" == "integer" else {{ param_conf.get('default', 0.0) }})
 {% elif param_conf.get('type') == 'textbox' %}
@@ -384,9 +397,21 @@ def on_submit(
 {% set display_label = key | lower | replace(" ", "_") %}
 
 {% if display_only_conf.get('type') == 'radio' %}
-{{ display_label }} = gr.Radio(label="{{ display_only_conf.get('label', '') }} (Can't be changed, display only)", info="{{ display_only_conf.get('description', '') }}", choices=[{% for option in display_only_conf.get('options', []) %}"{{ option.label }}"{% if not loop.last %}, {% endif %}{% endfor %}], value="{{ display_only_conf.get('default', '') }}", interactive=False)
+{% set default_label = '' %}
+{% for option in display_only_conf.get('options', []) %}
+{% if option.get('value', '') == display_only_conf.get('default', '') %}
+{% set default_label = option.get('label', '') %}
+{% endif %}
+{% endfor %}
+{{ display_label }} = gr.Radio(label="{{ display_only_conf.get('label', '') }} (Can't be changed, display only)", info="{{ display_only_conf.get('description', '') }}", choices=[{% for option in display_only_conf.get('options', []) %}"{{ option.label }}"{% if not loop.last %}, {% endif %}{% endfor %}], value="{{ default_label }}", interactive=False)
 {% elif display_only_conf.get('type') == 'dropdown' %}
-{{ display_label }} = gr.Dropdown(label="{{ display_only_conf.get('label', '') }} (Can't be changed, display only)", info="{{ display_only_conf.get('description', '') }}", choices=[{% for option in display_only_conf.get('options', []) %}("{{ option.label }}", "{{ option.value }}"){% if not loop.last %}, {% endif %}{% endfor %}], value="{{ display_only_conf.get('default', '') }}", interactive=False, multiselect={{ display_only_conf.get('multiselect', False) }})
+{% set default_label = '' %}
+{% for option in display_only_conf.get('options', []) %}
+{% if option.get('value', '') == display_only_conf.get('default', '') %}
+{% set default_label = option.get('label', '') %}
+{% endif %}
+{% endfor %}
+{{ display_label }} = gr.Dropdown(label="{{ display_only_conf.get('label', '') }} (Can't be changed, display only)", info="{{ display_only_conf.get('description', '') }}", choices=[{% for option in display_only_conf.get('options', []) %}("{{ option.label }}", "{{ option.value }}"){% if not loop.last %}, {% endif %}{% endfor %}], value="{{ default_label }}", interactive=False, multiselect={{ display_only_conf.get('multiselect', False) }})
 {% elif display_only_conf.get('type') in ['integer', 'float'] %}
 {{ display_label }} = gr.Number(label="{{ display_only_conf.get('label', '') }} (Can't be changed, display only)", info="{{ display_only_conf.get('description', '') }}", value={{ display_only_conf.get('default', 0) }} if "{{ display_only_conf.get('type') }}" == "integer" else {{ display_only_conf.get('default', 0.0) }}, interactive=False)
 {% elif display_only_conf.get('type') == 'textbox' %}

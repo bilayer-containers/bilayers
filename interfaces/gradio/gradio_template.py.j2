@@ -282,9 +282,9 @@ def on_submit(
         # Check if output_folder_name is not None and is a directory
         if output_folder_name and os.path.exists(output_folder_name) and os.path.isdir(output_folder_name):
             print("Folder exists")
-            output_files = [os.path.join(output_folder_name, f)
+            output_files = sorted([os.path.join(output_folder_name, f)
                             for f in os.listdir(output_folder_name)
-                            if os.path.isfile(os.path.join(output_folder_name, f))]
+                            if os.path.isfile(os.path.join(output_folder_name, f))])
         else:
             # Fallback: collect all generated files
             possible_files = []

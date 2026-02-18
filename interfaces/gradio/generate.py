@@ -25,6 +25,7 @@ def generate_gradio_app(
     exec_function: ExecFunction,
     citations: dict[str, Citations],
     docker_image: DockerImage,
+    cli_sequence: dict[str, dict],
 ) -> str:
     """
     Generates a Gradio application dynamically using Jinja2 templates.
@@ -38,6 +39,7 @@ def generate_gradio_app(
         display_only (Optional[dict[str, Parameter]]): dictionary of display-only parameters, or None.
         exec_function (ExecFunction): Execution function details.
         citations (dict[str, Citations]): Citations information.
+        cli_sequence (dict[str, dict]): Pre-ordered sequence of CLI arguments.
 
     Returns:
         str: The rendered Gradio application code.
@@ -57,8 +59,48 @@ def generate_gradio_app(
 
     title, full_description = generate_top_level_text(CITATION, citations, output_html=False)
 
+    split_parameters = {}
+    parameters_flat = {}
+
+    for paramkey, paramvalue in parameters.items():
+        assert "type" in paramvalue and "default" in paramvalue and "label" in paramvalue
+        if paramvalue["type"] in ["float", "integer"] and str(paramvalue["default"]) in ["None", "False"]:
+            # "Set a value?" toggle
+            bool_param = dict(paramvalue)
+            bool_param["name"] = f"set_{paramkey}"
+            bool_param["type"] = "checkbox"
+            bool_param["default"] = False
+            bool_param["cli_tag"] = ""
+            bool_param["optional"] = True
+            newlabel = paramvalue["label"][0].lower() + paramvalue["label"][1:]
+            bool_param["label"] = f"Set a value for {newlabel}?"
+            bool_param["description"] = paramvalue.get("description", "")
+
+            # Actual number input (hidden unless checkbox is ticked)
+            num_param = dict(paramvalue)
+            num_param["name"] = paramkey
+            num_param["default"] = 0
+            num_param["optional"] = True
+
+            split_parameters[paramkey] = {
+                f"set_{paramkey}": bool_param,
+                paramkey: num_param,
+            }
+            parameters_flat[f"set_{paramkey}"] = bool_param
+            parameters_flat[paramkey] = num_param
+        else:
+            parameters_flat[paramkey] = paramvalue
+
     gradio_app_code: str = template.render(
-        inputs=inputs, outputs=outputs, parameters=parameters, display_only=display_only, exec_function=exec_function, title=title, description=full_description
+        inputs=inputs,
+        outputs=outputs,
+        parameters=parameters_flat,
+        split_parameters=split_parameters,
+        display_only=display_only,
+        exec_function=exec_function,
+        title=title,
+        description=full_description,
+        cli_sequence=list(cli_sequence.values()),
     )
 
     return gradio_app_code
@@ -72,6 +114,7 @@ def generate(
     exec_function: ExecFunction,
     citations: dict[str, Citations],
     docker_image: DockerImage,
+    cli_sequence: dict[str, dict],
 ):
     gradio_template_path = project_path() / "interfaces/gradio"
 
@@ -84,7 +127,8 @@ def generate(
         display_only,
         exec_function,
         citations,
-        docker_image)
+        docker_image,
+        cli_sequence)
 
     gradio_app_path = output_dir / "app.py"
 

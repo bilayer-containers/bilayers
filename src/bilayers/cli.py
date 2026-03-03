@@ -49,7 +49,9 @@ def cli() -> None:  # noqa: C901
 
     if args.command == "parse":
         try:
-            inputs, outputs, parameters, display_only, exec_function, algorithm_folder_name, citations, docker_image, cli_sequence = safe_parse_config(args.config)
+            inputs, outputs, parameters, display_only, exec_function, algorithm_folder_name, citations, docker_image, cli_sequence = safe_parse_config(
+                args.config
+            )
 
             print(f"Inputs: {inputs}")
             print(f"Outputs: {outputs}")

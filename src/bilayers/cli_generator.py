@@ -15,7 +15,7 @@ def _option_to_append(cli_tag: str, value: Any) -> str:
         str: The formatted CLI option.
     """
     # A protective layer not to append None values
-    # But also, this edge case is taken care before calling _insert_into_jagged_array function
+    # In normal workflow, required/optional validation happens earlier, so this is just a safeguard for unexpected cases
     if value is None:
         return ""
 

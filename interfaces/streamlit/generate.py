@@ -26,6 +26,7 @@ def generate_streamlit_app(
     exec_function: ExecFunction,
     citations: dict[str, Citations],
     docker_image: DockerImage,
+    cli_sequence: dict[str, dict],
 ) -> str:
     """
     Generates a Streamlit application dynamically using Jinja2 templates.
@@ -73,7 +74,8 @@ def generate(
     display_only: Optional[dict[str, Parameter]],
     exec_function: ExecFunction,
     citations: dict[str, Citations],
-    docker_image: DockerImage
+    docker_image: DockerImage, 
+    cli_sequence: dict[str, dict],
 ):
     streamlit_template_path = project_path() / "interfaces/streamlit"
 
@@ -86,7 +88,8 @@ def generate(
         display_only,
         exec_function,
         citations, 
-        docker_image)
+        docker_image,
+        cli_sequence)
 
 
     streamlit_app_path = output_dir / "streamlit_app.py"

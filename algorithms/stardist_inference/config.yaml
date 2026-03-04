@@ -173,6 +173,7 @@ parameters:
     type: textbox
     label: "Output Image Path"
     description: "Segmented Images will be saved here"
+    output_dir_set: True
     default: "/bilayers/output_images"
     cli_tag: "--output_folder"
     cli_order: 0

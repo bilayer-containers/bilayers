@@ -147,7 +147,7 @@ parameters:
     mode: "beginner"
   - name: ignore_segmented
     type: checkbox
-    label: "Ignore Segmentated"
+    label: "Ignore Segmented"
     description: "Whether to ignore previously segmented images in the image path"
     default: False
     cli_tag: "--ignore_segmented"

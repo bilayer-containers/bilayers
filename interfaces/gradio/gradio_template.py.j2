@@ -372,7 +372,16 @@ def on_submit(
 {% set default_label = option.get('label', '') %}
 {% endif %}
 {% endfor %}
-{{ param_label }} = gr.Radio(label="{{ param_conf.get('label', '') }}", info="{{ param_conf.get('description', '') }}", choices=[{% for option in param_conf.get('options', []) %}"{{ option.label }}"{% if not loop.last %}, {% endif %}{% endfor %}], value="{{ default_label}}")
+{{ param_label }} = gr.Radio(
+    label="{{ param_conf.get('label', '') }}",
+    info="{{ param_conf.get('description', '') }}",
+    choices=[
+        {% for option in param_conf.get('options', []) -%}
+        ("{{ option.label }}", {{ option.value | tojson }}){% if not loop.last %}, {% endif %}
+        {%- endfor %}
+    ],
+    value={{ param_conf.get('default') | tojson }}
+)
 {% elif param_conf.get('type') == 'dropdown' %}
 {% set default_label = '' %}
 {% for option in param_conf.get('options', []) %}

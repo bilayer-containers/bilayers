@@ -40,6 +40,7 @@ def generate_streamlit_app(
         display_only (Optional[dict[str, Parameter]]): dictionary of display-only parameters, or None.
         exec_function (ExecFunction): Execution function details.
         citations (dict[str, Citations]): Citations information.
+        cli_sequence (dict[str, dict]): Pre-ordered sequence of CLI arguments.
 
     Returns:
         str: The rendered Streamlit application code.
@@ -60,11 +61,17 @@ def generate_streamlit_app(
     title, full_description = generate_top_level_text(CITATION, citations, output_html=False)
 
     streamlit_app_code: str = template.render(
-        inputs=inputs, outputs=outputs, parameters=parameters, display_only=display_only, exec_function=exec_function, title=title, description=full_description
+        inputs=inputs,
+        outputs=outputs,
+        parameters=parameters,
+        display_only=display_only,
+        exec_function=exec_function,
+        title=title,
+        description=full_description,
+        cli_sequence=list(cli_sequence.values()),
     )
 
     return streamlit_app_code
-
 
 def generate(
     output_dir: Path,
@@ -74,7 +81,7 @@ def generate(
     display_only: Optional[dict[str, Parameter]],
     exec_function: ExecFunction,
     citations: dict[str, Citations],
-    docker_image: DockerImage, 
+    docker_image: DockerImage,
     cli_sequence: dict[str, dict],
 ):
     streamlit_template_path = project_path() / "interfaces/streamlit"
@@ -87,13 +94,13 @@ def generate(
         parameters,
         display_only,
         exec_function,
-        citations, 
+        citations,
         docker_image,
         cli_sequence)
-
 
     streamlit_app_path = output_dir / "streamlit_app.py"
 
     with open(streamlit_app_path, "w") as f:
         f.write(streamlit_app_code)
+
     print("streamlit_app.py generated successfully!!")

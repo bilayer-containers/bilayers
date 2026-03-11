@@ -341,18 +341,21 @@ def build_interface(session: nox.Session) -> None:
             final_image_name,
             "-f",
             dockerfile_path,
-            PROJ_ROOT/"interfaces",
+            PROJ_ROOT / "interfaces",
         )
+
 
 @nox.session
 def install_gradio(session: nox.Session) -> None:
     """Install Gradio"""
     session.install("gradio")
 
+
 @nox.session
 def install_streamlit(session: nox.Session) -> None:
     """Install Streamlit"""
     session.install("streamlit")
+
 
 # Testing sessions
 @nox.session

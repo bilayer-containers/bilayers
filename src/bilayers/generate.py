@@ -4,6 +4,7 @@ import importlib.util
 from pathlib import Path
 from typing import Optional, Union
 
+from bilayers_interface_shared import generate_top_level_text as _generate_top_level_text
 from bilayers_schema import Citations, DockerImage, ExecFunction, Input, Output, Parameter
 
 from ._blpath import project_path
@@ -12,10 +13,9 @@ from .parse import safe_parse_config
 
 def generate_top_level_text(interface_citation: Citations, citations: dict[str, Citations], output_html: bool = True) -> tuple[str, str]:
     import warnings
-    from interfaces.utils import generate_top_level_text as _generate_top_level_text
 
     warnings.warn(
-        "bilayers.generate.generate_top_level_text is deprecated. Use interfaces.utils.generate_top_level_text instead.",
+        "bilayers.generate.generate_top_level_text is deprecated. Use bilayers_interface_shared.generate_top_level_text instead.",
         DeprecationWarning,
         stacklevel=2,
     )

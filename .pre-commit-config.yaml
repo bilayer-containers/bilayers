@@ -1,0 +1,14 @@
+repos:
+  - repo: local
+    hooks:
+      - id: nox-format
+        name: nox -s format
+        entry: pixi run -e dockerdev nox -s format
+        language: system
+        pass_filenames: false
+
+      - id: nox-lint
+        name: nox -s lint
+        entry: pixi run -e dockerdev nox -s lint
+        language: system
+        pass_filenames: false

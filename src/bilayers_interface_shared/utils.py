@@ -36,7 +36,7 @@ def generate_top_level_text(interface_citation: Citations, citations: dict[str, 
     license_info_lines = ["**Licenses of the components:**"]
     app_names_lines = []
 
-    # Iterate through the citations dictionary from the config.
+    # Iterate through the citations dictionary from the config
     for name, citation in citations.items():
         app_descriptions_lines.append(f"{name}: {citation.get('description', '')}")
         if citation.get("doi"):
@@ -44,14 +44,14 @@ def generate_top_level_text(interface_citation: Citations, citations: dict[str, 
         license_info_lines.append(f"{name} is provided under the {citation.get('license', 'Unknown')} license")
         app_names_lines.append(name)
 
-    # Add default citations for "Bilayers" and for the given interface.
+    # Add default citations for "Bilayers" and for the given interface
     for citation in [BILAYERS, interface_citation]:
         if citation.get("doi"):
             citation_text_lines.append(f"Cite {citation.get('name')} using {citation.get('doi', 'N/A')}")
         license_info_lines.append(f"{citation.get('name')} is provided under the {citation.get('license', 'Unknown')} license")
 
     title = "+".join(app_names_lines) + f" - Brought to you in {interface_name} by Bilayers"
-    # Instead of joining with newlines, join with <br> so that the markdown cell shows line breaks.
+    # Instead of joining with newlines, join with <br> so that the markdown cell shows line breaks
     full_description = f"{newline}".join(
         [f"{newline}".join(app_descriptions_lines), f"{newline}".join(citation_text_lines), f"{newline}".join(license_info_lines)]
     )

@@ -5,7 +5,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from bilayers import project_path
 from bilayers_schema import Citations, Input, Output, Parameter, ExecFunction, DockerImage
-from bilayers.generate import generate_top_level_text
+from bilayers_interface_shared import generate_top_level_text
 
 
 CITATION: Citations = {

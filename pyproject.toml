@@ -39,7 +39,6 @@ dev = [
   "ipywidgets",
   "gradio",
   "pyright",
-  "pre-commit",
   "mypy",
   "types-pyyaml",
 ]
@@ -60,6 +59,12 @@ env = { DOCKER_CMD = "podman" }
 
 [tool.pixi.feature.docker.activation]
 env = { DOCKER_CMD = "docker" }
+
+[tool.pixi.feature.dev.pypi-dependencies]
+pre-commit = "*"
+
+[tool.pixi.feature.dev.activation]
+scripts = ["scripts/install-pre-commit.sh"]
 
 [tool.pixi.tasks]
 

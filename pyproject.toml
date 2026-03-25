@@ -82,6 +82,7 @@ dockerdev = ["dev", "docs", "linkml", "test", "lint", "nox", "docker"]
 [tool.ruff]
 # 80 columns are a thing of the past
 line-length = 160
+exclude = ["tests/fixtures/golden"]
 
 [tool.ruff.lint]
 # extend linting rules (may overlap with formatting fules)

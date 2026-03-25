@@ -19,12 +19,10 @@ frozen_version.py
 *.sqlite3
 _version.py
 .nox/
-app.py
 __pycache__/
 flagged/
 .ipynb_checkpoints/
 .virtual_documents/
-generated_notebook.ipynb
 generated_folders/
 final_generated_notebook.ipynb
 generate_jupyter.py

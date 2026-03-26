@@ -3,12 +3,12 @@ repos:
     hooks:
       - id: nox-format
         name: nox -s format
-        entry: pixi run -e dockerdev nox -s format
+        entry: pixi run -e dockerdev nox -s format -r
         language: system
         pass_filenames: false
 
       - id: nox-lint
         name: nox -s lint
-        entry: pixi run -e dockerdev nox -s lint
+        entry: pixi run -e dockerdev nox -s lint -r
         language: system
         pass_filenames: false

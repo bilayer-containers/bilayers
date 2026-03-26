@@ -1,4 +1,3 @@
-import os
 from typing import Optional
 from pathlib import Path
 
@@ -6,7 +5,6 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from bilayers import project_path
 from bilayers_schema import Citations, Input, Output, Parameter, ExecFunction, DockerImage
-from bilayers_interface_shared import generate_top_level_text
 
 
 # TODO: put in wiki to make publically available

@@ -2,10 +2,10 @@ import os
 import sys
 import importlib.util
 from pathlib import Path
-from typing import Optional, Union
+from typing import Union
 
 from bilayers_interface_shared import generate_top_level_text as _generate_top_level_text
-from bilayers_schema import Citations, DockerImage, ExecFunction, Input, Output, Parameter
+from bilayers_schema import Citations, InterfaceInput
 
 from ._blpath import project_path
 from .parse import safe_parse_config
@@ -24,15 +24,7 @@ def generate_top_level_text(interface_citation: Citations, citations: dict[str, 
 
 def load_and_run_generate(
     path: Path,
-    generated_dir: Path,
-    inputs: dict[str, Input],
-    outputs: dict[str, Output],
-    parameters: dict[str, Parameter],
-    display_only: Optional[dict[str, Parameter]],
-    exec_function: ExecFunction,
-    citations: dict[str, Citations],
-    docker_image: DockerImage,
-    cli_sequence: dict[str, dict],
+    interface_input: InterfaceInput,
 ):
     path = Path(path).resolve()
     spec = importlib.util.spec_from_file_location("external_module", path)
@@ -45,7 +37,7 @@ def load_and_run_generate(
         return
     spec.loader.exec_module(module)
 
-    return module.generate(generated_dir, inputs, outputs, parameters, display_only, exec_function, citations, docker_image, cli_sequence)
+    return module.generate(interface_input)
 
 
 def generate_interface(interface_name: str, config_path: Union[str, Path]) -> None:
@@ -65,11 +57,23 @@ def generate_interface(interface_name: str, config_path: Union[str, Path]) -> No
     generated_dir = interfaces_dir / "generated_folders" / algorithm_folder_name
     os.makedirs(generated_dir, exist_ok=True)
 
+    interface_input: InterfaceInput = {
+        "output_dir": generated_dir,
+        "inputs": inputs,
+        "outputs": outputs,
+        "parameters": parameters,
+        "display_only": display_only,
+        "exec_function": exec_function,
+        "citations": citations,
+        "docker_image": docker_image,
+        "cli_sequence": cli_sequence,
+    }
+
     generate_py = iface_dir / "generate.py"
     if generate_py.exists():
         print(f"Running generate for {interface_name}...")
 
-        load_and_run_generate(generate_py, generated_dir, inputs, outputs, parameters, display_only, exec_function, citations, docker_image, cli_sequence)
+        load_and_run_generate(generate_py, interface_input)
     else:
         print(f"No generate.py found for interface: {interface_name}")
 
@@ -85,6 +89,18 @@ def generate_all(config_path: Union[str, Path]) -> None:
     generated_dir = interfaces_dir / "generated_folders" / algorithm_folder_name
     os.makedirs(generated_dir, exist_ok=True)
 
+    interface_input: InterfaceInput = {
+        "output_dir": generated_dir,
+        "inputs": inputs,
+        "outputs": outputs,
+        "parameters": parameters,
+        "display_only": display_only,
+        "exec_function": exec_function,
+        "citations": citations,
+        "docker_image": docker_image,
+        "cli_sequence": cli_sequence,
+    }
+
     for iface_dir in interfaces_dir.iterdir():
         if not iface_dir.is_dir() or iface_dir.name == "generated_folders":
             continue
@@ -93,6 +109,6 @@ def generate_all(config_path: Union[str, Path]) -> None:
         if generate_py.exists():
             print(f"Running generate for {os.path.basename(iface_dir)}...")
 
-            load_and_run_generate(generate_py, generated_dir, inputs, outputs, parameters, display_only, exec_function, citations, docker_image, cli_sequence)
+            load_and_run_generate(generate_py, interface_input)
         else:
             print(f"No generate.py found for interface: {str(iface_dir)}")

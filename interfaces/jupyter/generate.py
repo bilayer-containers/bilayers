@@ -5,7 +5,6 @@ from pathlib import Path
 import nbformat as nbf
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from bilayers import project_path
 from bilayers_schema import Citations, Input, Output, Parameter, ExecFunction, DockerImage, InterfaceInput
 from bilayers_interface_shared import generate_top_level_text
 
@@ -126,7 +125,7 @@ def generate(interface_input: InterfaceInput) -> None:
     docker_image = interface_input["docker_image"]
     cli_sequence = interface_input["cli_sequence"]
 
-    jupyter_template_path = project_path() / "interfaces/jupyter"
+    jupyter_template_path = Path(__file__).parent
 
     jupyter_app_code = generate_jupyter_notebook(
         jupyter_template_path,

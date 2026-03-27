@@ -39,4 +39,7 @@ class InterfaceLoader:
 
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
+
+        if not hasattr(module, "generate") or not callable(module.generate):
+            raise AttributeError(f"Interface '{interface_name}' doesn't have a callable generate(interface_input) function")
         return module

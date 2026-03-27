@@ -4,7 +4,6 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from bilayers import project_path
 from bilayers_schema import Citations, Input, Output, Parameter, ExecFunction, DockerImage, InterfaceInput
 from bilayers_interface_shared import generate_top_level_text
 
@@ -85,7 +84,7 @@ def generate(interface_input: InterfaceInput) -> None:
     docker_image = interface_input["docker_image"]
     cli_sequence = interface_input["cli_sequence"]
 
-    streamlit_template_path = project_path() / "interfaces/streamlit"
+    streamlit_template_path = Path(__file__).parent
 
     streamlit_app_code = generate_streamlit_app(
         streamlit_template_path,

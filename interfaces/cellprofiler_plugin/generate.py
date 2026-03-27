@@ -3,7 +3,6 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from bilayers import project_path
 from bilayers_schema import Citations, Input, Output, Parameter, ExecFunction, DockerImage, InterfaceInput
 
 
@@ -256,7 +255,7 @@ def generate(interface_input: InterfaceInput) -> None:
     docker_image = interface_input["docker_image"]
     cli_sequence = interface_input["cli_sequence"]
 
-    cellprofiler_template_path = project_path() / "interfaces/cellprofiler_plugin"
+    cellprofiler_template_path = Path(__file__).parent
 
     cellprofiler_plugin_code, plugin_name = generate_cellprofiler_plugin(
         cellprofiler_template_path,

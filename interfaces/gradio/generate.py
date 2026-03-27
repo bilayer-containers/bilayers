@@ -4,7 +4,7 @@ from pathlib import Path
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from bilayers import project_path
-from bilayers_schema import Citations, Input, Output, Parameter, ExecFunction, DockerImage
+from bilayers_schema import Citations, Input, Output, Parameter, ExecFunction, DockerImage, InterfaceInput
 from bilayers_interface_shared import generate_top_level_text
 
 
@@ -105,17 +105,18 @@ def generate_gradio_app(
 
     return gradio_app_code
 
-def generate(
-    output_dir: Path,
-    inputs: dict[str, Input],
-    outputs: dict[str, Output],
-    parameters: dict[str, Parameter],
-    display_only: Optional[dict[str, Parameter]],
-    exec_function: ExecFunction,
-    citations: dict[str, Citations],
-    docker_image: DockerImage,
-    cli_sequence: dict[str, dict],
-):
+def generate(interface_input: InterfaceInput) -> None:
+    # unpack interface_input from dict
+    output_dir = interface_input["output_dir"]
+    inputs = interface_input["inputs"]
+    outputs = interface_input["outputs"]
+    parameters = interface_input["parameters"]
+    display_only = interface_input["display_only"]
+    exec_function = interface_input["exec_function"]
+    citations = interface_input["citations"]
+    docker_image = interface_input["docker_image"]
+    cli_sequence = interface_input["cli_sequence"]
+
     gradio_template_path = project_path() / "interfaces/gradio"
 
     gradio_app_code = generate_gradio_app(

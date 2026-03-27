@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import TypedDict, Any, Optional
 
 
@@ -85,3 +86,15 @@ class Config(TypedDict):
     parameters: dict[str, Parameter]
     display_only: Optional[dict[str, Parameter]]
     docker_image: DockerImage
+
+
+class InterfaceInput(TypedDict):
+    output_dir: Path
+    inputs: dict[str, Input]
+    outputs: dict[str, Output]
+    parameters: dict[str, Parameter]
+    display_only: Optional[dict[str, Parameter]]
+    exec_function: ExecFunction
+    citations: dict[str, Citations]
+    docker_image: DockerImage
+    cli_sequence: dict[str, dict[str, Any]]

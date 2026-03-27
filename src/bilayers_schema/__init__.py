@@ -7,6 +7,7 @@ from .types import (
     Input,
     Output,
     Parameter,
+    InterfaceInput,
 )
 
 __all__ = [
@@ -18,4 +19,5 @@ __all__ = [
     "Input",
     "Output",
     "Parameter",
+    "InterfaceInput",
 ]

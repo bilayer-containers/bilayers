@@ -12,3 +12,9 @@ repos:
         entry: pixi run -e dockerdev nox -s lint -r
         language: system
         pass_filenames: false
+      
+      - id: forbidden-interface-imports
+        name: Check for forbidden imports in interface generators
+        entry: pixi run -e dockerdev python checks/check_forbidden_interface_imports.py
+        language: system
+        pass_filenames: false

@@ -15,6 +15,6 @@ repos:
       
       - id: forbidden-interface-imports
         name: Check for forbidden imports in interface generators
-        entry: pixi run -e dockerdev python checks/check_forbidden_interface_imports.py
+        entry: pixi run -e dockerdev python scripts/check_forbidden_interface_imports.py
         language: system
         pass_filenames: false

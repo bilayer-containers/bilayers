@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import ast
 import sys
 from pathlib import Path
@@ -12,6 +13,7 @@ FORBIDDEN_BILAYERS_SYMBOLS = {
 }
 
 TARGET_FILES = list(Path("interfaces").glob("*/generate.py"))
+
 
 def check_file(path: Path) -> list[str]:
     errors = []
@@ -30,15 +32,16 @@ def check_file(path: Path) -> list[str]:
                 errors.append(
                     f"{path}:{node.lineno} forbidden import: from {node.module} import ..."
                 )
-            
+
             if node.module == "bilayers":
                 for alias in node.names:
                     if alias.name in FORBIDDEN_BILAYERS_SYMBOLS:
                         errors.append(
                             f"{path}:{node.lineno} forbidden import: from bilayers import {alias.name}"
                         )
-            
+
     return errors
+
 
 def main() -> int:
     all_errors = []
@@ -53,6 +56,7 @@ def main() -> int:
 
     print("No forbidden imports found.")
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())

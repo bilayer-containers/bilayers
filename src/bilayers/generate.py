@@ -87,5 +87,9 @@ def generate_all(config_path: Union[str, Path]) -> None:
     }
 
     for interface_name in loader.list_interfaces():
-        print(f"Running generate for {interface_name}...")
-        run_generate(interface_name, loader, interface_input)
+        try:
+            print(f"Running generate for {interface_name}...")
+            run_generate(interface_name, loader, interface_input)
+        except Exception as e:
+            print(f"Error occurred while generating for {interface_name}: {e}")
+            continue  # since, we want to keep iterarting through other interfaces even if one fails

@@ -12,7 +12,8 @@ FORBIDDEN_BILAYERS_SYMBOLS = {
     "project_path",
 }
 
-TARGET_FILES = list(Path("interfaces").glob("*/generate.py"))
+REPO_ROOT = Path(__file__).resolve().parent.parent
+TARGET_FILES = list((REPO_ROOT / "interfaces").glob("*/generate.py"))
 
 
 def check_file(path: Path) -> list[str]:

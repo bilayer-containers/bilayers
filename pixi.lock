@@ -1608,7 +1608,7 @@ packages:
 - pypi: .
   name: bilayers
   version: 0.1.0
-  sha256: aa5b4cc2ef4946d4d283b05bdb83f32b6d8722209a61122f6559302ee1acb441
+  sha256: e323fb4abad9fe345bd2727fee9518b2993a7356fb617373e53556e9b360ab5d
   requires_dist:
   - pyyaml>=6.0.1,<7
   - jinja2>=3.0,<4 ; extra == 'gradio'
@@ -1626,6 +1626,9 @@ packages:
   - nox ; extra == 'nox'
   - linkml ; extra == 'linkml'
   - pytest ; extra == 'test'
+  - bilayers[interfaces] ; extra == 'test'
+  - bilayers[plugins] ; extra == 'test'
+  - bilayers[linkml] ; extra == 'test'
   - ruff ; extra == 'lint'
   - numpy ; extra == 'dev'
   - scipy ; extra == 'dev'

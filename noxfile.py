@@ -374,7 +374,7 @@ def test_generate(session: nox.Session) -> None:
 
 @nox.session
 def test_pytest(session: nox.Session) -> None:
-    session.install("-e", ".[test,linkml]")
+    session.install("-e", ".[test]")
     session.run("pytest", str(PROJ_ROOT / "tests"))
 
 

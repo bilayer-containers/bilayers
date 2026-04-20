@@ -34,9 +34,8 @@ def cli() -> None:  # noqa: C901
     )
     generate_parser.add_argument("--cli", action="store_true", help="Generate CLI command string instead of generating full interface")
 
-    if linkml:
-        validate_parser = subparsers.add_parser("validate", help="Validate a Bilayers YAML config file.")
-        validate_parser.add_argument("config", help="Path to the YAML config file.")
+    validate_parser = subparsers.add_parser("validate", help="Validate a Bilayers YAML config file.")
+    validate_parser.add_argument("config", help="Path to the YAML config file.")
 
     # Using action="version" automatically prints the version string and exits
     parser.add_argument("-v", "--version", action="version", version="bilayers_cli 0.1.0", help="Show the version number and exit.")
@@ -79,7 +78,7 @@ def cli() -> None:  # noqa: C901
         elif args.interface and args.interface != "all":
             try:
                 generate_interface(args.interface, config_path)
-                print("Finished generating interface: {args.interface}")
+                print(f"Finished generating interface: {args.interface}")
             except Exception as e:
                 print(f"Error: generating interface {args.interface}: {e}")
                 sys.exit(1)
@@ -91,7 +90,10 @@ def cli() -> None:  # noqa: C901
                 print(f"Error: generating interfaces: {e}")
                 sys.exit(1)
 
-    elif linkml and args.command == "validate":
+    elif args.command == "validate":
+        if not linkml:
+            print("Validation dependency missing. Install with: pip install bilayers[linkml]")
+            sys.exit(1)
         from . import schema
 
         config_yaml = load_config(config_path)

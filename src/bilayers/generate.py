@@ -6,7 +6,7 @@ from bilayers_interface_shared import generate_top_level_text as _generate_top_l
 from bilayers_schema import Citations, InterfaceInput
 
 from ._blpath import project_path
-from .interface_loader import InterfaceLoader
+from .interface_loader import InterfaceLoader, MissingInterfaceDependencyError
 from .parse import safe_parse_config
 
 
@@ -30,13 +30,22 @@ def run_generate(
     return module.generate(interface_input)
 
 
+def _find_interfaces_dir(config_path: Union[str, Path]) -> Path:
+    config_path = Path(config_path).resolve()
+    for parent in [config_path.parent, *config_path.parents]:
+        candidate = parent / "interfaces"
+        if candidate.is_dir():
+            return candidate
+    return project_path() / "interfaces"
+
+
 def generate_interface(interface_name: str, config_path: Union[str, Path]) -> None:
     """Main function to parse config and generate files for specified interface (e.g. gradio, jupyter, cellprofiler plugin)."""
     print("Parsing config...")
 
     inputs, outputs, parameters, display_only, exec_function, algorithm_folder_name, citations, docker_image, cli_sequence = safe_parse_config(config_path)
 
-    interfaces_dir = project_path() / "interfaces"
+    interfaces_dir = _find_interfaces_dir(config_path)
     loader = InterfaceLoader(interfaces_dir)
 
     generated_dir = interfaces_dir / "generated_folders" / algorithm_folder_name
@@ -54,12 +63,8 @@ def generate_interface(interface_name: str, config_path: Union[str, Path]) -> No
         "cli_sequence": cli_sequence,
     }
 
-    try:
-        print(f"Running generate for {interface_name}...")
-        run_generate(interface_name, loader, interface_input)
-    except FileNotFoundError:
-        print(f"Interface {interface_name} not found")
-        return
+    print(f"Running generate for {interface_name}...")
+    run_generate(interface_name, loader, interface_input)
 
 
 def generate_all(config_path: Union[str, Path]) -> None:
@@ -68,7 +73,7 @@ def generate_all(config_path: Union[str, Path]) -> None:
 
     inputs, outputs, parameters, display_only, exec_function, algorithm_folder_name, citations, docker_image, cli_sequence = safe_parse_config(config_path)
 
-    interfaces_dir = project_path() / "interfaces"
+    interfaces_dir = _find_interfaces_dir(config_path)
     loader = InterfaceLoader(interfaces_dir)
 
     generated_dir = interfaces_dir / "generated_folders" / algorithm_folder_name
@@ -90,6 +95,9 @@ def generate_all(config_path: Union[str, Path]) -> None:
         try:
             print(f"Running generate for {interface_name}...")
             run_generate(interface_name, loader, interface_input)
+        except MissingInterfaceDependencyError as e:
+            print(e)
+            continue
         except Exception as e:
             print(f"Error occurred while generating for {interface_name}: {e}")
-            continue  # since, we want to keep iterarting through other interfaces even if one fails
+            continue  # keep iterating through other interfaces even if one fails

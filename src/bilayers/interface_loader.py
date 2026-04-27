@@ -1,49 +1,47 @@
-import importlib.util
-from pathlib import Path
-from types import ModuleType
+from importlib.metadata import entry_points
+
+_GROUP = "bilayers.interfaces"
 
 
 class MissingInterfaceDependencyError(RuntimeError):
-    """Raised when an interface module cannot be imported because an optional dependency is missing."""
+    """Raised when an interface exists but cannot be imported due to missing optional dependencies."""
+
+    pass
 
 
 class InterfaceLoader:
-    """Thin adapter for filesystem-based interface discovery and loading"""
+    """Adapter for entry-point-based interface discovery and loading."""
 
-    def __init__(self, interfaces_dir: Path) -> None:
-        self.interfaces_dir = interfaces_dir
+    def __init__(self) -> None:
+        # Retrieve all registered entry points
+        # NOTE:
+        # Python 3.9 has an older API where entry_points() does NOT accept 'group='
+        # Newer Python versions support entry_points(group=...)
+        # This compatibility pattern supports both versions
+        discovered = entry_points()
+        if hasattr(discovered, "select"):
+            # Python 3.10+ style API
+            eps = discovered.select(group=_GROUP)
+        else:
+            # Python 3.9 fallback
+            eps = discovered.get(_GROUP, [])
+        self._entry_points = {ep.name: ep for ep in eps}
 
     def list_interfaces(self) -> list[str]:
-        names = []
-        for iface_dir in self.interfaces_dir.iterdir():
-            if not iface_dir.is_dir() or iface_dir.name == "generated_folders":
-                continue
+        """Return all available interface names."""
+        return sorted(self._entry_points)
 
-            generate_py = iface_dir / "generate.py"
-            if generate_py.exists():
-                names.append(iface_dir.name)
+    def load_generate(self, interface_name: str):
+        """Load the generate() callable for a given interface via entry points."""
 
-        return names
+        ep = self._entry_points.get(interface_name)
 
-    def get_generate_path(self, interface_name: str) -> Path:
-        generate_py = self.interfaces_dir / interface_name / "generate.py"
-        if not generate_py.exists():
+        if ep is None:
+            # Interface not registered (or corresponding extra not installed)
             raise FileNotFoundError(f"Interface '{interface_name}' not found. Install with: pip install bilayers[{interface_name}]")
-        return generate_py
 
-    def load_module(self, interface_name: str) -> ModuleType:
-        generate_py = self.get_generate_path(interface_name).resolve()
-
-        spec = importlib.util.spec_from_file_location(
-            f"bilayers_interface_{interface_name}",
-            generate_py,
-        )
-        if not spec or not spec.loader:
-            raise RuntimeError(f"Cannot load interface module for {interface_name}")
-
-        module = importlib.util.module_from_spec(spec)
         try:
-            spec.loader.exec_module(module)
+            generate_fn = ep.load()
         except ImportError as exc:
             missing = getattr(exc, "name", None)
             detail = f" (missing dependency: '{missing}')" if missing else ""
@@ -51,6 +49,8 @@ class InterfaceLoader:
                 f"Interface '{interface_name}' could not be loaded{detail}. Install with: pip install bilayers[{interface_name}]"
             ) from exc
 
-        if not hasattr(module, "generate") or not callable(module.generate):
-            raise AttributeError(f"Interface '{interface_name}' doesn't have a callable generate(interface_input) function")
-        return module
+        # Safety check: entry point must resolve to a callable
+        if not callable(generate_fn):
+            raise AttributeError(f"Interface '{interface_name}' entry point does not resolve to a callable generate(interface_input) function")
+
+        return generate_fn

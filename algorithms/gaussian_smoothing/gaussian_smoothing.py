@@ -2,7 +2,6 @@ import argparse
 import os
 import skimage.io
 import skimage.filters
-import numpy
 from typing import Any, TypedDict
 from numpy.typing import NDArray
 

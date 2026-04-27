@@ -121,7 +121,7 @@ def run_generate_all(session: nox.Session) -> None:
     Args:
         session (nox.Session): The Nox session object.
     """
-    session.install("-e", ".")
+    session.install("-e", ".[interfaces,plugins]")
     config_path = Path(session.posargs[0]).resolve()
     session.run("bilayers_cli", "generate", str(config_path))
 
@@ -134,9 +134,9 @@ def run_generate_interface(session: nox.Session) -> None:
     Args:
         session (nox.Session): The Nox session object.
     """
-    session.install("-e", ".")
+    session.install("-e", ".[interfaces,plugins]")
     config_path = Path(session.posargs[0]).resolve()
-    interface_name = Path(session.posargs[1]).resolve()
+    interface_name = session.posargs[1]
     session.run("bilayers_cli", "generate", "--interface", str(interface_name), str(config_path))
 
 
@@ -168,7 +168,7 @@ def build_algorithm(session: nox.Session) -> None:
         # Proceed to build from Dockerfile if pull fails
         if os.path.exists(dockerfile_path):
             print("Pull failed; attempting to build locally from Dockerfile.")
-            session.run(DOCKER_CMD, "buildx", "build", platform_opt, platform, "-t", image_name, "-f", dockerfile_path, algorithm_path, external=True)
+            session.run(DOCKER_CMD, "buildx", "build", platform_opt, platform, "-t", image_name, "-f", dockerfile_path, str(algorithm_path), external=True)
             # Save the locally built Docker image name in a file
             with open(tmp_path("docker_image_name.txt"), "w") as file:
                 file.write(image_name)
@@ -241,8 +241,8 @@ def build_interface(session: nox.Session) -> None:
     Final image is always tagged under bilayer/{algorithm}:{version}-{interface}.
     """
     session.install("requests", "pyyaml")
-    if len(session.posargs) < 2:
-        session.error("Must provide at least interface and algorithm arguments")
+    if len(session.posargs) < 1:
+        session.error("Must provide at least interface argument")
 
     interface = session.posargs[0]
     bump_type = session.posargs[1] if len(session.posargs) >= 2 else "minor"
@@ -260,6 +260,7 @@ def build_interface(session: nox.Session) -> None:
 
     # Build candidate first
     dockerfile_path = PROJ_ROOT / f"interfaces/{interface}/{interface.capitalize()}.Dockerfile"
+    algorithm_path = PROJ_ROOT / "algorithms" / algorithm_folder_name
     candidate_name = f"bilayer/{algorithm_folder_name}:build-candidate"
     print("Dockerfile Path: ", dockerfile_path)
 
@@ -277,7 +278,7 @@ def build_interface(session: nox.Session) -> None:
         candidate_name,
         "-f",
         dockerfile_path,
-        str(PROJ_ROOT / "interfaces"),
+        str(algorithm_path),
         external=True,
     )
 
@@ -305,7 +306,7 @@ def build_interface(session: nox.Session) -> None:
             final_image_name,
             "-f",
             dockerfile_path,
-            str(PROJ_ROOT / "interfaces"),
+            str(algorithm_path),
             external=True,
         )
     elif interface == "jupyter":
@@ -323,7 +324,7 @@ def build_interface(session: nox.Session) -> None:
             final_image_name,
             "-f",
             dockerfile_path,
-            str(PROJ_ROOT / "interfaces"),
+            str(algorithm_path),
             external=True,
         )
     elif interface == "streamlit":
@@ -341,7 +342,8 @@ def build_interface(session: nox.Session) -> None:
             final_image_name,
             "-f",
             dockerfile_path,
-            PROJ_ROOT / "interfaces",
+            str(algorithm_path),
+            external=True,
         )
 
 
@@ -367,7 +369,7 @@ def test_parse(session: nox.Session) -> None:
 
 @nox.session
 def test_generate(session: nox.Session) -> None:
-    session.install("-e", ".")
+    session.install("-e", ".[interfaces,plugins]")
     config_path = Path(session.posargs[0]).resolve()
     session.run("bilayers_cli", "generate", str(config_path))
 

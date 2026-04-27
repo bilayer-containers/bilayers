@@ -5,11 +5,6 @@ from .parse import parse_config, safe_parse_config, load_config
 from .generate import generate_all, generate_interface
 from .cli_generator import generate_cli_command
 
-try:
-    import linkml.validator
-except ImportError:
-    linkml = None
-
 
 def cli() -> None:  # noqa: C901
     """CLI entry point for bilayers_cli"""
@@ -91,13 +86,15 @@ def cli() -> None:  # noqa: C901
                 sys.exit(1)
 
     elif args.command == "validate":
-        if not linkml:
+        try:
+            import linkml.validator as _linkml_validator
+        except ImportError:
             print("Validation dependency missing. Install with: pip install bilayers[linkml]")
             sys.exit(1)
         from . import schema
 
         config_yaml = load_config(config_path)
-        report = linkml.validator.validate(config_yaml, schema)
+        report = _linkml_validator.validate(config_yaml, schema)
 
         if not report.results:
             print("No issues found")

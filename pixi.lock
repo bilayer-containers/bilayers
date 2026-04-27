@@ -2113,7 +2113,7 @@ packages:
 - pypi: .
   name: bilayers
   version: 0.1.0
-  sha256: b6fc52606ee9731992a3e66b8ee4e0967f92ef3a60355addf303308296a321aa
+  sha256: 1fe12f6c869bb600a106a8f8db5e12a1c1f72305f5646e0f19394fccdff22ec5
   requires_dist:
   - pyyaml>=6.0.1,<7
   - jinja2 ; extra == 'gradio'
@@ -2145,7 +2145,7 @@ packages:
   - streamlit ; extra == 'dev'
   - bilayers[interfaces] ; extra == 'dev'
   - bilayers[plugins] ; extra == 'dev'
-  requires_python: '>=3.10'
+  requires_python: '>=3.9'
   editable: true
 - pypi: https://files.pythonhosted.org/packages/10/cb/f2ad4230dc2eb1a74edf38f1a38b9b52277f75bef262d8908e60d957e13c/blinker-1.9.0-py3-none-any.whl
   name: blinker

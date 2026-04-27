@@ -14,17 +14,8 @@ class InterfaceLoader:
 
     def __init__(self) -> None:
         # Retrieve all registered entry points
-        # NOTE:
-        # Python 3.9 has an older API where entry_points() does NOT accept 'group='
-        # Newer Python versions support entry_points(group=...)
-        # This compatibility pattern supports both versions
         discovered = entry_points()
-        if hasattr(discovered, "select"):
-            # Python 3.10+ style API
-            eps = discovered.select(group=_GROUP)
-        else:
-            # Python 3.9 fallback
-            eps = discovered.get(_GROUP, [])
+        eps = discovered.select(group=_GROUP)
         self._entry_points = {ep.name: ep for ep in eps}
 
     def list_interfaces(self) -> list[str]:

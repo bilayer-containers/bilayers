@@ -15,7 +15,12 @@ class InterfaceLoader:
     def __init__(self) -> None:
         # Retrieve all registered entry points
         discovered = entry_points()
-        eps = discovered.select(group=_GROUP)
+        if hasattr(discovered, "select"):
+            # Python 3.10+
+            eps = discovered.select(group=_GROUP)
+        else:
+            # Python 3.9
+            eps = discovered.get(_GROUP, [])
         self._entry_points = {ep.name: ep for ep in eps}
 
     def list_interfaces(self) -> list[str]:

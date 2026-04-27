@@ -69,12 +69,20 @@ dev = [
 [project.scripts]
 bilayers_cli = "bilayers.cli:cli"
 
+[project.entry-points."bilayers.interfaces"]
+gradio = "interfaces.gradio.generate:generate"
+jupyter = "interfaces.jupyter.generate:generate"
+streamlit = "interfaces.streamlit.generate:generate"
+cellprofiler_plugin = "interfaces.cellprofiler_plugin.generate:generate"
+
 [tool.setuptools.packages.find]
-where = ["src"]
-include = ["bilayers*"]
+where = ["src", "."]
+include = ["bilayers*", "interfaces*"]
+exclude = ["build*", "tests*"]
 
 [tool.setuptools.package-data]
 bilayers = ["schema.yaml"]
+"*" = ["*.j2"]
 
 [tool.pixi.workspace]
 channels = ["conda-forge"]
@@ -87,11 +95,13 @@ env = { DOCKER_CMD = "podman" }
 env = { DOCKER_CMD = "docker" }
 
 [tool.pixi.feature.interfaces.pypi-dependencies]
-jinja2 = ">=3.0,<4"
+jinja2 = "*"
+gradio = "*"
 nbformat = "*"
+streamlit = "*"
 
 [tool.pixi.feature.plugins.pypi-dependencies]
-jinja2 = ">=3.0,<4"
+jinja2 = "*"
 
 [tool.pixi.feature.dev.pypi-dependencies]
 pre-commit = "*"

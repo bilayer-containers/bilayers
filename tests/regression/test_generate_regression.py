@@ -19,7 +19,7 @@ def test_generate_regression():
 
     config_path = repo_root / "algorithms" / "classical_segmentation" / "config.yaml"
     golden_dir = repo_root / "tests" / "fixtures" / "golden" / "classical_segmentation"
-    generated_dir = repo_root / "interfaces" / "generated_folders" / "classical_segmentation"
+    generated_dir = repo_root / "algorithms" / "classical_segmentation" / "generated_folders" / "classical_segmentation"
 
     if generated_dir.exists():
         shutil.rmtree(generated_dir)

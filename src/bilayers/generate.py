@@ -5,7 +5,6 @@ from typing import Union
 from bilayers_interface_shared import generate_top_level_text as _generate_top_level_text
 from bilayers_schema import Citations, InterfaceInput
 
-from ._blpath import project_path
 from .interface_loader import InterfaceLoader, MissingInterfaceDependencyError
 from .parse import safe_parse_config
 
@@ -21,22 +20,9 @@ def generate_top_level_text(interface_citation: Citations, citations: dict[str, 
     return _generate_top_level_text(interface_citation, citations, output_html)
 
 
-def run_generate(
-    interface_name: str,
-    loader: InterfaceLoader,
-    interface_input: InterfaceInput,
-):
-    module = loader.load_module(interface_name)
-    return module.generate(interface_input)
-
-
-def _find_interfaces_dir(config_path: Union[str, Path]) -> Path:
-    config_path = Path(config_path).resolve()
-    for parent in [config_path.parent, *config_path.parents]:
-        candidate = parent / "interfaces"
-        if candidate.is_dir():
-            return candidate
-    return project_path() / "interfaces"
+def run_generate(interface_name: str, loader: InterfaceLoader, interface_input: InterfaceInput):
+    generate_fn = loader.load_generate(interface_name)
+    return generate_fn(interface_input)
 
 
 def generate_interface(interface_name: str, config_path: Union[str, Path]) -> None:
@@ -45,10 +31,9 @@ def generate_interface(interface_name: str, config_path: Union[str, Path]) -> No
 
     inputs, outputs, parameters, display_only, exec_function, algorithm_folder_name, citations, docker_image, cli_sequence = safe_parse_config(config_path)
 
-    interfaces_dir = _find_interfaces_dir(config_path)
-    loader = InterfaceLoader(interfaces_dir)
+    loader = InterfaceLoader()
 
-    generated_dir = interfaces_dir / "generated_folders" / algorithm_folder_name
+    generated_dir = Path(config_path).resolve().parent / "generated_folders" / algorithm_folder_name
     os.makedirs(generated_dir, exist_ok=True)
 
     interface_input: InterfaceInput = {
@@ -73,10 +58,9 @@ def generate_all(config_path: Union[str, Path]) -> None:
 
     inputs, outputs, parameters, display_only, exec_function, algorithm_folder_name, citations, docker_image, cli_sequence = safe_parse_config(config_path)
 
-    interfaces_dir = _find_interfaces_dir(config_path)
-    loader = InterfaceLoader(interfaces_dir)
+    loader = InterfaceLoader()
 
-    generated_dir = interfaces_dir / "generated_folders" / algorithm_folder_name
+    generated_dir = Path(config_path).resolve().parent / "generated_folders" / algorithm_folder_name
     os.makedirs(generated_dir, exist_ok=True)
 
     interface_input: InterfaceInput = {
@@ -100,4 +84,4 @@ def generate_all(config_path: Union[str, Path]) -> None:
             continue
         except Exception as e:
             print(f"Error occurred while generating for {interface_name}: {e}")
-            continue  # keep iterating through other interfaces even if one fails
+            continue

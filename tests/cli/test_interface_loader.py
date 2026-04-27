@@ -95,18 +95,3 @@ def test_load_generate_non_callable_raises() -> None:
         loader.load_generate("gradio")
 
     assert "does not resolve to a callable" in str(exc_info.value)
-
-
-def test_entry_points_py39_fallback() -> None:
-    """InterfaceLoader supports the Python 3.9 entry_points() dict-like fallback."""
-    fake_generate = MagicMock()
-    fake_ep = _make_entry_point("gradio", fake_generate)
-
-    with patch(
-        "bilayers.interface_loader.entry_points",
-        return_value={"bilayers.interfaces": [fake_ep]},
-    ):
-        loader = InterfaceLoader()
-
-    assert loader.list_interfaces() == ["gradio"]
-    assert loader.load_generate("gradio") is fake_generate

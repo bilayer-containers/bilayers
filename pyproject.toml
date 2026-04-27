@@ -18,17 +18,17 @@ maintainers = [
 ]
 readme = "README.md"
 license = "BSD-3-Clause"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
     "pyyaml>=6.0.1,<7",
 ]
 
 [project.optional-dependencies]
 # Per Interface Extras
-gradio = ["jinja2>=3.0,<4", "gradio"]
-jupyter = ["jinja2>=3.0,<4", "nbformat"]
-cellprofiler_plugin = ["jinja2>=3.0,<4"]
-streamlit = ["jinja2>=3.0,<4", "streamlit"]
+gradio = ["jinja2"]
+jupyter = ["jinja2", "nbformat"]
+cellprofiler_plugin = ["jinja2"]
+streamlit = ["jinja2"]
 
 # Convenience Group Extras
 interfaces = [
@@ -62,6 +62,8 @@ dev = [
   "pyright",
   "mypy",
   "types-pyyaml",
+  "gradio",
+  "streamlit",
   "bilayers[interfaces]",
   "bilayers[plugins]",
 ]
@@ -94,15 +96,6 @@ env = { DOCKER_CMD = "podman" }
 [tool.pixi.feature.docker.activation]
 env = { DOCKER_CMD = "docker" }
 
-[tool.pixi.feature.interfaces.pypi-dependencies]
-jinja2 = "*"
-gradio = "*"
-nbformat = "*"
-streamlit = "*"
-
-[tool.pixi.feature.plugins.pypi-dependencies]
-jinja2 = "*"
-
 [tool.pixi.feature.dev.pypi-dependencies]
 pre-commit = "*"
 
@@ -112,15 +105,18 @@ scripts = ["scripts/install-pre-commit.sh"]
 [tool.pixi.tasks]
 
 [tool.pixi.dependencies]
-python = ">=3.9"
+python = ">=3.10"
 requests = ">=2.32.5,<3"
 
+[tool.pixi.feature.dev.dependencies]
+ripgrep = ">=15.1.0,<16"
+
 [tool.pixi.pypi-dependencies]
-bilayers = { path = ".", editable = true }
+bilayers = { path = ".", editable = true, extras = ["interfaces", "plugins"] }
 
 [tool.pixi.environments]
-dev = ["dev", "interfaces", "plugins", "docs", "linkml", "test", "lint", "nox", "podman"]
-dockerdev = ["dev", "interfaces", "plugins", "docs", "linkml", "test", "lint", "nox", "docker"]
+dev = ["dev", "docs", "linkml", "test", "lint", "nox", "podman"]
+dockerdev = ["dev", "docs", "linkml", "test", "lint", "nox", "docker"]
 
 [tool.ruff]
 # 80 columns are a thing of the past

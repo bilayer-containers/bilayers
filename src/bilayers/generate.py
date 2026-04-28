@@ -33,7 +33,7 @@ def generate_interface(interface_name: str, config_path: Union[str, Path]) -> No
 
     loader = InterfaceLoader()
 
-    generated_dir = Path(config_path).resolve().parent / "generated_folders" / algorithm_folder_name
+    generated_dir = Path.cwd() / "dist" / interface_name / algorithm_folder_name
     os.makedirs(generated_dir, exist_ok=True)
 
     interface_input: InterfaceInput = {
@@ -60,23 +60,23 @@ def generate_all(config_path: Union[str, Path]) -> None:
 
     loader = InterfaceLoader()
 
-    generated_dir = Path(config_path).resolve().parent / "generated_folders" / algorithm_folder_name
-    os.makedirs(generated_dir, exist_ok=True)
-
-    interface_input: InterfaceInput = {
-        "output_dir": generated_dir,
-        "inputs": inputs,
-        "outputs": outputs,
-        "parameters": parameters,
-        "display_only": display_only,
-        "exec_function": exec_function,
-        "citations": citations,
-        "docker_image": docker_image,
-        "cli_sequence": cli_sequence,
-    }
-
     for interface_name in loader.list_interfaces():
         try:
+            generated_dir = Path.cwd() / "dist" / interface_name / algorithm_folder_name
+            os.makedirs(generated_dir, exist_ok=True)
+
+            interface_input: InterfaceInput = {
+                "output_dir": generated_dir,
+                "inputs": inputs,
+                "outputs": outputs,
+                "parameters": parameters,
+                "display_only": display_only,
+                "exec_function": exec_function,
+                "citations": citations,
+                "docker_image": docker_image,
+                "cli_sequence": cli_sequence,
+            }
+
             print(f"Running generate for {interface_name}...")
             run_generate(interface_name, loader, interface_input)
         except MissingInterfaceDependencyError as e:

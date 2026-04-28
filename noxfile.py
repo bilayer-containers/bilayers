@@ -260,7 +260,6 @@ def build_interface(session: nox.Session) -> None:
 
     # Build candidate first
     dockerfile_path = PROJ_ROOT / f"interfaces/{interface}/{interface.capitalize()}.Dockerfile"
-    algorithm_path = PROJ_ROOT / "algorithms" / algorithm_folder_name
     candidate_name = f"bilayer/{algorithm_folder_name}:build-candidate"
     print("Dockerfile Path: ", dockerfile_path)
 
@@ -274,11 +273,13 @@ def build_interface(session: nox.Session) -> None:
         f"BASE_IMAGE={base_image}",
         "--build-arg",
         f"FOLDER_NAME={algorithm_folder_name}",
+        "--build-arg",
+        f"INTERFACE={interface}",
         "-t",
         candidate_name,
         "-f",
         dockerfile_path,
-        str(algorithm_path),
+        str(PROJ_ROOT),
         external=True,
     )
 
@@ -302,11 +303,13 @@ def build_interface(session: nox.Session) -> None:
             f"BASE_IMAGE={base_image}",
             "--build-arg",
             f"FOLDER_NAME={algorithm_folder_name}",
+            "--build-arg",
+            f"INTERFACE={interface}",
             "-t",
             final_image_name,
             "-f",
             dockerfile_path,
-            str(algorithm_path),
+            str(PROJ_ROOT),
             external=True,
         )
     elif interface == "jupyter":
@@ -320,11 +323,13 @@ def build_interface(session: nox.Session) -> None:
             f"BASE_IMAGE={base_image}",
             "--build-arg",
             f"FOLDER_NAME={algorithm_folder_name}",
+            "--build-arg",
+            f"INTERFACE={interface}",
             "-t",
             final_image_name,
             "-f",
             dockerfile_path,
-            str(algorithm_path),
+            str(PROJ_ROOT),
             external=True,
         )
     elif interface == "streamlit":
@@ -338,11 +343,13 @@ def build_interface(session: nox.Session) -> None:
             f"BASE_IMAGE={base_image}",
             "--build-arg",
             f"FOLDER_NAME={algorithm_folder_name}",
+            "--build-arg",
+            f"INTERFACE={interface}",
             "-t",
             final_image_name,
             "-f",
             dockerfile_path,
-            str(algorithm_path),
+            str(PROJ_ROOT),
             external=True,
         )
 

@@ -1,0 +1,118 @@
+citations:
+  - name: "Classical Segmentation"
+    doi: doi_number
+    license: license_details
+    description: "Segments images using classical thresholding methods : Otsu and Li"
+
+docker_image:
+  org: bilayer
+  name: classical_segmentation
+  tag: "1.0.0"
+  platform: "linux/x86_64"
+
+algorithm_folder_name: "classical_segmentation"
+
+exec_function: 
+  name: "generate_cli_command"
+  cli_command: "python -m classical_segmentation"
+  hidden_args:
+
+inputs:
+  - name: input_images
+    type: image
+    label: "Drag and drop all images to be analyzed"
+    subtype: 
+      - grayscale
+      - color
+      - binary
+    description: "Upload all images to be analyzed"
+    cli_tag: "--folder"
+    cli_order: 0
+    default: "directory"
+    optional: False
+    format: 
+      - tiff
+      - ometiff
+      - png
+      - jpg
+      - jpeg
+    folder_name: "/bilayers/input_images"
+    file_count: multiple
+    unique_string:
+      - "*"
+    section_id: "inputs"
+    mode: "beginner"
+    depth: True
+    timepoints: True
+    tiled: True
+    pyramidal: True
+
+outputs:
+  - name: segmented_images
+    type: image
+    label: "Segmented Images"
+    subtype: 
+      - label
+    description: "Segmented images"
+    cli_tag: "None"
+    cli_order: 0
+    default: "directory"
+    optional: False 
+    format: 
+      - tiff
+    folder_name: "/bilayers/output_images" # discuss
+    file_count: single
+    unique_string:
+      - "_output"
+    section_id: "outputs"
+    mode: "beginner"
+    depth: True
+    timepoints: True
+    tiled: True
+    pyramidal: True
+    
+parameters:
+  - name: threshold_method
+    type: radio
+    label: "Select a Threshold Method"
+    description: "Select a threshold method to segment the image"
+    options:
+      - label: "otsu"
+        value: "otsu"
+      - label: "li"
+        value: "li"
+    default: "otsu"
+    cli_tag: "--threshold_method"
+    optional: False
+    section_id: "input-args"
+    mode: "beginner"
+  - name: min_diameter
+    type: float
+    label: "Object Minimum Diameter Size"
+    description: "Minimum diameter of objects in pixels"
+    default: 5
+    cli_tag: "--min_size"
+    optional: False
+    section_id: "input-args"
+    mode: "beginner"
+  - name: max_diameter
+    type: float
+    label: "Object Maximum Diameter Size"
+    description: "Maximum diameter of objects in pixels"
+    default: 20
+    cli_tag: "--max_size"
+    optional: False
+    section_id: "input-args"
+    mode: "beginner"
+  - name: save_dir
+    type: textbox
+    label: "Save Directory"
+    description: "directory to save output files"
+    output_dir_set: True
+    default: "/bilayers/output_images"
+    cli_tag: "--save_dir"
+    optional: True
+    section_id: "output-args"
+    mode: "advanced"
+
+display_only:

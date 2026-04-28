@@ -5,8 +5,9 @@ ARG BASE_IMAGE
 FROM $BASE_IMAGE
 
 ARG FOLDER_NAME
+ARG INTERFACE
 
-# Install the dependencies for the gradio app
+# Install the dependencies for the jupyter notebook
 RUN python -m pip install --no-cache-dir pyyaml jupyter huggingface-hub==0.23.4 pydantic==2.7.4
 
 # Set the working directory within the container
@@ -15,8 +16,8 @@ WORKDIR /bilayers
 # # Install numpy and opencv-python
 # RUN python -m pip install numpy==1.23.0 opencv-python-headless==4.5.3.56 matplotlib==3.5.1
 
-# Add app.py file to the container
-COPY generated_folders/$FOLDER_NAME/generated_notebook.ipynb /bilayers/
+# Add notebook.ipynb file to the container
+COPY dist/$INTERFACE/$FOLDER_NAME/generated_notebook.ipynb /bilayers/
 
 # Add __init__.py file for importing the files inside docker-container
 RUN touch /bilayers/__init__.py

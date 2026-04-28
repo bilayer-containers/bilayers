@@ -5,6 +5,7 @@ ARG BASE_IMAGE
 FROM $BASE_IMAGE
 
 ARG FOLDER_NAME
+ARG INTERFACE
 
 # Install the dependencies for the gradio app
 RUN python -m pip install --no-cache-dir pyyaml pydantic==2.10.6 gradio==4.44.1 huggingface-hub==0.34.3
@@ -13,7 +14,7 @@ RUN python -m pip install --no-cache-dir pyyaml pydantic==2.10.6 gradio==4.44.1 
 WORKDIR /bilayers
 
 # Add app.py file to the container
-COPY generated_folders/$FOLDER_NAME/app.py /bilayers/
+COPY dist/$INTERFACE/$FOLDER_NAME/app.py /bilayers/
 
 # Add __init__.py file for importing the files inside docker-container
 RUN touch /bilayers/__init__.py

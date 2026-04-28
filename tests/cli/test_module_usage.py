@@ -1,9 +1,9 @@
-import bilayers
+from pathlib import Path
 from bilayers.parse import parse_config
 from bilayers.cli_generator import generate_cli_command
 
 # Test if parsing config works
-config_data = parse_config(bilayers.project_path() / "algorithms/instanseg_inference/config.yaml")
+config_data = parse_config(Path(__file__).resolve().parents[1] / "fixtures" / "classical_segmentation" / "config.yaml")
 print("Parsed Config:", config_data)
 
 # Test CLI command generation

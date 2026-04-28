@@ -13,7 +13,14 @@ def package_path():
 
 def project_path():
     """
-    Returns an absolute path to the project dir hosting the bilayers package
-        /absolute/path/to/bilayers/
+    DEPRECATED: Will be removed after repo extraction.
+    Use installed package discovery instead.
     """
+    import warnings
+
+    warnings.warn(
+        "project_path() is deprecated and will be removed after repo extraction. Use configuration-based discovery or entry points instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
     return (package_path() / "../..").resolve()

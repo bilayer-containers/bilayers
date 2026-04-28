@@ -1,11 +1,11 @@
-import bilayers
+from pathlib import Path
 from bilayers.parse import parse_config
 from bilayers.cli_generator import generate_cli_command
 
 
 def test_main():
-    # Use a real configuration file path from your project.
-    config_path = bilayers.project_path() / "algorithms/classical_segmentation/config.yaml"
+    FIXTURES = Path(__file__).resolve().parents[1] / "fixtures"
+    config_path = FIXTURES / "classical_segmentation" / "config.yaml"
 
     # Parse the configuration file.
     config = parse_config(config_path)

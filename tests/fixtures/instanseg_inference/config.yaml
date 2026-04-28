@@ -1,0 +1,198 @@
+citations:
+  - name: "InstanSeg in Brightfield Images"
+    doi: 10.48550/arXiv.2408.15954
+    license: "Apache-2.0"
+    description: "InstanSeg for Nucleus Segmentation in Brightfield Images"
+  - name: "InstanSeg in Fluorescence Images"
+    doi: 10.1101/2024.09.04.611150
+    license: "Apache-2.0"
+    description: "InstanSeg for Nucleus/Cell Segmentation in Fluorescence Images"
+
+docker_image:
+  org: bilayer
+  name: instanseg
+  tag: "1.0.2"
+  platform: "linux/amd64"
+
+algorithm_folder_name: "instanseg_inference"
+
+exec_function: 
+  name: "generate_cli_command"
+  cli_command: "python /instanseg/instanseg/scripts/inference.py"
+  hidden_args:
+
+inputs:
+  - name: input_images
+    type: image
+    label: Drag and drop all images to be analyzed
+    subtype: 
+      - grayscale
+      - color
+      - binary
+    description: "Input images to be analyzed"
+    cli_tag: "--image_path"
+    cli_order: 0
+    default: "directory"
+    optional: False
+    format: 
+      - tiff
+      - ometiff
+      - png
+      - jpg
+      - jpeg
+    folder_name: "/bilayers/input_images"
+    file_count: multiple
+    unique_string:
+      - "*"
+    section_id: "inputs"
+    mode: "beginner"
+    depth: True
+    timepoints: True
+    tiled: True
+    pyramidal: True
+
+outputs: 
+  - name: output_images
+    type: image
+    label: "Prediction masks"
+    subtype: 
+      - label
+    description: "Prediction masks"
+    cli_tag: "None"
+    cli_order: 0
+    default: "directory"
+    optional: False
+    format: 
+      - tiff
+    folder_name: "/bilayers/input_images"
+    file_count: single
+    unique_string:
+      - "prediction"
+    section_id: "outputs"
+    mode: "beginner"
+    depth: True
+    timepoints: True
+    tiled: True
+    pyramidal: True
+  - name: overlay_images
+    type: image
+    label: "Overlay Images"
+    subtype: 
+      - color
+    description: "Overlay images"
+    cli_tag: "None"
+    cli_order: 0
+    default: "directory"
+    optional: False
+    format: 
+      - tiff
+    folder_name: "/bilayers/input_images"
+    file_count: single
+    unique_string:
+      - "prediction_overlay"
+    section_id: "outputs"
+    mode: "beginner"
+    depth: True
+    timepoints: True
+    tiled: True
+    pyramidal: True
+    
+parameters:
+  - name: model_folder
+    type: radio
+    label: "Model Folder"
+    description: "Upload the model folder"
+    options:
+      - label: "Brightfield Nuclei"
+        value: "brightfield_nuclei"
+      - label: "Fluorescence Nuclei and Cells"
+        value: "fluorescence_nuclei_and_cells"
+    default: "brightfield_nuclei"
+    cli_tag: "--model_folder"
+    optional: False
+    section_id: "input-args"
+    mode: "beginner"
+  - name: device
+    type: radio
+    label: "Device"
+    description: "Select the device to run the model"
+    options:
+      - label: "CPU"
+        value: "cpu"
+      - label: "GPU"
+        value: "cuda"
+    default: "cpu"
+    cli_tag: "--device"
+    optional: False
+    section_id: "input-args"
+    mode: "beginner"
+  - name: pixel_size
+    type: float
+    label: "Pixel Size"
+    description: "Pixel size of the input image in microns"
+    default: None
+    cli_tag: "--pixel_size"
+    optional: False
+    section_id: "input-args"
+    mode: "beginner"
+  - name: recursive
+    type: checkbox
+    label: "Recursive"
+    description: "Look for images recursively at the image path"
+    default: False
+    cli_tag: "--recursive"
+    append_value: False
+    optional: True
+    section_id: "input-args"
+    mode: "beginner"
+  - name: ignore_segmented
+    type: checkbox
+    label: "Ignore Segmented"
+    description: "Whether to ignore previously segmented images in the image path"
+    default: False
+    cli_tag: "--ignore_segmented"
+    append_value: False
+    optional: True
+    section_id: "input-args"
+    mode: "beginner"
+
+  # Advanced Usage
+  - name: tile_size
+    type: integer
+    label: "Tile Size"
+    description: "tile size in pixels given to the model, only used for large images"
+    default: 512
+    cli_tag: "--tile_size"
+    optional: True
+    section_id: "advanced-args"
+    mode: "advanced"
+  - name: batch_size
+    type: integer
+    label: "Batch Size"
+    description: "batch size, only useful for large images"
+    default: 1
+    cli_tag: "--batch_size"
+    optional: True
+    section_id: "advanced-args"
+    mode: "advanced"
+  # save_geojson throws an error: OS module not found - hence commented out
+  # - name: save_geojson
+  #   type: checkbox
+  #   label: "Save GeoJSON"
+  #   description: "Output geojson files of the segmentation"
+  #   default: False
+  #   cli_tag: "--output_geojson"
+  #   append_value: False
+  #   optional: True
+  #   section_id: "advanced-args"
+  #   mode: "advanced"
+
+display_only:
+  - name: exclude_str
+    type: textbox
+    label: "Exclude String"
+    description: "Exclude images with this string in their path"
+    default: "mask prediction geojson zip"
+    optional: True
+    section_id: "display_only-args"
+    mode: "beginner"

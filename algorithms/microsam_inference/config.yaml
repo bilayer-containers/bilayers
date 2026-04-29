@@ -1,0 +1,175 @@
+citations:
+  - name: "micro-sam"
+    doi: "10.48550/arXiv.2408.15954"
+    license: "MIT"
+    description: "micro-sam for automatic segmentation using Segment Anything models for microscopy images."
+
+docker_image:
+  org: rajavishah
+  name: microsam
+  tag: "1.0.1"
+  platform: "linux/amd64"
+
+algorithm_folder_name: "microsam_inference"
+
+exec_function:
+  name: "generate_cli_command"
+  cli_command: "micro_sam.automatic_segmentation"
+  hidden_args:
+
+inputs:
+  - name: input_path
+    type: image
+    label: "Input image(s)"
+    subtype:
+      - grayscale
+      - color
+      - binary
+    description: "Input image file(s), or an input folder when used with a pattern."
+    cli_tag: "-i"
+    cli_order: 0
+    default: "directory"
+    optional: False
+    format:
+      - tiff
+      - png
+      - jpg
+      - jpeg
+    folder_name: "/bilayers/input_images"
+    file_count: multiple
+    unique_string:
+      - "*"
+    section_id: "inputs"
+    mode: "beginner"
+    depth: True
+    timepoints: True
+    tiled: True
+    pyramidal: True
+
+outputs:
+  - name: output_path
+    type: image
+    label: "Segmentation masks"
+    subtype:
+      - label
+    description: "Output segmentation mask. For multiple inputs, this should be an output folder."
+    cli_tag: "-o"
+    cli_order: 1
+    default: "directory"
+    optional: False
+    format:
+      - tiff
+    folder_name: "/bilayers/output_images"
+    file_count: multiple
+    unique_string:
+      - "segmentation"
+    section_id: "outputs"
+    mode: "beginner"
+    depth: True
+    timepoints: True
+    tiled: True
+    pyramidal: True
+
+parameters:
+  - name: pattern
+    type: textbox
+    label: "Input file pattern"
+    description: "Wildcard pattern for selecting files from the input folder. Use *.tif to select all TIFF files."
+    default: "*.tif"
+    cli_tag: "--pattern"
+    cli_order: 2
+    optional: False
+    section_id: "input-args"
+    mode: "beginner"
+
+  - name: model_type
+    type: radio
+    label: "Model Type"
+    description: "Segment Anything model used by micro-sam."
+    options:
+      - label: "ViT Base"
+        value: "vit_b"
+      - label: "ViT Base LM"
+        value: "vit_b_lm"
+      - label: "ViT Tiny LM"
+        value: "vit_t_lm"
+      - label: "ViT Base LM Decoder"
+        value: "vit_b_lm_decoder"
+    default: "vit_b_lm"
+    cli_tag: "-m"
+    cli_order: 3
+    optional: False
+    section_id: "input-args"
+    mode: "beginner"
+
+  - name: ndim
+    type: integer
+    label: "Number of Dimensions"
+    description: "Number of spatial dimensions in the input data."
+    default: 2
+    cli_tag: "-n"
+    cli_order: 4
+    optional: False
+    section_id: "input-args"
+    mode: "beginner"
+
+  - name: mode
+    type: radio
+    label: "Segmentation Mode"
+    description: "Automatic segmentation mode."
+    options:
+      - label: "Auto"
+        value: "auto"
+      - label: "AMG"
+        value: "amg"
+      - label: "APG"
+        value: "apg"
+      - label: "AIS"
+        value: "ais"
+    default: "auto"
+    cli_tag: "--mode"
+    cli_order: 5
+    optional: False
+    section_id: "input-args"
+    mode: "beginner"
+
+  - name: device
+    type: radio
+    label: "Device"
+    description: "Device to use for prediction."
+    options:
+      - label: "CPU"
+        value: "cpu"
+      - label: "GPU"
+        value: "cuda"
+    default: "cpu"
+    cli_tag: "-d"
+    cli_order: 6
+    optional: False
+    section_id: "input-args"
+    mode: "beginner"
+
+  - name: batch_size
+    type: integer
+    label: "Batch Size"
+    description: "Batch size for computing image embeddings over tiles or z-planes."
+    default: 1
+    cli_tag: "--batch_size"
+    cli_order: 7
+    optional: True
+    section_id: "advanced-args"
+    mode: "advanced"
+
+  - name: output_path
+    type: textbox
+    label: "Output path"
+    description: "Path to save output segmentation mask. For multiple inputs, this should be an output folder."
+    output_dir_set: True
+    default: "/bilayers/output_images"
+    cli_tag: "-o"
+    cli_order: 1
+    optional: False
+    section_id: "output-args"
+    mode: "beginner"
+
+display_only:

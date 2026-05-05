@@ -21,6 +21,7 @@ license = "BSD-3-Clause"
 requires-python = ">=3.9"
 dependencies = [
     "pyyaml>=6.0.1,<7",
+    "bilayers-schema @ git+ssh://git@github.com/bilayer-containers/bilayers-schema.git",
 ]
 
 [project.optional-dependencies]
@@ -83,7 +84,6 @@ include = ["bilayers*", "interfaces*"]
 exclude = ["build*", "tests*"]
 
 [tool.setuptools.package-data]
-bilayers = ["schema.yaml"]
 "*" = ["**/*.j2"]
 
 [tool.pixi.workspace]

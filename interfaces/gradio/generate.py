@@ -132,7 +132,7 @@ def generate(interface_input: InterfaceInput) -> None:
 
     gradio_app_path = output_dir / "app.py"
 
-    with open(gradio_app_path, "w") as f:
+    with open(gradio_app_path, "w", encoding="utf-8") as f:
         f.write(gradio_app_code)
 
     print("app.py generated successfully!!")

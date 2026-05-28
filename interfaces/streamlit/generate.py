@@ -100,7 +100,7 @@ def generate(interface_input: InterfaceInput) -> None:
 
     streamlit_app_path = output_dir / "streamlit_app.py"
 
-    with open(streamlit_app_path, "w") as f:
+    with open(streamlit_app_path, "w", encoding="utf-8") as f:
         f.write(streamlit_app_code)
 
     print("streamlit_app.py generated successfully!!")

@@ -141,7 +141,7 @@ def generate(interface_input: InterfaceInput) -> None:
 
     jupyter_notebook_path = output_dir / "generated_notebook.ipynb"
 
-    with open(jupyter_notebook_path, "w") as f:
+    with open(jupyter_notebook_path, "w", encoding="utf-8") as f:
         nbf.write(jupyter_app_code, f)
 
     print("Jupyter notebook saved as generated_notebook.ipynb")

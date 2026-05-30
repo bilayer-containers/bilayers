@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 def normalize_notebook(path: Path):
-    with open(path) as f:
+    with open(path, encoding="utf-8") as f:
         nb = json.load(f)
 
     for cell in nb.get("cells", []):
@@ -55,4 +55,4 @@ def test_generate_regression():
             else:
                 golden_file = golden_base_dir / "runclassicalsegmentation.py"
 
-            assert golden_file.read_text() == generated_file.read_text()
+            assert golden_file.read_text(encoding="utf-8") == generated_file.read_text(encoding="utf-8")

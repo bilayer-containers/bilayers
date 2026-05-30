@@ -3,7 +3,7 @@ from pprint import pprint
 
 from ._blpath import package_path
 
-with (package_path() / "schema.yaml").open("r") as f:
+with (package_path() / "schema.yaml").open("r", encoding="utf-8") as f:
     schema = yaml.safe_load(f)
 
 

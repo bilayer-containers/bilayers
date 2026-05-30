@@ -273,7 +273,7 @@ def generate(interface_input: InterfaceInput) -> None:
     # join folders and file name - file name MUST match plugin name (but in lowercase) to work
     cellprofiler_plugin_path = output_dir / f"{plugin_name.lower()}.py"
 
-    with open(cellprofiler_plugin_path, "w") as f:
+    with open(cellprofiler_plugin_path, "w", encoding="utf-8") as f:
         f.write(cellprofiler_plugin_code)
 
     print("CellProfiler plugin generated successfully!!")

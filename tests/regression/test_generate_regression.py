@@ -17,7 +17,7 @@ def normalize_notebook(path: Path):
 def test_generate_regression():
     repo_root = Path(__file__).resolve().parents[2]
 
-    config_path = repo_root / "algorithms" / "classical_segmentation" / "config.yaml"
+    config_path = repo_root / "tests" / "fixtures" / "classical_segmentation" / "config.yaml"
     golden_dir = repo_root / "tests" / "fixtures" / "golden" / "classical_segmentation"
     generated_root = repo_root / "dist"
 

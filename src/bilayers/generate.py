@@ -2,22 +2,10 @@ import os
 from pathlib import Path
 from typing import Union
 
-from bilayers_interface_shared import generate_top_level_text as _generate_top_level_text
-from bilayers_schema import Citations, InterfaceInput
+from bilayers_schema import InterfaceInput
 
 from .interface_loader import InterfaceLoader, MissingInterfaceDependencyError
 from .parse import safe_parse_config
-
-
-def generate_top_level_text(interface_citation: Citations, citations: dict[str, Citations], output_html: bool = True) -> tuple[str, str]:
-    import warnings
-
-    warnings.warn(
-        "bilayers.generate.generate_top_level_text is deprecated. Use bilayers_interface_shared.generate_top_level_text instead.",
-        DeprecationWarning,
-        stacklevel=2,
-    )
-    return _generate_top_level_text(interface_citation, citations, output_html)
 
 
 def run_generate(interface_name: str, loader: InterfaceLoader, interface_input: InterfaceInput):

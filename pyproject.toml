@@ -25,6 +25,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+algorithms = ["bilayers-algorithms @ git+https://github.com/bilayer-containers/bilayers-algorithms.git@dev"]
 gradio = ["bilayers-targets[gradio] @ git+https://github.com/bilayer-containers/bilayers-targets.git@dev"]
 jupyter = ["bilayers-targets[jupyter] @ git+https://github.com/bilayer-containers/bilayers-targets.git@dev"]
 streamlit = ["bilayers-targets[streamlit] @ git+https://github.com/bilayer-containers/bilayers-targets.git@dev"]
@@ -100,8 +101,8 @@ requests = ">=2.32.5,<3"
 bilayers = { path = ".", editable = true }
 
 [tool.pixi.environments]
-dev = ["dev", "docs", "linkml", "test", "lint", "nox", "podman", "interfaces", "plugins"]
-dockerdev = ["dev", "docs", "linkml", "test", "lint", "nox", "docker", "interfaces", "plugins"]
+dev = ["dev", "docs", "linkml", "test", "lint", "nox", "podman", "interfaces", "plugins", "algorithms"]
+dockerdev = ["dev", "docs", "linkml", "test", "lint", "nox", "docker", "interfaces", "plugins", "algorithms"]
 
 [tool.ruff]
 # 80 columns are a thing of the past

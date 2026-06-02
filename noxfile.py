@@ -7,6 +7,8 @@ from typing import Optional
 from pathlib import Path
 from tempfile import gettempdir
 import bilayers
+import bilayers_algorithms
+import bilayers_targets
 
 
 DOCKER_CMD = os.getenv("DOCKER_CMD", "docker")
@@ -88,6 +90,8 @@ def decide_interface_tag(algo_name: str, interface: str, bump_type: str = "minor
 PKG_ROOT = Path(bilayers.__path__[0])
 # /absolute/path/to/bilayers/
 PROJ_ROOT = (PKG_ROOT / "../..").resolve()
+ALGO_PKG_ROOT = Path(bilayers_algorithms.__path__[0])
+TARGETS_PKG_ROOT = Path(bilayers_targets.__path__[0])
 
 
 def tmp_path(filename, prefix="bilayers", sep="_"):
@@ -161,7 +165,7 @@ def build_algorithm(session: nox.Session) -> None:
             image_name (str): The name of the Docker image.
             algorithm (str): The name of the algorithm.
         """
-        algorithm_path = PROJ_ROOT / f"algorithms/{algorithm}"
+        algorithm_path = ALGO_PKG_ROOT / algorithm
         dockerfile_path = algorithm_path / "Dockerfile"
         platform_opt: str = "--platform" if platform else ""
         platform = platform or ""
@@ -184,7 +188,7 @@ def build_algorithm(session: nox.Session) -> None:
     print("Building Algorithm Nox-File: ", algorithm)
     image_name = f"{algorithm}"
     print("Image Name: ", image_name)
-    config_file_path = PROJ_ROOT / f"algorithms/{algorithm}/config.yaml"
+    config_file_path = ALGO_PKG_ROOT / algorithm / "config.yaml"
 
     # Start by checking the config file for DockerHub image details
     if os.path.exists(config_file_path):
@@ -259,7 +263,7 @@ def build_interface(session: nox.Session) -> None:
         session.error("BASE_IMAGE is empty or invalid. Did build_algorithm run first?")
 
     # Build candidate first
-    dockerfile_path = PROJ_ROOT / f"interfaces/{interface}/{interface.capitalize()}.Dockerfile"
+    dockerfile_path = TARGETS_PKG_ROOT / "interfaces" / interface / f"{interface.capitalize()}.Dockerfile"
     candidate_name = f"bilayer/{algorithm_folder_name}:build-candidate"
     print("Dockerfile Path: ", dockerfile_path)
 

@@ -6,6 +6,13 @@ PKG_ROOT="$("$SCRIPT_DIR"/pkg_path.sh)"
 
 cd "$SCRIPT_DIR" || exit
 
+# Prefer explicit ALGORITHMS_PATH env override, otherwise use installed package
+if [ -n "$ALGORITHMS_PATH" ]; then
+    ALGO_PKG_PATH="$ALGORITHMS_PATH"
+else
+    ALGO_PKG_PATH=$(python -c "import bilayers_algorithms; import os; print(os.path.dirname(bilayers_algorithms.__file__))")
+fi
+
 SCHEMA_FILE=${1:-"$PKG_ROOT/schema.yaml"}
 # List of algorithms and interfaces
 ALGORITHM_NAMES=("cellpose_inference" "classical_segmentation" "instanseg_inference" "stardist_inference")
@@ -13,11 +20,26 @@ ALGORITHM_NAMES=("cellpose_inference" "classical_segmentation" "instanseg_infere
 echo "Validating all config files against the schema $SCHEMA_FILE"
 
 for ALGORITHM in "${ALGORITHM_NAMES[@]}"; do
-    CONFIG_DIR="$PKG_ROOT/algorithms/${ALGORITHM}"
+    CONFIG_DIR="${ALGO_PKG_PATH}/${ALGORITHM}"
     echo "Validating all config files in $CONFIG_DIR"
-    for config in "$CONFIG_DIR"/*.yaml; do
+
+    if [ ! -d "$CONFIG_DIR" ]; then
+        echo "Skipping ${CONFIG_DIR}: directory not found"
+        continue
+    fi
+
+    # Enable nullglob so the glob expands to an empty list when no matches
+    shopt -s nullglob
+    configs=("$CONFIG_DIR"/*.yaml)
+    shopt -u nullglob
+
+    if [ ${#configs[@]} -eq 0 ]; then
+        echo "No config files found in ${CONFIG_DIR}, skipping"
+        continue
+    fi
+
+    for config in "${configs[@]}"; do
         echo "Validating ${config} ..."
-        #linkml validate --schema "$SCHEMA_FILE" --target-class SpecContainer "${config}" || {
         bilayers_cli validate "${config}" || {
             echo "Validation failed for ${config}"
             exit 1

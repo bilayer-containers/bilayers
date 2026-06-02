@@ -51,6 +51,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/urllib3-2.5.0-pyhd8ed1ab_0.conda
       - pypi: .
       - pypi: git+https://github.com/bilayer-containers/bilayers-schema?rev=dev#d574636020a0e07e9de64500248c5284d47de96e
+      - pypi: git+https://github.com/bilayer-containers/bilayers-targets?rev=dev#e4a1311298a88f74c69adc2387a9d60eb3a6c24f
       - pypi: https://files.pythonhosted.org/packages/04/24/b7721e4845c2f162d26f50521b825fb061bc0a5afcf9a386840f23ea19fa/PyYAML-6.0.2-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
       osx-64:
       - conda: https://conda.anaconda.org/conda-forge/noarch/certifi-2025.11.12-pyhd8ed1ab_0.conda
@@ -85,6 +86,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-64/zstd-1.5.7-h3eecb57_6.conda
       - pypi: .
       - pypi: git+https://github.com/bilayer-containers/bilayers-schema?rev=dev#d574636020a0e07e9de64500248c5284d47de96e
+      - pypi: git+https://github.com/bilayer-containers/bilayers-targets?rev=dev#e4a1311298a88f74c69adc2387a9d60eb3a6c24f
       - pypi: https://files.pythonhosted.org/packages/ef/e3/3af305b830494fa85d95f6d95ef7fa73f2ee1cc8ef5b495c7c3269fb835f/PyYAML-6.0.2-cp313-cp313-macosx_10_13_x86_64.whl
       osx-arm64:
       - conda: https://conda.anaconda.org/conda-forge/noarch/certifi-2025.11.12-pyhd8ed1ab_0.conda
@@ -119,6 +121,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/zstd-1.5.7-hbf9d68e_6.conda
       - pypi: .
       - pypi: git+https://github.com/bilayer-containers/bilayers-schema?rev=dev#d574636020a0e07e9de64500248c5284d47de96e
+      - pypi: git+https://github.com/bilayer-containers/bilayers-targets?rev=dev#e4a1311298a88f74c69adc2387a9d60eb3a6c24f
       - pypi: https://files.pythonhosted.org/packages/45/9f/3b1c20a0b7a3200524eb0076cc027a970d320bd3a6592873c85c92a08731/PyYAML-6.0.2-cp313-cp313-macosx_11_0_arm64.whl
       win-64:
       - conda: https://conda.anaconda.org/conda-forge/noarch/certifi-2025.11.12-pyhd8ed1ab_0.conda
@@ -155,6 +158,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/win-64/zstandard-0.23.0-py313ha7868ed_2.conda
       - pypi: .
       - pypi: git+https://github.com/bilayer-containers/bilayers-schema?rev=dev#d574636020a0e07e9de64500248c5284d47de96e
+      - pypi: git+https://github.com/bilayer-containers/bilayers-targets?rev=dev#e4a1311298a88f74c69adc2387a9d60eb3a6c24f
       - pypi: https://files.pythonhosted.org/packages/fa/de/02b54f42487e3d3c6efb3f89428677074ca7bf43aae402517bc7cca949f3/PyYAML-6.0.2-cp313-cp313-win_amd64.whl
   dev:
     channels:
@@ -203,7 +207,7 @@ environments:
       - pypi: .
       - pypi: git+https://github.com/bilayer-containers/bilayers-algorithms?rev=dev#4b46f3bc43c899b778b8f21be198b78fe6227bd0
       - pypi: git+https://github.com/bilayer-containers/bilayers-schema?rev=dev#d574636020a0e07e9de64500248c5284d47de96e
-      - pypi: git+https://github.com/bilayer-containers/bilayers-targets?rev=dev#955977b1c40a03e7b30ca425653c128e238d2d09
+      - pypi: git+https://github.com/bilayer-containers/bilayers-targets?rev=dev#e4a1311298a88f74c69adc2387a9d60eb3a6c24f
       - pypi: https://files.pythonhosted.org/packages/00/c0/8f5d070730d7836adc9c9b6408dec68c6ced86b304a9b26a14df072a6e8c/traitlets-5.14.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/00/cc/7fbd75d3362e939eb98bcf9bd22f3f7df8c237a85148899ed3d38e5614e5/json_flattener-0.1.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/04/24/b7721e4845c2f162d26f50521b825fb061bc0a5afcf9a386840f23ea19fa/PyYAML-6.0.2-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
@@ -361,7 +365,7 @@ environments:
       - pypi: .
       - pypi: git+https://github.com/bilayer-containers/bilayers-algorithms?rev=dev#4b46f3bc43c899b778b8f21be198b78fe6227bd0
       - pypi: git+https://github.com/bilayer-containers/bilayers-schema?rev=dev#d574636020a0e07e9de64500248c5284d47de96e
-      - pypi: git+https://github.com/bilayer-containers/bilayers-targets?rev=dev#955977b1c40a03e7b30ca425653c128e238d2d09
+      - pypi: git+https://github.com/bilayer-containers/bilayers-targets?rev=dev#e4a1311298a88f74c69adc2387a9d60eb3a6c24f
       - pypi: https://files.pythonhosted.org/packages/00/c0/8f5d070730d7836adc9c9b6408dec68c6ced86b304a9b26a14df072a6e8c/traitlets-5.14.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/00/cc/7fbd75d3362e939eb98bcf9bd22f3f7df8c237a85148899ed3d38e5614e5/json_flattener-0.1.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/04/60/d0feb6b6d9fe4ab89fe8fe5b47cbf6cd936bfd9f1e7ffa9d0015425aeed6/ipython-8.31.0-py3-none-any.whl
@@ -519,7 +523,7 @@ environments:
       - pypi: .
       - pypi: git+https://github.com/bilayer-containers/bilayers-algorithms?rev=dev#4b46f3bc43c899b778b8f21be198b78fe6227bd0
       - pypi: git+https://github.com/bilayer-containers/bilayers-schema?rev=dev#d574636020a0e07e9de64500248c5284d47de96e
-      - pypi: git+https://github.com/bilayer-containers/bilayers-targets?rev=dev#955977b1c40a03e7b30ca425653c128e238d2d09
+      - pypi: git+https://github.com/bilayer-containers/bilayers-targets?rev=dev#e4a1311298a88f74c69adc2387a9d60eb3a6c24f
       - pypi: https://files.pythonhosted.org/packages/00/c0/8f5d070730d7836adc9c9b6408dec68c6ced86b304a9b26a14df072a6e8c/traitlets-5.14.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/00/cc/7fbd75d3362e939eb98bcf9bd22f3f7df8c237a85148899ed3d38e5614e5/json_flattener-0.1.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/04/60/d0feb6b6d9fe4ab89fe8fe5b47cbf6cd936bfd9f1e7ffa9d0015425aeed6/ipython-8.31.0-py3-none-any.whl
@@ -678,7 +682,7 @@ environments:
       - pypi: .
       - pypi: git+https://github.com/bilayer-containers/bilayers-algorithms?rev=dev#4b46f3bc43c899b778b8f21be198b78fe6227bd0
       - pypi: git+https://github.com/bilayer-containers/bilayers-schema?rev=dev#d574636020a0e07e9de64500248c5284d47de96e
-      - pypi: git+https://github.com/bilayer-containers/bilayers-targets?rev=dev#955977b1c40a03e7b30ca425653c128e238d2d09
+      - pypi: git+https://github.com/bilayer-containers/bilayers-targets?rev=dev#e4a1311298a88f74c69adc2387a9d60eb3a6c24f
       - pypi: https://files.pythonhosted.org/packages/00/c0/8f5d070730d7836adc9c9b6408dec68c6ced86b304a9b26a14df072a6e8c/traitlets-5.14.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/00/cc/7fbd75d3362e939eb98bcf9bd22f3f7df8c237a85148899ed3d38e5614e5/json_flattener-0.1.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/03/51/665617fe4f8c6450f42a6d8d69243f9420f5677395572c2fe9d21b493b7b/sqlalchemy-2.0.44-cp313-cp313-win_amd64.whl
@@ -846,7 +850,7 @@ environments:
       - pypi: .
       - pypi: git+https://github.com/bilayer-containers/bilayers-algorithms?rev=dev#4b46f3bc43c899b778b8f21be198b78fe6227bd0
       - pypi: git+https://github.com/bilayer-containers/bilayers-schema?rev=dev#d574636020a0e07e9de64500248c5284d47de96e
-      - pypi: git+https://github.com/bilayer-containers/bilayers-targets?rev=dev#955977b1c40a03e7b30ca425653c128e238d2d09
+      - pypi: git+https://github.com/bilayer-containers/bilayers-targets?rev=dev#e4a1311298a88f74c69adc2387a9d60eb3a6c24f
       - pypi: https://files.pythonhosted.org/packages/00/c0/8f5d070730d7836adc9c9b6408dec68c6ced86b304a9b26a14df072a6e8c/traitlets-5.14.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/00/cc/7fbd75d3362e939eb98bcf9bd22f3f7df8c237a85148899ed3d38e5614e5/json_flattener-0.1.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/02/10/5da547df7a391dcde17f59520a231527b8571e6f46fc8efb02ccb370ab12/docutils-0.22.4-py3-none-any.whl
@@ -1007,7 +1011,7 @@ environments:
       - pypi: .
       - pypi: git+https://github.com/bilayer-containers/bilayers-algorithms?rev=dev#4b46f3bc43c899b778b8f21be198b78fe6227bd0
       - pypi: git+https://github.com/bilayer-containers/bilayers-schema?rev=dev#d574636020a0e07e9de64500248c5284d47de96e
-      - pypi: git+https://github.com/bilayer-containers/bilayers-targets?rev=dev#955977b1c40a03e7b30ca425653c128e238d2d09
+      - pypi: git+https://github.com/bilayer-containers/bilayers-targets?rev=dev#e4a1311298a88f74c69adc2387a9d60eb3a6c24f
       - pypi: https://files.pythonhosted.org/packages/00/c0/8f5d070730d7836adc9c9b6408dec68c6ced86b304a9b26a14df072a6e8c/traitlets-5.14.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/00/cc/7fbd75d3362e939eb98bcf9bd22f3f7df8c237a85148899ed3d38e5614e5/json_flattener-0.1.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/02/10/5da547df7a391dcde17f59520a231527b8571e6f46fc8efb02ccb370ab12/docutils-0.22.4-py3-none-any.whl
@@ -1169,7 +1173,7 @@ environments:
       - pypi: .
       - pypi: git+https://github.com/bilayer-containers/bilayers-algorithms?rev=dev#4b46f3bc43c899b778b8f21be198b78fe6227bd0
       - pypi: git+https://github.com/bilayer-containers/bilayers-schema?rev=dev#d574636020a0e07e9de64500248c5284d47de96e
-      - pypi: git+https://github.com/bilayer-containers/bilayers-targets?rev=dev#955977b1c40a03e7b30ca425653c128e238d2d09
+      - pypi: git+https://github.com/bilayer-containers/bilayers-targets?rev=dev#e4a1311298a88f74c69adc2387a9d60eb3a6c24f
       - pypi: https://files.pythonhosted.org/packages/00/c0/8f5d070730d7836adc9c9b6408dec68c6ced86b304a9b26a14df072a6e8c/traitlets-5.14.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/00/cc/7fbd75d3362e939eb98bcf9bd22f3f7df8c237a85148899ed3d38e5614e5/json_flattener-0.1.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/02/10/5da547df7a391dcde17f59520a231527b8571e6f46fc8efb02ccb370ab12/docutils-0.22.4-py3-none-any.whl
@@ -1331,7 +1335,7 @@ environments:
       - pypi: .
       - pypi: git+https://github.com/bilayer-containers/bilayers-algorithms?rev=dev#4b46f3bc43c899b778b8f21be198b78fe6227bd0
       - pypi: git+https://github.com/bilayer-containers/bilayers-schema?rev=dev#d574636020a0e07e9de64500248c5284d47de96e
-      - pypi: git+https://github.com/bilayer-containers/bilayers-targets?rev=dev#955977b1c40a03e7b30ca425653c128e238d2d09
+      - pypi: git+https://github.com/bilayer-containers/bilayers-targets?rev=dev#e4a1311298a88f74c69adc2387a9d60eb3a6c24f
       - pypi: https://files.pythonhosted.org/packages/00/c0/8f5d070730d7836adc9c9b6408dec68c6ced86b304a9b26a14df072a6e8c/traitlets-5.14.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/00/cc/7fbd75d3362e939eb98bcf9bd22f3f7df8c237a85148899ed3d38e5614e5/json_flattener-0.1.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/02/10/5da547df7a391dcde17f59520a231527b8571e6f46fc8efb02ccb370ab12/docutils-0.22.4-py3-none-any.whl
@@ -3498,6 +3502,7 @@ packages:
   requires_dist:
   - pyyaml>=6.0.1,<7
   - bilayers-schema @ git+https://github.com/bilayer-containers/bilayers-schema@dev
+  - bilayers-targets @ git+https://github.com/bilayer-containers/bilayers-targets@dev
   - bilayers-algorithms @ git+https://github.com/bilayer-containers/bilayers-algorithms@dev ; extra == 'algorithms'
   - bilayers-targets[gradio] @ git+https://github.com/bilayer-containers/bilayers-targets@dev ; extra == 'gradio'
   - bilayers-targets[jupyter] @ git+https://github.com/bilayer-containers/bilayers-targets@dev ; extra == 'jupyter'
@@ -3539,7 +3544,7 @@ packages:
   requires_dist:
   - pyyaml>=6.0.1,<7
   requires_python: '>=3.9'
-- pypi: git+https://github.com/bilayer-containers/bilayers-targets?rev=dev#955977b1c40a03e7b30ca425653c128e238d2d09
+- pypi: git+https://github.com/bilayer-containers/bilayers-targets?rev=dev#e4a1311298a88f74c69adc2387a9d60eb3a6c24f
   name: bilayers-targets
   version: 0.1.0
   requires_dist:

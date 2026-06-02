@@ -8,9 +8,9 @@ from .interface_loader import InterfaceLoader, MissingInterfaceDependencyError
 from .parse import safe_parse_config
 
 
-def run_generate(interface_name: str, loader: InterfaceLoader, interface_input: InterfaceInput):
-    generate_fn = loader.load_generate(interface_name)
-    return generate_fn(interface_input)
+def run_generate(interface_name: str, loader: InterfaceLoader, interface_input: InterfaceInput) -> None:
+    module = loader.load_module(interface_name)
+    module.generate(interface_input)
 
 
 def generate_interface(interface_name: str, config_path: Union[str, Path]) -> None:
@@ -37,7 +37,13 @@ def generate_interface(interface_name: str, config_path: Union[str, Path]) -> No
     }
 
     print(f"Running generate for {interface_name}...")
-    run_generate(interface_name, loader, interface_input)
+    try:
+        run_generate(interface_name, loader, interface_input)
+    except MissingInterfaceDependencyError as e:
+        print(e)
+        return
+
+    print(f"Finished generating interface: {interface_name}")
 
 
 def generate_all(config_path: Union[str, Path]) -> None:
@@ -67,6 +73,7 @@ def generate_all(config_path: Union[str, Path]) -> None:
 
             print(f"Running generate for {interface_name}...")
             run_generate(interface_name, loader, interface_input)
+            print(f"Finished generating interface: {interface_name}")
         except MissingInterfaceDependencyError as e:
             print(e)
             continue

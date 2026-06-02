@@ -21,15 +21,14 @@ license = "BSD-3-Clause"
 requires-python = ">=3.9"
 dependencies = [
     "pyyaml>=6.0.1,<7",
-    "bilayers-schema @ git+https://github.com/bilayer-containers/bilayers-schema.git",
+    "bilayers-schema @ git+https://github.com/bilayer-containers/bilayers-schema.git@dev",
 ]
 
 [project.optional-dependencies]
-# Per Interface Extras
-gradio = ["jinja2"]
-jupyter = ["jinja2", "nbformat"]
-cellprofiler_plugin = ["jinja2"]
-streamlit = ["jinja2"]
+gradio = ["bilayers-targets[gradio] @ git+https://github.com/bilayer-containers/bilayers-targets.git@dev"]
+jupyter = ["bilayers-targets[jupyter] @ git+https://github.com/bilayer-containers/bilayers-targets.git@dev"]
+streamlit = ["bilayers-targets[streamlit] @ git+https://github.com/bilayer-containers/bilayers-targets.git@dev"]
+cellprofiler_plugin = ["bilayers-targets[cellprofiler_plugin] @ git+https://github.com/bilayer-containers/bilayers-targets.git@dev"]
 
 # Convenience Group Extras
 interfaces = [
@@ -63,8 +62,6 @@ dev = [
   "pyright",
   "mypy",
   "types-pyyaml",
-  "gradio",
-  "streamlit",
   "bilayers[interfaces]",
   "bilayers[plugins]",
 ]
@@ -72,19 +69,10 @@ dev = [
 [project.scripts]
 bilayers_cli = "bilayers.cli:cli"
 
-[project.entry-points."bilayers.interfaces"]
-gradio = "interfaces.gradio.generate:generate"
-jupyter = "interfaces.jupyter.generate:generate"
-streamlit = "interfaces.streamlit.generate:generate"
-cellprofiler_plugin = "interfaces.cellprofiler_plugin.generate:generate"
-
 [tool.setuptools.packages.find]
-where = ["src", "."]
-include = ["bilayers*", "interfaces*"]
+where = ["src"]
+include = ["bilayers*"]
 exclude = ["build*", "tests*"]
-
-[tool.setuptools.package-data]
-"*" = ["**/*.j2"]
 
 [tool.pixi.workspace]
 channels = ["conda-forge"]

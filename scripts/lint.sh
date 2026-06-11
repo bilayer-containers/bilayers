@@ -6,7 +6,7 @@ PKG_ROOT="$("$SCRIPT_DIR"/pkg_path.sh)"
 
 cd "$SCRIPT_DIR" || exit
 
-SCHEMA_FILE=${1:-"$PKG_ROOT/schema.yaml"}
+SCHEMA_FILE=${1:-"$("$SCRIPT_DIR"/schema_path.sh)"}
 
 echo "Linting the schema: $SCHEMA_FILE"
 

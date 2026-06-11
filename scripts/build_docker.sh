@@ -1,17 +1,20 @@
 #!/usr/bin/env bash
 
-# Exit on error
-set -e
+# Continue building remaining algorithm/interface combinations even if one fails
+# Fail the workflow at the end if any build failures occurred
+
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-PKG_ROOT="$("$SCRIPT_DIR"/pkg_path.sh)"
-PROJ_ROOT="$(cd "$PKG_ROOT/../.." && pwd)"
-ALGO_PKG_PATH=$(python -c "import bilayers_algorithms; import os; print(os.path.dirname(bilayers_algorithms.__file__))")
-
+if ! ALGO_PKG_PATH=$(python -c "import bilayers_algorithms; import os; print(os.path.dirname(bilayers_algorithms.__file__))"); then
+  echo "Could not locate installed bilayers_algorithms package."
+  exit 1
+fi
 # List of algorithms and interfaces
 ALGORITHM_NAMES=()
 INTERFACE_NAMES=()
 BUMP_TYPE="minor"
+# Collect failures and report them after all build combinations have been attempted
+FAILURES=()
 
 # Parse cli arguments
 while [[ "$#" -gt 0 ]]; do
@@ -49,21 +52,51 @@ if [[ ${#INTERFACE_NAMES[@]} -eq 0 ]]; then
   INTERFACE_NAMES=("gradio" "jupyter" "streamlit")
 fi
 
-# Build loop
+# Attempt every algorithm/interface combination independently
 for ALGO in "${ALGORITHM_NAMES[@]}"; do
   for IFACE in "${INTERFACE_NAMES[@]}"; do
     echo "Building Algorithm: $ALGO, Interface: $IFACE"
 
     CONFIG_PATH="${ALGO_PKG_PATH}/${ALGO}/config.yaml"
-    nox -s run_parse -- "$CONFIG_PATH"
-    nox -s run_generate_all -- "$CONFIG_PATH"
-    nox -s build_algorithm -- "$ALGO"
-    nox -s build_interface -- "$IFACE" "$BUMP_TYPE"
+    if ! nox -s run_parse -- "$CONFIG_PATH"; then
+      FAILURES+=("$ALGO:$IFACE:run_parse")
+      continue
+    fi
+
+    if ! nox -s run_generate_all -- "$CONFIG_PATH"; then
+      FAILURES+=("$ALGO:$IFACE:run_generate_all")
+      continue
+    fi
+
+    if ! nox -s build_algorithm -- "$ALGO"; then
+      FAILURES+=("$ALGO:$IFACE:build_algorithm")
+      continue
+    fi
+
+    if ! nox -s build_interface -- "$IFACE" "$BUMP_TYPE"; then
+      FAILURES+=("$ALGO:$IFACE:build_interface")
+      continue
+    fi
 
     if [[ "$IFACE" == "gradio" ]]; then
-      nox -s install_gradio
+      if ! nox -s install_gradio; then
+        FAILURES+=("$ALGO:$IFACE:install_gradio")
+        continue
+      fi
+
     elif [[ "$IFACE" == "streamlit" ]]; then
-      nox -s install_streamlit
+      if ! nox -s install_streamlit; then
+        FAILURES+=("$ALGO:$IFACE:install_streamlit")
+        continue
+      fi
     fi
   done
 done
+
+if [[ ${#FAILURES[@]} -gt 0 ]]; then
+  echo "Some builds failed:"
+  printf ' - %s\n' "${FAILURES[@]}"
+  exit 1
+fi
+
+echo "All builds completed successfully!"

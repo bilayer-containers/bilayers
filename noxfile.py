@@ -10,10 +10,21 @@ import bilayers
 
 
 DOCKER_CMD = os.getenv("DOCKER_CMD", "docker")
+# Optional override to force a specific buildx builder. Left empty by default so
+# buildx uses whatever builder is currently active. In CI, docker/setup-buildx-action
+# creates the Build Cloud builder AND sets it as the default, so we don't hardcode its
+# name here — Docker derives the instance name as cloud-<org>-<name>, which would drift
+# if the endpoint ever changes. The endpoint lives in one place: the workflow.
+DOCKER_BUILDER = os.getenv("DOCKER_BUILDER", "")
 
 ####################
 # Helper functions
 ####################
+
+
+def docker_builder_args() -> list[str]:
+    """Return --builder flag if DOCKER_BUILDER is set, empty list otherwise."""
+    return ["--builder", DOCKER_BUILDER] if DOCKER_BUILDER else []
 
 
 def get_local_digest(image: str) -> str:
@@ -89,6 +100,35 @@ def get_targets_pkg_root() -> Path:
     import bilayers_targets
 
     return Path(bilayers_targets.__path__[0])
+
+
+def _buildx(session, platform, base_image, algorithm_folder_name, interface, dockerfile_path, tag, push=False):
+    # --load pulls the cloud-built image back into the local Docker store so that
+    # downstream `docker tag`/`docker inspect` steps can find it. With the default
+    # (local) builder --load is a harmless no-op. --push is offered as an opt-in
+    # alternative for sending straight to the registry without a local copy.
+    output_arg = "--push" if push else "--load"
+    session.run(
+        DOCKER_CMD,
+        "buildx",
+        "build",
+        *docker_builder_args(),
+        output_arg,
+        "--platform",
+        platform,
+        "--build-arg",
+        f"BASE_IMAGE={base_image}",
+        "--build-arg",
+        f"FOLDER_NAME={algorithm_folder_name}",
+        "--build-arg",
+        f"INTERFACE={interface}",
+        "-t",
+        tag,
+        "-f",
+        str(dockerfile_path),
+        str(PROJ_ROOT),
+        external=True,
+    )
 
 
 ####################
@@ -276,96 +316,14 @@ def build_interface(session: nox.Session) -> None:
     dockerfile_path = get_targets_pkg_root() / "interfaces" / interface / f"{interface.capitalize()}.Dockerfile"
     candidate_name = f"bilayer/{algorithm_folder_name}:build-candidate"
     print("Dockerfile Path: ", dockerfile_path)
+    _buildx(session, platform, base_image, algorithm_folder_name, interface, dockerfile_path, candidate_name)
 
-    session.run(
-        DOCKER_CMD,
-        "buildx",
-        "build",
-        "--platform",
-        platform,
-        "--build-arg",
-        f"BASE_IMAGE={base_image}",
-        "--build-arg",
-        f"FOLDER_NAME={algorithm_folder_name}",
-        "--build-arg",
-        f"INTERFACE={interface}",
-        "-t",
-        candidate_name,
-        "-f",
-        dockerfile_path,
-        str(PROJ_ROOT),
-        external=True,
-    )
-
-    # Decide final tag (reuse or bump)
+    # Decide final tag, retag, build final
     final_tag = decide_interface_tag(algorithm_folder_name, interface, bump_type)
     final_image_name = f"bilayer/{algorithm_folder_name}:{final_tag}"
-
-    # Retag candidate -> final
-    session.run(DOCKER_CMD, "tag", candidate_name, final_image_name, external=True)
-
-    # TODO: below conditionals are identical and do not include cellprofiler_plugin
     print(f"Final image built and tagged as: {final_image_name}")
-    if interface == "gradio":
-        session.run(
-            DOCKER_CMD,
-            "buildx",
-            "build",
-            "--platform",
-            platform,
-            "--build-arg",
-            f"BASE_IMAGE={base_image}",
-            "--build-arg",
-            f"FOLDER_NAME={algorithm_folder_name}",
-            "--build-arg",
-            f"INTERFACE={interface}",
-            "-t",
-            final_image_name,
-            "-f",
-            dockerfile_path,
-            str(PROJ_ROOT),
-            external=True,
-        )
-    elif interface == "jupyter":
-        session.run(
-            DOCKER_CMD,
-            "buildx",
-            "build",
-            "--platform",
-            platform,
-            "--build-arg",
-            f"BASE_IMAGE={base_image}",
-            "--build-arg",
-            f"FOLDER_NAME={algorithm_folder_name}",
-            "--build-arg",
-            f"INTERFACE={interface}",
-            "-t",
-            final_image_name,
-            "-f",
-            dockerfile_path,
-            str(PROJ_ROOT),
-            external=True,
-        )
-    elif interface == "streamlit":
-        session.run(
-            DOCKER_CMD,
-            "buildx",
-            "build",
-            "--platform",
-            platform,
-            "--build-arg",
-            f"BASE_IMAGE={base_image}",
-            "--build-arg",
-            f"FOLDER_NAME={algorithm_folder_name}",
-            "--build-arg",
-            f"INTERFACE={interface}",
-            "-t",
-            final_image_name,
-            "-f",
-            dockerfile_path,
-            str(PROJ_ROOT),
-            external=True,
-        )
+    session.run(DOCKER_CMD, "tag", candidate_name, final_image_name, external=True)
+    _buildx(session, platform, base_image, algorithm_folder_name, interface, dockerfile_path, final_image_name)
 
 
 @nox.session

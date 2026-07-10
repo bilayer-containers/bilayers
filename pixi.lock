@@ -2547,7 +2547,6 @@ packages:
 - pypi: .
   name: bilayers
   requires_dist:
-  - pyyaml>=6.0.1,<7
   - bilayers-schema @ git+https://github.com/bilayer-containers/bilayers-schema@dev
   - bilayers-targets @ git+https://github.com/bilayer-containers/bilayers-targets@dev
   - bilayers-algorithms @ git+https://github.com/bilayer-containers/bilayers-algorithms@dev

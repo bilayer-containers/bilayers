@@ -8,7 +8,7 @@ ARG FOLDER_NAME
 ARG INTERFACE
 
 # Install the dependencies for the gradio app
-RUN python -m pip install --no-cache-dir pyyaml pydantic==2.10.6 gradio==4.44.1 huggingface-hub==0.34.3
+RUN python -m pip install --no-cache-dir pyyaml pydantic==2.10.6 gradio==4.44.1 huggingface-hub==0.34.3 "fastapi==0.112.2" "starlette==0.38.2"
 
 # Set the working directory within the container
 WORKDIR /bilayers

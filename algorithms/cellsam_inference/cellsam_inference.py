@@ -78,9 +78,10 @@ if __name__ == "__main__":
                         help="Run on CPU or GPU.")
     parser.add_argument("--bbox_threshold", type=float, default=0.4,
                         help="Confidence cutoff for detecting cells.")
-    parser.add_argument("--normalize", action=argparse.BooleanOptionalAction, default=True,
-                    help="Normalize the image before segmenting.") # only on Python 3.9+;
-                    # for older versions, use `action='store_true'` and `action='store_false'` with a default value
+    # Default is on, so read "True"/"False" as a bool to let the checkbox turn it off.
+    parser.add_argument("--normalize", type=lambda x: x.lower() == "true",
+                    default=True,
+                    help="Normalize the image before segmenting.")
     parser.add_argument("--postprocess", action="store_true",
                         help="Extra cleanup for noisy images.")
     parser.add_argument("--remove_boundaries", action="store_true",

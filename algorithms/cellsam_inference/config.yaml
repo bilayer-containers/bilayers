@@ -89,7 +89,7 @@ parameters:
   output_dir_set: false
   section_id: input-args
   type: radio
-- append_value: false
+- append_value: true
   cli_order: 3
   cli_tag: --normalize
   default: 'True'
@@ -164,3 +164,18 @@ parameters:
   output_dir_set: false
   section_id: input-args
   type: checkbox
+- append_value: false
+  cli_order: 1
+  cli_tag: --output_folder
+  default: /bilayers/outputs
+  description: Segmented images will be saved here.
+  interactive: false
+  label: Output Image Path
+  mode: beginner
+  multiselect: false
+  name: segmented_images_path
+  optional: true
+  options: []
+  output_dir_set: true
+  section_id: input-args
+  type: textbox

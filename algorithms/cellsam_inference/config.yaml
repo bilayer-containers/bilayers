@@ -16,7 +16,7 @@ exec_function:
   hidden_args: []
   name: generate_cli_command
 inputs:
-- cli_order: 0
+- cli_order: 1
   cli_tag: --input_folder
   default: directory
   depth: false
@@ -45,7 +45,7 @@ inputs:
   unique_string:
   - '*'
 outputs:
-- cli_order: 1
+- cli_order: 2
   cli_tag: --output_folder
   default: directory
   depth: false
@@ -70,7 +70,21 @@ outputs:
   - mask
 parameters:
 - append_value: false
-  cli_order: 2
+  cli_order: 3
+  cli_tag: --token
+  default: ''
+  description: Your DeepCell token for downloading model weights.
+  interactive: false
+  label: DeepCell Access Token
+  mode: beginner
+  multiselect: false
+  name: token
+  optional: false
+  options: []
+  section_id: input-args
+  type: textbox
+- append_value: false
+  cli_order: 4
   cli_tag: --model_name
   default: cellsam_general
   description: Which CellSAM model to load. General is trained only on the datasets
@@ -90,7 +104,7 @@ parameters:
   section_id: input-args
   type: radio
 - append_value: true
-  cli_order: 3
+  cli_order: 5
   cli_tag: --normalize
   default: 'True'
   description: Normalize the image before segmenting.
@@ -105,7 +119,7 @@ parameters:
   section_id: input-args
   type: checkbox
 - append_value: false
-  cli_order: 4
+  cli_order: 6
   cli_tag: --bbox_threshold
   default: '0.4'
   description: Confidence cutoff for detecting cells.
@@ -120,7 +134,7 @@ parameters:
   section_id: input-args
   type: float
 - append_value: false
-  cli_order: 5
+  cli_order: 7
   cli_tag: --postprocess
   default: 'False'
   description: Extra cleanup for noisy images.
@@ -135,7 +149,7 @@ parameters:
   section_id: input-args
   type: checkbox
 - append_value: false
-  cli_order: 6
+  cli_order: 8
   cli_tag: --remove_boundaries
   default: 'False'
   description: Shave a one pixel edge off each cell.
@@ -150,7 +164,7 @@ parameters:
   section_id: input-args
   type: checkbox
 - append_value: false
-  cli_order: 7
+  cli_order: 9
   cli_tag: --fast
   default: 'False'
   description: Batched inference. Faster, alpha feature.
@@ -165,7 +179,7 @@ parameters:
   section_id: input-args
   type: checkbox
 - append_value: false
-  cli_order: 1
+  cli_order: 2
   cli_tag: --output_folder
   default: /bilayers/outputs
   description: Segmented images will be saved here.

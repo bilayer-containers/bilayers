@@ -66,13 +66,15 @@ def cellsam_inference(model_name, input_folder, output_folder, device,
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Minimal CellSAM CLI for segmentation.")
+    parser.add_argument("-i", "--input_folder", type=str, required=True,
+                        help="Path to folder of input images.")
+    parser.add_argument("-o", "--output_folder", type=str, required=True,
+                        help="Path to folder for output masks.")
+    parser.add_argument("-t", "--token", type=str, default=None,
+                        help="DeepCell access token for downloading weights.")
     parser.add_argument("--model_name", type=str, default="cellsam_general",
                         choices=["cellsam_general", "cellsam_extra"],
                         help="Which CellSAM model to load.")
-    parser.add_argument("--input_folder", type=str, required=True,
-                        help="Path to folder of input images.")
-    parser.add_argument("--output_folder", type=str, required=True,
-                        help="Path to folder for output masks.")
     parser.add_argument("--device", type=str, default="cpu",
                         choices=["cpu", "cuda"],
                         help="Run on CPU or GPU.")
@@ -90,7 +92,10 @@ if __name__ == "__main__":
                         help="Batched inference. Faster, alpha feature.")
 
     args = parser.parse_args()
-
+    
+    if args.token:
+        os.environ["DEEPCELL_ACCESS_TOKEN"] = args.token
+    
     cellsam_inference(
         args.model_name,
         args.input_folder,

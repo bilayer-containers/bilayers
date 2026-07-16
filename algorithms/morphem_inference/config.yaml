@@ -53,10 +53,11 @@ outputs:
   default: directory
   depth: false
   description: "Feature table \u2014 one row per object, N_channels x 384 columns.\
-    \ Written as morphem_features.csv and morphem_features.npy."
+    \ Written as morphem_features.<output_format>."
   file_count: multiple
   folder_name: /bilayers/outputs
   format:
+  - pkl
   - csv
   label: MorphEm feature embeddings
   mode: beginner
@@ -83,10 +84,59 @@ parameters:
   optional: true
   options: []
   output_dir_set: false
-  section_id: input-args
+  section_id: parameter-args
   type: integer
 - append_value: false
-  cli_order: 3
+  cli_order: 4
+  cli_tag: --num_channels
+  default: '1'
+  description: Number of channels per object.
+  interactive: false
+  label: Number of Channels
+  mode: beginner
+  multiselect: false
+  name: num_channels
+  optional: true
+  options: []
+  output_dir_set: false
+  section_id: parameter-args
+  type: integer
+- append_value: false
+  cli_order: 5
+  cli_tag: --concatenated
+  default: 'False'
+  description: Whether the input is a concatenated multi-channel image (H, W*C).
+  interactive: false
+  label: Concatenated
+  mode: beginner
+  multiselect: false
+  name: concatenated
+  optional: true
+  options: []
+  output_dir_set: false
+  section_id: parameter-args
+  type: checkbox
+- append_value: false
+  cli_order: 6
+  cli_tag: --output_format
+  default: pkl
+  description: Format of the feature table written to the output folder.
+  interactive: false
+  label: Output Format
+  mode: beginner
+  multiselect: false
+  name: output_format
+  optional: true
+  options:
+  - label: Pickle (.pkl)
+    value: pkl
+  - label: CSV (.csv)
+    value: csv
+  output_dir_set: false
+  section_id: parameter-args
+  type: radio
+- append_value: false
+  cli_order: 2
   cli_tag: --output_folder
   default: /bilayers/outputs
   description: Feature table will be saved here.
@@ -98,5 +148,5 @@ parameters:
   optional: true
   options: []
   output_dir_set: true
-  section_id: input-args
+  section_id: parameter-args
   type: textbox

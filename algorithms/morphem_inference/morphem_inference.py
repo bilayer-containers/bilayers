@@ -8,26 +8,19 @@ Model contract (from the CaicedoLab/MorphEm card):
     own, then concatenate the per-channel embeddings.
   - Each channel embedding is the ViT-Small CLS token (384 numbers).
 
-Input contract this wrapper enforces (kept deliberately simple):
-  - One file = one channel, grayscale, one segmented object.
-  - Group channels of the same object by filename: <id>_<index>.<ext>
-      cell1_0.png, cell1_1.png, cell1_2.png  ->  object "cell1", 3 channels
-    Channels are ordered by <index>. A file with no numeric suffix is treated
-    as a standalone 1-channel object.
-  - Stacked arrays are also accepted as a self-contained object:
-      .npy or multi-page .tif shaped (C,H,W) or (H,W,C)  ->  one object, C channels.
-  - Concatenated / tiled images (e.g. raw HPA strips) are NOT auto-split.
-    Split them first with the official CHAMMI-75 splitter. A warning is printed
-    if a single-channel file looks tiled.
-
-Every object in a run must have the SAME channel count, so the output table is
-rectangular. Mixed counts raise a clear error.
+Input contract this wrapper enforces:
+  - One file = one object. Every object has --num_channels channels.
+  - --concatenated=False: each file is already a stack. A 2D file is one
+    channel (num_channels must be 1); a 3D file is (C,H,W) or (H,W,C).
+  - --concatenated=True: each file is a horizontal CHAMMI-75 strip shaped
+    (H, W*C). It is split along the width into C planes of width W/C.
+  - Every object yields exactly num_channels planes, so the output table is
+    rectangular: O objects x (num_channels * 384).
 """
 
 import argparse
 import glob
 import os
-import re
 
 import numpy as np
 import torch
@@ -37,14 +30,14 @@ from transformers import AutoModel
 
 import tifffile
 from PIL import Image
+import pandas as pd
 
 
-CLS_DIM = 384                      # ViT-Small CLS token width
-IMG_EXTS = (".png", ".jpg", ".jpeg", ".tif", ".tiff", ".npy")
-SUFFIX_RE = re.compile(r"^(.*)_(\d+)$")   # matches <id>_<index>
+CLS_DIM = 384                                                       # ViT-Small CLS token width
+IMG_EXTS = (".png", ".jpg", ".jpeg", ".tif", ".tiff", ".npy")       # specified in the config.yaml
 
 
-# --- Preprocessing transforms (verbatim from the MorphEm model card) ---
+# --- Preprocessing transforms (from the MorphEm model card) ---
 
 class SaturationNoiseInjector(nn.Module):
     """Replace fully saturated pixels (value 255) with random high noise."""
@@ -83,44 +76,35 @@ class PerImageNormalize(nn.Module):
 
 # --- Image loading ---
 
-def _to_chw(arr: np.ndarray, path: str) -> np.ndarray:
-    """Return a float32 array shaped (C, H, W) from a 2D or 3D array."""
+def _to_chw(arr: np.ndarray, path: str, num_channels: int) -> np.ndarray:
+    """Return a float32 array shaped (C, H, W) from any 2D or 3D input array.
+    num_channels is required to tell us which axis of a 3D array is channels,
+    """
     arr = arr.astype(np.float32)
     if arr.ndim == 2:
         return arr[None, ...]
     if arr.ndim == 3:
-        # Decide which axis holds channels. Channels are few (<= 8), pixels many.
-        first, last = arr.shape[0], arr.shape[2]
-        if last <= 8 and first > 8:          # H, W, C  ->  C, H, W
-            return np.transpose(arr, (2, 0, 1))
-        if first <= 8 and last > 8:          # already C, H, W
+        if arr.shape[0] == num_channels:         # already C, H, W
             return arr
-        # Ambiguous: assume the smaller axis is channels.
-        if last <= first:
+        if arr.shape[2] == num_channels:         # H, W, C  ->  C, H, W
             return np.transpose(arr, (2, 0, 1))
-        return arr
+        raise ValueError(
+            f"{os.path.basename(path)}: no axis matches num_channels "
+            f"{num_channels} in array shape {arr.shape}."
+        )
     raise ValueError(f"Unsupported array shape {arr.shape} in {path}")
 
 
-def _maybe_warn_tiled(chw: np.ndarray, path: str) -> None:
-    """Warn if a single-channel image looks like a horizontally tiled strip."""
-    if chw.shape[0] != 1:
-        return
-    h, w = chw.shape[1], chw.shape[2]
-    if h and w % h == 0 and (w // h) in (2, 3, 4, 5):
-        print(f"WARNING: {os.path.basename(path)} is {w}x{h}, width is {w // h}x "
-              f"the height. It may be a concatenated multi-channel strip. "
-              f"If so, split it into channels first.")
+def load_image(path: str, num_channels: int) -> np.ndarray:
+    """Load any supported file, return as float32 (C, H, W)
+    -> expected input for MorphEm model."""
 
-
-def load_image(path: str) -> np.ndarray:
-    """Load any supported file and return it as float32 (C, H, W)."""
     lower = path.lower()
     if lower.endswith(".npy"):
         arr = np.load(path)
-        return _to_chw(arr, path)
+        return _to_chw(arr, path, num_channels)
     if lower.endswith((".tif", ".tiff")):
-        return _to_chw(tifffile.imread(path), path)
+        return _to_chw(tifffile.imread(path), path, num_channels)
 
     # PNG / JPG via PIL.
     arr = np.array(Image.open(path)).astype(np.float32)
@@ -131,41 +115,33 @@ def load_image(path: str) -> np.ndarray:
         # Grayscale saved as RGB: identical planes collapse to one channel.
         if arr.shape[2] > 1 and np.all(arr[:, :, 0:1] == arr):
             arr = arr[:, :, 0]
-    return _to_chw(arr, path)
+    return _to_chw(arr, path, num_channels)
 
 
-# --- Grouping files into objects ---
+# --- One file -> one object's channel planes ---
 
-def build_objects(paths):
-    """Return an ordered dict: object_id -> list of single-channel (H, W) planes."""
-    groups = {}   # gid -> {channel_index: plane}
-    for path in paths:
-        chw = load_image(path)
-        _maybe_warn_tiled(chw, path)
-        stem = os.path.splitext(os.path.basename(path))[0]
-        c = chw.shape[0]
+def load_object(path: str, num_channels: int, concatenated: bool):
+    """Return a list of num_channels single-channel (H, W) planes."""
+    if concatenated:
+        # a horizontal CHAMMI-75 strip: one 2D image (H, W*C) split into C planes.
+        chw = load_image(path, num_channels=1)   # (1, H, W*C)
+        if chw.shape[0] != 1:
+            raise SystemExit(
+                f"{os.path.basename(path)}: --concatenated expects a single "
+                f"2D strip but got {chw.shape[0]} array channels."
+            )
+        _, h, w = chw.shape
+        if w % num_channels != 0:
+            raise SystemExit(
+                f"{os.path.basename(path)}: width {w} is not divisible by "
+                f"num_channels {num_channels}; cannot split the strip."
+            )
+        step = w // num_channels
+        return [chw[0, :, i * step:(i + 1) * step] for i in range(num_channels)]
 
-        if c == 1:
-            m = SUFFIX_RE.match(stem)
-            if m:
-                gid, idx = m.group(1), int(m.group(2))
-            else:
-                gid, idx = stem, 0
-            groups.setdefault(gid, {})[idx] = chw[0]
-        else:
-            # Self-contained multi-channel file: its own object, array order.
-            d = groups.setdefault(stem, {})
-            for k in range(c):
-                d[k] = chw[k]
-
-    ordered = {}
-    for gid in sorted(groups):
-        idxs = sorted(groups[gid])
-        if idxs != list(range(len(idxs))):
-            print(f"WARNING: object '{gid}' has non-contiguous channel indices "
-                  f"{idxs}; using this order anyway.")
-        ordered[gid] = [groups[gid][i] for i in idxs]
-    return ordered
+    # already-stacked file
+    chw = load_image(path, num_channels)   # (C, H, W)
+    return [chw[k] for k in range(num_channels)]
 
 
 # --- Main ---
@@ -173,18 +149,28 @@ def build_objects(paths):
 def main():
     parser = argparse.ArgumentParser(description="MorphEm feature extraction")
     parser.add_argument("-i", "--input_folder", required=True,
-                        help="Folder of pre-segmented single-channel images")
+                        help="Folder of pre-segmented cell images, one file per object")
     parser.add_argument("-o", "--output_folder", required=True,
                         help="Where to write the feature CSV and NPY")
     parser.add_argument("-b", "--batch_size", type=int, default=32,
                         help="Single channels processed per forward pass")
+    parser.add_argument("-c", "--num_channels", type=int, default=1,
+                        help="Number of channels per object")
+    parser.add_argument("--concatenated", action="store_true",
+                        help="Input files are horizontal (H, W*C) multi-channel strips")
+    parser.add_argument("--output_format", choices=("pkl", "csv"), default="pkl",
+                        help="Format of the feature table written to the output folder")
     args = parser.parse_args()
+
+    if args.num_channels < 1:
+        raise SystemExit("--num_channels must be >= 1")
 
     os.makedirs(args.output_folder, exist_ok=True)
 
-    # TODO: Add GPU support once CUDA containers exist.
+    # TODO: Add GPU support
     device = "cpu"
 
+    # find all supported images in the input folder, recursively.
     paths = sorted(
         p for p in glob.glob(os.path.join(args.input_folder, "**", "*"), recursive=True)
         if p.lower().endswith(IMG_EXTS)
@@ -192,67 +178,50 @@ def main():
     if not paths:
         raise SystemExit(f"No supported images found in {args.input_folder}")
 
-    objects = build_objects(paths)
-    gids = list(objects.keys())
+    # One file = one object, each split into exactly num_channels planes.
+    gids = [os.path.splitext(os.path.basename(p))[0] for p in paths]                        # global id of each object
+    objects = [load_object(p, args.num_channels, args.concatenated) for p in paths]
 
-    counts = {len(v) for v in objects.values()}
-    if len(counts) > 1:
-        detail = ", ".join(f"{g}:{len(objects[g])}ch" for g in gids)
-        raise SystemExit(
-            "All objects must have the same channel count to form one table.\n"
-            f"Found mixed counts -> {detail}\n"
-            "Fix the inputs so every object has the same number of channels."
-        )
-    num_channels = counts.pop()
-
-    # trust_remote_code=True: we already have the model code locally
+    # run the model (from the MorphEm model card)
+    # model exist locally, so local_files_only=True to avoid downloading from the internet
     model = AutoModel.from_pretrained("/morphem_inference/model_cache", trust_remote_code=True, local_files_only=True)
     model.to(device).eval()
 
-    # Applied per single channel, so x[0] is that channel (matches the card).
     transform = v2.Compose([
         SaturationNoiseInjector(),
         PerImageNormalize(),
         v2.Resize(size=(224, 224), antialias=True),
     ])
 
-    # Flatten to one work item per channel, remembering where each belongs.
-    work = []   # (object_pos, channel_pos, transformed_tensor)
-    for gp, gid in enumerate(gids):
-        for cp, plane in enumerate(objects[gid]):
-            t = transform(torch.from_numpy(plane).float().unsqueeze(0))  # (1,224,224)
-            work.append((gp, cp, t))
-
-    # Batched Bag-of-Channels inference.
-    embeds = [[None] * num_channels for _ in gids]
+    # Bag of Channels: one channel at a time, objects processed in batch_size chunks.
+    # each forward pass sees (B, 1, 224, 224) -> per channel we build an (O, 384) array.
+    per_channel = []   # per_channel[c] is (O, 384)
     with torch.no_grad():
-        for start in range(0, len(work), args.batch_size):
-            chunk = work[start:start + args.batch_size]
-            batch = torch.stack([w[2] for w in chunk], dim=0).to(device)  # (B,1,224,224)
-            out = model.forward_features(batch)
-            cls = out["x_norm_clstoken"].cpu().numpy()                    # (B,384)
-            for (gp, cp, _), vec in zip(chunk, cls):
-                embeds[gp][cp] = vec
+        for c in range(args.num_channels):
+            planes = [transform(torch.from_numpy(obj[c]).float().unsqueeze(0)) for obj in objects]
+            feats = []
+            for start in range(0, len(planes), args.batch_size):
+                batch = torch.stack(planes[start:start + args.batch_size], dim=0).to(device)  # (B,1,224,224)
+                out = model.forward_features(batch)
+                feats.append(out["x_norm_clstoken"].cpu().numpy())    # (B, 384)
+            per_channel.append(np.concatenate(feats, axis=0))          # (O, 384)
 
-    # Concatenate channels per object: (N, num_channels * 384).
-    features = np.stack(
-        [np.concatenate(embeds[gp], axis=0) for gp in range(len(gids))], axis=0
-    )
+    # concatenate channels per object: (O, num_channels * 384).
+    features = np.concatenate(per_channel, axis=1)
 
-    npy_path = os.path.join(args.output_folder, "morphem_features.npy")
-    np.save(npy_path, features)
+    # save the feature table (one row per object) in the requested format.
+    df = pd.DataFrame(features, columns=[f"f{i}" for i in range(features.shape[1])])
+    df.insert(0, "object_id", gids)
 
-    csv_path = os.path.join(args.output_folder, "morphem_features.csv")
-    header = ",".join(["object_id"] + [f"f{i}" for i in range(features.shape[1])])
-    with open(csv_path, "w") as f:
-        f.write(header + "\n")
-        for gid, row in zip(gids, features):
-            f.write(gid + "," + ",".join(map(str, row.tolist())) + "\n")
+    out_path = os.path.join(args.output_folder, f"morphem_features.{args.output_format}")
+    if args.output_format == "csv":
+        df.to_csv(out_path, index=False)
+    else:  # pkl
+        df.to_pickle(out_path)
 
-    print(f"Objects: {len(gids)}, channels each: {num_channels}, "
-          f"features: {features.shape[1]} ({num_channels} x {CLS_DIM})")
-    print(f"  {csv_path}")
-    print(f"  {npy_path}")
+    print(f"Objects: {len(gids)}, channels each: {args.num_channels}, "
+          f"features: {features.shape[1]} ({args.num_channels} x {CLS_DIM})")
+    print(f"  {out_path}")
 
 
 if __name__ == "__main__":

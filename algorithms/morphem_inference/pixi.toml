@@ -13,6 +13,7 @@ pip = ">=24,<26"
 numpy = ">=2.4.6,<3"
 pillow = ">=12.3.0,<13"
 tifffile = ">=2026.3.3,<2027"
+pandas = ">=2.0,<3"
 
 [feature.cpu.dependencies]
 pytorch-cpu = ">=2.12.1,<3"

@@ -14,6 +14,9 @@ RUN --mount=type=cache,target=/root/.cache/rattler pixi install -e cpuenv
 ENV HF_HOME=/morphem_inference/hf_cache
 
 # bake the MorphEm weights into the image
+# model_cache is not trached in git -> download the weights from the HF model
+# repo (https://huggingface.co/CaicedoLab/MorphEm - commit ID: 0e8d58787421f83f975634d72420d85c5dfc9c2c)
+# into morphem_inference/model_cache before building
 COPY ./model_cache /morphem_inference/model_cache
 
 FROM ubuntu:jammy AS production

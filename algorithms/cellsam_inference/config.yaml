@@ -1,7 +1,6 @@
 algorithm_folder_name: cellsam_inference
 citations:
-- description: CellSAM, a foundation model for whole-cell segmentation across imaging       modalities,
-    built on SAM with a CellFinder detector.
+- description: CellSAM, a foundation model for whole-cell segmentation across imaging modalities, built on SAM with a CellFinder detector.
   doi: 10.1101/2023.11.17.567630
   license: Apache-2.0
   name: A Foundation Model for Cell Segmentation

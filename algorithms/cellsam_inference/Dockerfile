@@ -14,15 +14,11 @@ RUN git checkout 362a8e5
 COPY ./pixi.toml ./pixi.toml
 COPY ./pixi.lock ./pixi.lock
 
-RUN pixi install -e default
+RUN pixi install -e cpuenv --frozen
 
 # convert all .py files to .pyc for faster startup.
-# -x skips version-shim modules that use newer-Python syntax
-# alternative to completely removing this line
-RUN pixi run --environment default python -m compileall -q \
-    -x 'py3(1[1-9]|[2-9][0-9])_intrinsics\.py' \
-    /cellSAM/.pixi/envs/default/lib/python3.10/site-packages
-RUN pixi run --environment default python -m compileall -q /cellSAM/cellSAM
+RUN pixi run --as-is --environment cpuenv python -m compileall /cellSAM/.pixi/envs/cpuenv/lib/python3.10/site-packages
+RUN pixi run --as-is --environment cpuenv python -m compileall -q /cellSAM/cellSAM
 
 FROM ubuntu:jammy AS production
 
@@ -30,7 +26,7 @@ FROM ubuntu:jammy AS production
 COPY --from=build /usr/local/bin/pixi /usr/local/bin/pixi
 # copy the built project and environment (path must match the build stage)
 COPY --from=build /cellSAM/ /cellSAM/
-COPY --from=build /cellSAM/.pixi/envs/default /cellSAM/.pixi/envs/default
+COPY --from=build /cellSAM/.pixi/envs/cpuenv /cellSAM/.pixi/envs/cpuenv
 
 WORKDIR /cellSAM
 
@@ -39,16 +35,16 @@ COPY ./cellsam_inference.py /bilayers/cellsam_inference.py
 
 ENV BILAYERS_TOOL_NAME=cellsam
 ENV BILAYERS_VENV_MANAGER=pixi
-ENV BILAYERS_VENV_NAME=default
+ENV BILAYERS_VENV_NAME=cpuenv
 
 # provide python/pip shims that dispatch into the pixi environment
 # (replaces reliance on SHELL, which does not survive podman / the UI image)
-RUN printf '#!/bin/sh\nexec pixi run --manifest-path /cellSAM/pixi.toml --environment default python "$@"\n' > /usr/local/bin/python \
+RUN printf '#!/bin/sh\nexec pixi run --as-is --manifest-path /cellSAM/pixi.toml --environment cpuenv python "$@"\n' > /usr/local/bin/python \
  && chmod +x /usr/local/bin/python
 
-RUN printf '#!/bin/sh\nexec pixi run --manifest-path /cellSAM/pixi.toml --environment default python -m pip "$@"\n' > /usr/local/bin/pip \
+RUN printf '#!/bin/sh\nexec pixi run --as-is --manifest-path /cellSAM/pixi.toml --environment cpuenv python -m pip "$@"\n' > /usr/local/bin/pip \
  && chmod +x /usr/local/bin/pip
 
-ENTRYPOINT ["pixi", "run", "--manifest-path", "/cellSAM/pixi.toml", "--no-progress", "--frozen", "--environment", "default"]
+ENTRYPOINT ["pixi", "run", "--as-is", "--manifest-path", "/cellSAM/pixi.toml", "--no-progress", "--frozen", "--environment", "cpuenv"]
 
 CMD ["/bin/bash"]

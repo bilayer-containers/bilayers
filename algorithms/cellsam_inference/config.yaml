@@ -1,0 +1,194 @@
+algorithm_folder_name: cellsam_inference
+citations:
+- description: CellSAM, a foundation model for whole-cell segmentation across imaging modalities, built on SAM with a CellFinder detector.
+  doi: 10.1101/2023.11.17.567630
+  license: Apache-2.0
+  name: A Foundation Model for Cell Segmentation
+display_only: []
+docker_image:
+  name: cellsam
+  org: bilayers
+  platform: linux/amd64
+  tag: latest
+exec_function:
+  cli_command: python cellsam_inference.py
+  hidden_args: []
+  name: generate_cli_command
+inputs:
+- cli_order: 1
+  cli_tag: --input_folder
+  default: directory
+  depth: false
+  description: Input images to be segmented.
+  file_count: multiple
+  folder_name: /bilayers/input_images
+  format:
+  - tif
+  - tiff
+  - png
+  - jpg
+  - bmp
+  - npy
+  label: Drag and drop all images to be analyzed.
+  mode: beginner
+  name: input_folder
+  optional: false
+  pyramidal: false
+  section_id: inputs
+  subtype:
+  - grayscale
+  - color
+  tiled: false
+  timepoints: false
+  type: image
+  unique_string:
+  - '*'
+outputs:
+- cli_order: 2
+  cli_tag: --output_folder
+  default: directory
+  depth: false
+  description: Folder where the integer-labeled segmentation masks are written as
+    tif.
+  file_count: multiple
+  folder_name: /bilayers/outputs
+  format:
+  - tif
+  label: Segmentation masks
+  mode: beginner
+  name: output_path
+  optional: false
+  pyramidal: false
+  section_id: outputs
+  subtype:
+  - label
+  tiled: false
+  timepoints: false
+  type: image
+  unique_string:
+  - mask
+parameters:
+- append_value: false
+  cli_order: 3
+  cli_tag: --token
+  default: ''
+  description: Your DeepCell token for downloading model weights.
+  interactive: false
+  label: DeepCell Access Token
+  mode: beginner
+  multiselect: false
+  name: token
+  optional: false
+  options: []
+  section_id: input-args
+  type: textbox
+- append_value: false
+  cli_order: 4
+  cli_tag: --model_name
+  default: cellsam_general
+  description: Which CellSAM model to load. General is trained only on the datasets
+    in       the paper. Extra adds more datasets and suits images beyond the paper.
+  interactive: false
+  label: Model Type
+  mode: beginner
+  multiselect: false
+  name: model_name
+  optional: true
+  options:
+  - label: General
+    value: cellsam_general
+  - label: Extra
+    value: cellsam_extra
+  output_dir_set: false
+  section_id: input-args
+  type: radio
+- append_value: true
+  cli_order: 5
+  cli_tag: --normalize
+  default: 'True'
+  description: Normalize the image before segmenting.
+  interactive: false
+  label: Normalize image
+  mode: beginner
+  multiselect: false
+  name: normalize
+  optional: true
+  options: []
+  output_dir_set: false
+  section_id: input-args
+  type: checkbox
+- append_value: false
+  cli_order: 6
+  cli_tag: --bbox_threshold
+  default: '0.4'
+  description: Confidence cutoff for detecting cells.
+  interactive: false
+  label: Bounding Box Threshold
+  mode: beginner
+  multiselect: false
+  name: bbox_threshold
+  optional: true
+  options: []
+  output_dir_set: false
+  section_id: input-args
+  type: float
+- append_value: false
+  cli_order: 7
+  cli_tag: --postprocess
+  default: 'False'
+  description: Extra cleanup for noisy images.
+  interactive: false
+  label: Postprocess (noisy images)
+  mode: beginner
+  multiselect: false
+  name: postprocess
+  optional: true
+  options: []
+  output_dir_set: false
+  section_id: input-args
+  type: checkbox
+- append_value: false
+  cli_order: 8
+  cli_tag: --remove_boundaries
+  default: 'False'
+  description: Shave a one pixel edge off each cell.
+  interactive: false
+  label: Remove cell boundaries
+  mode: beginner
+  multiselect: false
+  name: remove_boundaries
+  optional: true
+  options: []
+  output_dir_set: false
+  section_id: input-args
+  type: checkbox
+- append_value: false
+  cli_order: 9
+  cli_tag: --fast
+  default: 'False'
+  description: Batched inference. Faster, alpha feature.
+  interactive: false
+  label: Fast (batched, alpha)
+  mode: beginner
+  multiselect: false
+  name: fast
+  optional: true
+  options: []
+  output_dir_set: false
+  section_id: input-args
+  type: checkbox
+- append_value: false
+  cli_order: 2
+  cli_tag: --output_folder
+  default: /bilayers/outputs
+  description: Segmented images will be saved here.
+  interactive: false
+  label: Output Image Path
+  mode: beginner
+  multiselect: false
+  name: segmented_images_path
+  optional: true
+  options: []
+  output_dir_set: true
+  section_id: input-args
+  type: textbox

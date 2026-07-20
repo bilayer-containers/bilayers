@@ -1,0 +1,23 @@
+[workspace]
+name = "cellsam_inference"
+channels = ["conda-forge"]
+platforms = ["linux-64"]
+version = "0.1.0"
+
+[tasks]
+
+[dependencies]
+python = "3.10.*"
+pip = ">=26.1.2,<27"
+pytorch-cpu = "<2.5"
+torchvision = "<0.20"
+
+
+[feature.cpu.pypi-dependencies]
+cellsam = { git = "https://github.com/vanvalenlab/cellSAM.git" }
+numpy = ">=2.2.6, <3"
+scikit-image = ">=0.25.2, <0.26"
+imageio = ">=2.37.3, <3"
+
+[environments]
+cpuenv = ["cpu"]

@@ -260,7 +260,7 @@ Select a threshold method to segment the image
             
             
             
-            value="5",
+            value=5,
             
             
             
@@ -280,7 +280,7 @@ Minimum diameter of objects in pixels
             
             
             
-            value="20",
+            value=20,
             
             
             
@@ -464,11 +464,40 @@ Select "No" to preserve temporary files for debugging purposes. The path to the 
         
 
         # Set up Docker/Podman's execution environment
-        # Define how to call docker/podman
+        # Resolve the container runtime path in a cross-platform way. GUI-launched
+        # apps (e.g. CellProfiler.app) often start with a minimal PATH that omits
+        # /usr/local/bin or /opt/homebrew/bin, so shutil.which() alone is unreliable;
+        # we also probe well-known install locations. os.path.exists() follows
+        # symlinks, so a dangling link (e.g. a stale Docker Desktop symlink) is
+        # skipped automatically.
+        def _resolve_runtime(name, candidates):
+            found = shutil.which(name)
+            if found:
+                return found
+            for candidate in candidates:
+                if os.path.exists(candidate) and os.access(candidate, os.X_OK):
+                    return candidate
+            raise RuntimeError(
+                f"Could not locate the '{name}' executable. Tried PATH and the "
+                f"following locations: {candidates}. Please install {name} or add it to your PATH."
+            )
+
         if self.execution_method.value == "Docker":
-            docker_path = "docker" if sys.platform.lower().startswith("win") else "/usr/local/bin/docker"
+            docker_path = _resolve_runtime("docker", [
+                r"C:\Program Files\Docker\Docker\resources\bin\docker.exe",
+                "/usr/local/bin/docker",
+                "/opt/homebrew/bin/docker",
+                "/Applications/Docker.app/Contents/Resources/bin/docker",
+                "/usr/bin/docker",
+            ])
         elif self.execution_method.value == "Podman":
-            docker_path = "podman" if sys.platform.lower().startswith("win") else "/opt/podman/bin/podman"
+            docker_path = _resolve_runtime("podman", [
+                r"C:\Program Files\RedHat\Podman\podman.exe",
+                "/opt/podman/bin/podman",
+                "/usr/local/bin/podman",
+                "/opt/homebrew/bin/podman",
+                "/usr/bin/podman",
+            ])
 
         # Create temporary directory (same as official CP modules)
         temp_dir = tempfile.mkdtemp(prefix=f"CP_{self.module_name}_")

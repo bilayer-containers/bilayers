@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-PKG_ROOT="$("$SCRIPT_DIR"/pkg_path.sh)"
-#PROJ_ROOT="$(cd "$PKG_ROOT/../.." && pwd)"
 
 cd "$SCRIPT_DIR" || exit
 
@@ -13,7 +11,7 @@ else
     ALGO_PKG_PATH=$(python -c "import bilayers_algorithms; import os; print(os.path.dirname(bilayers_algorithms.__file__))")
 fi
 
-SCHEMA_FILE=${1:-"$PKG_ROOT/schema.yaml"}
+SCHEMA_FILE=${1:-"$("$SCRIPT_DIR"/schema_path.sh)"}
 # List of algorithms and interfaces
 ALGORITHM_NAMES=("cellpose_inference" "classical_segmentation" "instanseg_inference" "stardist_inference")
 

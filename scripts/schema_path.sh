@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
 
-SCHEMA_FILE="$("$SCRIPT_DIR"/schema_path.sh)"
-echo "Validating algorithm configs against installed schema: $SCHEMA_FILE"
+# Prints the absolute path to the installed bilayers_schema/schema.yaml.
+# Used by lint.sh / gendoc.sh / validate.sh to locate the schema.
+
+set -euo pipefail
+
+python -c "import bilayers_schema, os; print(os.path.join(os.path.dirname(bilayers_schema.__file__), 'schema.yaml'))"

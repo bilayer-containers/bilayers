@@ -17,19 +17,20 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
 
-      - name: Set up Python 3.9
-        uses: actions/setup-python@v3
+      # locked: false so CI re-resolves each run. Sibling repos are pulled via
+      # git+...@dev (a moving branch), so we intentionally test against the
+      # latest dev of those dependencies rather than a frozen pixi.lock snapshot.
+      # Python version comes from pyproject.toml/pixi, not a hardcoded CI value.
+      - name: Set up pixi
+        uses: prefix-dev/setup-pixi@v0.10.0
         with:
-          python-version: 3.9
+          environments: dev
+          locked: false
+          cache: true
 
-      - name: Install dependencies
+      - name: Run tests
         run: |
-          pip install -e ".[nox, test, linkml]"
-
-      - name: Lint code with LinkML
-        run: |
-          chmod +x scripts/test_docker.sh
-          scripts/test_docker.sh
-          nox -s test_pytest
+          pixi run -e dev bash scripts/test_docker.sh
+          pixi run -e dev nox -s test_pytest

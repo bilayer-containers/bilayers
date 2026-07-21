@@ -10,7 +10,7 @@ COPY ./pixi.lock ./pixi.lock
 RUN --mount=type=cache,target=/root/.cache/rattler pixi install -e cpuenv --frozen
 
 RUN pixi run --as-is --environment cpuenv python -m compileall -q \
-    -x 'py312_intrinsics\.py' /
+    -x 'py3(1[1-9]|[2-9][0-9])_intrinsics\.py' \    
     /morphem_inference/.pixi/envs/cpuenv/lib/python3.11/site-packages
 
 # add HF cache dir to the image

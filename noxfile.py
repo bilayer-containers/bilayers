@@ -318,12 +318,12 @@ def build_interface(session: nox.Session) -> None:
     print("Dockerfile Path: ", dockerfile_path)
     _buildx(session, platform, base_image, algorithm_folder_name, interface, dockerfile_path, candidate_name)
 
-    # Decide final tag, retag, build final
+    # Decide final tag and reuse the already-built candidate: retagging is enough
+    # since it was loaded into the local image store, so no second buildx rebuild
     final_tag = decide_interface_tag(algorithm_folder_name, interface, bump_type)
     final_image_name = f"bilayer/{algorithm_folder_name}:{final_tag}"
-    print(f"Final image built and tagged as: {final_image_name}")
+    print(f"Final image tagged as: {final_image_name}")
     session.run(DOCKER_CMD, "tag", candidate_name, final_image_name, external=True)
-    _buildx(session, platform, base_image, algorithm_folder_name, interface, dockerfile_path, final_image_name)
 
 
 @nox.session

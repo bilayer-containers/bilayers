@@ -37,11 +37,9 @@ def generate_interface(interface_name: str, config_path: Union[str, Path]) -> No
     }
 
     print(f"Running generate for {interface_name}...")
-    try:
-        run_generate(interface_name, loader, interface_input)
-    except MissingInterfaceDependencyError as e:
-        print(e)
-        return
+    # Missing-dependency error propagate so a single requested interface
+    # fails loudly (exit non-zero) rather than silently generating nothing
+    run_generate(interface_name, loader, interface_input)
 
     print(f"Finished generating interface: {interface_name}")
 

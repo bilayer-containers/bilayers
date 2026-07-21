@@ -20,6 +20,7 @@ readme = "README.md"
 license = "BSD-3-Clause"
 requires-python = ">=3.9"
 dependencies = [
+    "pyyaml>=6.0.1,<7",
     "bilayers-schema @ git+https://github.com/bilayer-containers/bilayers-schema.git@dev",
     "bilayers-targets @ git+https://github.com/bilayer-containers/bilayers-targets.git@dev",
     "bilayers-algorithms @ git+https://github.com/bilayer-containers/bilayers-algorithms.git@dev",

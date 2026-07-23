@@ -21,9 +21,7 @@ inputs:
   cli_tag: --input_folder
   default: directory
   depth: false
-  description: Pre-segmented, single-channel cell images. One file = one channel;
-    group channels of same object by <id>_<index> filename. Stacked .npy/.tif (C,H,W)
-    also accepted. NOT raw/tiled images.
+  description: Pre-segmented, single-cell images. One file = one object, with its num_channels channels bundled inside: a stacked (C,H,W)/(H,W,C) .npy/.tif, or a horizontal (H, W*C) strip via --concatenated. A 2D file = one channel. NOT raw/tiled images.
   file_count: multiple
   folder_name: /bilayers/input_images
   format:
@@ -33,7 +31,7 @@ inputs:
   - tif
   - tiff
   - npy
-  label: Drag and drop pre-segmented cell crops.
+  label: Drag and drop pre-segmented cell crop.
   mode: beginner
   name: input_folder
   optional: false

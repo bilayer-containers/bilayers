@@ -1,0 +1,150 @@
+algorithm_folder_name: morphem_inference
+citations:
+- description: MorphEm, self-supervised ViT-Small feature extractor for single-cell
+    microscopy images (CHAMMI benchmark). Makes per-channel CLS-token embeddings,
+    concatenated Bag-of-Channels.
+  doi: https://doi.org/10.48550/arXiv.2512.20833
+  license: MIT
+  name: MorphEm
+display_only: []
+docker_image:
+  name: MorphEm
+  org: bilayers
+  platform: linux/amd64
+  tag: latest
+exec_function:
+  cli_command: python /morphem_inference/morphem_inference.py
+  hidden_args: []
+  name: generate_cli_command
+inputs:
+- cli_order: 1
+  cli_tag: --input_folder
+  default: directory
+  depth: false
+  description: Pre-segmented, single-cell images. One file = one object, with its num_channels channels bundled inside: a stacked (C,H,W)/(H,W,C) .npy/.tif, or a horizontal (H, W*C) strip via --concatenated. A 2D file = one channel. NOT raw/tiled images.
+  file_count: multiple
+  folder_name: /bilayers/input_images
+  format:
+  - png
+  - jpg
+  - jpeg
+  - tif
+  - tiff
+  - npy
+  label: Drag and drop pre-segmented cell crop.
+  mode: beginner
+  name: input_folder
+  optional: false
+  pyramidal: false
+  section_id: inputs
+  subtype:
+  - grayscale
+  - color
+  tiled: false
+  timepoints: false
+  type: image
+  unique_string:
+  - '*'
+outputs:
+- cli_order: 2
+  cli_tag: --output_folder
+  default: directory
+  depth: false
+  description: "Feature table \u2014 one row per object, N_channels x 384 columns.\
+    \ Written as morphem_features.<output_format>."
+  file_count: multiple
+  folder_name: /bilayers/outputs
+  format:
+  - pkl
+  - csv
+  label: MorphEm feature embeddings
+  mode: beginner
+  name: output_features
+  optional: false
+  pyramidal: false
+  section_id: outputs
+  subtype: []
+  tiled: false
+  timepoints: false
+  type: measurement
+  unique_string: []
+parameters:
+- append_value: false
+  cli_order: 3
+  cli_tag: --batch_size
+  default: '32'
+  description: Single channels processed per forward pass.
+  interactive: false
+  label: Batch Size
+  mode: beginner
+  multiselect: false
+  name: batch_size
+  optional: true
+  options: []
+  output_dir_set: false
+  section_id: parameter-args
+  type: integer
+- append_value: false
+  cli_order: 4
+  cli_tag: --num_channels
+  default: '1'
+  description: Number of channels per object.
+  interactive: false
+  label: Number of Channels
+  mode: beginner
+  multiselect: false
+  name: num_channels
+  optional: true
+  options: []
+  output_dir_set: false
+  section_id: parameter-args
+  type: integer
+- append_value: false
+  cli_order: 5
+  cli_tag: --concatenated
+  default: 'False'
+  description: Whether the input is a concatenated multi-channel image (H, W*C).
+  interactive: false
+  label: Concatenated
+  mode: beginner
+  multiselect: false
+  name: concatenated
+  optional: true
+  options: []
+  output_dir_set: false
+  section_id: parameter-args
+  type: checkbox
+- append_value: false
+  cli_order: 6
+  cli_tag: --output_format
+  default: pkl
+  description: Format of the feature table written to the output folder.
+  interactive: false
+  label: Output Format
+  mode: beginner
+  multiselect: false
+  name: output_format
+  optional: true
+  options:
+  - label: Pickle (.pkl)
+    value: pkl
+  - label: CSV (.csv)
+    value: csv
+  output_dir_set: false
+  section_id: parameter-args
+  type: radio
+- append_value: false
+  cli_order: 2
+  cli_tag: --output_folder
+  default: /bilayers/outputs
+  description: Feature table will be saved here.
+  interactive: false
+  label: Output Features Path
+  mode: beginner
+  multiselect: false
+  name: output_features_path
+  optional: true
+  options: []
+  output_dir_set: true
+  section_id: parameter-args
+  type: textbox

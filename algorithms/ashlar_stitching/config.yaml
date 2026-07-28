@@ -38,10 +38,10 @@ inputs:
       - "*"
     section_id: "inputs"
     mode: "beginner"
-    depth: True
-    timepoints: True
+    depth: False
+    timepoints: False
     tiled: True
-    pyramidal: True
+    pyramidal: False
   - name: ffp
     type: image
     label: Flat-field profile image(s)
@@ -61,10 +61,10 @@ inputs:
       - "ffp"
     section_id: "inputs"
     mode: "advanced"
-    depth: True
-    timepoints: True
+    depth: False
+    timepoints: False
     tiled: True
-    pyramidal: True
+    pyramidal: False
   - name: dfp
     type: image
     label: Dark-field profile image(s)
@@ -84,10 +84,10 @@ inputs:
       - "dfp"
     section_id: "inputs"
     mode: "advanced"
-    depth: True
-    timepoints: True
+    depth: False
+    timepoints: False
     tiled: True
-    pyramidal: True
+    pyramidal: False
 
 outputs:
   - name: output_images
@@ -108,8 +108,8 @@ outputs:
       - "cycle"
     section_id: "outputs"
     mode: "beginner"
-    depth: True
-    timepoints: True
+    depth: False
+    timepoints: False
     tiled: True
     pyramidal: True
 

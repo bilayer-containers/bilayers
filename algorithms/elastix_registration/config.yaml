@@ -1,0 +1,263 @@
+citations:
+  - name: "Elastix registration"
+    doi: 10.1109/TMI.2009.2035616
+    license: "Apache-2.0"
+    description: "elastix aligns a moving image to a fixed image using a modular pipeline of metric, optimizer, and transform components configured via a parameter file."
+
+docker_image:
+  org: bilayer
+  name: elastix
+  tag: "5.0.1"
+  platform: "linux/amd64"
+
+algorithm_folder_name: "elastix_registration"
+
+exec_function:
+  name: "generate_cli_command"
+  cli_command: "elastix"
+  hidden_args:
+
+inputs:
+  - name: fixed_image
+    type: image
+    label: "Fixed image (reference)"
+    subtype:
+      - grayscale
+    description: "The reference image. The moving image will be warped to align with this one."
+    cli_tag: "-f"
+    cli_order: 1
+    default: ""
+    optional: False
+    format:
+      - mha
+      - mhd
+      - nii
+      - nii.gz
+      - hdr
+      - tiff
+      - tif
+    folder_name: ""
+    file_count: single
+    unique_string:
+      - "*"
+    section_id: "inputs"
+    mode: "beginner"
+    depth: True
+    timepoints: False
+    tiled: False
+    pyramidal: False
+
+  - name: moving_image
+    type: image
+    label: "Moving image (to be warped)"
+    subtype:
+      - grayscale
+    description: "The image that will be transformed to align with the fixed image."
+    cli_tag: "-m"
+    cli_order: 2
+    default: ""
+    optional: False
+    format:
+      - mha
+      - mhd
+      - nii
+      - nii.gz
+      - hdr
+      - tiff
+      - tif
+    folder_name: ""
+    file_count: single
+    unique_string:
+      - "*"
+    section_id: "inputs"
+    mode: "beginner"
+    depth: True
+    timepoints: False
+    tiled: False
+    pyramidal: False
+
+  - name: parameter_file
+    type: file
+    label: "Parameter file(s)"
+    description: "One or more elastix parameter files defining metric, optimizer, and transform. Multiple files run in sequence, with the output of each feeding the next."
+    cli_tag: "-p"
+    cli_order: 3
+    default: ""
+    optional: False
+    format:
+      - txt
+    folder_name: ""
+    file_count: multiple
+    unique_string:
+      - "*"
+    section_id: "inputs"
+    mode: "beginner"
+
+  - name: fixed_mask
+    type: image
+    label: "Fixed image mask"
+    subtype:
+      - grayscale
+    description: "Binary mask for the fixed image. Zero pixels are ignored during registration."
+    cli_tag: "-fMask"
+    cli_order: 4
+    default: ""
+    optional: True
+    format:
+      - mha
+      - mhd
+      - nii
+      - nii.gz
+    folder_name: ""
+    file_count: single
+    unique_string:
+      - "*"
+    section_id: "inputs"
+    mode: "advanced"
+    depth: True
+    timepoints: False
+    tiled: False
+    pyramidal: False
+
+  - name: moving_mask
+    type: image
+    label: "Moving image mask"
+    subtype:
+      - grayscale
+    description: "Binary mask for the moving image. Zero pixels are ignored during registration."
+    cli_tag: "-mMask"
+    cli_order: 5
+    default: ""
+    optional: True
+    format:
+      - mha
+      - mhd
+      - nii
+      - nii.gz
+    folder_name: ""
+    file_count: single
+    unique_string:
+      - "*"
+    section_id: "inputs"
+    mode: "advanced"
+    depth: True
+    timepoints: False
+    tiled: False
+    pyramidal: False
+
+  - name: fixed_points
+    type: file
+    label: "Fixed image landmark points"
+    description: "Text file listing landmark points on the fixed image (for landmark-based transforms)."
+    cli_tag: "-fp"
+    cli_order: 6
+    default: ""
+    optional: True
+    format:
+      - txt
+    folder_name: ""
+    file_count: single
+    unique_string:
+      - "*"
+    section_id: "inputs"
+    mode: "advanced"
+
+  - name: moving_points
+    type: file
+    label: "Moving image landmark points"
+    description: "Text file listing landmark points on the moving image. Must correspond to fixed points."
+    cli_tag: "-mp"
+    cli_order: 7
+    default: ""
+    optional: True
+    format:
+      - txt
+    folder_name: ""
+    file_count: single
+    unique_string:
+      - "*"
+    section_id: "inputs"
+    mode: "advanced"
+
+  - name: initial_transform
+    type: file
+    label: "Initial transform"
+    description: "Optional starting transform (e.g. output of a previous elastix run) to initialize this registration."
+    cli_tag: "-t0"
+    cli_order: 8
+    default: ""
+    optional: True
+    format:
+      - txt
+    folder_name: ""
+    file_count: single
+    unique_string:
+      - "*"
+    section_id: "advanced-args"
+    mode: "advanced"
+
+outputs:
+  - name: warped_image
+    type: image
+    label: "Registered (warped) moving image"
+    subtype:
+      - grayscale
+    description: "The moving image after alignment onto the fixed image. Written as result.0.mhd/.raw by default."
+    cli_tag: "None"
+    cli_order: 0
+    default: "directory"
+    optional: False
+    format:
+      - mhd
+      - mha
+    folder_name: ""
+    file_count: single
+    unique_string:
+      - "result"
+    section_id: "outputs"
+    mode: "beginner"
+    depth: True
+    timepoints: False
+    tiled: False
+    pyramidal: False
+
+  - name: transform_file
+    type: file
+    label: "Transform parameter file"
+    description: "Text file describing the spatial transform found by elastix. Feed to transformix to warp other images."
+    cli_tag: "None"
+    cli_order: 0
+    default: "directory"
+    optional: False
+    format:
+      - txt
+    folder_name: ""
+    file_count: single
+    unique_string:
+      - "TransformParameters"
+    section_id: "outputs"
+    mode: "beginner"
+
+parameters:
+  - name: output_dir
+    type: textbox
+    label: "Output Directory"
+    description: "Directory where elastix writes the registered image, transform parameter file, and log. Must already exist."
+    default: "elastix_output"
+    cli_tag: "-out"
+    optional: False
+    section_id: "input-args"
+    mode: "beginner"
+    output_dir_set: True
+
+  - name: threads
+    type: integer
+    label: "Threads"
+    description: "Maximum number of CPU threads. Leave 0 to use all available."
+    default: 0
+    cli_tag: "-threads"
+    optional: True
+    section_id: "advanced-args"
+    mode: "advanced"
+
+display_only:

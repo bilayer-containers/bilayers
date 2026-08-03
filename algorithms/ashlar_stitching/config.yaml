@@ -95,17 +95,19 @@ outputs:
     label: "Stitched mosaic images"
     subtype:
       - color
+      - grayscale
     description: "Stitched and registered mosaic output images"
     cli_tag: "None"
     cli_order: 0
-    default: "directory"
+    default: "single"
     optional: False
     format:
       - ome.tif
+      - tif
     folder_name: ""
     file_count: single
     unique_string:
-      - "cycle"
+      - "*"
     section_id: "outputs"
     mode: "beginner"
     depth: False
@@ -114,16 +116,16 @@ outputs:
     pyramidal: True
 
 parameters:
-  - name: output
+  - name: output_filename
     type: textbox
-    label: "Output File"
-    description: "Output file path. If it ends in .ome.tif a pyramidal OME-TIFF is written; if it ends in .tif and contains {cycle} and {channel} placeholders, single-channel plain TIFFs are written. A leading directory path must already exist."
-    default: "ashlar_output.ome.tif"
-    cli_tag: "--output"
+    label: "Output Filename"
+    description: "The output filename. If it ends in .ome.tif a pyramidal OME-TIFF is written; if it ends in .tif and contains {cycle} and {channel} placeholders, single-channel plain TIFFs are written. WARNING: plain .tif output is currently broken in ASHLAR (it crashes writing the file). Use a .ome.tif filename. A leading directory path must already exist."
     optional: False
-    section_id: "input-args"
-    mode: "beginner"
-    output_dir_set: True
+    section_id: outputs
+    mode: beginner
+    default: "ashlar_output.ome.tif"
+    cli_tag: "-o"
+    cli_order: 4
   - name: align_channel
     type: integer
     label: "Alignment Channel"
@@ -187,13 +189,12 @@ parameters:
   - name: output_channels
     type: textbox
     label: "Output Channels"
-    description: "Output only the specified channels for each cycle, given as space-separated indices (e.g. '0 1 2'). Numbering starts at 0. Leave blank to output all channels."
+    description: "Output only the specified channels for each cycle, given as space-separated indices (e.g. 0 1 2). Numbering starts at 0. Leave blank to output all channels."
     default: ""
     cli_tag: "--output-channels"
     optional: True
     section_id: "advanced-args"
     mode: "advanced"
-    output_dir_set: False
   - name: filter_sigma
     type: float
     label: "Filter Sigma"

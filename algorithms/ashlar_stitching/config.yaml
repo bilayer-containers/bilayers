@@ -1,0 +1,237 @@
+citations:
+  - name: "ASHLAR: combines multi-tile microscopy images into a high-dimensional mosaic image."
+    doi: 10.1093/bioinformatics/btac544
+    license: "MIT"
+    description: "ASHLAR stitches and registers multi-tile, multi-cycle whole-slide microscopy images"
+
+docker_image:
+  org: docker.io/labsyspharm
+  name: ashlar
+  tag: "1.20.0"
+  platform: "linux/amd64"
+
+algorithm_folder_name: "ashlar_stitching"
+
+exec_function:
+  name: "generate_cli_command"
+  cli_command: "ashlar"
+  hidden_args:
+
+inputs:
+  - name: input_images
+    type: image
+    label: Drag and drop all images to be stitched (one file per cycle)
+    subtype:
+      - grayscale
+      - color
+    description: "Image file(s) to be processed, one per cycle"
+    cli_tag: ""
+    cli_order: 1
+    default: "directory"
+    optional: False
+    format:
+      - tiff
+      - ome.tiff
+    folder_name: ""
+    file_count: multiple
+    unique_string:
+      - "*"
+    section_id: "inputs"
+    mode: "beginner"
+    depth: False
+    timepoints: False
+    tiled: True
+    pyramidal: False
+  - name: ffp
+    type: image
+    label: Flat-field profile image(s)
+    subtype:
+      - grayscale
+    description: "Flat-field illumination correction profile image. Specify one common file for all cycles or one file per cycle; channel counts must match input files."
+    cli_tag: "--ffp"
+    cli_order: 2
+    default: "directory"
+    optional: True
+    format:
+      - tiff
+      - ome.tiff
+    folder_name: ""
+    file_count: multiple
+    unique_string:
+      - "ffp"
+    section_id: "inputs"
+    mode: "advanced"
+    depth: False
+    timepoints: False
+    tiled: True
+    pyramidal: False
+  - name: dfp
+    type: image
+    label: Dark-field profile image(s)
+    subtype:
+      - grayscale
+    description: "Dark-field illumination correction profile image. Specify one common file for all cycles or one file per cycle; channel counts must match input files."
+    cli_tag: "--dfp"
+    cli_order: 3
+    default: "directory"
+    optional: True
+    format:
+      - tiff
+      - ome.tiff
+    folder_name: ""
+    file_count: multiple
+    unique_string:
+      - "dfp"
+    section_id: "inputs"
+    mode: "advanced"
+    depth: False
+    timepoints: False
+    tiled: True
+    pyramidal: False
+
+outputs:
+  - name: output_images
+    type: image
+    label: "Stitched mosaic images"
+    subtype:
+      - color
+      - grayscale
+    description: "Stitched and registered mosaic output images"
+    cli_tag: "None"
+    cli_order: 0
+    default: "single"
+    optional: False
+    format:
+      - ome.tif
+      - tif
+    folder_name: ""
+    file_count: single
+    unique_string:
+      - "*"
+    section_id: "outputs"
+    mode: "beginner"
+    depth: False
+    timepoints: False
+    tiled: True
+    pyramidal: True
+
+parameters:
+  - name: output_filename
+    type: textbox
+    label: "Output Filename"
+    description: "The output filename. If it ends in .ome.tif a pyramidal OME-TIFF is written; if it ends in .tif and contains {cycle} and {channel} placeholders, single-channel plain TIFFs are written. WARNING: plain .tif output is currently broken in ASHLAR (it crashes writing the file). Use a .ome.tif filename. A leading directory path must already exist."
+    optional: False
+    section_id: outputs
+    mode: beginner
+    default: "ashlar_output.ome.tif"
+    cli_tag: "-o"
+    cli_order: 4
+  - name: align_channel
+    type: integer
+    label: "Alignment Channel"
+    description: "Channel number to use for image alignment (numbering starts at 0)"
+    default: 0
+    cli_tag: "--align-channel"
+    optional: True
+    section_id: "input-args"
+    mode: "beginner"
+  - name: maximum_shift
+    type: float
+    label: "Maximum Shift"
+    description: "Maximum allowed per-tile corrective shift in microns"
+    default: 15
+    cli_tag: "--maximum-shift"
+    optional: True
+    section_id: "input-args"
+    mode: "beginner"
+
+  # Advanced Usage
+  - name: flip_x
+    type: checkbox
+    label: "Flip Tile Positions X"
+    description: "Flip tile grid positions horizontally"
+    default: False
+    cli_tag: "--flip-x"
+    append_value: False
+    optional: True
+    section_id: "advanced-args"
+    mode: "advanced"
+  - name: flip_y
+    type: checkbox
+    label: "Flip Tile Positions Y"
+    description: "Flip tile grid positions vertically"
+    default: False
+    cli_tag: "--flip-y"
+    append_value: False
+    optional: True
+    section_id: "advanced-args"
+    mode: "advanced"
+  - name: flip_mosaic_x
+    type: checkbox
+    label: "Flip Mosaic X"
+    description: "Flip the final mosaic image horizontally"
+    default: False
+    cli_tag: "--flip-mosaic-x"
+    append_value: False
+    optional: True
+    section_id: "advanced-args"
+    mode: "advanced"
+  - name: flip_mosaic_y
+    type: checkbox
+    label: "Flip Mosaic Y"
+    description: "Flip the final mosaic image vertically"
+    default: False
+    cli_tag: "--flip-mosaic-y"
+    append_value: False
+    optional: True
+    section_id: "advanced-args"
+    mode: "advanced"
+  - name: output_channels
+    type: textbox
+    label: "Output Channels"
+    description: "Output only the specified channels for each cycle, given as space-separated indices (e.g. 0 1 2). Numbering starts at 0. Leave blank to output all channels."
+    default: ""
+    cli_tag: "--output-channels"
+    optional: True
+    section_id: "advanced-args"
+    mode: "advanced"
+  - name: filter_sigma
+    type: float
+    label: "Filter Sigma"
+    description: "Width in pixels of the Gaussian filter applied to images before alignment; use to suppress noise (0 disables filtering)"
+    default: 0
+    cli_tag: "--filter-sigma"
+    optional: True
+    section_id: "advanced-args"
+    mode: "advanced"
+  - name: pyramid
+    type: checkbox
+    label: "Pyramid Output"
+    description: "Write output as a single pyramidal TIFF."
+    default: False
+    cli_tag: "--pyramid"
+    append_value: False
+    optional: True
+    section_id: "input-args"
+    mode: "beginner"
+  - name: tile_size
+    type: integer
+    label: "Tile Size"
+    description: "Pyramid tile dimensions in pixels (only used with pyramidal output)"
+    default: 1024
+    cli_tag: "--tile-size"
+    optional: True
+    section_id: "advanced-args"
+    mode: "advanced"
+  - name: plates
+    type: checkbox
+    label: "Plate Mode"
+    description: "Enable multi-well plate mode for HTS data."
+    default: False
+    cli_tag: "--plates"
+    append_value: False
+    optional: True
+    section_id: "advanced-args"
+    mode: "advanced"
+
+display_only:

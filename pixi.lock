@@ -2760,6 +2760,10 @@ packages:
   - types-pyyaml ; extra == 'dev'
   - bilayers[interfaces] ; extra == 'dev'
   - bilayers[plugins] ; extra == 'dev'
+  - bilayers[docs] ; extra == 'dev'
+  - bilayers[nox] ; extra == 'dev'
+  - bilayers[test] ; extra == 'dev'
+  - bilayers[lint] ; extra == 'dev'
   requires_python: '>=3.9'
 - pypi: git+https://github.com/bilayer-containers/bilayers-algorithms.git?rev=dev#dee9d5a693d52e590786e2c5c9f4b38db35c2386
   name: bilayers-algorithms

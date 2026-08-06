@@ -3,18 +3,18 @@ repos:
     hooks:
       - id: nox-format
         name: nox -s format
-        entry: pixi run -e dockerdev nox -s format -r
+        entry: env -u GIT_DIR -u GIT_INDEX_FILE -u GIT_WORK_TREE -u GIT_PREFIX pixi run -e dockerdev nox -s format -r
         language: system
         pass_filenames: false
 
       - id: nox-lint
         name: nox -s lint
-        entry: pixi run -e dockerdev nox -s lint -r
+        entry: env -u GIT_DIR -u GIT_INDEX_FILE -u GIT_WORK_TREE -u GIT_PREFIX pixi run -e dockerdev nox -s lint -r
         language: system
         pass_filenames: false
-      
+
       - id: forbidden-interface-imports
         name: Check for forbidden imports in interface generators
-        entry: pixi run -e dockerdev python scripts/check_forbidden_interface_imports.py
+        entry: env -u GIT_DIR -u GIT_INDEX_FILE -u GIT_WORK_TREE -u GIT_PREFIX pixi run -e dockerdev python scripts/check_forbidden_interface_imports.py
         language: system
         pass_filenames: false

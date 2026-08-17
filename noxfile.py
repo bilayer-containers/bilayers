@@ -221,7 +221,20 @@ def build_algorithm(session: nox.Session) -> None:
         # Proceed to build from Dockerfile if pull fails
         if os.path.exists(dockerfile_path):
             print("Pull failed; attempting to build locally from Dockerfile.")
-            session.run(DOCKER_CMD, "buildx", "build", platform_opt, platform, "-t", image_name, "-f", dockerfile_path, str(algorithm_path), external=True)
+            session.run(
+                DOCKER_CMD,
+                "buildx",
+                "build",
+                *docker_builder_args(),
+                platform_opt,
+                platform,
+                "-t",
+                image_name,
+                "-f",
+                dockerfile_path,
+                str(algorithm_path),
+                external=True,
+            )
             # Save the locally built Docker image name in a file
             with open(tmp_path("docker_image_name.txt"), "w") as file:
                 file.write(image_name)

@@ -4,7 +4,6 @@
 # Fail the workflow at the end if any build failures occurred
 
 
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 if ! ALGO_PKG_PATH=$(python -c "import bilayers_algorithms; import os; print(os.path.dirname(bilayers_algorithms.__file__))"); then
   echo "Could not locate installed bilayers_algorithms package."
   exit 1

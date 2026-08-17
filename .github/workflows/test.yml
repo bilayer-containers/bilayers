@@ -19,15 +19,11 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v5
 
-      # locked: false so CI re-resolves each run. Sibling repos are pulled via
-      # git+...@dev (a moving branch), so we intentionally test against the
-      # latest dev of those dependencies rather than a frozen pixi.lock snapshot.
-      # Python version comes from pyproject.toml/pixi, not a hardcoded CI value.
       - name: Set up pixi
         uses: prefix-dev/setup-pixi@v0.10.0
         with:
           environments: dev
-          locked: false
+          locked: true
           cache: true
 
       - name: Run tests

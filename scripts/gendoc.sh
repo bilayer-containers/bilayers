@@ -4,6 +4,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PKG_ROOT="$("$SCRIPT_DIR"/pkg_path.sh)"
 PROJ_ROOT="$(cd "$PKG_ROOT/../.." && pwd)"
 
+# $1 optionally overrides the schema file path (defaults to schema_path.sh's output)
 SCHEMA_FILE=${1:-"$("$SCRIPT_DIR"/schema_path.sh)"}
 DOCS_DIR="${PROJ_ROOT}/docs/developer"
 # DOCS_OUTPUT = "${DOCS_DIR}/schema_docs.md"

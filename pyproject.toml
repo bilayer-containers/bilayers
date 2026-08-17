@@ -21,16 +21,16 @@ license = "BSD-3-Clause"
 requires-python = ">=3.9"
 dependencies = [
     "pyyaml>=6.0.1,<7",
-    "bilayers-schema @ git+https://github.com/bilayer-containers/bilayers-schema.git@dev",
-    "bilayers-targets @ git+https://github.com/bilayer-containers/bilayers-targets.git@dev",
-    "bilayers-algorithms @ git+https://github.com/bilayer-containers/bilayers-algorithms.git@dev",
+    "bilayers-schema @ git+https://github.com/bilayer-containers/bilayers-schema.git",
+    "bilayers-targets @ git+https://github.com/bilayer-containers/bilayers-targets.git",
+    "bilayers-algorithms @ git+https://github.com/bilayer-containers/bilayers-algorithms.git",
 ]
 
 [project.optional-dependencies]
-gradio = ["bilayers-targets[gradio] @ git+https://github.com/bilayer-containers/bilayers-targets.git@dev"]
-jupyter = ["bilayers-targets[jupyter] @ git+https://github.com/bilayer-containers/bilayers-targets.git@dev"]
-streamlit = ["bilayers-targets[streamlit] @ git+https://github.com/bilayer-containers/bilayers-targets.git@dev"]
-cellprofiler_plugin = ["bilayers-targets[cellprofiler_plugin] @ git+https://github.com/bilayer-containers/bilayers-targets.git@dev"]
+gradio = ["bilayers-targets[gradio] @ git+https://github.com/bilayer-containers/bilayers-targets.git"]
+jupyter = ["bilayers-targets[jupyter] @ git+https://github.com/bilayer-containers/bilayers-targets.git"]
+streamlit = ["bilayers-targets[streamlit] @ git+https://github.com/bilayer-containers/bilayers-targets.git"]
+cellprofiler_plugin = ["bilayers-targets[cellprofiler_plugin] @ git+https://github.com/bilayer-containers/bilayers-targets.git"]
 
 # Convenience Group Extras
 interfaces = [

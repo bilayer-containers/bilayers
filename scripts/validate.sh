@@ -11,6 +11,7 @@ else
     ALGO_PKG_PATH=$(python -c "import bilayers_algorithms; import os; print(os.path.dirname(bilayers_algorithms.__file__))")
 fi
 
+# $1 optionally overrides the schema file path (defaults to schema_path.sh's output)
 SCHEMA_FILE=${1:-"$("$SCRIPT_DIR"/schema_path.sh)"}
 # List of algorithms and interfaces
 ALGORITHM_NAMES=("cellpose_inference" "classical_segmentation" "instanseg_inference" "stardist_inference")

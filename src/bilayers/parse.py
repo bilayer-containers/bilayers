@@ -74,8 +74,10 @@ def build_cli_sequence(parsed_config: Config) -> dict[str, dict[str, Any]]:
         item["source"] = "input"
         all_items.append(item)
 
-    # Add parameters
+    # Add parameters, except secrets which are passed as environment variables, never on the CLI
     for name, config in parameters.items():
+        if config.get("type") == "secret":
+            continue
         item = dict(config)
         item["name"] = name
         item["source"] = "parameter"

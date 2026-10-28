@@ -56,6 +56,15 @@ def test_secret_with_default_fails_validation(tmp_path, value) -> None:
     assert out != "No issues found" and "[ERROR]" in out and "/parameters/" in out
 
 
+def test_secret_without_allowed_suffix_fails_validation(tmp_path) -> None:
+    config = cellsam_config()
+    parameter(config, SECRET_NAME)["name"] = "path"
+    path = tmp_path / "config.yaml"
+    path.write_text(yaml.safe_dump(config, sort_keys=False))
+    result = subprocess.run(["bilayers_cli", "validate", str(path)], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    assert result.returncode != 0 and "env var 'PATH'" in result.stderr
+
+
 def test_non_secret_without_default_validates(tmp_path) -> None:
     config = cellsam_config()
     del parameter(config, "model_name")["default"]

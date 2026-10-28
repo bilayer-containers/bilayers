@@ -3,6 +3,8 @@ from pathlib import Path
 from typing import Any, Optional, Union
 from bilayers_schema import Config, Input, Output, Parameter, Citations, DockerImage, ExecFunction
 
+SECRET_SUFFIXES = ("_TOKEN", "_KEY", "_SECRET", "_PASSWORD")
+
 
 def load_config(config_path: Union[str, Path]) -> dict[str, Any]:
     # even if already type Path, convert
@@ -14,6 +16,11 @@ def load_config(config_path: Union[str, Path]) -> dict[str, Any]:
 
     with open(config_path, "r") as file:
         config = yaml.safe_load(file)
+
+    for param in (config or {}).get("parameters") or []:
+        env_name = str(param.get("name", "")).upper().replace(" ", "_")
+        if param.get("type") == "secret" and not env_name.endswith(SECRET_SUFFIXES):
+            raise ValueError(f"Secret '{param.get('name')}' becomes env var '{env_name}', which must end with one of {', '.join(SECRET_SUFFIXES)}")
 
     return config
 
@@ -74,8 +81,10 @@ def build_cli_sequence(parsed_config: Config) -> dict[str, dict[str, Any]]:
         item["source"] = "input"
         all_items.append(item)
 
-    # Add parameters
+    # Add parameters, except secrets which are passed as environment variables, never on the CLI
     for name, config in parameters.items():
+        if config.get("type") == "secret":
+            continue
         item = dict(config)
         item["name"] = name
         item["source"] = "parameter"

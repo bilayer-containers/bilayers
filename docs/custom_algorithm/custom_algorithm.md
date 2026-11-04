@@ -21,8 +21,8 @@ To successfully generate an interface, familiarize yourself with the key **Bilay
     - [Gradio](/supported-interfaces#gradio) - A no code web UI
     - [Streamlit](/supported-interfaces#streamlit) - A no code web UI, alternative to Gradio
     - [Jupyter Notebook](/supported-interfaces#jupyter-notebook) - Interactive notebooks
-    - [CellProfiler plugin](/supported-interfaces#cellprofiler-plugin) - A generated module for an existing CellProfiler installation, not a container
+    - [CellProfiler plugin](/supported-interfaces#cellprofiler-plugin) - A generated module for an existing CellProfiler installation that runs your algorithm's image in Docker or Podman
 3. [Understanding config.yaml requirements](/understanding-config)
-   The **config.yaml** file (the spec file) is a declarative description of your container: what it takes in, what it produces, and which knobs a user is allowed to turn. You write one per algorithm, and it lives in your algorithms folder in the  [bilayers-algorithms](https://github.com/bilayer-containers/bilayers-algorithms) repository.
-4. [Steps to create your custom Algorithm’s Interfaces](/steps-to-create)
+   The **config.yaml** file (the spec file) is a declarative description of your container: what it takes in, what it produces, and which knobs a user is allowed to turn. You write one per algorithm, and it lives in your algorithm's folder in the [bilayers-algorithms](https://github.com/bilayer-containers/bilayers-algorithms) repository.
+4. [Wrap a New Algorithm](/wrap-algorithm)
    Once you’ve selected an interface type, configured config.yaml, and prepared a compatible Docker image, follow the Step-by-Step Guide to generate your UI automatically.

@@ -106,8 +106,8 @@ COPY --from=<upstream_image>:<tag> <library_path> <library_path>
 You can run these templates to check if your base image is compatible with the Bilayers wrappers:
 ```{code} bash
 # is Python and pip reachable at build time?
-docker run --rm --entrypoint sh <your_image> -c 'PY=$(command -v python || command -v python3); echo "$PY"; "$PY" -m pip --version
+docker run --rm --entrypoint sh <your_image> -c 'PY=$(command -v python || command -v python3); echo "$PY"; "$PY" -m pip --version'
 
 # are they still reachable after ENTRYPOINT runs?
-docker run --rm <your_image> sh -c 'PY=$(command -v python || command -v python3); echo "$PY"; "$PY" --version; "$PY" -m pip --version
+docker run --rm <your_image> sh -c 'PY=$(command -v python || command -v python3); echo "$PY"; "$PY" --version; "$PY" -m pip --version'
 ```

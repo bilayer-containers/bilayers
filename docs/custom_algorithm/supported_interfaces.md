@@ -14,7 +14,7 @@ Bilayers supports four targets, grouped into two families.
 2. **Streamlit** – A no-code web-based UI, an alternative to Gradio
 3. **Jupyter Notebook** – An interactive coding environment
 
-**Plugins** are generated source files for a tool the user already has. There is no container to run:
+**Plugins** are generated source files for a tool the user already has. The plugin itself is not packaged as an image; it runs your algorithm's base image in Docker or Podman when the module executes:
 
 4. **CellProfiler Plugin** – A module for an existing CellProfiler installation
 
@@ -46,6 +46,6 @@ Jupyter Notebooks offer a flexible, interactive environment where users can run 
 
 **Best for:** Users who already work in CellProfiler and want your algorithm as a step in an existing pipeline.
 
-Unlike the interfaces above, this target produces a Python module rather than a container. Drop the generated file into your CellProfiler plugins directory and your algorithm appears as a module in the pipeline builder. [Learn More](https://plugins.cellprofiler.org/)
+Unlike the interfaces above, this target produces a Python module rather than an interface image. Drop the generated file into your CellProfiler plugins directory and your algorithm appears as a module in the pipeline builder. When the module runs, it starts your algorithm's base image (the `docker_image` in `config.yaml`) in Docker or Podman, so one of them must be installed and running. [Learn More](https://plugins.cellprofiler.org/)
 
 Bilayers derives the module's category from the combination of input and output types declared in your `config.yaml`, placing it under Image Processing, Image Segmentation, Object Processing, or Measurement. Some combinations have no CellProfiler equivalent, in which case plugin generation stops with an error, leaving the other targets unaffected.

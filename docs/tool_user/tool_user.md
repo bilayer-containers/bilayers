@@ -6,7 +6,7 @@ authors:
       - Broad Institute of MIT and Harvard
 ---
 
-Bilayers provides pre-configured Docker images for widely used bioimage analysis algorithms, each bundled with an interactive web interface (Gradio) or a Jupyter Notebook UI. These images are hosted on DockerHub, enabling researchers and developers to run deep-learning models seamlessly without manual dependency management.
+Bilayers provides pre-configured Docker images for widely used bioimage analysis algorithms, each bundled with an interactive web interface (Gradio or Streamlit) or a Jupyter Notebook UI. These images are hosted on DockerHub, enabling researchers and developers to run deep-learning models seamlessly without manual dependency management.
 
 **New to Docker?** Learn the basics in [this introductory blog post on Docker](https://carpenter-singh-lab.broadinstitute.org/docker_for_biologists)
 
@@ -16,13 +16,13 @@ Bilayers provides pre-configured Docker images for widely used bioimage analysis
     - For Mac: [Docker Desktop for Mac](https://docs.docker.com/desktop/install/mac-install/)
     - For Windows: [Docker Desktop for Windows](https://docs.docker.com/desktop/install/windows-install/)
 
-2. DockerHub Account
+2. DockerHub Account (optional)
     Bilayers retrieves pre-built images from DockerHub. 
     ![DockerDesktopLook](../images/tool_user/docker_desktop_look.png)
 
-    You’ll need a DockerHub account to pull and run images.  
-    Sign up for DockerHub if you don’t have an account.  
-    Log in via the command line:
+    Bilayers images are public, so you can pull them without an account. Signing in to a
+    free DockerHub account raises DockerHub's pull rate limit, which helps if you pull
+    many images. To sign in from the command line:
     ```{code} bash
     docker login
     ```

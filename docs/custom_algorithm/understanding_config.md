@@ -7,19 +7,44 @@ authors:
 ---
 To define an interface for your algorithm, it is essential to understand the structure and key components of the `config.yaml` file (aka spec file).
 
-The config.yaml file specifies how the interface interacts with the algorithm and is located at: `bilayers/src/bilayers/algorithms/algorithm_name/config.yaml`.   
+The config.yaml file specifies how the interface interacts with the algorithm and is located in the [bilayers-algorithms](https://github.com/bilayer-containers/bilayers-algorithms) repository at `src/bilayers_algorithms/algorithm_name/config.yaml`.  
 Here, `algorithm_name` should accurately represent the task, such as `cellpose_inference` or `cellpose_training`.
 
 Each config.yaml contains key sections  that define how an algorithm integrates with an interface. These sections include: `citations`, `docker_image`, `algorithm_folder_name`, `exec_function`, `inputs`, `outputs`, `parameters`, and `display_only`. The skeleton structure can be copied from an existing example.
 
 Once defined, the config.yaml is processed to generate an executable CLI command, where user-specified inputs are mapped to command-line arguments, facilitating algorithm execution and output retrieval.
 
+## Fill it out with a form
+
+You don't have to write the YAML by hand. Two tools give you a form for each section and produce a `config.yaml` you can download:
+
+| Tool | What it's like | Good to know |
+| --- | --- | --- |
+| [**Bilayers Config Generator**](https://bilayer-containers.github.io/bilayers-config-generator/) | A web page with a form per section (citations, docker image, exec function and hidden args, inputs, outputs, parameters, display-only). The YAML updates live beside the form, and you can edit it directly before you **Copy** or **Download** it. | Built by hand, so a brand-new schema field may take a while to show up. |
+| [**Bilayers schema form**](https://bilayers-schema.streamlit.app/) (Streamlit) | A form generated automatically from the current `schema.yaml` on `bilayers-schema` main. Optional fields are tucked into expandable sections. Finish with **Download your config file here**. | Always matches the latest schema, because it reads the schema itself. |
+
+:::{important}
+A form gets the structure right, but it can't tell what your tool expects. You still need to know what each field does, because the choices you make decide the command your tool receives and where the app looks for results. In particular:
+
+- Anything the tool needs on its command line must be an `input` or a `parameter`. `display_only` fields are never passed to the tool.
+- `cli_tag` and `cli_order` decide the exact command. A wrong tag or order produces a command your tool rejects.
+- The output-folder parameter needs `output_dir_set: True`, or the app won't find your results.
+- `unique_string` decides which output files the CellProfiler plugin picks up.
+
+Read the sections below before you fill out the form, and check the result afterwards:
+
+```bash
+bilayers_cli validate config.yaml        # does it match the schema?
+bilayers_cli generate config.yaml --cli  # is this the command my tool expects?
+```
+:::
+
 ## Key Sections of `config.yaml`
 
 - **citations**: References relevant research citation, doi, and license associated with the algorithm.
 - **docker_image**: Defines the Docker image used for execution, including the organization, repository name, and tag.
-- **algorithm_folder_name**: Specifies the directory where the generated Gradio and Jupyter Notebook interface files are stored.
-- **exec_function**: Defines the function that converts the config.yaml (i.e. spec file) into a Gradio or Jupyter Notebook interface. It also includes the base command (e.g., python -m cellpose) that serves as the entry point for execution and a special **`hidden_args`** section if applicable.
+- **algorithm_folder_name**: Names the generated interface files' folder (`dist/<interface>/<algorithm_folder_name>/`) and the published image (`bilayer/<algorithm_folder_name>`).
+- **exec_function**: Defines the function that converts the config.yaml (i.e. spec file) into the interfaces' command line. It also includes the base command (e.g., python -m cellpose) that serves as the entry point for execution and a special **`hidden_args`** section if applicable.
 - **inputs**: Refers to the elements that are translated into command-line arguments for our supported interfaces. Additionally, they contribute to adapting the Bilayers specification for integration with workflow management tools such as Snakemake, Nextflow, or WDL.
 - **outputs**: Primarily used for refining the Bilayers specification to be compatible with workflow management tools like Snakemake, Nextflow, or WDL. While they may or may not include a cli_tag, they are **NOT** involved in generating our interfaces.
 - **parameters**: Defines arguments that contribute to CLI command construction. Each parameter under this section either takes user-specified values or defaults when not explicitly provided.
@@ -123,7 +148,7 @@ docker_image:
 ```
 
 ## Defining algorithm_folder_name
-This specifies the folder where the generated Gradio and Jupyter Notebook interface files will be stored. The folder name should follow the convention of the `config.yaml`'s parent folder, such as `algorithm_inference` or `algorithm_training`.  
+This names the folder the generated interface files are written to (`dist/<interface>/<algorithm_folder_name>/`) and the DockerHub repository the interface images are published under (`bilayer/<algorithm_folder_name>`). The folder name should follow the convention of the `config.yaml`'s parent folder, such as `algorithm_inference` or `algorithm_training`.  
 Example: algorithm_folder_name: "cellpose_inference"
 
 ## Defining exec_function
@@ -470,7 +495,7 @@ The name field must be unique within each section—inputs, outputs, parameters,
 
   <tr>
       <td><code>label</code></td>
-      <td>User-facing name displayed in the UI (Gradio, Jupyter).</td>
+      <td>User-facing name displayed in the UI.</td>
       <td>inputs, parameters, display_only, outputs</td>
   </tr>
 
@@ -525,7 +550,7 @@ The name field must be unique within each section—inputs, outputs, parameters,
   <tr>
       <td><code>section_id</code></td>
       <td>Groups related UI elements together (e.g., "inputs", "advanced settings").</td>
-      <td>iinputs, parameters, display_only, outputs</td>
+      <td>inputs, parameters, display_only, outputs</td>
   </tr>
 
   <tr>
@@ -580,48 +605,24 @@ mode: ""
 - **type**: This defines how the parameter will appear on the user interface. For example, if you want a Checkbox, the `type` should be set to `checkbox`.
   Example: ```type: checkbox```
 
-    Below is a list of supported types and how they will appear in Gradio or Jupyter Notebook.
+    Below is a list of supported types and how they will appear in each interface.
 
     :::{table} supported type in config.yaml
     :label: tbl:config-supported-types
 
     <table>
     <tr>
-        <th rowspan="1">type(in config.yaml file)</th>
-        <th rowspan="1">Gradio</th>
-        <th rowspan="1">Jupyter Notebook</th>
+        <th>type (in config.yaml file)</th>
+        <th>Gradio</th>
+        <th>Jupyter Notebook</th>
+        <th>Streamlit</th>
     </tr>
-
-    <tr>
-        <td>checkbox</td>
-        <td>Checkbox</td>
-        <td>Checkbox</td>
-    </tr>
-
-    <tr>
-        <td>integer</td>
-        <td>Number (decimal values allowed)</td>
-        <td>IntText (allows to put Integer values)</td>
-    </tr>
-
-    <tr>
-        <td>float</td>
-        <td>Number (decimal value allowed)</td>
-        <td>FloatText (allows to put Float values)</td>
-    </tr>
-
-    <tr>
-        <td>radio</td>
-        <td>Radio</td>
-        <td>RadioButtons</td>
-    </tr>
-
-    <tr>
-        <td>dropdown</td>
-        <td>Dropdown</td>
-        <td>Dropdown</td>
-    </tr>
-    
+    <tr><td>checkbox</td><td>Checkbox</td><td>Checkbox</td><td>checkbox</td></tr>
+    <tr><td>integer</td><td>Number</td><td>IntText (integer values only)</td><td>number_input</td></tr>
+    <tr><td>float</td><td>Number</td><td>FloatText (decimal values)</td><td>number_input</td></tr>
+    <tr><td>textbox</td><td>Textbox</td><td>Textarea</td><td>text_input</td></tr>
+    <tr><td>radio</td><td>Radio</td><td>RadioButtons</td><td>radio</td></tr>
+    <tr><td>dropdown</td><td>Dropdown</td><td>Dropdown</td><td>selectbox (multiselect if <code>multiselect: True</code>)</td></tr>
     </table>
     :::
 
@@ -855,3 +856,12 @@ mode: ""
 `display_only` functions similarly to `parameters`, but the key difference is that these objects are only displayed in the user interface and are not appended to the `cli_command`. They are non-interactive, meaning users cannot modify the values, which will always reflect the default specified in the `config.yaml` file.
 
 Since they are not part of the `cli_command`, you can omit `cli_tag` and `cli_order`. For the rest of the structure, you can reuse the template from `parameters` based on the object type.
+
+:::{important}
+Anything the tool needs on its command line must be an `input` or a `parameter`, never `display_only`. In particular, the output-folder field (the textbox with `output_dir_set`) must be a `parameter`: the interfaces use it to create the run folder, pass it to the tool, and collect the results. If it is under `display_only`, the run's outputs silently come back empty.
+
+To check what your config actually produces, print the generated command:
+```{code} bash
+pixi run -e dev bilayers_cli generate path/to/config.yaml --cli
+```
+:::

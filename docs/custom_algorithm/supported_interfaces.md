@@ -6,23 +6,68 @@ authors:
       - Broad Institute of MIT and Harvard
 ---
 
-Bilayers supports two primary interface types for interacting with deep-learning models:
+Bilayers supports four targets, grouped into two families.
 
-1. **Gradio** – A no-code web-based UI  
-2. **Jupyter Notebook** – An interactive coding environment
+**Interfaces** are self-contained applications. Bilayers generates the application and layers it onto your algorithm image, producing a container you can run:
 
-## Gradio : Instant Web-Based Interface
+1. **Gradio** – A no-code web-based UI
+2. **Streamlit** – A no-code web-based UI, an alternative to Gradio
+3. **Jupyter Notebook** – An interactive coding environment
 
+**Plugins** are generated source files for a tool the user already has. The plugin itself is not packaged as an image; it runs your algorithm's base image in Docker or Podman when the module executes:
+
+4. **CellProfiler Plugin** – A module for an existing CellProfiler installation
+
+## How the targets work
+
+All four targets are generated from the same `config.yaml`, by code in the [`bilayers-targets`](https://github.com/bilayer-containers/bilayers-targets) repository. Where they differ is in how they're delivered and how they run your tool:
+
+```{mermaid}
+flowchart TB
+    CFG["your config.yaml"] --> GEN["bilayers-targets generators"]
+    GEN --> GR["app.py"]
+    GEN --> JU["generated_notebook.ipynb"]
+    GEN --> ST["streamlit_app.py"]
+    GEN --> CP["run&lt;algorithm&gt;.py"]
+    subgraph ifaces["Interfaces: app + tool in one image"]
+        GR --> I1["bilayer/&lt;algorithm&gt;:&lt;version&gt;-gradio"]
+        JU --> I2["bilayer/&lt;algorithm&gt;:&lt;version&gt;-jupyter"]
+        ST --> I3["bilayer/&lt;algorithm&gt;:&lt;version&gt;-streamlit"]
+    end
+    subgraph plug["Plugin: a file for CellProfiler"]
+        CP --> P1["CellProfiler starts your<br/>base image when the module runs"]
+    end
+```
+
+- **Interfaces** are built on top of your algorithm's Docker image. The app and your tool live in the same container, and the app runs your tool as a command when the user clicks Run.
+- **The plugin** is a single Python file. It isn't packaged into an image; instead, when the module runs inside CellProfiler, it starts your algorithm's base image with Docker or Podman, passes the images in, and reads the results back.
+
+For the full picture, including the generator code, the templates, and diagrams of each target at run time, see [Inside bilayers-targets](../architecture/targets.md).
+
+## Gradio
 **Best for:** Users who want a simple, interactive web-based UI without coding.
 
 Gradio provides a quick and easy way to demo your machine learning model through a user-friendly web interface, making it accessible to anyone, anywhere. [Learn More](https://www.gradio.app/)
 
-![GradioApp](../images/custom_algorithm/Gradio-Interface.png)
 
----
+
+## Streamlit
+
+**Best for:** Users who want a web-based UI and prefer Streamlit's layout and widgets over Gradio's.
+
+Streamlit turns Python scripts into shareable web apps with minimal effort. It covers the same ground as Gradio, so pick whichever suits your users better. [Learn More](https://streamlit.io/)
 
 ## Jupyter Notebook
 
+**Best for:** Users who want to read, modify, and rerun the code that drives the algorithm.
+
 Jupyter Notebooks offer a flexible, interactive environment where users can run and modify code. [Learn More](https://jupyter-notebook.readthedocs.io/en/latest/)
 
-![JupyterNB](../images/custom_algorithm/JupyterNB.png)
+
+## CellProfiler Plugin
+
+**Best for:** Users who already work in CellProfiler and want your algorithm as a step in an existing pipeline.
+
+Unlike the interfaces above, this target produces a Python module rather than an interface image. Drop the generated file into your CellProfiler plugins directory and your algorithm appears as a module in the pipeline builder. When the module runs, it starts your algorithm's base image (the `docker_image` in `config.yaml`) in Docker or Podman, so one of them must be installed and running. [Learn More](https://plugins.cellprofiler.org/)
+
+Bilayers derives the module's category from the combination of input and output types declared in your `config.yaml`, placing it under Image Processing, Image Segmentation, Object Processing, or Measurement. Some combinations have no CellProfiler equivalent, in which case plugin generation stops with an error, leaving the other targets unaffected.

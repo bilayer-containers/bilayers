@@ -1,34 +1,59 @@
 ---
-title: What is Bilayers?
+title: Bilayers
 authors:
   - name: Cimini Lab
     affiliations:
       - Broad Institute of MIT and Harvard
 ---
 
-Bilayers is an **open-source specification** designed to characterize software containers in terms of expected inputs, outputs, and tunable parameters. Its primary aim is to make bioimage analysis deep-learning algorithms more accessible by automatically generating intuitive, no-terminal-required user interfaces. Bilayers ensures that software containers can be deployed consistently across different environments, from small prototypes to large-scale workflows, without the risk of version mismatch.
+## Browse the Catalog
 
-Bilayers currently supports interfaces like Gradio and Jupyter Notebook and plans to expand to others, such as CellProfiler plugins. Each algorithm-interface pair is containerized and published as a Docker image on DockerHub, allowing users to run the tool effortlessly by spinning up a Docker container. You can start using it right away — No Coding or Complicated Installations needed!
+If you're here to analyze images, start with the catalog. Each tool runs in a Docker container on your computer, and you use it from your web browser.
 
+::::{grid} 1 1 2 2
 
-In addition to using pre-built Docker images provided by Bilayers, you can also create your own web interface or Jupyter Notebook interface for custom deep-learning algorithms. You can even fine-tune algorithms from the BioImage Model Zoo by simply filling out a configuration file (as long as the algorithm's Docker image is available on DockerHub). Bilayers offers a simple, interactive interface with widgets like number inputs, text fields, radio buttons, dropdown menus, image upload options and more. This makes it easy to tweak parameters and input your images for analysis, giving you the desired output with minimal effort.
+:::{card} Algorithms
+:link: ../user_guide/catalog_algorithms.md
+**Cellpose, StarDist, InstanSeg, classical segmentation, Gaussian smoothing**
 
-It ensures that the same containerized algorithms used in prototypes can be reliably deployed in large-scale workflows without version drift, whether on local machines, high-performance computing (HPC) systems, or in the cloud. This also helps sysadmins create and validate workflows for end users in tools like Nextflow or Snakemake.
+What each tool does and which image to pull.
+:::
 
-Bilayers is open-source, and we welcome contributions! You can create an interface for your custom deep-learning algorithm using Bilayers, and if you’d like, we can publish it on DockerHub to benefit the broader bioimaging community.
+:::{card} Interfaces
+:link: ../user_guide/catalog_interfaces.md
+**Gradio, Jupyter Notebook, Streamlit, CellProfiler plugin**
 
-## What are containers?
-Containers are lightweight piece of software that contains all the code, libraries, and dependencies that the application needs to run. Containers do not have their own operating system, they get resources from the host operating system. They are also easily portable as they contain all the libraries and the dependencies to run the application.
+The different ways you can work with a tool, and what each one looks like.
+:::
 
-## What is Docker?
-Docker is a containerization platform that allows you to package code and dependencies into a Docker image that can be run on any machine. It allows your application to be separated from your infrastructure. The image that you created is portable, so you can run it on any machine that has Docker installed.
+::::
 
-## Quick Links
-### Getting Started with Pre-Built Docker Images
-Learn how to quickly start using Bilayers with our pre-built Docker images. [Start Here](../tool-user)
+## What is Bilayers?
 
-### Generating Interfaces for Your Custom Algorithm
-Follow our guide to create a web or Jupyter Notebook interface for your deep-learning algorithm. [Learn More](../custom-algorithm)
+A lot of good bioimage analysis software only runs from the command line, which keeps it out of reach for many of the biologists it was written for. Bilayers is our attempt to fix that.
 
-### Contribution & Developer Guidelines
-Want to contribute to Bilayers? Check out our developer guidelines and learn how to submit your custom interfaces. Read the Guidelines
+Bilayers is an open-source specification for describing a containerized tool: the files it takes in, the files it produces, and the parameters you can adjust. A tool is described once, in a single `config.yaml`. From that file, Bilayers generates user interfaces for it. You get a Gradio or Streamlit web app, a Jupyter notebook, or a CellProfiler plugin, with the right widgets for each parameter (number fields, dropdowns, checkboxes, image uploads).
+
+Each web app or notebook is packaged together with the tool into a Docker image and published on DockerHub. To use one, you pull the image, start it, and open it in your browser. You don't need to install Python, set up dependencies, or type commands.
+
+### One container, from laptop to cluster
+
+The container you use to try a tool on a few images is the same one you can run on an HPC cluster or in the cloud later. Since the software inside never changes, results don't drift between versions. This also helps people building larger pipelines in Nextflow or Snakemake: they can test a step interactively, then use the same image in production.
+
+### Bring your own tool
+
+If your tool has a command-line interface and a Docker image, you can wrap it. You write the `config.yaml` (by hand, or with a form like the [Bilayers Config Generator](https://bilayer-containers.github.io/bilayers-config-generator/)), and Bilayers generates the interfaces. If you'd like to share it, open a pull request and we can publish the images for others to use. See [Wrap a New Algorithm](../developer_guide/wrap_algorithm.md) to get started.
+
+## Containers and Docker, briefly
+
+A **container** bundles a program together with everything it needs to run: code, libraries, and system dependencies. Containers share the host computer's operating system rather than carrying their own, so they're much lighter than a virtual machine. Because everything is inside, a container behaves the same no matter which machine it runs on.
+
+**Docker** is the most widely used tool for building and running containers. A Docker *image* is the packaged program. You can download it from a registry like DockerHub and run it on any computer that has Docker (or Podman) installed. Bilayers publishes its tools as Docker images for this reason.
+
+## Where to go next
+
+- **Watch the introduction.** A short video overview, plus slides and posters, on [Talks & Tutorials](../resources/talks_tutorials.md).
+- **Run a tool.** Pull an image and open the interface. See the [User Guide](../user_guide/user_guide.md).
+- **Wrap your own tool.** Describe it in a config and generate interfaces. See [Wrap a New Algorithm](../developer_guide/wrap_algorithm.md).
+- **See how it works.** The four repositories and how a config becomes an interface. See [Architecture](../architecture/overview.md).
+- **Contribute.** Local setup, testing, and the PR workflow. See the [Developer Guide](../developer_guide/developer_guide.md).

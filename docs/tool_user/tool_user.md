@@ -12,13 +12,22 @@ Bilayers provides pre-configured Docker images for widely used bioimage analysis
 
 ## Prerequisites
 
-1. Install Docker Desktop
+1. **Install Docker Desktop**
+
     - For Mac: [Docker Desktop for Mac](https://docs.docker.com/desktop/install/mac-install/)
     - For Windows: [Docker Desktop for Windows](https://docs.docker.com/desktop/install/windows-install/)
 
-2. DockerHub Account (optional)
-    Bilayers retrieves pre-built images from DockerHub. 
-    ![DockerDesktopLook](../images/tool_user/docker_desktop_look.png)
+2. **DockerHub Account (optional)**
+
+    Bilayers retrieves pre-built images from DockerHub.
+
+    ```{figure} ../images/tool_user/docker_desktop_look.png
+    :alt: Docker Desktop window
+    :width: 100%
+    :align: center
+
+    Docker Desktop
+    ```
 
     Bilayers images are public, so you can pull them without an account. Signing in to a
     free DockerHub account raises DockerHub's pull rate limit, which helps if you pull
@@ -28,8 +37,8 @@ Bilayers provides pre-configured Docker images for widely used bioimage analysis
     ```
     You’ll be prompted to enter your DockerHub username and password.
 
-3. Verify Your Docker Installation (Optional but Recommended)
-   
+3. **Verify Your Docker Installation (optional but recommended)**
+
     To confirm Docker is installed correctly, run:
     ```{code} bash
     docker run hello-world

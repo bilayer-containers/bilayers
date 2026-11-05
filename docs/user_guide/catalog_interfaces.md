@@ -25,4 +25,17 @@ for now.
 
 See [Supported Interfaces](../custom_algorithm/supported_interfaces.md) for more on each.
 
-<!-- TODO: replace with an auto-generated table from the bilayers-targets registry (#128). -->
+<!--
+TODO (#128): auto-generate this page. Plan:
+1. Same script as #127 (scripts/build_catalog.py; draft at ../build_catalog_draft.py).
+2. One row per entry in bilayers_targets.available_ifaces, so a newly registered interface appears
+   automatically.
+3. Derive: Interface vs Plugin (module path under interfaces/ or plugins/), description and license
+   from the generator's CITATION constant, port from EXPOSE in its *.Dockerfile (no Dockerfile =
+   plugin), and the file it writes by running generate() once on a real config into a temp folder.
+   Name that folder "algorithm": the CellProfiler plugin derives its file name from the folder name.
+4. Keep a small hand-written "Best for" map in the script; unknown interfaces get "—".
+5. Gap: the CellProfiler generator has no CITATION constant, so it has no description. Add one in
+   bilayers-targets, or keep a fallback in the script.
+6. Run in deploy.yml before `myst build`, together with #127.
+-->

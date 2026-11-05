@@ -52,6 +52,8 @@ project:
           title: The Config Model
         - file: docs/custom_algorithm/supported_interfaces.md
           title: Supported Interfaces
+        - file: docs/architecture/targets.md
+          title: Inside bilayers-targets
 
     - title: Testing Guide
       children:
@@ -69,6 +71,9 @@ project:
 
     - file: docs/faq/faq.md
       title: FAQ
+
+    - file: docs/resources/talks_tutorials.md
+      title: Talks & Tutorials
 
   exports:
     - format: pdf
@@ -90,6 +95,8 @@ site:
       url: /versioning
     - title: FAQ
       url: /faq
+    - title: Talks & Tutorials
+      url: /talks-tutorials
   options:
     favicon: docs/images/standard/favicon.ico
     logo: docs/images/standard/Bilayers_Logo.png

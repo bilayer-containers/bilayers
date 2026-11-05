@@ -76,10 +76,22 @@ Gradio apps are launched with `share=True`, so besides `localhost` Gradio also p
 
 - Gradio: Start the Image, assign it a name, and under Ports map host port `7878` to the container's `7878`
 
-![cellposeXgradio](../images/tool_user/cellposeXgradio.mp4)
+```{figure} ../images/tool_user/cellposeXgradio.mp4
+:alt: Running the Cellpose Gradio image from Docker Desktop
+:width: 100%
+:align: center
+
+Running Cellpose with the Gradio interface from Docker Desktop
+```
 
 ---
 
 - Jupyter: Map host port `7878` to the container's `7878`, and use the Volume option to mount your data directory to `/bilayers/input_images`
 
-![cellposeXjupyter](../images/tool_user/cellposeXjupyter.mp4)
+```{figure} ../images/tool_user/cellposeXjupyter.mp4
+:alt: Running the Cellpose Jupyter image from Docker Desktop
+:width: 100%
+:align: center
+
+Running Cellpose with the Jupyter interface from Docker Desktop
+```

@@ -14,6 +14,31 @@ Each config.yaml contains key sections  that define how an algorithm integrates 
 
 Once defined, the config.yaml is processed to generate an executable CLI command, where user-specified inputs are mapped to command-line arguments, facilitating algorithm execution and output retrieval.
 
+## Fill it out with a form
+
+You don't have to write the YAML by hand. Two tools give you a form for each section and produce a `config.yaml` you can download:
+
+| Tool | What it's like | Good to know |
+| --- | --- | --- |
+| [**Bilayers Config Generator**](https://bilayer-containers.github.io/bilayers-config-generator/) | A web page with a form per section (citations, docker image, exec function and hidden args, inputs, outputs, parameters, display-only). The YAML updates live beside the form, and you can edit it directly before you **Copy** or **Download** it. | Built by hand, so a brand-new schema field may take a while to show up. |
+| [**Bilayers schema form**](https://bilayers-schema.streamlit.app/) (Streamlit) | A form generated automatically from the current `schema.yaml` on `bilayers-schema` main. Optional fields are tucked into expandable sections. Finish with **Download your config file here**. | Always matches the latest schema, because it reads the schema itself. |
+
+:::{important}
+A form gets the structure right, but it can't tell what your tool expects. You still need to know what each field does, because the choices you make decide the command your tool receives and where the app looks for results. In particular:
+
+- Anything the tool needs on its command line must be an `input` or a `parameter`. `display_only` fields are never passed to the tool.
+- `cli_tag` and `cli_order` decide the exact command. A wrong tag or order produces a command your tool rejects.
+- The output-folder parameter needs `output_dir_set: True`, or the app won't find your results.
+- `unique_string` decides which output files the CellProfiler plugin picks up.
+
+Read the sections below before you fill out the form, and check the result afterwards:
+
+```bash
+bilayers_cli validate config.yaml        # does it match the schema?
+bilayers_cli generate config.yaml --cli  # is this the command my tool expects?
+```
+:::
+
 ## Key Sections of `config.yaml`
 
 - **citations**: References relevant research citation, doi, and license associated with the algorithm.

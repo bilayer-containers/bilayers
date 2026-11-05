@@ -33,11 +33,23 @@ Splitting them keeps each concern independently versioned, tested, and installab
 
 ## How they depend on each other
 
+```{mermaid}
+flowchart TB
+    B["bilayers<br/>(orchestrator)"]
+    T["bilayers-targets<br/>(generators)"]
+    A["bilayers-algorithms<br/>(configs + Dockerfiles)"]
+    S["bilayers-schema<br/>(schema.yaml + types)"]
+    B --> T
+    B --> A
+    B --> S
+    T --> S
+    A --> S
 ```
-bilayers  ─▶  bilayers-schema
-   │      ─▶  bilayers-targets    ─▶  bilayers-schema
-   └──────▶  bilayers-algorithms  ─▶  bilayers-schema
-```
+:::{admonition} TODO
+:class: warning
+Replace the above one with Nodar's architecture flowchart
+:::
+
 
 `bilayers` depends on all three; `bilayers-targets` and `bilayers-algorithms` depend
 only on `bilayers-schema`. The siblings are installed from git (their `main`

@@ -37,4 +37,20 @@ See [Run a Bilayers Image](../tool_user/steps_to_run.md) for the exact tags to p
 `bilayers-algorithms` also contains `example_algorithm`, an empty config template for
 wrapping a new tool; it is not a runnable algorithm.
 
-<!-- TODO: replace with an auto-generated table sourced from bilayers-algorithms configs (#127). -->
+<!--
+TODO (#127): auto-generate this page. Plan:
+1. Add scripts/build_catalog.py (draft exists outside the repo at ../build_catalog_draft.py) that
+   reads every config.yaml in the *installed* bilayers_algorithms package, skipping templates with
+   no docker_image (example_algorithm).
+2. Group by category using determine_category_from_matrix from the CellProfiler generator
+   (bilayers_targets.plugins.cellprofiler_plugin.generate), which classifies by input/output types.
+3. Columns: algorithm (link to its folder), description (first citation description), base image,
+   published interface images, citation DOI links. Treat "doi_number" / "license_details" as empty.
+4. Published images: query DockerHub tags. Repo names are inconsistent, so try bilayer/<folder>,
+   then <folder> without _inference/_training, then docker_image.name when org is bilayer.
+   Match both "-gradio" and "_pixi_gradio" tag styles. A network failure must not fail the build.
+5. Run the script in deploy.yml before `myst build` (needs setup-pixi with the dev env, like test.yml),
+   and mark the generated file "do not edit".
+6. Open question: commit the generated page too (local `myst start` works) or only build it in CI.
+-->
+<!-- Do this together with #128 (catalog_interfaces.md): same script, same deploy step. -->

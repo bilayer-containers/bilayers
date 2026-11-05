@@ -65,6 +65,12 @@ display_only:
 
 - See [The Config Model](../custom_algorithm/understanding_config.md) for what each
   field means.
+- To fill it out with a form instead of typing YAML, use the
+  [Bilayers Config Generator](https://bilayer-containers.github.io/bilayers-config-generator/)
+  or the [Bilayers schema form](https://bilayers-schema.streamlit.app/), then save the
+  download as `config.yaml` in your folder. Either one saves typing, but you still need
+  to understand the fields: the form can't know which flags your tool expects. Step 4
+  shows how to check the result.
 - See [Choosing a Base Docker Image](../custom_algorithm/right_base_docker_image.md)
   for the image selection.
 
@@ -111,7 +117,7 @@ set `ALGORITHMS_PATH=../bilayers-algorithms/src/bilayers_algorithms`.
 
 The generated interfaces run your tool inside its Docker image. Build the base image
 and an interface image and run one end-to-end (see the
-[Testing Guide](../testing/developer_testing.md)) to confirm real inputs produce the
+[Testing in a container](../testing/developer_testing.md#container-testing)) to confirm real inputs produce the
 expected outputs.
 
 ## 6. Open a pull request

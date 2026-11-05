@@ -32,9 +32,13 @@ dict it's handed.
 
 Generators must be **standalone**. They may **not** import `bilayers.parse` or
 `bilayers.generate`, and must not import `project_path` from `bilayers`. Everything the
-generator needs arrives in the plain `InterfaceInput` dict. This is enforced by
-`scripts/check_forbidden_interface_imports.py` in the orchestrator's pre-commit — it's
-what lets `bilayers-targets` be released independently.
+generator needs arrives in the plain `InterfaceInput` dict. That's what lets
+`bilayers-targets` be released independently.
+
+The orchestrator's pre-commit runs `scripts/check_forbidden_interface_imports.py` for
+this, but the script still looks for generators at their old location inside `bilayers`,
+so it currently checks nothing. Until it's pointed at `bilayers-targets`, reviewers need
+to check this by hand.
 
 ## Keep command-building consistent
 
@@ -43,7 +47,8 @@ command-building logic in one place and reuse it across templates rather than
 re-implementing per interface — divergent copies drift and produce subtly different
 commands.
 
-:::{note}
-Expand this page with a walkthrough of an existing generator (e.g. `gradio`) as the
-canonical example.
-:::
+## Learn from an existing generator
+
+[Inside bilayers-targets](../architecture/targets.md) walks through how the existing
+generators are put together: the registry, the steps every `generate()` follows, and
+how each target runs the tool. The Gradio generator is the simplest one to copy from.

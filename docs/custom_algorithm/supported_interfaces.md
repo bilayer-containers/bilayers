@@ -18,9 +18,31 @@ Bilayers supports four targets, grouped into two families.
 
 4. **CellProfiler Plugin** – A module for an existing CellProfiler installation
 
+## How the targets work
 
+All four targets are generated from the same `config.yaml`, by code in the [`bilayers-targets`](https://github.com/bilayer-containers/bilayers-targets) repository. Where they differ is in how they're delivered and how they run your tool:
 
-<br>
+```{mermaid}
+flowchart TB
+    CFG["your config.yaml"] --> GEN["bilayers-targets generators"]
+    GEN --> GR["app.py"]
+    GEN --> JU["generated_notebook.ipynb"]
+    GEN --> ST["streamlit_app.py"]
+    GEN --> CP["run&lt;algorithm&gt;.py"]
+    subgraph ifaces["Interfaces: app + tool in one image"]
+        GR --> I1["bilayer/&lt;algorithm&gt;:&lt;version&gt;-gradio"]
+        JU --> I2["bilayer/&lt;algorithm&gt;:&lt;version&gt;-jupyter"]
+        ST --> I3["bilayer/&lt;algorithm&gt;:&lt;version&gt;-streamlit"]
+    end
+    subgraph plug["Plugin: a file for CellProfiler"]
+        CP --> P1["CellProfiler starts your<br/>base image when the module runs"]
+    end
+```
+
+- **Interfaces** are built on top of your algorithm's Docker image. The app and your tool live in the same container, and the app runs your tool as a command when the user clicks Run.
+- **The plugin** is a single Python file. It isn't packaged into an image; instead, when the module runs inside CellProfiler, it starts your algorithm's base image with Docker or Podman, passes the images in, and reads the results back.
+
+For the full picture, including the generator code, the templates, and diagrams of each target at run time, see [Inside bilayers-targets](../architecture/targets.md).
 
 ## Gradio
 **Best for:** Users who want a simple, interactive web-based UI without coding.

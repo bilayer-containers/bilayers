@@ -38,7 +38,8 @@ interface generators. To keep drift minimal:
 - Validate downstream against your branch before merge (see
   [Developer Testing → Testing a schema change](../testing/developer_testing.md)).
 
-:::{note}
+:::{admonition} TODO
+:class: warning
 Flesh this out with the concrete PR-template checklist and review expectations once
 they're finalized.
 :::
